@@ -1,0 +1,12 @@
+name: solid_lints
+description: Solid Dart lints for complex projects.
+version: 0.0.1
+# homepage: https://www.example.com
+
+environment:
+  sdk: '>=2.14.4 <3.0.0'
+
+dependencies:
+  dart_code_metrics: ^4.8.0
+  lints: ^1.0.0
+

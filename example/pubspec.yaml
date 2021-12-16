@@ -1,0 +1,14 @@
+name: solid_lints_example
+description: A starting point for Dart libraries or applications.
+publish_to: none
+
+environment:
+  sdk: '>=2.14.4 <3.0.0'
+
+dev_dependencies:
+  dart_code_metrics: ^4.8.0
+  solid_lints:
+    path: ../
+
+
+
