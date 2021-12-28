@@ -9,10 +9,10 @@ Add dependency in your pubspec.yaml:
 
 ```yaml
 dev_dependencies:
-    solid_lints: any
+  solid_lints: any
 ```
 
-And then include `solid_lints` analysis options configuration:
+And then include `solid_lints` into your project top-level `analysis_options.yaml`:
 
 ```yaml
 include: package:solid_lints/analysis_options.yaml
