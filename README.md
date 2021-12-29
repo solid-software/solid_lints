@@ -18,6 +18,17 @@ And then include `solid_lints` into your project top-level `analysis_options.yam
 include: package:solid_lints/analysis_options.yaml
 ```
 
+Then you can see suggestions in your IDE or you can run checks manually:
+
+```bash
+dart analyze;
+dart run dart_code_metrics:metrics analyze lib;
+dart run dart_code_metrics:metrics check-unused-files lib;
+dart run dart_code_metrics:metrics check-unused-l10n lib;
+
+```
+
+Learn more: https://github.com/dart-code-checker/dart-code-metrics#cli
 # Badge
 
 To indicate that your project is using Solid Lints, you can use the following badge:

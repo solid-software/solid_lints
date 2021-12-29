@@ -25,8 +25,8 @@ dart_code_metrics:
 #    source-lines-of-code: 50
 #    lines-of-code: 50
   rules:
-    - avoid-non-null-assertion
     - avoid-late-keyword
+    - avoid-non-null-assertion
     - avoid-returning-widgets
     - avoid-unnecessary-setstate
     - newline-before-return
@@ -43,8 +43,8 @@ linter:
     - annotate_overrides
     - avoid_bool_literals_in_conditional_expressions
     - avoid_catching_errors
-    - avoid_dynamic_calls
     - avoid_double_and_int_checks
+    - avoid_dynamic_calls
     - avoid_empty_else
     - avoid_escaping_inner_quotes
     - avoid_field_initializers_in_const_classes
@@ -127,9 +127,11 @@ linter:
     - prefer_constructors_over_static_methods
     - prefer_contains
     - prefer_equal_for_default_values
-    # Not used, as the default app template has a single statement return code generated.
-    # We are unaware of any substantial evidence that improves code when using expression function body vs single statement return.
-    # - prefer_expression_function_bodies
+# Not used, as the default app template has a single statement return code generated.
+# While this could be beneficial for Dart projects and maintaining code style, we are unaware
+# of any substantial evidence that improves code when using expression function body
+# vs single statement return. We are considering including this in Dart only lints.
+#   - prefer_expression_function_bodies
     - prefer_final_fields
     - prefer_final_in_for_each
     - prefer_final_locals
@@ -193,8 +195,8 @@ linter:
 #    - use_decorated_box
     - use_full_hex_values_for_flutter_colors
     - use_function_type_syntax_for_parameters
-    - use_is_even_rather_than_modulo
     - use_if_null_to_convert_nulls_to_bools
+    - use_is_even_rather_than_modulo
     - use_named_constants
     - use_rethrow_when_possible
     - use_setters_to_change_properties
