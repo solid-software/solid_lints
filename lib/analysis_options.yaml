@@ -22,7 +22,9 @@ dart_code_metrics:
     cyclomatic-complexity: 10
     number-of-arguments: 4
     number-of-parameters: 4
-#    source-lines-of-code: 50
+    # Reference: Code Complete: Chapter 7 High-Quality Routines -> 7.4 How Long Can a Routine Be?
+    # https://dl.acm.org/doi/book/10.5555/1096143
+    source-lines-of-code: 200
 #    lines-of-code: 50
   rules:
     - avoid-late-keyword
