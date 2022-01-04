@@ -1,3 +1,8 @@
+## 0.0.4
+
+- Set maximum method length to 200
+- Set maximum parameters list length to 7
+
 ## 0.0.3
 
 - Configure rules based on Flutter 2.5 (Dart 2.14.4)
