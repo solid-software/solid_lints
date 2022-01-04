@@ -166,6 +166,8 @@ linter:
 #    - sized_box_shrink_expand
     - slash_for_doc_comments
     - sort_child_properties_last
+# We tend to use class organization close to standard Java convention, where fields come first.
+# Martin, R. C. & Coplien, J. O. (2013), Chapter 10: Classes. Clean code: a handbook of agile software craftsmanship , Prentice Hall , Upper Saddle River, NJ [etc.] . 136
 #    - sort_constructors_first
     - sort_pub_dependencies
     - sort_unnamed_constructors_first
