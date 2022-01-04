@@ -1,3 +1,7 @@
+## 0.0.5
+
+- Remove the `sort_constructors_first` rule
+
 ## 0.0.4
 
 - Set maximum method length to 200
