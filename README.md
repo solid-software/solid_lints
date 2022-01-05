@@ -18,6 +18,13 @@ And then include `solid_lints` into your project top-level `analysis_options.yam
 include: package:solid_lints/analysis_options.yaml
 ```
 
+Also you can use a specialized rule set designed for Dart tests.
+Add an `analysis_options.yaml` file under the `test/` directory, and include the ruleset:
+
+```yaml
+include: package:solid_lints/analysis_options_test.yaml
+```
+
 Then you can see suggestions in your IDE or you can run checks manually:
 
 ```bash
