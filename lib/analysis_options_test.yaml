@@ -13,7 +13,7 @@ dart_code_metrics:
 # - Allows passing the mock inside functions that require non-null params,
 #   without any extra force-unwraps or null checks.
 # - Uninitialized test mocks are clearly traceable.
-# - Prodices minimal visual clutter.
+# - Produces minimal visual clutter.
 
 # Alternatives considered:
 
