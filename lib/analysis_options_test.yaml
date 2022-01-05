@@ -2,4 +2,6 @@ include: package:solid_lints/analysis_options.yaml
 
 dart_code_metrics:
   rules:
+    # `late` keyword is useful for setting up custom stubs and mocks that get
+    # reinstantiated on each test run.
     avoid-late-keyword: false
