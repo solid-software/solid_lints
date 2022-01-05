@@ -1,3 +1,7 @@
+## 0.0.6
+
+- Add a separate anayisis options file for tests
+
 ## 0.0.5
 
 - Remove the `sort_constructors_first` rule
