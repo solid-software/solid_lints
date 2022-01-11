@@ -30,12 +30,31 @@ dart_code_metrics:
     # We use source-lines-of-code instead of this as we don't want to count comment or blank lines.
     # lines-of-code: 50
   rules:
+    - avoid-global-state
     - avoid-late-keyword
     - avoid-non-null-assertion
     - avoid-returning-widgets
     - avoid-unnecessary-setstate
+    - avoid-unnecessary-type-assertions
+    - avoid-unnecessary-type-casts
+    - avoid-unrelated-type-assertions
+    - avoid-unused-parameters
+    - double-literal-format
+    - member-ordering-extended:
+        order:
+          - fields
+          - getters-setters
+          - constructors
+          - methods
     - newline-before-return
+    - no-empty-block
+    - no-equal-then-else
     - no-magic-number
+    - prefer-conditional-expressions
+    - prefer-first
+    - prefer-last
+    # This improves navigation by matching file content and file name.
+    - prefer-match-file-name
   anti-patterns:
     - long-method
     - long-parameter-list

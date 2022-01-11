@@ -48,6 +48,8 @@ dart_code_metrics:
 #      many places inside the test code, adding uninformative visual noise.
 #    - The use of this operator is also discouraged by the main ruleset.
     avoid-late-keyword: false
+# In test files it's ok to place stubs or other helper classes.
+    prefer-match-file-name: false
   anti-patterns:
 # Same as for `source-lines-of-code`
     long-method: false
