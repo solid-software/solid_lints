@@ -29,11 +29,13 @@ Then you can see suggestions in your IDE or you can run checks manually:
 
 ```bash
 dart analyze;
-dart run dart_code_metrics:metrics analyze lib;
-dart run dart_code_metrics:metrics check-unused-files lib;
-dart run dart_code_metrics:metrics check-unused-l10n lib;
+dart run dart_code_metrics:metrics analyze lib test;
+dart run dart_code_metrics:metrics check-unused-files lib test;
+dart run dart_code_metrics:metrics check-unused-l10n lib test;
 
 ```
+Beware that some of the `dart_code_metrics` checks are not displayed in IDE so running checks 
+manually or in your actions (CI) is essential.
 
 Learn more: https://github.com/dart-code-checker/dart-code-metrics#cli
 # Badge

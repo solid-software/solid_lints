@@ -6,7 +6,6 @@ environment:
   sdk: '>=2.14.4 <3.0.0'
 
 dev_dependencies:
-  dart_code_metrics: ^4.8.0
   solid_lints:
     path: ../
   test: ^1.20.1
