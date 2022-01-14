@@ -1,3 +1,7 @@
+## 0.0.7
+
+- Add more useful DCM rules.
+
 ## 0.0.6
 
 - Add a separate anayisis options file for tests
