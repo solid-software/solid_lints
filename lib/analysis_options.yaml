@@ -5,9 +5,6 @@ analyzer:
   plugins:
     - dart_code_metrics
   strong-mode:
-    # We've seen errors tied to use of implicit operations similar to the ones described in
-    # https://dart.dev/guides/language/analysis-options#enabling-additional-type-checks.
-    # When we do things explicitly there is less room for errors.
     implicit-casts: false
     implicit-dynamic: false
 
@@ -18,16 +15,10 @@ analyzer:
 
 dart_code_metrics:
   metrics:
-    # NIST 500-235 item 2.5
     cyclomatic-complexity: 10
-    
-    # McConnell, S. (2004), Chapter 7.5: High-Quality Routines: How To Use Routine Parameters. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 174-180
     number-of-parameters: 7
-    
-    # McConnell, S. (2004), Chapter 7.4: High-Quality Routines: How Long Can a Routine Be?. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 173-174
     source-lines-of-code: 200
 
-    # We use source-lines-of-code instead of this as we don't want to count comment or blank lines.
     # lines-of-code: 50
   rules:
     - avoid-global-state
@@ -53,7 +44,6 @@ dart_code_metrics:
     - prefer-conditional-expressions
     - prefer-first
     - prefer-last
-    # This improves navigation by matching file content and file name.
     - prefer-match-file-name
   anti-patterns:
     - long-method
@@ -151,10 +141,6 @@ linter:
     - prefer_constructors_over_static_methods
     - prefer_contains
     - prefer_equal_for_default_values
-# Not used, as the default app template has a single statement return code generated.
-# While this could be beneficial for Dart projects and maintaining code style, we are unaware
-# of any substantial evidence that improves code when using expression function body
-# vs single statement return. We are considering including this in Dart only lints.
 #   - prefer_expression_function_bodies
     - prefer_final_fields
     - prefer_final_in_for_each
@@ -187,8 +173,6 @@ linter:
 #    - sized_box_shrink_expand
     - slash_for_doc_comments
     - sort_child_properties_last
-# We tend to use class organization close to standard Java convention, where fields come first.
-# Martin, R. C. & Coplien, J. O. (2013), Chapter 10: Classes. Clean code: a handbook of agile software craftsmanship , Prentice Hall , Upper Saddle River, NJ [etc.] . 136
 #    - sort_constructors_first
     - sort_pub_dependencies
     - sort_unnamed_constructors_first

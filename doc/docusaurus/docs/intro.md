@@ -1,10 +1,14 @@
+---
+sidebar_position: 1
+---
+
 # Solid Lints
 
 [![style: solid](https://img.shields.io/badge/style-solid-orange)](https://pub.dev/packages/solid_lints)
 
 Flutter/Dart lints configuration based on software engineering industry standards (ISO/IEC, NIST) and best practices.
 
-# Usage
+## Usage
 
 Add dependency in your pubspec.yaml:
 
@@ -41,7 +45,7 @@ manually or in your actions (CI) is essential.
 
 Learn more: <https://github.com/dart-code-checker/dart-code-metrics#cli>
 
-# Badge
+## Badge
 
 To indicate that your project is using Solid Lints, you can use the following badge:
 
