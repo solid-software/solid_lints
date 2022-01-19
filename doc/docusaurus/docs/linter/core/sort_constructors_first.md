@@ -1,5 +1,7 @@
 # sort_constructors_first
 
+State: **Disabled**.
+
 We tend to use class organization close to standard Java convention, where fields come first.
 
 Reference:
