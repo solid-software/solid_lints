@@ -1,3 +1,7 @@
+## 0.0.8
+
+- Exclude generated files
+
 ## 0.0.7
 
 - Add more useful DCM rules.

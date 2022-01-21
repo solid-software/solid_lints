@@ -1,4 +1,24 @@
 analyzer:
+  exclude:
+    # General generated files
+    - '**/*.g.dart'
+    - '**/*.gr.dart'
+
+    # Flutter
+    - 'lib/generated_plugin_registrant.dart'
+
+    # mockito
+    - '**/*.mocks.dart'
+
+    # freezed
+    - '**/*.freezed.dart'
+
+    # protobuf
+    - '**/*.pb.dart'
+
+    # test_coverage
+    - test/.test_coverage.dart
+
   # Dart Code Metrics plugin (https://dartcodemetrics.dev/) provides many additional rules
   # that helped to automate some pieces of our internal team code style based on the best
   # industry practices.
@@ -20,10 +40,10 @@ dart_code_metrics:
   metrics:
     # NIST 500-235 item 2.5
     cyclomatic-complexity: 10
-    
+
     # McConnell, S. (2004), Chapter 7.5: High-Quality Routines: How To Use Routine Parameters. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 174-180
     number-of-parameters: 7
-    
+
     # McConnell, S. (2004), Chapter 7.4: High-Quality Routines: How Long Can a Routine Be?. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 173-174
     source-lines-of-code: 200
 
@@ -72,8 +92,8 @@ linter:
     - avoid_empty_else
     - avoid_escaping_inner_quotes
     - avoid_field_initializers_in_const_classes
-# available in later releases
-#    - avoid_final_parameters
+    # available in later releases
+    #    - avoid_final_parameters
     - avoid_function_literals_in_foreach_calls
     - avoid_implementing_value_types
     - avoid_init_to_null
@@ -101,8 +121,8 @@ linter:
     - cancel_subscriptions
     - close_sinks
     - comment_references
-# available in later releases
-#    - conditional_uri_does_not_exist
+    # available in later releases
+    #    - conditional_uri_does_not_exist
     - constant_identifier_names
     - control_flow_in_finally
     - curly_braces_in_flow_control_structures
@@ -130,9 +150,9 @@ linter:
     - literal_only_boolean_expressions
     - no_adjacent_strings_in_list
     - no_duplicate_case_values
-# available in later releases
-#    - no_leading_underscores_for_library_prefixes
-#    - no_leading_underscores_for_local_identifiers
+    # available in later releases
+    #    - no_leading_underscores_for_library_prefixes
+    #    - no_leading_underscores_for_local_identifiers
     - no_logic_in_create_state
     - no_runtimeType_toString
     - non_constant_identifier_names
@@ -151,11 +171,11 @@ linter:
     - prefer_constructors_over_static_methods
     - prefer_contains
     - prefer_equal_for_default_values
-# Not used, as the default app template has a single statement return code generated.
-# While this could be beneficial for Dart projects and maintaining code style, we are unaware
-# of any substantial evidence that improves code when using expression function body
-# vs single statement return. We are considering including this in Dart only lints.
-#   - prefer_expression_function_bodies
+    # Not used, as the default app template has a single statement return code generated.
+    # While this could be beneficial for Dart projects and maintaining code style, we are unaware
+    # of any substantial evidence that improves code when using expression function body
+    # vs single statement return. We are considering including this in Dart only lints.
+    #   - prefer_expression_function_bodies
     - prefer_final_fields
     - prefer_final_in_for_each
     - prefer_final_locals
@@ -180,16 +200,16 @@ linter:
     - public_member_api_docs
     - recursive_getters
     - require_trailing_commas
-# available in later releases
-#    - secure_pubspec_urls
+    # available in later releases
+    #    - secure_pubspec_urls
     - sized_box_for_whitespace
-# available in later releases
-#    - sized_box_shrink_expand
+    # available in later releases
+    #    - sized_box_shrink_expand
     - slash_for_doc_comments
     - sort_child_properties_last
-# We tend to use class organization close to standard Java convention, where fields come first.
-# Martin, R. C. & Coplien, J. O. (2013), Chapter 10: Classes. Clean code: a handbook of agile software craftsmanship , Prentice Hall , Upper Saddle River, NJ [etc.] . 136
-#    - sort_constructors_first
+    # We tend to use class organization close to standard Java convention, where fields come first.
+    # Martin, R. C. & Coplien, J. O. (2013), Chapter 10: Classes. Clean code: a handbook of agile software craftsmanship , Prentice Hall , Upper Saddle River, NJ [etc.] . 136
+    #    - sort_constructors_first
     - sort_pub_dependencies
     - sort_unnamed_constructors_first
     - test_types_in_equals
@@ -217,8 +237,8 @@ linter:
     - unrelated_type_equality_checks
     - unsafe_html
     - use_build_context_synchronously
-# available in later releases
-#    - use_decorated_box
+    # available in later releases
+    #    - use_decorated_box
     - use_full_hex_values_for_flutter_colors
     - use_function_type_syntax_for_parameters
     - use_if_null_to_convert_nulls_to_bools
