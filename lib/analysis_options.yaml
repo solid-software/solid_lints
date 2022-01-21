@@ -1,4 +1,24 @@
 analyzer:
+  exclude:
+    # General generated files
+    - '**/*.g.dart'
+    - '**/*.gr.dart'
+
+    # Flutter
+    - 'lib/generated_plugin_registrant.dart'
+
+    # mockito
+    - '**/*.mocks.dart'
+
+    # freezed
+    - '**/*.freezed.dart'
+
+    # protobuf
+    - '**/*.pb.dart'
+
+    # test_coverage
+    - test/.test_coverage.dart
+
   # Dart Code Metrics plugin (https://dartcodemetrics.dev/) provides many additional rules
   # that helped to automate some pieces of our internal team code style based on the best
   # industry practices.
