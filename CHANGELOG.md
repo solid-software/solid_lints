@@ -1,3 +1,7 @@
+## 0.0.9
+
+- Disable cyclomatic complexity metric for tests
+
 ## 0.0.8
 
 - Exclude generated files
