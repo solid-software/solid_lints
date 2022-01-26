@@ -128,7 +128,7 @@ linter:
     - curly_braces_in_flow_control_structures
     - depend_on_referenced_packages
     - deprecated_consistency
-    - diagnostic_describe_all_properties
+    # - diagnostic_describe_all_properties
     - directives_ordering
     - do_not_use_environment
     - empty_catches
