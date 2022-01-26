@@ -14,6 +14,7 @@ dart_code_metrics:
 # Since we're not using the source-lines-of-code rule, `main()` function in test can 
 # have high cyclomatic complexity.
 # For rationale against splitting up `main()` in tests, see `source-lines-of-code` comments.
+# Also there is a bug in metric calculation: https://github.com/dart-code-checker/dart-code-metrics/issues/663
     cyclomatic-complexity: false
 
   rules:
