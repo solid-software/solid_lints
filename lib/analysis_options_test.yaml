@@ -11,6 +11,11 @@ dart_code_metrics:
 # Both options didn't look right, so we decided that tests are ok to be long.
     source-lines-of-code: false
 
+# Since we're not using the source-lines-of-code rule, `main()` function in test can 
+# have high cyclomatic complexity.
+# For rationale against splitting up `main()` in tests, see `source-lines-of-code` comments.
+    cyclomatic-complexity: false
+
   rules:
   
 # Late keyword is allowed in tests in order to enable the use of custom mocks and

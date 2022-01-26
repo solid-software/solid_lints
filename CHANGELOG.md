@@ -1,6 +1,7 @@
 ## 0.0.9
 
 - Remove `diagnostic_describe_all_properties` rule
+- Disable cyclomatic complexity metric for tests
 
 ## 0.0.8
 
