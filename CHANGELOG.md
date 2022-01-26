@@ -1,3 +1,7 @@
+## 0.0.9
+
+- Remove `diagnostic_describe_all_properties` rule
+
 ## 0.0.8
 
 - Exclude generated files
