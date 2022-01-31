@@ -9,7 +9,7 @@ Add dependency in your pubspec.yaml:
 
 ```yaml
 dev_dependencies:
-  solid_lints: any
+  solid_lints: <INSERT LATEST VERSION>
 ```
 
 And then include `solid_lints` into your project top-level `analysis_options.yaml`:
