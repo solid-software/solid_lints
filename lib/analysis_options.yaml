@@ -8,6 +8,7 @@ analyzer:
     - 'lib/generated_plugin_registrant.dart'
 
     # mockito
+    - '*.mocks.dart'
     - '**/*.mocks.dart'
 
     # freezed
