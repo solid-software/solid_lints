@@ -1,6 +1,6 @@
 ## 0.0.10
 
-- Update `dart_code_metrics` dependency to 4.10.1, pin the version
+- Update `dart_code_metrics` dependency to 4.10.1
 - Ignore `mockito` mocks generated to be alongside source test files
 
 ## 0.0.9
