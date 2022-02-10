@@ -1,5 +1,7 @@
 name: solid_lints
-description: Lints for Dart and Flutter based on software industry standards and best practices.
+description:
+  Lints for Dart and Flutter based on software industry standards and best
+  practices.
 version: 0.0.9
 homepage: https://github.com/solid-software/solid_lints/
 
@@ -7,4 +9,4 @@ environment:
   sdk: '>=2.14.4 <3.0.0'
 
 dependencies:
-  dart_code_metrics: ^4.9.0
+  dart_code_metrics: 4.10.1
