@@ -9,4 +9,4 @@ environment:
   sdk: '>=2.14.4 <3.0.0'
 
 dependencies:
-  dart_code_metrics: 4.10.1
+  dart_code_metrics: ^4.10.1
