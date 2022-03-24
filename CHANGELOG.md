@@ -1,3 +1,7 @@
+## 0.0.11
+
+- Disabe do_not_use_environment as we need to for Flutter for web
+
 ## 0.0.10
 
 - Update `dart_code_metrics` dependency to 4.10.1

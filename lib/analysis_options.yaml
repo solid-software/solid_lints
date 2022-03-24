@@ -131,7 +131,10 @@ linter:
     - deprecated_consistency
     # - diagnostic_describe_all_properties
     - directives_ordering
-    - do_not_use_environment
+    # Pretty much agree with Passy & linter package.
+    # Our use case for Flutter for web where there is no flavors yet.
+    # So using dart-define is helpful.
+    #- do_not_use_environment
     - empty_catches
     - empty_constructor_bodies
     - empty_statements
