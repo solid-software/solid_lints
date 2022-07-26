@@ -1,3 +1,7 @@
+## 0.0.12
+
+- Update to the latest DCM to make sure that it works with latest flutter.
+
 ## 0.0.11
 
 - Disabe do_not_use_environment as we need to for Flutter for web
