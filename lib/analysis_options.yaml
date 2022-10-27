@@ -93,7 +93,7 @@ linter:
     - avoid_empty_else
     - avoid_escaping_inner_quotes
     - avoid_field_initializers_in_const_classes
-    # available in later releases
+    # linter v1.15+
     #    - avoid_final_parameters
     - avoid_function_literals_in_foreach_calls
     - avoid_implementing_value_types
@@ -125,7 +125,7 @@ linter:
     - cast_nullable_to_non_nullable
     - close_sinks
     - comment_references
-    # available in later releases
+    # linter v1.16.0+
     #    - conditional_uri_does_not_exist
     - constant_identifier_names
     - control_flow_in_finally
@@ -157,8 +157,9 @@ linter:
     - literal_only_boolean_expressions
     - no_adjacent_strings_in_list
     - no_duplicate_case_values
-    # available in later releases
+    # linter v1.15+
     #    - no_leading_underscores_for_library_prefixes
+    # linter v1.15+
     #    - no_leading_underscores_for_local_identifiers
     - no_logic_in_create_state
     - no_runtimeType_toString
@@ -207,10 +208,10 @@ linter:
     - public_member_api_docs
     - recursive_getters
     - require_trailing_commas
-    # available in later releases
+    # linter v1.15+
     #    - secure_pubspec_urls
     - sized_box_for_whitespace
-    # available in later releases
+    # linter v1.15+
     #    - sized_box_shrink_expand
     - slash_for_doc_comments
     - sort_child_properties_last
@@ -244,8 +245,10 @@ linter:
     - unrelated_type_equality_checks
     - unsafe_html
     - use_build_context_synchronously
-    # available in later releases
-    #    - use_decorated_box
+    # linter v1.19+
+    - use_colored_box
+    # linter v1.15+
+    - use_decorated_box
     - use_full_hex_values_for_flutter_colors
     - use_function_type_syntax_for_parameters
     - use_if_null_to_convert_nulls_to_bools
