@@ -1,3 +1,7 @@
+## 0.0.13
+
+- enable use_colored_box & use_decorated_box + add more comments about specific lints
+
 ## 0.0.12
 
 - Update to the latest DCM to make sure that it works with latest flutter.
