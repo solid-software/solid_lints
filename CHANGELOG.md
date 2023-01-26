@@ -1,3 +1,7 @@
+## 0.0.14
+
+- Disabe invariant_booleans as it is deprecated in Flutter 3.7
+
 ## 0.0.13
 
 - enable use_colored_box & use_decorated_box + add more comments about specific lints

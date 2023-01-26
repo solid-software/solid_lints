@@ -146,7 +146,7 @@ linter:
     - file_names
     - hash_and_equals
     - implementation_imports
-    # deprecated rule
+    # deprecated rule in Flutter 3.7
     # - invariant_booleans
     - iterable_contains_unrelated_type
     - join_return_with_assignment
