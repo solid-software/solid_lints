@@ -1,3 +1,7 @@
+## 0.0.15
+
+- Add support for Dart 3
+
 ## 0.0.14
 
 - Disabe invariant_booleans as it is deprecated in Flutter 3.7
