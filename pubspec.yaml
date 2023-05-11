@@ -6,7 +6,7 @@ version: 0.0.15
 homepage: https://github.com/solid-software/solid_lints/
 
 environment:
-  sdk: '>=2.4.14 <4.0.0'
+  sdk: '>=2.14.4 <4.0.0'
 
 dependencies:
   dart_code_metrics: ^4.16.0
