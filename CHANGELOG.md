@@ -1,3 +1,15 @@
+## 0.0.16
+
+- Update `dart_code_metrics` dependency to 5.7.3
+- Rename deprecated `member-ordering-extended` to `member-ordering`
+- Add rule for widgets methods order configuration:
+    - initState
+    - build
+    - didChangeDependencies
+    - didUpdateWidget
+    - deactivate
+    - dispose
+
 ## 0.0.15
 
 - Add support for Dart 3
