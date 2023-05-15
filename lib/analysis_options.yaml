@@ -61,12 +61,19 @@ dart_code_metrics:
     - avoid-unrelated-type-assertions
     - avoid-unused-parameters
     - double-literal-format
-    - member-ordering-extended:
+    - member-ordering:
         order:
           - fields
           - getters-setters
           - constructors
           - methods
+        widgets-order:
+          - init-state-method
+          - build-method
+          - did-change-dependencies-method
+          - did-update-widget-method
+          - deactivate-method
+          - dispose-method
     - newline-before-return
     - no-empty-block
     - no-equal-then-else
