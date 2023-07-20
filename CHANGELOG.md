@@ -1,3 +1,7 @@
+## 0.0.17
+
+- Lock DCM version as they switch to proprietary license.
+
 ## 0.0.16
 
 - Update `dart_code_metrics` dependency to 5.7.3
