@@ -1,6 +1,8 @@
 ## 0.0.18
 
-- Add `use_super_parameters` rule
+- Add rules
+  - `use_super_parameters`
+  - `always_put_required_named_parameters_first`
 
 ## 0.0.17
 
