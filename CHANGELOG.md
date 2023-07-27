@@ -3,6 +3,7 @@
 - Add rules
   - `use_super_parameters`
   - `always_put_required_named_parameters_first`
+  - `avoid_redundant_argument_values`
 
 ## 0.0.17
 
