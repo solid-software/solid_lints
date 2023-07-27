@@ -1,3 +1,7 @@
+## 0.0.18
+
+- Add `use_super_parameters` rule
+
 ## 0.0.17
 
 - Lock DCM version as they switch to proprietary license.
