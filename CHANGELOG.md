@@ -1,3 +1,13 @@
+## 0.0.19
+
+- Add rules
+  - `avoid_final_parameters`
+  - `conditional_uri_does_not_exist`
+  - `no_leading_underscores_for_library_prefixes`
+  - `no_leading_underscores_for_local_identifiers`
+  - `secure_pubspec_urls`
+  - `sized_box_shrink_expand`
+
 ## 0.0.18
 
 - Add rules
