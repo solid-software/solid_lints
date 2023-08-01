@@ -5,6 +5,7 @@
   - `conditional_uri_does_not_exist`
   - `no_leading_underscores_for_library_prefixes`
   - `no_leading_underscores_for_local_identifiers`
+  - `noop_primitive_operations`
   - `secure_pubspec_urls`
   - `sized_box_shrink_expand`
 
