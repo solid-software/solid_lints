@@ -2,6 +2,7 @@ import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
 import 'package:solid_lints/cyclomatic_complexity/visitor/cyclomatic_complexity_flow_visitor.dart';
+import 'package:solid_lints/models/metric_rule.dart';
 
 /// A Complexity metric checks content of block and detects more easier solution
 class CyclomaticComplexityMetric extends DartLintRule {
@@ -9,14 +10,11 @@ class CyclomaticComplexityMetric extends DartLintRule {
   /// reaches maximum value.
   static const lintName = 'cyclomatic_complexity_metric';
 
-  /// The additional parameters for this metric.
-  final CyclomaticComplexityParameters additionalParameters;
+  /// Configuration for complexity metric rule.
+  final MetricRule<CyclomaticComplexityParameters> config;
 
   /// Creates a new instance of [CyclomaticComplexityMetric].
-  const CyclomaticComplexityMetric({
-    required this.additionalParameters,
-    required super.code,
-  });
+  CyclomaticComplexityMetric(this.config) : super(code: config.lintCode);
 
   @override
   void run(
@@ -30,7 +28,7 @@ class CyclomaticComplexityMetric extends DartLintRule {
       node.visitChildren(visitor);
 
       if (visitor.complexityEntities.length + 1 >
-          additionalParameters.maxComplexity) {
+          config.parameters.maxComplexity) {
         reporter.reportErrorForNode(code, node);
       }
     });

@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/models/metric_rule.dart';
 import 'package:solid_lints/number_of_parameters/models/number_of_parameters_parameters.dart';
 
 /// A number of parameters metric which checks whether we didn't exceed
@@ -10,14 +11,11 @@ class NumberOfParametersMetric extends DartLintRule {
   /// parameters reaches the maximum value.
   static const lintName = 'number_of_parameters';
 
-  /// The additional parameters for this metric.
-  final NumberOfParametersParameters additionalParameters;
+  /// Configuration for complexity metric rule.
+  final MetricRule<NumberOfParametersParameters> config;
 
   /// Creates a new instance of [NumberOfParametersMetric].
-  const NumberOfParametersMetric({
-    required this.additionalParameters,
-    required super.code,
-  });
+  NumberOfParametersMetric(this.config) : super(code: config.lintCode);
 
   @override
   void run(
@@ -34,7 +32,7 @@ class NumberOfParametersMetric extends DartLintRule {
         _ => 0,
       };
 
-      if (parameters > additionalParameters.maxParameters) {
+      if (parameters > config.parameters.maxParameters) {
         reporter.reportErrorForNode(code, node);
       }
     });
