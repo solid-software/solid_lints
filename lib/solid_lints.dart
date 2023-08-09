@@ -64,7 +64,8 @@ class _SolidLints extends PluginBase {
         name: 'number_of_parameters',
         problemMessage: ''
             'The maximum allowed number of parameters is '
-            '${numberOfParametersParameters.maxParameters}',
+            '${numberOfParametersParameters.maxParameters}. '
+            'Try reducing the number of parameters.',
       );
 
       rules.add(
