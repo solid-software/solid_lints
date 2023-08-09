@@ -1,14 +1,12 @@
 include: package:solid_lints/analysis_options.yaml
 
-# Dart restricts the number of analyzers that we can use at
-# the same time, so we have to migrate everything from DCM first
-# and after that we can enable custom_lint
-# See https://github.com/dart-lang/sdk/issues/50981 for more information
-# analyzer:
-#   plugins:
-#     - custom_lint
+analyzer:
+  plugins:
+    - custom_lint
 
 custom_lint:
   rules:
     - cyclomatic_complexity_metric:
       max_complexity: 4
+    - number_of_parameters:
+      max_parameters: 2
