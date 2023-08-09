@@ -11,7 +11,7 @@ class NumberOfParametersMetric extends DartLintRule {
   /// parameters reaches the maximum value.
   static const lintName = 'number_of_parameters';
 
-  /// Configuration for complexity metric rule.
+  /// Configuration for number of parameters metric rule.
   final MetricRule<NumberOfParametersParameters> config;
 
   /// Creates a new instance of [NumberOfParametersMetric].
