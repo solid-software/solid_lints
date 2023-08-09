@@ -20,11 +20,6 @@ analyzer:
     # test_coverage
     - test/.test_coverage.dart
 
-  # Dart Code Metrics plugin (https://dartcodemetrics.dev/) provides many additional rules
-  # that helped to automate some pieces of our internal team code style based on the best
-  # industry practices.
-  plugins:
-    - dart_code_metrics
   language:
     # We've seen errors tied to use of implicit operations similar to the ones described in
     # https://dart.dev/guides/language/analysis-options#enabling-additional-type-checks.
