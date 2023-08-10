@@ -1,11 +1,9 @@
-/// expect_lint: lines_of_code
-/// Check lines of code fail
-///
-/// `lines_of_code: max_length`
 import 'package:test/test.dart';
 
 /// Check number of lines fail
 ///
+/// `function_lines_of_code: max_lines`
+/// expect_lint: function_lines_of_code
 void linesOfCode() {
   test("addition", () {
     expect(1 + 1, equals(2));

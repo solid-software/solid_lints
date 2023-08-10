@@ -27,7 +27,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/line_info.dart';
 
 /// The AST visitor that will find lines with code.
-class SourceCodeVisitor extends RecursiveAstVisitor<void> {
+class FunctionLinesOfCodeVisitor extends RecursiveAstVisitor<void> {
   final LineInfo _lineInfo;
 
   final _linesWithCode = <int>{};
@@ -35,8 +35,8 @@ class SourceCodeVisitor extends RecursiveAstVisitor<void> {
   /// Returns the array with indices of lines with code.
   Iterable<int> get linesWithCode => _linesWithCode;
 
-  /// Creates a new instance of [SourceCodeVisitor].
-  SourceCodeVisitor(this._lineInfo);
+  /// Creates a new instance of [FunctionLinesOfCodeVisitor].
+  FunctionLinesOfCodeVisitor(this._lineInfo);
 
   @override
   void visitBlockFunctionBody(BlockFunctionBody node) {
