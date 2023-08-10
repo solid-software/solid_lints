@@ -61,8 +61,9 @@ class _SolidLints extends PluginBase {
     final avoidLateKeyword = MetricRule(
       configs: configs,
       name: AvoidLateKeywordRule.lintName,
-      problemMessage: (value) => ''
-          "Don't use the \"late\" keyword to avoid runtime exceptions.",
+      problemMessage: (_) => ''
+          'Avoid using the "late" keyword. '
+          'It may result in runtime exceptions.',
     );
 
     if (avoidLateKeyword.enabled) {
