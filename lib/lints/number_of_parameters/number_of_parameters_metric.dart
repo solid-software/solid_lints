@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/lints/number_of_parameters/models/number_of_parameters_parameters.dart';
 import 'package:solid_lints/models/metric_rule.dart';
-import 'package:solid_lints/number_of_parameters/models/number_of_parameters_parameters.dart';
 
 /// A number of parameters metric which checks whether we didn't exceed
 /// the maximum allowed number of parameters for a function or a method

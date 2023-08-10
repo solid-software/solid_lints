@@ -1,7 +1,7 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
-import 'package:solid_lints/cyclomatic_complexity/visitor/cyclomatic_complexity_flow_visitor.dart';
+import 'package:solid_lints/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
+import 'package:solid_lints/lints/cyclomatic_complexity/visitor/cyclomatic_complexity_flow_visitor.dart';
 import 'package:solid_lints/models/metric_rule.dart';
 
 /// A Complexity metric checks content of block and detects more easier solution
