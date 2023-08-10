@@ -21,8 +21,8 @@ class _SolidLints extends PluginBase {
       name: CyclomaticComplexityMetric.lintName,
       factory: CyclomaticComplexityParameters.fromJson,
       problemMessage: (value) => ''
-          'Please decrease the complexity of function to '
-          'a minimum value ${value.maxComplexity}',
+          'The maximum allowed complexity of a function is '
+          '${value.maxComplexity}. Please decrease it.',
     );
 
     if (cyclomaticComplexity.enabled) {

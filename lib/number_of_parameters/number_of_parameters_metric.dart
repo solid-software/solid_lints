@@ -33,7 +33,11 @@ class NumberOfParametersMetric extends DartLintRule {
       };
 
       if (parameters > config.parameters.maxParameters) {
-        reporter.reportErrorForNode(code, node);
+        reporter.reportErrorForOffset(
+          code,
+          node.firstTokenAfterCommentAndMetadata.offset,
+          node.end,
+        );
       }
     });
   }

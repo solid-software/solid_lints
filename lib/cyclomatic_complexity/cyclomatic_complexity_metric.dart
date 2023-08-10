@@ -8,7 +8,7 @@ import 'package:solid_lints/models/metric_rule.dart';
 class CyclomaticComplexityMetric extends DartLintRule {
   /// The [LintCode] of this lint rule that represents the error if complexity
   /// reaches maximum value.
-  static const lintName = 'cyclomatic_complexity_metric';
+  static const lintName = 'cyclomatic_complexity';
 
   /// Configuration for complexity metric rule.
   final MetricRule<CyclomaticComplexityParameters> config;
