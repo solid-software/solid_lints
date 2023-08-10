@@ -28,7 +28,11 @@ class LinesOfCodeMetric extends DartLintRule {
     context.registry.addNode((node) {
       node.visitChildren(visitor);
 
-      if (visitor.linesWithCode.length > config.parameters.maxLines) {
+      final exceedsLines =
+          visitor.linesWithCode.length > config.parameters.maxLines;
+
+      // Without checking for an offset each line would be marked with an issue
+      if (exceedsLines && node.sourceRange.offset == 0) {
         reporter.reportErrorForNode(code, node);
       }
     });
