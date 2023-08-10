@@ -1,6 +1,7 @@
 library solid_metrics;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
 import 'package:solid_lints/lints/function_lines_of_code/function_lines_of_code_metric.dart';
@@ -55,6 +56,20 @@ class _SolidLints extends PluginBase {
 
     if (functionLinesOfCode.enabled) {
       rules.add(FunctionLinesOfCodeMetric(functionLinesOfCode));
+    }
+
+    final avoidNonNullAssertion = MetricRule(
+      configs: configs,
+      name: AvoidNonNullAssertionRule.lintName,
+      problemMessage: (_) => ''
+          'Avoid using the bang operator. '
+          'It may result in runtime exceptions.',
+    );
+
+    if (avoidNonNullAssertion.enabled) {
+      rules.add(
+        AvoidNonNullAssertionRule(code: avoidNonNullAssertion.lintCode),
+      );
     }
 
     return rules;
