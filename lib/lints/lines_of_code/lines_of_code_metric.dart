@@ -24,16 +24,26 @@ class LinesOfCodeMetric extends DartLintRule {
     CustomLintContext context,
   ) {
     final visitor = SourceCodeVisitor(resolver.lineInfo);
+    var exceedsLines = false;
 
     context.registry.addNode((node) {
+      // Allows us to skip analyzing the file when we already determined that
+      // it's either too long or when the node is not matching the entire file
+      if (exceedsLines || node.offset != 0) {
+        return;
+      }
+
       node.visitChildren(visitor);
+      if (visitor.linesWithCode.length > config.parameters.maxLines) {
+        exceedsLines = true;
 
-      final exceedsLines =
-          visitor.linesWithCode.length > config.parameters.maxLines;
-
-      // Without checking for an offset each line would be marked with an issue
-      if (exceedsLines && node.sourceRange.offset == 0) {
-        reporter.reportErrorForNode(code, node);
+        // Start on the second line to give us an option to declare
+        // `ignore` or `expect_lint` on the first one
+        reporter.reportErrorForOffset(
+          code,
+          resolver.lineInfo.lineStarts[1],
+          node.end,
+        );
       }
     });
   }

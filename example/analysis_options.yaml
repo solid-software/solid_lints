@@ -11,4 +11,4 @@ custom_lint:
     - number_of_parameters:
       max_parameters: 2
     - lines_of_code:
-      max_lines: 100
+      max_lines: 50
