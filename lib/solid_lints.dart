@@ -1,6 +1,7 @@
 library solid_metrics;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/lints/avoid_global_state/avoid_global_state_rule.dart';
 import 'package:solid_lints/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
@@ -68,6 +69,16 @@ class _SolidLints extends PluginBase {
 
     if (avoidLateKeyword.enabled) {
       rules.add(AvoidLateKeywordRule(code: avoidLateKeyword.lintCode));
+    }
+
+    final avoidGlobalState = MetricRule(
+      configs: configs,
+      name: AvoidGlobalStateRule.lintName,
+      problemMessage: (_) => 'Avoid variables that can be globally mutated.',
+    );
+
+    if (avoidGlobalState.enabled) {
+      rules.add(AvoidGlobalStateRule(code: avoidGlobalState.lintCode));
     }
 
     return rules;

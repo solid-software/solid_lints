@@ -5,7 +5,7 @@ import 'package:solid_lints/lints/function_lines_of_code/visitor/function_lines_
 import 'package:solid_lints/models/metric_rule.dart';
 
 /// A number of lines metric which checks whether we didn't exceed
-/// the maximum allowed number of lines for a file
+/// the maximum allowed number of lines for a function.
 class FunctionLinesOfCodeMetric extends DartLintRule {
   /// The [LintCode] of this lint rule that represents the error if number of
   /// parameters reaches the maximum value.
