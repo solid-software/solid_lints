@@ -12,5 +12,6 @@ custom_lint:
       max_parameters: 2
     - function_lines_of_code:
       max_lines: 50
+    - avoid_non_null_assertion
     - avoid_late_keyword
     - avoid_global_state
