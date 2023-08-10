@@ -13,3 +13,4 @@ custom_lint:
     - function_lines_of_code:
       max_lines: 50
     - avoid_non_null_assertion
+    - avoid_late_keyword

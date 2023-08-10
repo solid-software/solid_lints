@@ -1,6 +1,7 @@
 library solid_metrics;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:solid_lints/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
@@ -56,6 +57,17 @@ class _SolidLints extends PluginBase {
 
     if (functionLinesOfCode.enabled) {
       rules.add(FunctionLinesOfCodeMetric(functionLinesOfCode));
+    }
+
+    final avoidLateKeyword = MetricRule(
+      configs: configs,
+      name: AvoidLateKeywordRule.lintName,
+      problemMessage: (value) => ''
+          "Don't use the \"late\" keyword to avoid runtime exceptions.",
+    );
+
+    if (avoidLateKeyword.enabled) {
+      rules.add(AvoidLateKeywordRule(code: avoidLateKeyword.lintCode));
     }
 
     final avoidNonNullAssertion = MetricRule(
