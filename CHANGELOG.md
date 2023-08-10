@@ -16,7 +16,6 @@
   - `use_raw_strings`
 - Bump minimum supported sdk to `2.18.0`
 
-
 ## 0.0.18
 
 - Add rules
