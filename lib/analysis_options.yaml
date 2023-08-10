@@ -186,7 +186,11 @@ linter:
     - prefer_const_literals_to_create_immutables
     - prefer_constructors_over_static_methods
     - prefer_contains
-    # - prefer_equal_for_default_values - removed in Dart 3.0.0
+    # These two are incompatible, and one should be selected depending on your project's style.
+    # - prefer_double_quotes
+    # - prefer_single_quotes
+    # removed in Dart 3.0.0
+    # - prefer_equal_for_default_values
     # Not used, as the default app template has a single statement return code generated.
     # While this could be beneficial for Dart projects and maintaining code style, we are unaware
     # of any substantial evidence that improves code when using expression function body
