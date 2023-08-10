@@ -15,10 +15,10 @@ class MetricRule<T> {
   MetricRule({
     required this.name,
     required CustomLintConfigs configs,
-    required MetricRuleValueFactory<T> factory,
     required MetricRuleProblemFactory<T> problemMessage,
+    MetricRuleValueFactory<T>? factory,
   })  : enabled = configs.rules[name]?.enabled ?? false,
-        parameters = factory(configs.rules[name]?.json ?? {}),
+        parameters = factory?.call(configs.rules[name]?.json ?? {}) as T,
         _problemMessageFactory = problemMessage;
 
   /// The [LintCode] of this lint rule that represents the error.

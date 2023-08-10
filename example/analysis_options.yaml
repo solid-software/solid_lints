@@ -12,3 +12,4 @@ custom_lint:
       max_parameters: 2
     - function_lines_of_code:
       max_lines: 50
+    - avoid_late_keyword
