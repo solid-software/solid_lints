@@ -1,0 +1,44 @@
+name: Application ON Push & PR DO Code check
+on: [push, pull_request]
+
+jobs:
+  code-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Check Flutter SDK version
+        run: flutter --version
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Check formatting
+        run: dart format . --set-exit-if-changed
+
+        # example app shows warnings as an example of a working linter, so
+        # we can't analyze it as its purpose is to have issues
+      - name: Disable analyzer for example app
+        run: rm example/analysis_options.yaml
+
+      - name: Run default analyzer
+        run: flutter analyze
+
+      - name: Run custom analyzer
+        run: dart run custom_lint
+
+      - name: Run tests
+        run: |
+          # run tests if `test` folder exists
+          if [ -d test ]
+          then
+              flutter test -r expanded
+          else
+              echo "Tests not found."
+          fi
