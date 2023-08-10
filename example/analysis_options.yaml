@@ -10,3 +10,5 @@ custom_lint:
       max_complexity: 4
     - number_of_parameters:
       max_parameters: 2
+    - function_lines_of_code:
+      max_lines: 50
