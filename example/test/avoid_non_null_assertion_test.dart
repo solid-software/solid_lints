@@ -1,3 +1,6 @@
+/// Check "bang" operator fail
+///
+/// `avoid_non_null_assertion`
 class AvoidNonNullAssertion {
   AvoidNonNullAssertion? object;
   int? number;
