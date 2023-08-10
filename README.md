@@ -1,5 +1,7 @@
 # Solid Lints
 [![style: solid](https://img.shields.io/badge/style-solid-orange)](https://pub.dev/packages/solid_lints)
+[![$solid_lints](https://nokycucwgzweensacwfy.supabase.co/functions/v1/get_project_badge?projectName=solid_lints)](https://www.worklog.ai)
+
 
 Flutter/Dart lints configuration based on software engineering industry standards (ISO/IEC, NIST) and best practices.
 
