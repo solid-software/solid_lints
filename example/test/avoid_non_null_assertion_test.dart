@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_global_state
+
 /// Check "bang" operator fail
 ///
 /// `avoid_non_null_assertion`

@@ -1,4 +1,4 @@
-/// A data model class that represents the "source lines of code" input
+/// A data model class that represents the "function lines of code" input
 /// parameters.
 class FunctionLinesOfCodeParameters {
   /// Maximum number of lines

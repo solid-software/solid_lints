@@ -10,7 +10,7 @@ typedef MetricRuleProblemFactory<T> = String Function(T value);
 
 /// [MetricRule] allows us to quickly parse a lint rule and
 /// declare basic configuration for it.
-class MetricRule<T> {
+class MetricRule<T extends Object?> {
   /// Constructor for [MetricRule] model.
   MetricRule({
     required this.name,
