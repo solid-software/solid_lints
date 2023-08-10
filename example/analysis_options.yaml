@@ -6,7 +6,7 @@ analyzer:
 
 custom_lint:
   rules:
-    - cyclomatic_complexity_metric:
+    - cyclomatic_complexity:
       max_complexity: 4
     - number_of_parameters:
       max_parameters: 2

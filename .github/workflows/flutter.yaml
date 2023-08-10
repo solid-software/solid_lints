@@ -22,11 +22,6 @@ jobs:
       - name: Check formatting
         run: dart format . --set-exit-if-changed
 
-        # example app shows warnings as an example of a working linter, so
-        # we can't analyze it as its purpose is to have issues
-      - name: Disable analyzer for example app
-        run: rm example/analysis_options.yaml
-
       - name: Run default analyzer
         run: flutter analyze
 
