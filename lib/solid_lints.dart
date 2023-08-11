@@ -27,7 +27,7 @@ class _SolidLints extends PluginBase {
       AvoidReturningWidgetsRule.createRule(configs),
     ];
 
-    // Return only supported rules
+    // Return only enabled rules
     return supportedRules.where((r) => r.enabled).toList();
   }
 }
