@@ -15,3 +15,4 @@ custom_lint:
     - avoid_non_null_assertion
     - avoid_late_keyword
     - avoid_global_state
+    - avoid_returning_widgets

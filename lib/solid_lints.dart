@@ -4,6 +4,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/avoid_global_state/avoid_global_state_rule.dart';
 import 'package:solid_lints/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:solid_lints/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
+import 'package:solid_lints/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
 import 'package:solid_lints/lints/function_lines_of_code/function_lines_of_code_metric.dart';
@@ -94,6 +95,20 @@ class _SolidLints extends PluginBase {
 
     if (avoidGlobalState.enabled) {
       rules.add(AvoidGlobalStateRule(code: avoidGlobalState.lintCode));
+    }
+
+    final avoidReturningWidgets = MetricRule(
+      configs: configs,
+      name: AvoidReturningWidgetsRule.lintName,
+      problemMessage: (_) => ''
+          'Returning a widget from a function is considered an anti-pattern. '
+          'Extract your widget to a separate class.',
+    );
+
+    if (avoidReturningWidgets.enabled) {
+      rules.add(
+        AvoidReturningWidgetsRule(code: avoidReturningWidgets.lintCode),
+      );
     }
 
     return rules;
