@@ -3,19 +3,32 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
 import 'package:solid_lints/lints/function_lines_of_code/visitor/function_lines_of_code_visitor.dart';
 import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A number of lines metric which checks whether we didn't exceed
 /// the maximum allowed number of lines for a function.
-class FunctionLinesOfCodeMetric extends DartLintRule {
+class FunctionLinesOfCodeMetric
+    extends SolidLintRule<FunctionLinesOfCodeParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of
   /// parameters reaches the maximum value.
   static const lintName = 'function_lines_of_code';
 
-  /// Configuration for number of parameters metric rule.
-  final MetricRule<FunctionLinesOfCodeParameters> config;
+  FunctionLinesOfCodeMetric._(super.config);
 
-  /// Creates a new instance of [FunctionLinesOfCodeMetric].
-  FunctionLinesOfCodeMetric(this.config) : super(code: config.lintCode);
+  /// Creates a new instance of [FunctionLinesOfCodeMetric]
+  /// based on the lint configuration.
+  factory FunctionLinesOfCodeMetric.createRule(CustomLintConfigs configs) {
+    final rule = MetricRule(
+      configs: configs,
+      name: lintName,
+      factory: FunctionLinesOfCodeParameters.fromJson,
+      problemMessage: (value) => ''
+          'The maximum allowed number of lines is ${value.maxLines}. '
+          'Try splitting this function into smaller parts.',
+    );
+
+    return FunctionLinesOfCodeMetric._(rule);
+  }
 
   @override
   void run(
