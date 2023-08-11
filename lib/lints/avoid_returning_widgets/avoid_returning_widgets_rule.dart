@@ -20,8 +20,7 @@ class AvoidReturningWidgetsRule extends DartLintRule {
   ) {
     context.registry.addDeclaration((node) {
       final isWidgetReturned = switch (node) {
-        FunctionDeclaration(returnType: TypeAnnotation(:final type?)) =>
-          hasWidgetType(type),
+        FunctionDeclaration(returnType: TypeAnnotation(:final type?)) ||
         MethodDeclaration(returnType: TypeAnnotation(:final type?)) =>
           hasWidgetType(type),
         _ => false,
