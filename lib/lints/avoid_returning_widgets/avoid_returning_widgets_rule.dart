@@ -19,27 +19,16 @@ class AvoidReturningWidgetsRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
-      final bool isWidgetReturned;
-      switch (node) {
-        case (final FunctionDeclaration node):
-          final returnType = node.returnType?.type;
-          isWidgetReturned = returnType != null && hasWidgetType(returnType);
-        case (final MethodDeclaration node):
-          // `build` methods return widgets by nature
-          if (node.declaredElement?.name == "build") {
-            return;
-          }
+      final isWidgetReturned = switch (node) {
+        FunctionDeclaration(returnType: TypeAnnotation(:final type?)) =>
+          hasWidgetType(type),
+        MethodDeclaration(returnType: TypeAnnotation(:final type?)) =>
+          hasWidgetType(type),
+        _ => false,
+      };
 
-          // `FunctionDeclaration` and `MethodDeclaration` implement
-          // different things to have this `returnType` getter so
-          // unfortunately it can't be simplified.
-          final returnType = node.returnType?.type;
-          isWidgetReturned = returnType != null && hasWidgetType(returnType);
-        default:
-          isWidgetReturned = false;
-      }
-
-      if (isWidgetReturned) {
+      // `build` methods return widgets by nature
+      if (isWidgetReturned && node.declaredElement?.name != "build") {
         reporter.reportErrorForNode(code, node);
       }
     });
