@@ -1,16 +1,31 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/solid_lint_rule.dart';
 import 'package:solid_lints/utils/types_utils.dart';
 
 /// A rule which forbids returning widgets from functions and methods.
-class AvoidReturningWidgetsRule extends DartLintRule {
+class AvoidReturningWidgetsRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we return a widget.
   static const lintName = 'avoid_returning_widgets';
 
-  /// Creates a new instance of [AvoidReturningWidgetsRule].
-  const AvoidReturningWidgetsRule({required super.code});
+  AvoidReturningWidgetsRule._(super.config);
+
+  /// Creates a new instance of [AvoidReturningWidgetsRule]
+  /// based on the lint configuration.
+  factory AvoidReturningWidgetsRule.createRule(CustomLintConfigs configs) {
+    final rule = MetricRule(
+      configs: configs,
+      name: lintName,
+      problemMessage: (_) => ''
+          'Returning a widget from a function is considered an anti-pattern. '
+          'Extract your widget to a separate class.',
+    );
+
+    return AvoidReturningWidgetsRule._(rule);
+  }
 
   @override
   void run(

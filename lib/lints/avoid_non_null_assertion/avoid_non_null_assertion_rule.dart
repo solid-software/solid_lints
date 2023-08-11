@@ -3,16 +3,31 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// Rule which forbids using bang operator ("!")
 /// as it may result in runtime exceptions.
-class AvoidNonNullAssertionRule extends DartLintRule {
+class AvoidNonNullAssertionRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bang operator.
   static const lintName = 'avoid_non_null_assertion';
 
-  /// Creates a new instance of [AvoidNonNullAssertionRule].
-  const AvoidNonNullAssertionRule({required super.code});
+  AvoidNonNullAssertionRule._(super.config);
+
+  /// Creates a new instance of [AvoidNonNullAssertionRule]
+  /// based on the lint configuration.
+  factory AvoidNonNullAssertionRule.createRule(CustomLintConfigs configs) {
+    final rule = MetricRule(
+      configs: configs,
+      name: lintName,
+      problemMessage: (_) => ''
+          'Avoid using the bang operator. '
+          'It may result in runtime exceptions.',
+    );
+
+    return AvoidNonNullAssertionRule._(rule);
+  }
 
   @override
   void run(
