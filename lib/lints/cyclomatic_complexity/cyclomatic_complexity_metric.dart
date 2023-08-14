@@ -3,18 +3,31 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/visitor/cyclomatic_complexity_flow_visitor.dart';
 import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A Complexity metric checks content of block and detects more easier solution
-class CyclomaticComplexityMetric extends DartLintRule {
+class CyclomaticComplexityMetric
+    extends SolidLintRule<CyclomaticComplexityParameters> {
   /// The [LintCode] of this lint rule that represents the error if complexity
   /// reaches maximum value.
   static const lintName = 'cyclomatic_complexity';
 
-  /// Configuration for complexity metric rule.
-  final MetricRule<CyclomaticComplexityParameters> config;
+  CyclomaticComplexityMetric._(super.rule);
 
-  /// Creates a new instance of [CyclomaticComplexityMetric].
-  CyclomaticComplexityMetric(this.config) : super(code: config.lintCode);
+  /// Creates a new instance of [CyclomaticComplexityMetric]
+  /// based on the lint configuration.
+  factory CyclomaticComplexityMetric.createRule(CustomLintConfigs configs) {
+    final rule = MetricRule(
+      configs: configs,
+      name: lintName,
+      factory: CyclomaticComplexityParameters.fromJson,
+      problemMessage: (value) => ''
+          'The maximum allowed complexity of a function is '
+          '${value.maxComplexity}. Please decrease it.',
+    );
+
+    return CyclomaticComplexityMetric._(rule);
+  }
 
   @override
   void run(

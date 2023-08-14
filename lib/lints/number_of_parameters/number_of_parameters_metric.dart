@@ -3,19 +3,32 @@ import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/number_of_parameters/models/number_of_parameters_parameters.dart';
 import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A number of parameters metric which checks whether we didn't exceed
 /// the maximum allowed number of parameters for a function or a method
-class NumberOfParametersMetric extends DartLintRule {
+class NumberOfParametersMetric
+    extends SolidLintRule<NumberOfParametersParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of
   /// parameters reaches the maximum value.
   static const lintName = 'number_of_parameters';
 
-  /// Configuration for number of parameters metric rule.
-  final MetricRule<NumberOfParametersParameters> config;
+  NumberOfParametersMetric._(super.rule);
 
-  /// Creates a new instance of [NumberOfParametersMetric].
-  NumberOfParametersMetric(this.config) : super(code: config.lintCode);
+  /// Creates a new instance of [NumberOfParametersMetric]
+  /// based on the lint configuration.
+  factory NumberOfParametersMetric.createRule(CustomLintConfigs configs) {
+    final rule = MetricRule(
+      configs: configs,
+      name: lintName,
+      factory: NumberOfParametersParameters.fromJson,
+      problemMessage: (value) => ''
+          'The maximum allowed number of parameters is ${value.maxParameters}. '
+          'Try reducing the number of parameters.',
+    );
+
+    return NumberOfParametersMetric._(rule);
+  }
 
   @override
   void run(

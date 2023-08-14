@@ -6,111 +6,28 @@ import 'package:solid_lints/lints/avoid_late_keyword/avoid_late_keyword_rule.dar
 import 'package:solid_lints/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
-import 'package:solid_lints/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
 import 'package:solid_lints/lints/function_lines_of_code/function_lines_of_code_metric.dart';
-import 'package:solid_lints/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
-import 'package:solid_lints/lints/number_of_parameters/models/number_of_parameters_parameters.dart';
 import 'package:solid_lints/lints/number_of_parameters/number_of_parameters_metric.dart';
-import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// creates plugin
+/// Creates a plugin for our custom linter
 PluginBase createPlugin() => _SolidLints();
 
-/// Solid metric linter
+/// Initialize custom solid lints
 class _SolidLints extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) {
-    final List<LintRule> rules = [];
+    final List<SolidLintRule> supportedRules = [
+      CyclomaticComplexityMetric.createRule(configs),
+      NumberOfParametersMetric.createRule(configs),
+      FunctionLinesOfCodeMetric.createRule(configs),
+      AvoidNonNullAssertionRule.createRule(configs),
+      AvoidLateKeywordRule.createRule(configs),
+      AvoidGlobalStateRule.createRule(configs),
+      AvoidReturningWidgetsRule.createRule(configs),
+    ];
 
-    final cyclomaticComplexity = MetricRule<CyclomaticComplexityParameters>(
-      configs: configs,
-      name: CyclomaticComplexityMetric.lintName,
-      factory: CyclomaticComplexityParameters.fromJson,
-      problemMessage: (value) => ''
-          'The maximum allowed complexity of a function is '
-          '${value.maxComplexity}. Please decrease it.',
-    );
-
-    if (cyclomaticComplexity.enabled) {
-      rules.add(CyclomaticComplexityMetric(cyclomaticComplexity));
-    }
-
-    final numberOfParameters = MetricRule<NumberOfParametersParameters>(
-      configs: configs,
-      name: NumberOfParametersMetric.lintName,
-      factory: NumberOfParametersParameters.fromJson,
-      problemMessage: (value) => ''
-          'The maximum allowed number of parameters is ${value.maxParameters}. '
-          'Try reducing the number of parameters.',
-    );
-
-    if (numberOfParameters.enabled) {
-      rules.add(NumberOfParametersMetric(numberOfParameters));
-    }
-
-    final functionLinesOfCode = MetricRule<FunctionLinesOfCodeParameters>(
-      configs: configs,
-      name: FunctionLinesOfCodeMetric.lintName,
-      factory: FunctionLinesOfCodeParameters.fromJson,
-      problemMessage: (value) => ''
-          'The maximum allowed number of lines is ${value.maxLines}. '
-          'Try splitting this function into smaller parts.',
-    );
-
-    if (functionLinesOfCode.enabled) {
-      rules.add(FunctionLinesOfCodeMetric(functionLinesOfCode));
-    }
-
-    final avoidNonNullAssertion = MetricRule(
-      configs: configs,
-      name: AvoidNonNullAssertionRule.lintName,
-      problemMessage: (_) => ''
-          'Avoid using the bang operator. '
-          'It may result in runtime exceptions.',
-    );
-
-    if (avoidNonNullAssertion.enabled) {
-      rules.add(
-        AvoidNonNullAssertionRule(code: avoidNonNullAssertion.lintCode),
-      );
-    }
-
-    final avoidLateKeyword = MetricRule(
-      configs: configs,
-      name: AvoidLateKeywordRule.lintName,
-      problemMessage: (_) => ''
-          'Avoid using the "late" keyword. '
-          'It may result in runtime exceptions.',
-    );
-
-    if (avoidLateKeyword.enabled) {
-      rules.add(AvoidLateKeywordRule(code: avoidLateKeyword.lintCode));
-    }
-
-    final avoidGlobalState = MetricRule(
-      configs: configs,
-      name: AvoidGlobalStateRule.lintName,
-      problemMessage: (_) => 'Avoid variables that can be globally mutated.',
-    );
-
-    if (avoidGlobalState.enabled) {
-      rules.add(AvoidGlobalStateRule(code: avoidGlobalState.lintCode));
-    }
-
-    final avoidReturningWidgets = MetricRule(
-      configs: configs,
-      name: AvoidReturningWidgetsRule.lintName,
-      problemMessage: (_) => ''
-          'Returning a widget from a function is considered an anti-pattern. '
-          'Extract your widget to a separate class.',
-    );
-
-    if (avoidReturningWidgets.enabled) {
-      rules.add(
-        AvoidReturningWidgetsRule(code: avoidReturningWidgets.lintCode),
-      );
-    }
-
-    return rules;
+    // Return only enabled rules
+    return supportedRules.where((r) => r.enabled).toList();
   }
 }
