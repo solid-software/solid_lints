@@ -2,7 +2,7 @@ import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
 import 'package:solid_lints/lints/function_lines_of_code/visitor/function_lines_of_code_visitor.dart';
-import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A number of lines metric which checks whether we didn't exceed
@@ -18,10 +18,10 @@ class FunctionLinesOfCodeMetric
   /// Creates a new instance of [FunctionLinesOfCodeMetric]
   /// based on the lint configuration.
   factory FunctionLinesOfCodeMetric.createRule(CustomLintConfigs configs) {
-    final rule = MetricRule(
+    final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      factory: FunctionLinesOfCodeParameters.fromJson,
+      paramsParser: FunctionLinesOfCodeParameters.fromJson,
       problemMessage: (value) => ''
           'The maximum allowed number of lines is ${value.maxLines}. '
           'Try splitting this function into smaller parts.',

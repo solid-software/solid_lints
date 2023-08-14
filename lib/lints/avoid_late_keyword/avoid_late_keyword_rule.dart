@@ -1,6 +1,6 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A `late` keyword rule which forbids using it to avoid runtime exceptions.
@@ -14,7 +14,7 @@ class AvoidLateKeywordRule extends SolidLintRule {
   /// Creates a new instance of [AvoidLateKeywordRule]
   /// based on the lint configuration.
   factory AvoidLateKeywordRule.createRule(CustomLintConfigs configs) {
-    final rule = MetricRule(
+    final rule = RuleConfig(
       configs: configs,
       name: lintName,
       problemMessage: (_) => ''
