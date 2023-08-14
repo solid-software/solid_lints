@@ -2,7 +2,7 @@ import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/visitor/cyclomatic_complexity_flow_visitor.dart';
-import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A Complexity metric checks content of block and detects more easier solution
@@ -17,10 +17,10 @@ class CyclomaticComplexityMetric
   /// Creates a new instance of [CyclomaticComplexityMetric]
   /// based on the lint configuration.
   factory CyclomaticComplexityMetric.createRule(CustomLintConfigs configs) {
-    final rule = MetricRule(
+    final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      factory: CyclomaticComplexityParameters.fromJson,
+      paramsParser: CyclomaticComplexityParameters.fromJson,
       problemMessage: (value) => ''
           'The maximum allowed complexity of a function is '
           '${value.maxComplexity}. Please decrease it.',

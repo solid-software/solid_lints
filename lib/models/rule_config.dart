@@ -2,23 +2,23 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Type definition of a value factory which allows us to map data from
 /// YAML configuration to an object of type [T].
-typedef MetricRuleValueFactory<T> = T Function(Map<String, Object?> json);
+typedef RuleParameterParser<T> = T Function(Map<String, Object?> json);
 
 /// Type definition for a problem message factory after finding a problem
 /// by a given lint.
-typedef MetricRuleProblemFactory<T> = String Function(T value);
+typedef RuleProblemFactory<T> = String Function(T value);
 
-/// [MetricRule] allows us to quickly parse a lint rule and
+/// [RuleConfig] allows us to quickly parse a lint rule and
 /// declare basic configuration for it.
-class MetricRule<T extends Object?> {
-  /// Constructor for [MetricRule] model.
-  MetricRule({
+class RuleConfig<T extends Object?> {
+  /// Constructor for [RuleConfig] model.
+  RuleConfig({
     required this.name,
     required CustomLintConfigs configs,
-    required MetricRuleProblemFactory<T> problemMessage,
-    MetricRuleValueFactory<T>? factory,
+    required RuleProblemFactory<T> problemMessage,
+    RuleParameterParser<T>? paramsParser,
   })  : enabled = configs.rules[name]?.enabled ?? false,
-        parameters = factory?.call(configs.rules[name]?.json ?? {}) as T,
+        parameters = paramsParser?.call(configs.rules[name]?.json ?? {}) as T,
         _problemMessageFactory = problemMessage;
 
   /// The [LintCode] of this lint rule that represents the error.
@@ -31,7 +31,7 @@ class MetricRule<T extends Object?> {
   final T parameters;
 
   /// Factory for generating error messages.
-  final MetricRuleProblemFactory<T> _problemMessageFactory;
+  final RuleProblemFactory<T> _problemMessageFactory;
 
   /// [LintCode] which is generated based on the provided data.
   LintCode get lintCode => LintCode(

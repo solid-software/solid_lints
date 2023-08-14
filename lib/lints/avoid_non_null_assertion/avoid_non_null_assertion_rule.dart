@@ -3,7 +3,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// Rule which forbids using bang operator ("!")
@@ -18,7 +18,7 @@ class AvoidNonNullAssertionRule extends SolidLintRule {
   /// Creates a new instance of [AvoidNonNullAssertionRule]
   /// based on the lint configuration.
   factory AvoidNonNullAssertionRule.createRule(CustomLintConfigs configs) {
-    final rule = MetricRule(
+    final rule = RuleConfig(
       configs: configs,
       name: lintName,
       problemMessage: (_) => ''
