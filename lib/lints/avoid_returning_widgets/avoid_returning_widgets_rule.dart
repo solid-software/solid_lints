@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 import 'package:solid_lints/utils/types_utils.dart';
 
@@ -16,7 +16,7 @@ class AvoidReturningWidgetsRule extends SolidLintRule {
   /// Creates a new instance of [AvoidReturningWidgetsRule]
   /// based on the lint configuration.
   factory AvoidReturningWidgetsRule.createRule(CustomLintConfigs configs) {
-    final rule = MetricRule(
+    final rule = RuleConfig(
       configs: configs,
       name: lintName,
       problemMessage: (_) => ''

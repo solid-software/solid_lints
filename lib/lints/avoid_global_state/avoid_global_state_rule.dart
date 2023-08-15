@@ -1,6 +1,6 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/models/metric_rule.dart';
+import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A global state rule which forbids using variables
@@ -15,7 +15,7 @@ class AvoidGlobalStateRule extends SolidLintRule {
   /// Creates a new instance of [AvoidGlobalStateRule]
   /// based on the lint configuration.
   factory AvoidGlobalStateRule.createRule(CustomLintConfigs configs) {
-    final rule = MetricRule(
+    final rule = RuleConfig(
       configs: configs,
       name: lintName,
       problemMessage: (_) => 'Avoid variables that can be globally mutated.',
