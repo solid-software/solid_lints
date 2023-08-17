@@ -14,7 +14,7 @@
   - `unnecessary_lambdas`
   - `unnecessary_to_list_in_spreads`
   - `use_raw_strings`
-- Bump minimum supported sdk to `2.18.0`
+- Bump minimum supported sdk to `3.0.0`
 
 ## 0.0.18
 
