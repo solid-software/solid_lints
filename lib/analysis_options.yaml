@@ -101,8 +101,10 @@ linter:
     - avoid_empty_else
     - avoid_escaping_inner_quotes
     - avoid_field_initializers_in_const_classes
-    # linter v1.15+
-    #    - avoid_final_parameters
+    # We are already using the `parameter_assignments` lint.
+    # Adding final to parameters has the same effect as `parameter_assignments`
+    # so it doesn't make sense to use final parameters with `parameter_assignments`.
+    - avoid_final_parameters
     - avoid_function_literals_in_foreach_calls
     - avoid_implementing_value_types
     - avoid_init_to_null
@@ -134,8 +136,7 @@ linter:
     - cast_nullable_to_non_nullable
     - close_sinks
     - comment_references
-    # linter v1.16.0+
-    #    - conditional_uri_does_not_exist
+    - conditional_uri_does_not_exist
     - constant_identifier_names
     - control_flow_in_finally
     - curly_braces_in_flow_control_structures
@@ -144,7 +145,7 @@ linter:
     # - diagnostic_describe_all_properties
     - directives_ordering
     # Pretty much agree with Passy & linter package.
-    # Our use case for Flutter for web where there is no flavors yet.
+    # Our use case for Flutter for web where there are no flavors yet.
     # So using dart-define is helpful.
     #- do_not_use_environment
     - empty_catches
@@ -167,18 +168,18 @@ linter:
     - literal_only_boolean_expressions
     - no_adjacent_strings_in_list
     - no_duplicate_case_values
-    # linter v1.15+
-    #    - no_leading_underscores_for_library_prefixes
-    # linter v1.15+
-    #    - no_leading_underscores_for_local_identifiers
+    - no_leading_underscores_for_library_prefixes
+    - no_leading_underscores_for_local_identifiers
     - no_logic_in_create_state
     - no_runtimeType_toString
     - non_constant_identifier_names
+    - noop_primitive_operations
     - null_check_on_nullable_type_parameter
     - overridden_fields
     - package_names
     - package_prefixed_library_names
     - parameter_assignments
+    - prefer_adjacent_string_concatenation
     - prefer_asserts_in_initializer_lists
     - prefer_collection_literals
     - prefer_conditional_assignment
@@ -188,7 +189,11 @@ linter:
     - prefer_const_literals_to_create_immutables
     - prefer_constructors_over_static_methods
     - prefer_contains
-    # - prefer_equal_for_default_values - removed in Dart 3.0.0
+    # These two are incompatible, and one should be selected depending on your project's style.
+    # - prefer_double_quotes
+    # - prefer_single_quotes
+    # removed in Dart 3.0.0
+    # - prefer_equal_for_default_values
     # Not used, as the default app template has a single statement return code generated.
     # While this could be beneficial for Dart projects and maintaining code style, we are unaware
     # of any substantial evidence that improves code when using expression function body
@@ -197,6 +202,11 @@ linter:
     - prefer_final_fields
     - prefer_final_in_for_each
     - prefer_final_locals
+    # While it is similar to `unnecessary_lambdas`,
+    # it forcefully replaces structural/procedural semantics with
+    # their functional counterparts.
+    # We think this is a stylistic choice and will leave it up to users.
+    # - prefer_foreach
     - prefer_for_elements_to_map_fromIterable
     - prefer_function_declarations_over_variables
     - prefer_generic_function_type_aliases
@@ -218,11 +228,9 @@ linter:
     - public_member_api_docs
     - recursive_getters
     - require_trailing_commas
-    # linter v1.15+
-    #    - secure_pubspec_urls
+    - secure_pubspec_urls
     - sized_box_for_whitespace
-    # linter v1.15+
-    #    - sized_box_shrink_expand
+    - sized_box_shrink_expand
     - slash_for_doc_comments
     - sort_child_properties_last
     # We tend to use class organization close to standard Java convention, where fields come first.
@@ -238,8 +246,10 @@ linter:
     - unawaited_futures
     - unnecessary_await_in_return
     - unnecessary_brace_in_string_interps
+    - unnecessary_breaks
     - unnecessary_const
     - unnecessary_getters_setters
+    - unnecessary_lambdas
     - unnecessary_new
     - unnecessary_null_aware_assignments
     - unnecessary_null_checks
@@ -252,18 +262,18 @@ linter:
     - unnecessary_string_escapes
     - unnecessary_string_interpolations
     - unnecessary_this
+    - unnecessary_to_list_in_spreads
     - unrelated_type_equality_checks
     - unsafe_html
     - use_build_context_synchronously
-    # linter v1.19+
     - use_colored_box
-    # linter v1.15+
     - use_decorated_box
     - use_full_hex_values_for_flutter_colors
     - use_function_type_syntax_for_parameters
     - use_if_null_to_convert_nulls_to_bools
     - use_is_even_rather_than_modulo
     - use_named_constants
+    - use_raw_strings
     - use_rethrow_when_possible
     - use_setters_to_change_properties
     - use_string_buffers

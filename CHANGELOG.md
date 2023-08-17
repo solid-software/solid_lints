@@ -1,3 +1,21 @@
+## 0.0.19
+
+- Add rules
+  - `avoid_final_parameters`
+  - `conditional_uri_does_not_exist`
+  - `no_leading_underscores_for_library_prefixes`
+  - `no_leading_underscores_for_local_identifiers`
+  - `noop_primitive_operations`
+  - `prefer_adjacent_string_concatenation`
+  - `prefer_foreach`
+  - `secure_pubspec_urls`
+  - `sized_box_shrink_expand`
+  - `unnecessary_breaks`
+  - `unnecessary_lambdas`
+  - `unnecessary_to_list_in_spreads`
+  - `use_raw_strings`
+- Bump minimum supported sdk to `3.0.0`
+
 ## 0.0.18
 
 - Add rules
