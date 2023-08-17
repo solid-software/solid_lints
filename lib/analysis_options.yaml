@@ -101,6 +101,9 @@ linter:
     - avoid_empty_else
     - avoid_escaping_inner_quotes
     - avoid_field_initializers_in_const_classes
+    # We are already using the `parameter_assignments` lint.
+    # Adding final to parameters has the same effect as `parameter_assignments`
+    # so it doesn't make sense to use final parameters with `parameter_assignments`.
     - avoid_final_parameters
     - avoid_function_literals_in_foreach_calls
     - avoid_implementing_value_types
