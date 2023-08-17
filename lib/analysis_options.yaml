@@ -145,7 +145,7 @@ linter:
     # - diagnostic_describe_all_properties
     - directives_ordering
     # Pretty much agree with Passy & linter package.
-    # Our use case for Flutter for web where there is no flavors yet.
+    # Our use case for Flutter for web where there are no flavors yet.
     # So using dart-define is helpful.
     #- do_not_use_environment
     - empty_catches
@@ -202,7 +202,11 @@ linter:
     - prefer_final_fields
     - prefer_final_in_for_each
     - prefer_final_locals
-    - prefer_foreach
+    # While it is similar to `unnecessary_lambdas`,
+    # it forcefully replaces structural/procedural semantics with
+    # their functional counterparts.
+    # We think this is a stylistic choice and will leave it up to users.
+    # - prefer_foreach
     - prefer_for_elements_to_map_fromIterable
     - prefer_function_declarations_over_variables
     - prefer_generic_function_type_aliases
