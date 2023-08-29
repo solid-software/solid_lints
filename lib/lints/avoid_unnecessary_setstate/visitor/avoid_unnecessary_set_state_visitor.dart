@@ -23,6 +23,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/lints/avoid_unnecessary_setstate/visitor/avoid_unnecessary_set_state_method_visitor.dart';
 import 'package:solid_lints/utils/types_utils.dart';
 
 /// AST visitor which checks if class is State, in case yes checks its methods
@@ -35,14 +36,9 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
   ];
 
   final _setStateInvocations = <MethodInvocation>[];
-  final _classMethodsInvocations = <MethodInvocation>[];
 
   /// All setState invocations in checkedMethods
   Iterable<MethodInvocation> get setStateInvocations => _setStateInvocations;
-
-  /// All class methods invocations
-  Iterable<MethodInvocation> get classMethodsInvocations =>
-      _classMethodsInvocations;
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
@@ -67,12 +63,13 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
     final visitedRestMethods = <String, bool>{};
 
     for (final method in methods) {
-      final visitor = _MethodVisitor(classMethodsNames, bodies);
+      final visitor =
+          AvoidUnnecessarySetStateMethodVisitor(classMethodsNames, bodies);
       method.visitChildren(visitor);
 
-      _setStateInvocations.addAll(visitor.setStateInvocations);
-      _classMethodsInvocations.addAll(
-        visitor.classMethodsInvocations
+      _setStateInvocations.addAll([
+        ...visitor.setStateInvocations,
+        ...visitor.classMethodsInvocations
             .where(
               (invocation) => _containsSetState(
                 visitedRestMethods,
@@ -84,7 +81,7 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
               ),
             )
             .toList(),
-      );
+      ]);
     }
   }
 
@@ -104,7 +101,8 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
       return true;
     }
 
-    final visitor = _MethodVisitor(classMethodsNames, bodies);
+    final visitor =
+        AvoidUnnecessarySetStateMethodVisitor(classMethodsNames, bodies);
     declaration.visitChildren(visitor);
 
     final hasSetState = visitor.setStateInvocations.isNotEmpty;
@@ -113,42 +111,4 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
 
     return hasSetState;
   }
-}
-
-/// AST Visitor which finds all setState invocations and checks if they are
-/// necessary
-class _MethodVisitor extends RecursiveAstVisitor<void> {
-  final Set<String> classMethodsNames;
-  final Iterable<FunctionBody> bodies;
-
-  final _setStateInvocations = <MethodInvocation>[];
-  final _classMethodsInvocations = <MethodInvocation>[];
-
-  Iterable<MethodInvocation> get setStateInvocations => _setStateInvocations;
-  Iterable<MethodInvocation> get classMethodsInvocations =>
-      _classMethodsInvocations;
-
-  _MethodVisitor(this.classMethodsNames, this.bodies);
-
-  @override
-  void visitMethodInvocation(MethodInvocation node) {
-    super.visitMethodInvocation(node);
-
-    final name = node.methodName.name;
-    final notInBody = _isNotInFunctionBody(node);
-
-    if (name == 'setState' && notInBody) {
-      _setStateInvocations.add(node);
-    } else if (classMethodsNames.contains(name) &&
-        notInBody &&
-        node.realTarget == null) {
-      _classMethodsInvocations.add(node);
-    }
-  }
-
-  bool _isNotInFunctionBody(MethodInvocation node) =>
-      node.thisOrAncestorMatching(
-        (parent) => parent is FunctionBody && !bodies.contains(parent),
-      ) ==
-      null;
 }

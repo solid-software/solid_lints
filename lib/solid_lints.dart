@@ -5,6 +5,7 @@ import 'package:solid_lints/lints/avoid_global_state/avoid_global_state_rule.dar
 import 'package:solid_lints/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:solid_lints/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
+import 'package:solid_lints/lints/avoid_unnecessary_setstate/avoid_unnecessary_set_state_rule.dart';
 import 'package:solid_lints/lints/avoid_unnecessary_setstate/avoid_unnecessary_setstate_rule.dart';
 import 'package:solid_lints/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';

@@ -1,22 +1,22 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/lints/avoid_unnecessary_setstate/visitor/avoid_unnecessary_setstate_visitor.dart';
+import 'package:solid_lints/lints/avoid_unnecessary_setstate/visitor/avoid_unnecessary_set_state_visitor.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A rule which warns when setState is called inside initState, didUpdateWidget
-/// or build methods and when it's called
-/// from a sync method that is called inside those methods.
-class AvoidUnnecessarySetstateRule extends SolidLintRule {
+/// or build methods and when it's called from a sync method that is called
+/// inside those methods.
+class AvoidUnnecessarySetStateRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
-  /// the error whether we return a widget.
+  /// the error whether we use setState in inappropriate way.
   static const lintName = 'avoid_unnecessary_setstate';
 
-  AvoidUnnecessarySetstateRule._(super.config);
+  AvoidUnnecessarySetStateRule._(super.config);
 
-  /// Creates a new instance of [AvoidUnnecessarySetstateRule]
+  /// Creates a new instance of [AvoidUnnecessarySetStateRule]
   /// based on the lint configuration.
-  factory AvoidUnnecessarySetstateRule.createRule(CustomLintConfigs configs) {
+  factory AvoidUnnecessarySetStateRule.createRule(CustomLintConfigs configs) {
     final rule = RuleConfig(
       name: lintName,
       configs: configs,
@@ -24,7 +24,7 @@ class AvoidUnnecessarySetstateRule extends SolidLintRule {
           'Avoid calling unnecessary setState. '
           'Consider changing the state directly.',
     );
-    return AvoidUnnecessarySetstateRule._(rule);
+    return AvoidUnnecessarySetStateRule._(rule);
   }
 
   @override
@@ -38,9 +38,6 @@ class AvoidUnnecessarySetstateRule extends SolidLintRule {
     context.registry.addClassDeclaration((node) {
       visitor.visitClassDeclaration(node);
       for (final element in visitor.setStateInvocations) {
-        reporter.reportErrorForNode(code, element);
-      }
-      for (final element in visitor.classMethodsInvocations) {
         reporter.reportErrorForNode(code, element);
       }
     });
