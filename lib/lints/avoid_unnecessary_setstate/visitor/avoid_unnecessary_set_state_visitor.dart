@@ -56,11 +56,6 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
     final methods = declarations
         .where((member) => _checkedMethods.contains(member.name.lexeme))
         .toList();
-    final restMethods = declarations
-        .where((member) => !_checkedMethods.contains(member.name.lexeme))
-        .toList();
-
-    final visitedRestMethods = <String, bool>{};
 
     for (final method in methods) {
       final visitor =
@@ -69,46 +64,7 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
 
       _setStateInvocations.addAll([
         ...visitor.setStateInvocations,
-        ...visitor.classMethodsInvocations
-            .where(
-              (invocation) => _containsSetState(
-                visitedRestMethods,
-                classMethodsNames,
-                bodies,
-                restMethods.firstWhere(
-                  (method) => method.name.lexeme == invocation.methodName.name,
-                ),
-              ),
-            )
-            .toList(),
       ]);
     }
-  }
-
-  bool _containsSetState(
-    Map<String, bool> visitedRestMethods,
-    Set<String> classMethodsNames,
-    Iterable<FunctionBody> bodies,
-    MethodDeclaration declaration,
-  ) {
-    final type = declaration.returnType?.type;
-    if (type != null && (type.isDartAsyncFuture || type.isDartAsyncFutureOr)) {
-      return false;
-    }
-
-    final name = declaration.name.lexeme;
-    if (visitedRestMethods.containsKey(name) && visitedRestMethods[name]!) {
-      return true;
-    }
-
-    final visitor =
-        AvoidUnnecessarySetStateMethodVisitor(classMethodsNames, bodies);
-    declaration.visitChildren(visitor);
-
-    final hasSetState = visitor.setStateInvocations.isNotEmpty;
-
-    visitedRestMethods[name] = hasSetState;
-
-    return hasSetState;
   }
 }

@@ -8,7 +8,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// or build methods and when it's called from a sync method that is called
 /// inside those methods.
 class AvoidUnnecessarySetStateRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// The lint name of this lint rule that represents
   /// the error whether we use setState in inappropriate way.
   static const lintName = 'avoid_unnecessary_setstate';
 

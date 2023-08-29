@@ -31,14 +31,9 @@ class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
   final Iterable<FunctionBody> _bodies;
 
   final _setStateInvocations = <MethodInvocation>[];
-  final _classMethodsInvocations = <MethodInvocation>[];
 
   /// All setState invocations
   Iterable<MethodInvocation> get setStateInvocations => _setStateInvocations;
-
-  /// All sync method invocations with setState inside
-  Iterable<MethodInvocation> get classMethodsInvocations =>
-      _classMethodsInvocations;
 
   /// Constructor for AvoidUnnecessarySetStateMethodVisitor
   AvoidUnnecessarySetStateMethodVisitor(this._classMethodsNames, this._bodies);
@@ -55,7 +50,7 @@ class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
     } else if (_classMethodsNames.contains(name) &&
         notInBody &&
         node.realTarget == null) {
-      _classMethodsInvocations.add(node);
+      _setStateInvocations.add(node);
     }
   }
 
