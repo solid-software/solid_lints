@@ -16,3 +16,4 @@ custom_lint:
     - avoid_late_keyword
     - avoid_global_state
     - avoid_returning_widgets
+    - double-literal-format
