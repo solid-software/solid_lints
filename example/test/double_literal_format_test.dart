@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_global_state
 // ignore_for_file: type_annotate_public_apis
-// ignore_for_file:unused_local_variable
+// ignore_for_file: unused_local_variable
 
 /// Check the `double-literal-format` rule
 
@@ -8,6 +8,8 @@
 var badA = 05.23;
 var goodA = 5.23;
 var stringA = '05.23';
+
+var intA = 00;
 
 // expect_lint: double-literal-format
 double badB = -01.2;
