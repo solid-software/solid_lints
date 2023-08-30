@@ -49,7 +49,7 @@ class DoubleLiteralFormatRule extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      problemMessage: (_) => 'Bad formatted double literal',
+      problemMessage: (_) => 'Double literal formatting issue',
     );
 
     return DoubleLiteralFormatRule._(rule);
@@ -64,27 +64,27 @@ class DoubleLiteralFormatRule extends SolidLintRule {
     context.registry.addDoubleLiteral((node) {
       final lexeme = node.literal.lexeme;
 
-      if (_isLeadingZero(lexeme)) {
+      if (_hasLeadingZero(lexeme)) {
         reporter.reportErrorForNode(_leadingZeroCode, node);
         return;
       }
-      if (_isLeadingDecimal(lexeme)) {
+      if (_hasLeadingDecimalPoint(lexeme)) {
         reporter.reportErrorForNode(_leadingDecimalCode, node);
         return;
       }
-      if (_isTrailingZero(lexeme)) {
+      if (_hasTrailingZero(lexeme)) {
         reporter.reportErrorForNode(_trailingZeroCode, node);
         return;
       }
     });
   }
 
-  bool _isLeadingZero(String lexeme) =>
+  bool _hasLeadingZero(String lexeme) =>
       lexeme.startsWith('0') && lexeme[1] != '.';
 
-  bool _isLeadingDecimal(String lexeme) => lexeme.startsWith('.');
+  bool _hasLeadingDecimalPoint(String lexeme) => lexeme.startsWith('.');
 
-  bool _isTrailingZero(String lexeme) {
+  bool _hasTrailingZero(String lexeme) {
     final mantissa = lexeme.split('e').first;
 
     return mantissa.contains('.') &&
