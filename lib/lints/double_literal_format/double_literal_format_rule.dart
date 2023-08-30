@@ -1,7 +1,12 @@
+import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
+
+part 'double_literal_format_fix.dart';
+part 'double_literal_format_utils.dart';
 
 /// A `double-literal-format` rule which
 /// checks that double literals should begin with 0. instead of just .,
@@ -64,31 +69,21 @@ class DoubleLiteralFormatRule extends SolidLintRule {
     context.registry.addDoubleLiteral((node) {
       final lexeme = node.literal.lexeme;
 
-      if (_hasLeadingZero(lexeme)) {
+      if (lexeme.hasLeadingZero) {
         reporter.reportErrorForNode(_leadingZeroCode, node);
         return;
       }
-      if (_hasLeadingDecimalPoint(lexeme)) {
+      if (lexeme.hasLeadingDecimalPoint) {
         reporter.reportErrorForNode(_leadingDecimalCode, node);
         return;
       }
-      if (_hasTrailingZero(lexeme)) {
+      if (lexeme.hasTrailingZero) {
         reporter.reportErrorForNode(_trailingZeroCode, node);
         return;
       }
     });
   }
 
-  bool _hasLeadingZero(String lexeme) =>
-      lexeme.startsWith('0') && lexeme[1] != '.';
-
-  bool _hasLeadingDecimalPoint(String lexeme) => lexeme.startsWith('.');
-
-  bool _hasTrailingZero(String lexeme) {
-    final mantissa = lexeme.split('e').first;
-
-    return mantissa.contains('.') &&
-        mantissa.endsWith('0') &&
-        mantissa.split('.').last != '0';
-  }
+  @override
+  List<Fix> getFixes() => [_DoubleLiteralFormatFix()];
 }

@@ -9,7 +9,7 @@ var badA = 05.23;
 var goodA = 5.23;
 var stringA = '05.23';
 
-var intA = 00;
+var intA = 0;
 
 // expect_lint: double-literal-format
 double badB = -01.2;
@@ -33,6 +33,6 @@ class DoubleLiteralFormatTest {
     const badA = -0.250;
     const goodA = -0.25;
     // expect_lint: double-literal-format
-    const goodB = 0.160e+5;
+    const badB = 0.160e+5;
   }
 }
