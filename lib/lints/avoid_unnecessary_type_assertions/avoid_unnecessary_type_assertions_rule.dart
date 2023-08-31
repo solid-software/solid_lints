@@ -1,11 +1,15 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/source/source_range.dart';
 import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 import 'package:solid_lints/utils/types_utils.dart';
+
+part 'avoid_unnecessary_type_assertions_fix.dart';
 
 /// A `avoid-unnecessary-type-assertions` rule which
 /// warns about unnecessary usage of `is` and `whereType` operators
@@ -58,6 +62,9 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => [_UnnecessaryTypeAssertionsFix()];
 
   bool _isUnnecessaryIsExpression(IsExpression node) {
     final objectType = node.expression.staticType;
@@ -114,10 +121,8 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
       return false;
     }
 
-    final objectCastedType = _castedTypeInObjectTypeHierarchy(
-      objectType,
-      castedType,
-    );
+    final objectCastedType =
+        _castedTypeInObjectTypeHierarchy(objectType, castedType);
 
     if (objectCastedType == null) {
       return isReversed;
