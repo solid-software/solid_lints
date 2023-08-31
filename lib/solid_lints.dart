@@ -30,8 +30,8 @@ class _SolidLints extends PluginBase {
       AvoidGlobalStateRule.createRule(configs),
       AvoidReturningWidgetsRule.createRule(configs),
       DoubleLiteralFormatRule.createRule(configs),
-      AvoidUnnecessarySetstateRule.createRule(configs),
       AvoidUnnecessaryTypeAssertions.createRule(configs),
+      AvoidUnnecessarySetStateRule.createRule(configs),
     ];
 
     // Return only enabled rules
