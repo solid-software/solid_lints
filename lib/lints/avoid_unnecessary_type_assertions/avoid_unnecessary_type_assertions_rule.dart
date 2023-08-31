@@ -117,7 +117,6 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   }
 
   bool _isGenerics(DartType objectType, DartType castedType) {
-    print('IS GEN $objectType');
     if (objectType is! ParameterizedType || castedType is! ParameterizedType) {
       return false;
     }

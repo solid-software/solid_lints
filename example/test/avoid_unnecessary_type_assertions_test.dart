@@ -1,6 +1,7 @@
-// ignore_for_file: unnecessary_nullable_for_final_variable_declarations
 // ignore_for_file: prefer_const_declarations
+// ignore_for_file: unnecessary_nullable_for_final_variable_declarations
 // ignore_for_file: unnecessary_type_check
+// ignore_for_file: unused_local_variable
 
 /// Check the `avoid-unnecessary-type-assertions` rule
 
