@@ -36,6 +36,9 @@ bool hasWidgetType(DartType type) =>
         _isListInheritedProvider(type) ||
         _isFutureInheritedProvider(type));
 
+bool isIterableOrSubclass(DartType? type) =>
+    _checkSelfOrSupertypes(type, (t) => t?.isDartCoreIterable ?? false);
+
 bool isNullableType(DartType? type) =>
     type?.nullabilitySuffix == NullabilitySuffix.question;
 
@@ -77,6 +80,13 @@ bool isBuildContext(DartType? type) =>
 
 bool isGameWidget(DartType? type) =>
     type?.getDisplayString(withNullability: false) == 'GameWidget';
+
+bool _checkSelfOrSupertypes(
+  DartType? type,
+  bool Function(DartType?) predicate,
+) =>
+    predicate(type) ||
+    (type is InterfaceType && type.allSupertypes.any(predicate));
 
 bool _isWidget(DartType? type) =>
     type?.getDisplayString(withNullability: false) == 'Widget';

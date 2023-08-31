@@ -15,6 +15,16 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   /// the error whether we use bad formatted double literals.
   static const lintName = 'avoid-unnecessary-type-assertions';
 
+  static const _unnecessaryIsCode = LintCode(
+    name: lintName,
+    problemMessage: "Unnecessary usage of the 'is' operator.",
+  );
+
+  static const _unnecessaryWhereTypeCode = LintCode(
+    name: lintName,
+    problemMessage: "Unnecessary usage of the 'whereType'.",
+  );
+
   AvoidUnnecessaryTypeAssertions._(super.config);
 
   /// Creates a new instance of [AvoidUnnecessaryTypeAssertions]
@@ -24,7 +34,7 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
       configs: configs,
       name: lintName,
       problemMessage: (_) =>
-          'Avoid unnecessary usage of `is` or `whereType` operators',
+          "Unnecessary usage of 'is' or 'whereType' operators.",
     );
 
     return AvoidUnnecessaryTypeAssertions._(rule);
@@ -38,7 +48,13 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   ) {
     context.registry.addIsExpression((node) {
       if (_isUnnecessaryIsExpression(node)) {
-        reporter.reportErrorForNode(code, node);
+        reporter.reportErrorForNode(_unnecessaryIsCode, node);
+      }
+    });
+
+    context.registry.addMethodInvocation((node) {
+      if (_isUnnecessaryWhereType(node)) {
+        reporter.reportErrorForNode(_unnecessaryWhereTypeCode, node);
       }
     });
   }
@@ -61,6 +77,28 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
     }
 
     return _isUnnecessaryTypeCheck(objectType, castedType);
+  }
+
+  bool _isUnnecessaryWhereType(MethodInvocation node) {
+    const whereTypeMethodName = 'whereType';
+
+    final targetType = node.target?.staticType;
+
+    if (node.methodName.name == whereTypeMethodName &&
+        isIterableOrSubclass(node.realTarget?.staticType) &&
+        targetType is ParameterizedType) {
+      final isTargetTypeHasGeneric = targetType.typeArguments.isNotEmpty;
+      final arguments = node.typeArguments?.arguments;
+      final isWhereTypeHasGeneric = arguments?.isNotEmpty ?? false;
+
+      return isTargetTypeHasGeneric &&
+          isWhereTypeHasGeneric &&
+          _isUnnecessaryTypeCheck(
+            targetType.typeArguments.first,
+            arguments?.first.type,
+          );
+    }
+    return false;
   }
 
   bool _isUnnecessaryTypeCheck(
