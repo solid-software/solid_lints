@@ -17,3 +17,4 @@ custom_lint:
     - avoid_global_state
     - avoid_returning_widgets
     - double-literal-format
+    - avoid-unnecessary-type-assertions
