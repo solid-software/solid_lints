@@ -12,43 +12,39 @@ class _UnnecessaryTypeAssertionsFix extends DartFix {
     List<AnalysisError> others,
   ) {
     context.registry.addIsExpression((node) {
-      // checks that the literal declaration is where our warning is located
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: "Remove unnecessary 'is'",
-        priority: 1,
-      );
-
-      final isOperatorOffset = node.isOperator.offset;
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addDeletion(
-          SourceRange(
-            isOperatorOffset,
-            node.length - (isOperatorOffset - node.offset),
-          ),
-        );
-      });
+      if (analysisError.sourceRange.intersects(node.sourceRange)) {
+        _addDeletion(reporter, 'is', node, node.isOperator.offset);
+      }
     });
 
     context.registry.addMethodInvocation((node) {
-      // checks that the literal declaration is where our warning is located
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: "Remove unnecessary 'whereType'",
-        priority: 1,
-      );
-
-      final operatorOffset = node.operator?.offset ?? node.offset;
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addDeletion(
-          SourceRange(
-            operatorOffset,
-            node.length - (operatorOffset - node.offset),
-          ),
+      if (analysisError.sourceRange.intersects(node.sourceRange)) {
+        _addDeletion(
+          reporter,
+          'whereType',
+          node,
+          node.operator?.offset ?? node.offset,
         );
-      });
+      }
+    });
+  }
+
+  void _addDeletion(
+    ChangeReporter reporter,
+    String itemToDelete,
+    Expression node,
+    int operatorOffset,
+  ) {
+    final targetNameLength = operatorOffset - node.offset;
+    final removedPartLength = node.length - targetNameLength;
+
+    final changeBuilder = reporter.createChangeBuilder(
+      message: "Remove unnecessary '$itemToDelete'",
+      priority: 1,
+    );
+
+    changeBuilder.addDartFileEdit((builder) {
+      builder.addDeletion(SourceRange(operatorOffset, removedPartLength));
     });
   }
 }

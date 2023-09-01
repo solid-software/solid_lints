@@ -36,7 +36,7 @@ bool hasWidgetType(DartType type) =>
         _isListInheritedProvider(type) ||
         _isFutureInheritedProvider(type));
 
-bool isIterableOrSubclass(DartType? type) =>
+bool isIterable(DartType? type) =>
     _checkSelfOrSupertypes(type, (t) => t?.isDartCoreIterable ?? false);
 
 bool isNullableType(DartType? type) =>
