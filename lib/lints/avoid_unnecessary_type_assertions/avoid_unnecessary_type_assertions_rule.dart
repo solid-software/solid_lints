@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
+import 'package:solid_lints/utils/typecast_utils.dart';
 import 'package:solid_lints/utils/types_utils.dart';
 
 part 'avoid_unnecessary_type_assertions_fix.dart';
@@ -112,49 +113,63 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
       return false;
     }
 
-    if (_isNullableCompatibility(objectType, castedType)) {
+    final typeCast = TypeCast(
+      source: objectType,
+      target: castedType,
+    );
+
+    if (_isNullableCompatibility(typeCast)) {
       return false;
     }
 
-    final objectCastedType = _castTypeInHierarchy(objectType, castedType);
+    final objectCastedType = _castTypeInHierarchy(typeCast);
 
     if (objectCastedType == null) {
       return isReversed;
     }
 
-    if (!_areGenericsWithSameTypeArgs(objectCastedType, castedType)) {
+    final objectTypeCast = TypeCast(
+      source: objectCastedType,
+      target: castedType,
+    );
+    if (!_areGenericsWithSameTypeArgs(objectTypeCast)) {
       return false;
     }
 
     return !isReversed;
   }
 
-  bool _isNullableCompatibility(DartType objectType, DartType castedType) {
-    final isObjectTypeNullable = isNullableType(objectType);
-    final isCastedTypeNullable = isNullableType(castedType);
+  bool _isNullableCompatibility(TypeCast typeCast) {
+    final isObjectTypeNullable = isNullableType(typeCast.source);
+    final isCastedTypeNullable = isNullableType(typeCast.target);
 
     // Only one case `Type? is Type` always valid assertion case.
     return isObjectTypeNullable && !isCastedTypeNullable;
   }
 
-  DartType? _castTypeInHierarchy(DartType objectType, DartType castType) {
-    if (objectType.element == castType.element) {
-      return objectType;
+  DartType? _castTypeInHierarchy(TypeCast typeCast) {
+    if (typeCast.source.element == typeCast.target.element) {
+      return typeCast.source;
     }
 
+    final objectType = typeCast.source;
     if (objectType is InterfaceType) {
-      return objectType.allSupertypes
-          .firstWhereOrNull((value) => value.element == castType.element);
+      return objectType.allSupertypes.firstWhereOrNull(
+        (value) => value.element == typeCast.target.element,
+      );
     }
 
     return null;
   }
 
-  bool _areGenericsWithSameTypeArgs(DartType objectType, DartType castedType) {
-    if (objectType is! ParameterizedType || castedType is! ParameterizedType) {
+  bool _areGenericsWithSameTypeArgs(TypeCast typeCast) {
+    if (typeCast.source is! ParameterizedType ||
+        typeCast.target is! ParameterizedType) {
       return false;
     }
 
+    final objectType = typeCast.source as ParameterizedType;
+    final castedType = typeCast.target as ParameterizedType;
     if (objectType.typeArguments.length != castedType.typeArguments.length) {
       return false;
     }
