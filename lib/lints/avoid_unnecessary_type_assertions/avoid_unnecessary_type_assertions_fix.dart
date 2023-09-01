@@ -30,5 +30,25 @@ class _UnnecessaryTypeAssertionsFix extends DartFix {
         );
       });
     });
+
+    context.registry.addMethodInvocation((node) {
+      // checks that the literal declaration is where our warning is located
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: "Remove unnecessary 'whereType'",
+        priority: 1,
+      );
+
+      final operatorOffset = node.operator?.offset ?? node.offset;
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addDeletion(
+          SourceRange(
+            operatorOffset,
+            node.length - (operatorOffset - node.offset),
+          ),
+        );
+      });
+    });
   }
 }
