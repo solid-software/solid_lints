@@ -10,8 +10,9 @@ void fun() {
   // expect_lint: avoid-unnecessary-type-assertions
   final result = testList is List<double>;
 
+  // to check quick-fix => testList.length
   // expect_lint: avoid-unnecessary-type-assertions
-  testList.whereType<double>();
+  testList.whereType<double>().length;
 
   final dynamicList = <dynamic>[1.0, 2.0];
   dynamicList.whereType<double>();
