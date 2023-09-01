@@ -13,7 +13,7 @@ class _UnnecessaryTypeAssertionsFix extends DartFix {
   ) {
     context.registry.addIsExpression((node) {
       if (analysisError.sourceRange.intersects(node.sourceRange)) {
-        _addDeletion(reporter, 'is', node, node.isOperator.offset);
+        _addDeletion(reporter, operatorIsName, node, node.isOperator.offset);
       }
     });
 
@@ -21,7 +21,7 @@ class _UnnecessaryTypeAssertionsFix extends DartFix {
       if (analysisError.sourceRange.intersects(node.sourceRange)) {
         _addDeletion(
           reporter,
-          'whereType',
+          whereTypeMethodName,
           node,
           node.operator?.offset ?? node.offset,
         );
