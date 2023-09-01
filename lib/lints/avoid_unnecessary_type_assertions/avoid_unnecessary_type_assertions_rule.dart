@@ -107,6 +107,11 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
     return false;
   }
 
+  /// Checks that type checking is unnecessary
+  /// [objectType] is the source expression type
+  /// [castedType] is the type against which the expression type is compared
+  /// [isReversed] true for opposite comparison, i.e 'is!'
+  /// and false for positive comparison, i.e. 'is' or 'whereType'
   bool _isUnnecessaryTypeCheck(
     DartType? objectType,
     DartType? castedType, {
