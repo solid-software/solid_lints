@@ -130,7 +130,7 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
       return false;
     }
 
-    final objectCastedType = _castTypeInHierarchy(typeCast);
+    final objectCastedType = typeCast.castTypeInHierarchy();
 
     if (objectCastedType == null) {
       return isReversed;
@@ -153,21 +153,6 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
 
     // Only one case `Type? is Type` always valid assertion case.
     return isObjectTypeNullable && !isCastedTypeNullable;
-  }
-
-  DartType? _castTypeInHierarchy(TypeCast typeCast) {
-    if (typeCast.source.element == typeCast.target.element) {
-      return typeCast.source;
-    }
-
-    final objectType = typeCast.source;
-    if (objectType is InterfaceType) {
-      return objectType.allSupertypes.firstWhereOrNull(
-        (value) => value.element == typeCast.target.element,
-      );
-    }
-
-    return null;
   }
 
   bool _areGenericsWithSameTypeArgs(TypeCast typeCast) {
