@@ -88,23 +88,23 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   }
 
   bool _isUnnecessaryWhereType(MethodInvocation node) {
-    final targetType = node.target?.staticType;
-
-    if (node.methodName.name == whereTypeMethodName &&
-        isIterable(node.realTarget?.staticType) &&
-        targetType is ParameterizedType) {
-      final targetHasExplicitTypeArgs = targetType.typeArguments.isNotEmpty;
-      final arguments = node.typeArguments?.arguments;
-      final invocationHasExplicitTypeArgs = arguments?.isNotEmpty ?? false;
-
-      return targetHasExplicitTypeArgs &&
-          invocationHasExplicitTypeArgs &&
-          _isUnnecessaryTypeCheck(
-            targetType.typeArguments.first,
-            arguments?.first.type,
-          );
+    if (node
+        case MethodInvocation(
+          methodName: Identifier(name: whereTypeMethodName),
+          target: Expression(staticType: final targetType),
+          realTarget: Expression(staticType: final realTargetType),
+          typeArguments: TypeArgumentList(arguments: final arguments),
+        )
+        when targetType is ParameterizedType &&
+            isIterable(realTargetType) &&
+            arguments.isNotEmpty) {
+      return _isUnnecessaryTypeCheck(
+        targetType.typeArguments.first,
+        arguments.first.type,
+      );
+    } else {
+      return false;
     }
-    return false;
   }
 
   /// Checks that type checking is unnecessary
