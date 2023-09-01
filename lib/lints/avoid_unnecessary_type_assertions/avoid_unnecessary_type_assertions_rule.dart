@@ -12,9 +12,14 @@ import 'package:solid_lints/utils/types_utils.dart';
 
 part 'avoid_unnecessary_type_assertions_fix.dart';
 
+/// The name of 'is' operator
+const operatorIsName = 'is';
+
+/// The name of 'whereType' method
+const whereTypeMethodName = 'whereType';
+
 /// A `avoid-unnecessary-type-assertions` rule which
 /// warns about unnecessary usage of `is` and `whereType` operators
-
 class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
@@ -22,12 +27,12 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
 
   static const _unnecessaryIsCode = LintCode(
     name: lintName,
-    problemMessage: "Unnecessary usage of the 'is' operator.",
+    problemMessage: "Unnecessary usage of the '$operatorIsName' operator.",
   );
 
   static const _unnecessaryWhereTypeCode = LintCode(
     name: lintName,
-    problemMessage: "Unnecessary usage of the 'whereType' method.",
+    problemMessage: "Unnecessary usage of the '$whereTypeMethodName' method.",
   );
 
   AvoidUnnecessaryTypeAssertions._(super.config);
@@ -83,8 +88,6 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   }
 
   bool _isUnnecessaryWhereType(MethodInvocation node) {
-    const whereTypeMethodName = 'whereType';
-
     final targetType = node.target?.staticType;
 
     if (node.methodName.name == whereTypeMethodName &&
