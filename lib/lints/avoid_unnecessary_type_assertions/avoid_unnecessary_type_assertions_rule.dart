@@ -171,18 +171,18 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   }
 
   bool _areGenericsWithSameTypeArgs(TypeCast typeCast) {
-    if (typeCast.source is! ParameterizedType ||
-        typeCast.target is! ParameterizedType) {
+    if (typeCast
+        case TypeCast(source: final objectType, target: final castedType)
+        when objectType is ParameterizedType &&
+            castedType is ParameterizedType) {
+      if (objectType.typeArguments.length != castedType.typeArguments.length) {
+        return false;
+      }
+
+      return IterableZip([objectType.typeArguments, castedType.typeArguments])
+          .every((e) => _isUnnecessaryTypeCheck(e[0], e[1]));
+    } else {
       return false;
     }
-
-    final objectType = typeCast.source as ParameterizedType;
-    final castedType = typeCast.target as ParameterizedType;
-    if (objectType.typeArguments.length != castedType.typeArguments.length) {
-      return false;
-    }
-
-    return IterableZip([objectType.typeArguments, castedType.typeArguments])
-        .every((e) => _isUnnecessaryTypeCheck(e[0], e[1]));
   }
 }
