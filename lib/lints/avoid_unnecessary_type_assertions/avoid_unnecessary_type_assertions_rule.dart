@@ -26,7 +26,7 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
 
   static const _unnecessaryWhereTypeCode = LintCode(
     name: lintName,
-    problemMessage: "Unnecessary usage of the 'whereType'.",
+    problemMessage: "Unnecessary usage of the 'whereType' method.",
   );
 
   AvoidUnnecessaryTypeAssertions._(super.config);
@@ -37,8 +37,7 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      problemMessage: (_) =>
-          "Unnecessary usage of 'is' or 'whereType' operators.",
+      problemMessage: (_) => "Unnecessary usage of typecast operators.",
     );
 
     return AvoidUnnecessaryTypeAssertions._(rule);
@@ -70,20 +69,16 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
     final objectType = node.expression.staticType;
     final castedType = node.type.type;
 
-    if (node.notOperator != null) {
-      if (objectType != null &&
-          objectType is! TypeParameterType &&
-          objectType is! DynamicType &&
-          !objectType.isDartCoreObject) {
-        return _isUnnecessaryTypeCheck(
-          objectType,
-          castedType,
-          isReversed: true,
-        );
-      }
+    if (node.notOperator != null &&
+        objectType != null &&
+        objectType is! TypeParameterType &&
+        objectType is! DynamicType &&
+        !objectType.isDartCoreObject &&
+        _isUnnecessaryTypeCheck(objectType, castedType, isReversed: true)) {
+      return true;
+    } else {
+      return _isUnnecessaryTypeCheck(objectType, castedType);
     }
-
-    return _isUnnecessaryTypeCheck(objectType, castedType);
   }
 
   bool _isUnnecessaryWhereType(MethodInvocation node) {
@@ -92,14 +87,14 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
     final targetType = node.target?.staticType;
 
     if (node.methodName.name == whereTypeMethodName &&
-        isIterableOrSubclass(node.realTarget?.staticType) &&
+        isIterable(node.realTarget?.staticType) &&
         targetType is ParameterizedType) {
-      final isTargetTypeHasGeneric = targetType.typeArguments.isNotEmpty;
+      final targetHasExplicitTypeArgs = targetType.typeArguments.isNotEmpty;
       final arguments = node.typeArguments?.arguments;
-      final isWhereTypeHasGeneric = arguments?.isNotEmpty ?? false;
+      final invocationHasExplicitTypeArgs = arguments?.isNotEmpty ?? false;
 
-      return isTargetTypeHasGeneric &&
-          isWhereTypeHasGeneric &&
+      return targetHasExplicitTypeArgs &&
+          invocationHasExplicitTypeArgs &&
           _isUnnecessaryTypeCheck(
             targetType.typeArguments.first,
             arguments?.first.type,
@@ -121,14 +116,13 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
       return false;
     }
 
-    final objectCastedType =
-        _castedTypeInObjectTypeHierarchy(objectType, castedType);
+    final objectCastedType = _castTypeInHierarchy(objectType, castedType);
 
     if (objectCastedType == null) {
       return isReversed;
     }
 
-    if (!_isGenerics(objectCastedType, castedType)) {
+    if (!_areGenericsWithSameTypeArgs(objectCastedType, castedType)) {
       return false;
     }
 
@@ -143,41 +137,29 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
     return isObjectTypeNullable && !isCastedTypeNullable;
   }
 
-  DartType? _castedTypeInObjectTypeHierarchy(
-    DartType objectType,
-    DartType castedType,
-  ) {
-    if (objectType.element == castedType.element) {
+  DartType? _castTypeInHierarchy(DartType objectType, DartType castType) {
+    if (objectType.element == castType.element) {
       return objectType;
     }
 
     if (objectType is InterfaceType) {
       return objectType.allSupertypes
-          .firstWhereOrNull((value) => value.element == castedType.element);
+          .firstWhereOrNull((value) => value.element == castType.element);
     }
 
     return null;
   }
 
-  bool _isGenerics(DartType objectType, DartType castedType) {
+  bool _areGenericsWithSameTypeArgs(DartType objectType, DartType castedType) {
     if (objectType is! ParameterizedType || castedType is! ParameterizedType) {
       return false;
     }
 
-    final length = objectType.typeArguments.length;
-    if (length != castedType.typeArguments.length) {
+    if (objectType.typeArguments.length != castedType.typeArguments.length) {
       return false;
     }
 
-    for (var argumentIndex = 0; argumentIndex < length; argumentIndex++) {
-      if (!_isUnnecessaryTypeCheck(
-        objectType.typeArguments[argumentIndex],
-        castedType.typeArguments[argumentIndex],
-      )) {
-        return false;
-      }
-    }
-
-    return true;
+    return IterableZip([objectType.typeArguments, castedType.typeArguments])
+        .every((e) => _isUnnecessaryTypeCheck(e[0], e[1]));
   }
 }
