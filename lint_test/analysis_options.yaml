@@ -16,3 +16,4 @@ custom_lint:
     - avoid_returning_widgets
     - avoid_unnecessary_setstate
     - double-literal-format
+    - avoid-unnecessary-type-assertions

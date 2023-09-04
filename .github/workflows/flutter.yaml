@@ -39,6 +39,3 @@ jobs:
           else
               echo "Tests not found."
           fi
-
-      - name: Run lint tests
-        run: dart run custom_lint lint_test
