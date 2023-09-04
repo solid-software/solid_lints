@@ -37,3 +37,9 @@ jobs:
           else
               echo "Tests not found."
           fi
+
+      - name: Run lint tests
+        run: |
+          cd lint_test
+          flutter pub get;
+          dart run custom_lint lint_test;

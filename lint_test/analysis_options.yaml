@@ -1,0 +1,18 @@
+analyzer:
+  plugins:
+    - custom_lint
+
+custom_lint:
+  rules:
+    - cyclomatic_complexity:
+      max_complexity: 4
+    - number_of_parameters:
+      max_parameters: 2
+    - function_lines_of_code:
+      max_lines: 50
+    - avoid_non_null_assertion
+    - avoid_late_keyword
+    - avoid_global_state
+    - avoid_returning_widgets
+    - avoid_unnecessary_setstate
+    - double-literal-format
