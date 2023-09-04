@@ -3,7 +3,7 @@
 /// Check returning a widget fail
 /// `avoid_returning_widgets`
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 // expect_lint: avoid_returning_widgets
 Widget avoidReturningWidgets() => const SizedBox();

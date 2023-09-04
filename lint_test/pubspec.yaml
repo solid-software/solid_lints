@@ -1,0 +1,15 @@
+name: solid_lints_test
+description: A starting point for Dart libraries or applications.
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  solid_lints:
+    path: ../
+  test: ^1.20.1
