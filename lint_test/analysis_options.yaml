@@ -18,3 +18,4 @@ custom_lint:
     - double-literal-format
     - avoid-unnecessary-type-assertions
     - avoid-unnecessary-type-casts
+    - avoid-unrelated-type-assertions
