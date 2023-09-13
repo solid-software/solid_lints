@@ -11,9 +11,9 @@ class _UnnecessaryTypeCastsFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry.addIsExpression((node) {
+    context.registry.addAsExpression((node) {
       if (analysisError.sourceRange.intersects(node.sourceRange)) {
-        _addDeletion(reporter, 'as', node, node.isOperator.offset);
+        _addDeletion(reporter, 'as', node, node.asOperator.offset);
       }
     });
   }
