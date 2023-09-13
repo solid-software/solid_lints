@@ -1,11 +1,16 @@
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/avoid_unnecessary_type_casts/avoid_unnecessary_type_casts_visitor.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
+part 'avoid_unnecessary_type_casts_fix.dart';
+
 /// A `avoid-unnecessary-type-casts` rule which
-/// warns about unnecessary usage of `is` and `whereType` operators
+/// warns about unnecessary usage of `as` operator
 class AvoidUnnecessaryTypeCastsRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
@@ -41,4 +46,7 @@ class AvoidUnnecessaryTypeCastsRule extends SolidLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => [_UnnecessaryTypeCastsFix()];
 }
