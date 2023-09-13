@@ -17,3 +17,4 @@ custom_lint:
     - avoid_unnecessary_setstate
     - double-literal-format
     - avoid-unnecessary-type-assertions
+    - avoid-unnecessary-type-casts
