@@ -78,16 +78,21 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
       return false;
     }
 
-    final typeCast = TypeCast(source: objectType, target: castedType);
+    final typeCast = TypeCast(
+      source: objectType,
+      target: castedType,
+      isReversed: true,
+    );
 
     if (node.notOperator != null &&
         objectType is! TypeParameterType &&
         objectType is! DynamicType &&
         !objectType.isDartCoreObject &&
-        typeCast.isUnnecessaryTypeCheck(isReversed: true)) {
+        typeCast.isUnnecessaryTypeCheck) {
       return true;
     } else {
-      return typeCast.isUnnecessaryTypeCheck();
+      final typeCast = TypeCast(source: objectType, target: castedType);
+      return typeCast.isUnnecessaryTypeCheck;
     }
   }
 
@@ -111,7 +116,7 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
 
       final typeCast = TypeCast(source: objectType, target: castedType);
 
-      return typeCast.isUnnecessaryTypeCheck();
+      return typeCast.isUnnecessaryTypeCheck;
     } else {
       return false;
     }

@@ -16,7 +16,7 @@ void fun() {
   // casting `Type? is Type` is allowed
   final castedD = nullableD as double;
 
-  final testMap = { 'A': 'B' };
+  final testMap = {'A': 'B'};
 
   // expect_lint: avoid-unnecessary-type-casts
   final castedMapValue = testMap['A'] as String?;
