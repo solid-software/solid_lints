@@ -62,7 +62,6 @@ class TypeCast {
     }
 
     final objectCastedType = castTypeInHierarchy();
-
     if (objectCastedType == null) {
       return isReversed;
     }
@@ -71,7 +70,6 @@ class TypeCast {
       source: objectCastedType,
       target: target,
     );
-
     if (!objectTypeCast.areGenericsWithSameTypeArgs()) {
       return false;
     }
