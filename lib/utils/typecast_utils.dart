@@ -83,6 +83,10 @@ class TypeCast {
 
   /// Checks for type arguments and compares them
   bool get areGenericsWithSameTypeArgs {
+    if (source is DynamicType || target is DynamicType) {
+      return false;
+    }
+
     if (this case TypeCast(source: final objectType, target: final castedType)
         when objectType is ParameterizedType &&
             castedType is ParameterizedType) {
