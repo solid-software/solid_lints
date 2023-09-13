@@ -7,6 +7,7 @@ import 'package:solid_lints/lints/avoid_non_null_assertion/avoid_non_null_assert
 import 'package:solid_lints/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
 import 'package:solid_lints/lints/avoid_unnecessary_setstate/avoid_unnecessary_set_state_rule.dart';
 import 'package:solid_lints/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
+import 'package:solid_lints/lints/avoid_unnecessary_type_casts/avoid_unnecessary_type_casts_rule.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/lints/function_lines_of_code/function_lines_of_code_metric.dart';
@@ -31,6 +32,7 @@ class _SolidLints extends PluginBase {
       DoubleLiteralFormatRule.createRule(configs),
       AvoidUnnecessaryTypeAssertions.createRule(configs),
       AvoidUnnecessarySetStateRule.createRule(configs),
+      AvoidUnnecessaryTypeCastsRule.createRule(configs),
     ];
 
     // Return only enabled rules
