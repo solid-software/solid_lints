@@ -17,9 +17,16 @@ class TypeCast {
   /// The type being tested for
   final DartType target;
 
+  /// Set to true for opposite comparison, i.e 'is!'
+  final bool isReversed;
+
   /// Creates a new Typecast object with a given expression's or object's type
   /// and a tested type
-  TypeCast({required this.source, required this.target});
+  TypeCast({
+    required this.source,
+    required this.target,
+    this.isReversed = false,
+  });
 
   /// Returns the first type from source's supertypes
   /// which is corresponding to target or null
@@ -40,7 +47,7 @@ class TypeCast {
 
   /// Checks for nullable type casts
   /// Only one case `Type? is Type` always valid assertion case.
-  bool isNullableCompatibility() {
+  bool get isNullableCompatibility {
     final isObjectTypeNullable =
         source.nullabilitySuffix != NullabilitySuffix.none;
     final isCastedTypeNullable =
@@ -52,12 +59,9 @@ class TypeCast {
   /// Checks that type checking is unnecessary
   /// [source] is the source expression type
   /// [target] is the type against which the expression type is compared
-  /// [isReversed] true for opposite comparison, i.e 'is!'
   /// and false for positive comparison, i.e. 'is', 'as' or 'whereType'
-  bool isUnnecessaryTypeCheck({
-    bool isReversed = false,
-  }) {
-    if (isNullableCompatibility()) {
+  bool get isUnnecessaryTypeCheck {
+    if (isNullableCompatibility) {
       return false;
     }
 
@@ -70,7 +74,7 @@ class TypeCast {
       source: objectCastedType,
       target: target,
     );
-    if (!objectTypeCast.areGenericsWithSameTypeArgs()) {
+    if (!objectTypeCast.areGenericsWithSameTypeArgs) {
       return false;
     }
 
@@ -78,7 +82,7 @@ class TypeCast {
   }
 
   /// Checks for type arguments and compares them
-  bool areGenericsWithSameTypeArgs() {
+  bool get areGenericsWithSameTypeArgs {
     if (this case TypeCast(source: final objectType, target: final castedType)
         when objectType is ParameterizedType &&
             castedType is ParameterizedType) {
@@ -87,9 +91,8 @@ class TypeCast {
       }
 
       return IterableZip([objectType.typeArguments, castedType.typeArguments])
-          .every(
-        (e) => TypeCast(source: e[0], target: e[1]).isUnnecessaryTypeCheck(),
-      );
+          .map((e) => TypeCast(source: e[0], target: e[1]))
+          .every((cast) => cast.isUnnecessaryTypeCheck);
     } else {
       return false;
     }

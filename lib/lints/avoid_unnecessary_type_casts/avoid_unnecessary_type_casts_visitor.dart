@@ -49,7 +49,7 @@ class AvoidUnnecessaryTypeCastsVisitor extends RecursiveAstVisitor<void> {
       target: castedType,
     );
 
-    if (typeCast.isUnnecessaryTypeCheck()) {
+    if (typeCast.isUnnecessaryTypeCheck) {
       _expressions[node] = 'as';
     }
   }
