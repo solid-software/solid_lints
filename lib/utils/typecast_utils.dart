@@ -55,8 +55,8 @@ class TypeCast {
   /// [isReversed] true for opposite comparison, i.e 'is!'
   /// and false for positive comparison, i.e. 'is', 'as' or 'whereType'
   bool isUnnecessaryTypeCheck({
-        bool isReversed = false,
-      }) {
+    bool isReversed = false,
+  }) {
     if (isNullableCompatibility()) {
       return false;
     }
@@ -79,21 +79,19 @@ class TypeCast {
     return !isReversed;
   }
 
-
   /// Checks for type arguments and compares them
   bool areGenericsWithSameTypeArgs() {
-    if (this
-        case TypeCast(source: final objectType, target: final castedType)
-        when objectType is ParameterizedType && castedType is ParameterizedType
-    ) {
+    if (this case TypeCast(source: final objectType, target: final castedType)
+        when objectType is ParameterizedType &&
+            castedType is ParameterizedType) {
       if (objectType.typeArguments.length != castedType.typeArguments.length) {
         return false;
       }
 
       return IterableZip([objectType.typeArguments, castedType.typeArguments])
-        .every(
-          (e) => TypeCast(source: e[0], target: e[1]).isUnnecessaryTypeCheck(),
-        );
+          .every(
+        (e) => TypeCast(source: e[0], target: e[1]).isUnnecessaryTypeCheck(),
+      );
     } else {
       return false;
     }
