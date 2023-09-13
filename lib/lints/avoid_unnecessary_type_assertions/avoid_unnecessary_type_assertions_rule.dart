@@ -3,7 +3,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
-import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
@@ -75,15 +74,20 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
     final objectType = node.expression.staticType;
     final castedType = node.type.type;
 
+    if (objectType == null || castedType == null) {
+      return false;
+    }
+
+    final typeCast = TypeCast(source: objectType, target: castedType);
+
     if (node.notOperator != null &&
-        objectType != null &&
         objectType is! TypeParameterType &&
         objectType is! DynamicType &&
         !objectType.isDartCoreObject &&
-        _isUnnecessaryTypeCheck(objectType, castedType, isReversed: true)) {
+        typeCast.isUnnecessaryTypeCheck(isReversed: true)) {
       return true;
     } else {
-      return _isUnnecessaryTypeCheck(objectType, castedType);
+      return typeCast.isUnnecessaryTypeCheck();
     }
   }
 
@@ -98,74 +102,17 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
         when targetType is ParameterizedType &&
             isIterable(realTargetType) &&
             arguments.isNotEmpty) {
-      return _isUnnecessaryTypeCheck(
-        targetType.typeArguments.first,
-        arguments.first.type,
-      );
-    } else {
-      return false;
-    }
-  }
 
-  /// Checks that type checking is unnecessary
-  /// [objectType] is the source expression type
-  /// [castedType] is the type against which the expression type is compared
-  /// [isReversed] true for opposite comparison, i.e 'is!'
-  /// and false for positive comparison, i.e. 'is' or 'whereType'
-  bool _isUnnecessaryTypeCheck(
-    DartType? objectType,
-    DartType? castedType, {
-    bool isReversed = false,
-  }) {
-    if (objectType == null || castedType == null) {
-      return false;
-    }
+      final objectType = targetType.typeArguments.first;
+      final castedType = arguments.first.type;
 
-    final typeCast = TypeCast(
-      source: objectType,
-      target: castedType,
-    );
-
-    if (_isNullableCompatibility(typeCast)) {
-      return false;
-    }
-
-    final objectCastedType = typeCast.castTypeInHierarchy();
-
-    if (objectCastedType == null) {
-      return isReversed;
-    }
-
-    final objectTypeCast = TypeCast(
-      source: objectCastedType,
-      target: castedType,
-    );
-    if (!_areGenericsWithSameTypeArgs(objectTypeCast)) {
-      return false;
-    }
-
-    return !isReversed;
-  }
-
-  bool _isNullableCompatibility(TypeCast typeCast) {
-    final isObjectTypeNullable = isNullableType(typeCast.source);
-    final isCastedTypeNullable = isNullableType(typeCast.target);
-
-    // Only one case `Type? is Type` always valid assertion case.
-    return isObjectTypeNullable && !isCastedTypeNullable;
-  }
-
-  bool _areGenericsWithSameTypeArgs(TypeCast typeCast) {
-    if (typeCast
-        case TypeCast(source: final objectType, target: final castedType)
-        when objectType is ParameterizedType &&
-            castedType is ParameterizedType) {
-      if (objectType.typeArguments.length != castedType.typeArguments.length) {
+      if (castedType == null) {
         return false;
       }
 
-      return IterableZip([objectType.typeArguments, castedType.typeArguments])
-          .every((e) => _isUnnecessaryTypeCheck(e[0], e[1]));
+      final typeCast = TypeCast(source: objectType, target: castedType);
+
+      return typeCast.isUnnecessaryTypeCheck();
     } else {
       return false;
     }

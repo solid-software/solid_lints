@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 
@@ -35,5 +36,66 @@ class TypeCast {
     }
 
     return null;
+  }
+
+  /// Checks for nullable type casts
+  /// Only one case `Type? is Type` always valid assertion case.
+  bool isNullableCompatibility() {
+    final isObjectTypeNullable =
+        source.nullabilitySuffix != NullabilitySuffix.none;
+    final isCastedTypeNullable =
+        target.nullabilitySuffix != NullabilitySuffix.none;
+
+    return isObjectTypeNullable && !isCastedTypeNullable;
+  }
+
+  /// Checks that type checking is unnecessary
+  /// [source] is the source expression type
+  /// [target] is the type against which the expression type is compared
+  /// [isReversed] true for opposite comparison, i.e 'is!'
+  /// and false for positive comparison, i.e. 'is', 'as' or 'whereType'
+  bool isUnnecessaryTypeCheck({
+        bool isReversed = false,
+      }) {
+    if (isNullableCompatibility()) {
+      return false;
+    }
+
+    final objectCastedType = castTypeInHierarchy();
+
+    if (objectCastedType == null) {
+      return isReversed;
+    }
+
+    final objectTypeCast = TypeCast(
+      source: objectCastedType,
+      target: target,
+    );
+
+    if (!objectTypeCast.areGenericsWithSameTypeArgs()) {
+      return false;
+    }
+
+    return !isReversed;
+  }
+
+
+  /// Checks for type arguments and compares them
+  bool areGenericsWithSameTypeArgs() {
+    if (this
+        case TypeCast(source: final objectType, target: final castedType)
+        when objectType is ParameterizedType && castedType is ParameterizedType
+    ) {
+      if (objectType.typeArguments.length != castedType.typeArguments.length) {
+        return false;
+      }
+
+      return IterableZip([objectType.typeArguments, castedType.typeArguments])
+        .every(
+          (e) => TypeCast(source: e[0], target: e[1]).isUnnecessaryTypeCheck(),
+        );
+    } else {
+      return false;
+    }
   }
 }
