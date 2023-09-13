@@ -15,4 +15,21 @@ void fun() {
   final double? nullableD = 2.0;
   // casting `Type? is Type` is allowed
   final castedD = nullableD as double;
+
+  final testMap = { 'A': 'B' };
+
+  // expect_lint: avoid-unnecessary-type-casts
+  final castedMapValue = testMap['A'] as String?;
+
+  // casting `Type? is Type` is allowed
+  final castedNotNullMapValue = testMap['A'] as String;
+
+  final testString = 'String';
+  // expect_lint: avoid-unnecessary-type-casts
+  _testFun(testString as String);
+}
+
+void _testFun(String a) {
+  // expect_lint: avoid-unnecessary-type-casts
+  final result = (a as String).length;
 }
