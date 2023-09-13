@@ -102,7 +102,6 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
         when targetType is ParameterizedType &&
             isIterable(realTargetType) &&
             arguments.isNotEmpty) {
-
       final objectType = targetType.typeArguments.first;
       final castedType = arguments.first.type;
 
