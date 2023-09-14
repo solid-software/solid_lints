@@ -19,3 +19,20 @@ custom_lint:
     - avoid-unnecessary-type-assertions
     - avoid-unnecessary-type-casts
     - avoid-unrelated-type-assertions
+    - member-ordering:
+      order:
+        - public-fields
+        - private-fields
+        - constructors
+        - getters
+        - setters
+        - public-methods
+        - private-methods
+        - close-method
+      widgets-order:
+        - constructor
+        - build-method
+        - init-state-method
+        - did-change-dependencies-method
+        - did-update-widget-method
+        - dispose-method
