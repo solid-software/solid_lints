@@ -61,7 +61,6 @@ class SomeOtherAnotherClass {
 
 // expect_lint: avoid-unused-parameters
 void closure(int a) {
-
   void internal(int a) {
     print(a);
   }
