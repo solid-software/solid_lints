@@ -57,7 +57,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
         _getUnusedParameters(
           node.body,
           parameters.parameters,
-        ).whereNot(nameIsUnderscores),
+        ).whereNot(nameConsistsOfUnderscoresOnly),
       );
     }
   }
@@ -77,7 +77,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       _getUnusedParameters(
         node.functionExpression.body,
         parameters.parameters,
-      ).whereNot(nameIsUnderscores),
+      ).whereNot(nameConsistsOfUnderscoresOnly),
     );
   }
 
