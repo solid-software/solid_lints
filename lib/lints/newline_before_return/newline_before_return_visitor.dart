@@ -42,7 +42,7 @@ class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
     super.visitReturnStatement(node);
 
     if (!_statementIsInBlock(node)) return;
-    if (!_statementIsFirstInBlock(node)) return;
+    if (_statementIsFirstInBlock(node)) return;
     if (_statementHasNewLineBefore(node, _lineInfo)) return;
 
     _statements.add(node);
@@ -67,6 +67,7 @@ class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
     return tokenLineNumber > previousTokenLineNumber + 1;
   }
 
+  /// If return statement has comment above ignores all the comment lines
   static Token _optimalToken(Token token, LineInfo lineInfo) {
     var optimalToken = token;
 
