@@ -22,16 +22,18 @@ class NoEmptyBlockRule extends SolidLintRule {
       configs: configs,
       name: lintName,
       problemMessage: (_) =>
-      'Block is empty. Empty blocks are often indicators of missing code.',
+          'Block is empty. Empty blocks are often indicators of missing code.',
     );
 
     return NoEmptyBlockRule._(config);
   }
 
   @override
-  void run(CustomLintResolver resolver,
-      ErrorReporter reporter,
-      CustomLintContext context,) {
+  void run(
+    CustomLintResolver resolver,
+    ErrorReporter reporter,
+    CustomLintContext context,
+  ) {
     context.registry.addCompilationUnit((node) {
       final visitor = NoEmptyBlockVisitor();
       node.accept(visitor);

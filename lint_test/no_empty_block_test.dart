@@ -1,10 +1,20 @@
 // ignore_for_file: prefer_const_declarations
 // ignore_for_file: unused_local_variable
+// ignore_for_file: cyclomatic_complexity
 
 /// Check the `no-empty-block` rule
 
 // expect_lint: no-empty-block
 void fun() {}
+
+void anotherFun() {
+  if (true) {
+    if (true) {
+      // expect_lint: no-empty-block
+      if (true) {}
+    }
+  }
+}
 
 // to-do comments are allowed
 void toDoStuff() {
