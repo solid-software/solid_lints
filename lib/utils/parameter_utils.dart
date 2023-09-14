@@ -1,6 +1,10 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
-/// Checks if parameter has underscores in its name
-bool hasNoUnderscoresInName(FormalParameter parameter) =>
-    parameter.name != null &&
-    parameter.name!.lexeme.replaceAll('_', '').isNotEmpty;
+/// Checks if parameter name consists only of underscores
+bool nameIsUnderscores(FormalParameter parameter) {
+  final paramName = parameter.name;
+
+  if (paramName == null) return false;
+
+  return paramName.lexeme.replaceAll('_', '').isEmpty;
+}

@@ -24,6 +24,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 import 'package:solid_lints/utils/node_utils.dart';
 import 'package:solid_lints/utils/parameter_utils.dart';
 
@@ -62,7 +63,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
         _getUnusedParameters(
           node.body,
           parameters.parameters,
-        ).where(hasNoUnderscoresInName),
+        ).whereNot(nameIsUnderscores),
       );
     }
   }
@@ -82,7 +83,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       _getUnusedParameters(
         node.functionExpression.body,
         parameters.parameters,
-      ).where(hasNoUnderscoresInName),
+      ).whereNot(nameIsUnderscores),
     );
   }
 
