@@ -31,16 +31,10 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// AST Visitor which finds all is expressions and checks if they are
 /// unrelated (result always false)
 class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
-  final _unusedMethodParameters = <FormalParameter>[];
-  final _unusedFunctionParameters = <FormalParameter>[];
+  final _unusedParameters = <FormalParameter>[];
 
-  /// List of unused parameters in methods
-  Iterable<FormalParameter> get unusedMethodParameters =>
-      _unusedMethodParameters;
-
-  /// List of all unused parameters in functions
-  Iterable<FormalParameter> get unusedFunctionParameters =>
-      _unusedFunctionParameters;
+  /// List of unused parameters
+  Iterable<FormalParameter> get unusedParameters => _unusedParameters;
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
@@ -59,7 +53,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     final isTearOff = _usedAsTearOff(node);
 
     if (!isOverride(node.metadata) && !isTearOff) {
-      _unusedMethodParameters.addAll(
+      _unusedParameters.addAll(
         _getUnusedParameters(
           node.body,
           parameters.parameters,
@@ -79,7 +73,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    _unusedFunctionParameters.addAll(
+    _unusedParameters.addAll(
       _getUnusedParameters(
         node.functionExpression.body,
         parameters.parameters,

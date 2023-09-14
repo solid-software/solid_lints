@@ -33,20 +33,20 @@ class AvoidUnusedParametersRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    final visitor = AvoidUnusedParametersVisitor();
-
     context.registry.addMethodDeclaration((node) {
+      final visitor = AvoidUnusedParametersVisitor();
       visitor.visitMethodDeclaration(node);
 
-      for (final element in visitor.unusedMethodParameters) {
+      for (final element in visitor.unusedParameters) {
         reporter.reportErrorForNode(code, element);
       }
     });
 
     context.registry.addFunctionDeclaration((node) {
+      final visitor = AvoidUnusedParametersVisitor();
       visitor.visitFunctionDeclaration(node);
 
-      for (final element in visitor.unusedFunctionParameters) {
+      for (final element in visitor.unusedParameters) {
         reporter.reportErrorForNode(code, element);
       }
     });
