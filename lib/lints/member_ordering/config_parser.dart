@@ -67,7 +67,7 @@ class MemberOrderingConfigParser {
 
   /// Parse rule config for regular class order rules
   static List<MemberGroup> parseOrder(Object? orderConfig) {
-    final order = orderConfig is Iterable<String>
+    final order = orderConfig is Iterable
         ? List<String>.from(orderConfig)
         : _defaultOrderList;
 
@@ -76,7 +76,7 @@ class MemberOrderingConfigParser {
 
   /// Parse rule config for widget class order rules
   static List<MemberGroup> parseWidgetsOrder(Object? widgetsOrderConfig) {
-    final widgetsOrder = widgetsOrderConfig is Iterable<String>
+    final widgetsOrder = widgetsOrderConfig is Iterable
         ? List<String>.from(widgetsOrderConfig)
         : _defaultWidgetsOrderList;
 
