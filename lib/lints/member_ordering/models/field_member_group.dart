@@ -23,11 +23,11 @@
 
 import 'package:analyzer/dart/ast/ast.dart' show FieldDeclaration;
 import 'package:analyzer/dart/element/nullability_suffix.dart';
+import 'package:solid_lints/lints/member_ordering/member_ordering_utils.dart';
 import 'package:solid_lints/lints/member_ordering/models/annotation.dart';
 import 'package:solid_lints/lints/member_ordering/models/field_keyword.dart';
 import 'package:solid_lints/lints/member_ordering/models/member_group.dart';
 import 'package:solid_lints/lints/member_ordering/models/member_type.dart';
-import 'package:solid_lints/lints/member_ordering/member_ordering_utils.dart';
 import 'package:solid_lints/lints/member_ordering/models/modifier.dart';
 
 /// Data class represents class field

@@ -22,10 +22,10 @@
 // SOFTWARE.
 
 import 'package:analyzer/dart/ast/ast.dart' show ConstructorDeclaration;
+import 'package:solid_lints/lints/member_ordering/member_ordering_utils.dart';
 import 'package:solid_lints/lints/member_ordering/models/annotation.dart';
 import 'package:solid_lints/lints/member_ordering/models/member_group.dart';
 import 'package:solid_lints/lints/member_ordering/models/member_type.dart';
-import 'package:solid_lints/lints/member_ordering/member_ordering_utils.dart';
 import 'package:solid_lints/lints/member_ordering/models/modifier.dart';
 
 /// Data class represents class constructor
