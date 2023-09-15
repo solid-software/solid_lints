@@ -1,4 +1,5 @@
 // ignore_for_file: unused_element
+// ignore_for_file: member-ordering
 
 /// Check returning a widget fail
 /// `avoid_returning_widgets`
