@@ -1,6 +1,6 @@
 analyzer:
   plugins:
-    - custom_lint
+    - ../custom_lint
 
 custom_lint:
   rules:
