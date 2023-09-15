@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 // ignore_for_file: cyclomatic_complexity
+// ignore_for_file: no-magic-number
 
 /// Check the `no-equal-then-else` rule
 void fun() {
