@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field
 // ignore_for_file: unused_element
+// ignore_for_file: no-empty-block
 
 import 'package:flutter/widgets.dart';
 
