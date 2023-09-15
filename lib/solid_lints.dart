@@ -16,6 +16,7 @@ import 'package:solid_lints/lints/newline_before_return/newline_before_return_ru
 import 'package:solid_lints/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:solid_lints/lints/no_equal_then_else/no_equal_then_else_rule.dart';
 import 'package:solid_lints/lints/number_of_parameters/number_of_parameters_metric.dart';
+import 'package:solid_lints/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// Creates a plugin for our custom linter
@@ -41,6 +42,7 @@ class _SolidLints extends PluginBase {
       NewlineBeforeReturnRule.createRule(configs),
       NoEmptyBlockRule.createRule(configs),
       NoEqualThenElseRule.createRule(configs),
+      PreferConditionalExpressionsRule.createRule(configs),
     ];
 
     // Return only enabled rules
