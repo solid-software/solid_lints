@@ -3,6 +3,7 @@
 // ignore_for_file: unused_local_variable
 // ignore_for_file: unused_element
 // ignore_for_file: newline-before-return
+// ignore_for_file: no-empty-block
 
 import 'package:flutter/material.dart';
 
