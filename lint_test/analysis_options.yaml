@@ -19,4 +19,5 @@ custom_lint:
     - avoid-unnecessary-type-assertions
     - avoid-unnecessary-type-casts
     - avoid-unrelated-type-assertions
+    - newline-before-return
     - no-empty-block
