@@ -2,6 +2,7 @@
 // ignore_for_file: cyclomatic_complexity
 // ignore_for_file: no-equal-then-else
 // ignore_for_file: dead_code
+// ignore_for_file: no-magic-number
 
 /// Check the `prefer-conditional-expressions` rule
 void fun() {
