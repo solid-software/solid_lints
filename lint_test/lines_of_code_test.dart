@@ -1,3 +1,5 @@
+// ignore_for_file: no-magic-number
+
 import 'package:test/test.dart';
 
 /// Check number of lines fail
