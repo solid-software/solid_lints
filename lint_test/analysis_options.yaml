@@ -30,6 +30,13 @@ custom_lint:
         - private-methods
         - close-method
       widgets-order:
+        - const-fields
+        - static-fields
+        - static-methods
+        - public-fields
+        - private-fields
+        - public-methods
+        - private-methods
         - constructor
         - build-method
         - init-state-method

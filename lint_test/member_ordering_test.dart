@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_declarations
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations
 // ignore_for_file: unnecessary_cast
+// ignore_for_file: unused_field
+// ignore_for_file: unused_element
 // ignore_for_file: unused_local_variable
 
 import 'package:flutter/widgets.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/widgets.dart';
 
 class A {
   int _a = 1;
+
   // expect_lint: member-ordering
   final b = 2;
 
@@ -33,6 +36,30 @@ class AWidget extends StatefulWidget {
 }
 
 class _AWidgetState extends State<AWidget> {
+  final _aWidgetDouble = 1;
+
+  // should be before private-fields
+  // expect_lint: member-ordering
+  final aWidgetInt = 1;
+
+  // should be before public-fields
+  // expect_lint: member-ordering
+  static double staticGetDouble() => 0.0;
+
+  // should be before public-fields
+  // expect_lint: member-ordering
+  static const _aWidgetString = 'AWidget';
+
+  void _privateDoStuff() {}
+
+  // should be before private-methods
+  // expect_lint: member-ordering
+  void doStuff() {}
+
+  // should be before public-methods
+  // expect_lint: member-ordering
+  static final aWidgetString = 'AWidget';
+
   @override
   void initState() {
     super.initState();
