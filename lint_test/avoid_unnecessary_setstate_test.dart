@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// ignore_for_file: member-ordering
+
 import 'package:flutter/material.dart';
 
 /// Check unnecessary setstate fail
