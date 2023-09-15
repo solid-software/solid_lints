@@ -77,6 +77,8 @@ class Foo {
 
   Foo.name(this.a, this.b);
 
+  Foo.coolName({required this.a, required this.b});
+
   // expect_lint: avoid-unused-parameters
   Foo.another({required int c})
       : a = 1,
