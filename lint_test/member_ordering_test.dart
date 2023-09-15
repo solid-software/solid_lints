@@ -1,91 +1,211 @@
-// ignore_for_file: prefer_const_declarations
-// ignore_for_file: unnecessary_nullable_for_final_variable_declarations
-// ignore_for_file: unnecessary_cast
 // ignore_for_file: unused_field
 // ignore_for_file: unused_element
-// ignore_for_file: unused_local_variable
 
 import 'package:flutter/widgets.dart';
 
 /// Check the `member-ordering` rule
 
-class A {
-  int _a = 1;
+class CorrectOrder {
+  final publicField = 1;
+  int _privateField = 2;
 
-  // expect_lint: member-ordering
-  final b = 2;
+  CorrectOrder();
 
-  // Allowed because it's before constructor according to config
-  set a(int value) => _a = value;
+  int get privateFieldGetter => _privateField;
 
-  // expect_lint: member-ordering
-  A();
+  void set privateFieldSetter(int value) {
+    _privateField = value;
+  }
 
-  void close() {}
-
-  // should be before close-method
-  // expect_lint: member-ordering
-  int get a => _a;
-}
-
-class AWidget extends StatefulWidget {
-  const AWidget({super.key});
-
-  @override
-  State<AWidget> createState() => _AWidgetState();
-}
-
-class _AWidgetState extends State<AWidget> {
-  final _aWidgetDouble = 1;
-
-  // should be before private-fields
-  // expect_lint: member-ordering
-  final aWidgetInt = 1;
-
-  // should be before public-fields
-  // expect_lint: member-ordering
-  static double staticGetDouble() => 0.0;
-
-  // should be before public-fields
-  // expect_lint: member-ordering
-  static const _aWidgetString = 'AWidget';
+  void publicDoStuff() {}
 
   void _privateDoStuff() {}
 
-  // should be before private-methods
+  void close() {}
+}
+
+class WrongOrder {
+  void close() {}
+
   // expect_lint: member-ordering
-  void doStuff() {}
+  void _privateDoStuff() {}
 
-  // should be before public-methods
   // expect_lint: member-ordering
-  static final aWidgetString = 'AWidget';
+  void publicDoStuff() {}
 
-  @override
-  void initState() {
-    super.initState();
+  // expect_lint: member-ordering
+  void set privateFieldSetter(int value) {
+    _privateField = value;
   }
 
-  @override
-  void didUpdateWidget(covariant AWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  // expect_lint: member-ordering
+  int get privateFieldGetter => _privateField;
+
+  // expect_lint: member-ordering
+  WrongOrder();
+
+  // expect_lint: member-ordering
+  int _privateField = 2;
+
+  // expect_lint: member-ordering
+  final publicField = 1;
+}
+
+class PartiallyWrongOrder {
+  final publicField = 1;
+
+  PartiallyWrongOrder();
+
+  // expect_lint: member-ordering
+  int _privateField = 2;
+
+  int get privateFieldGetter => _privateField;
+
+  void set privateFieldSetter(int value) {
+    _privateField = value;
   }
 
-  // should be before did-update-widget
+  void _privateDoStuff() {}
+
+  // expect_lint: member-ordering
+  void publicDoStuff() {}
+
+  void close() {}
+}
+
+class CorrectWidget extends StatefulWidget {
+  @override
+  State<CorrectWidget> createState() => _CorrectWidgetState();
+
+  const CorrectWidget({super.key});
+}
+
+class _CorrectWidgetState extends State<CorrectWidget> {
+  static const constField = 1;
+  static final staticField = 1;
+
+  static void staticDoStuff() {}
+
+  final publicField = 1;
+  final _privateField = 1;
+
+  void publicDoStuff() {}
+
+  void _privateDoStuff() {}
+
+  _CorrectWidgetState();
+
+  @override
+  Widget build(BuildContext context) => throw UnimplementedError();
+
+  @override
+  void initState() => super.initState();
+
+  @override
+  void didChangeDependencies() => super.didChangeDependencies();
+
+  @override
+  void didUpdateWidget(covariant CorrectWidget oldWidget) =>
+      super.didUpdateWidget(oldWidget);
+
+  @override
+  void dispose() => super.dispose();
+}
+
+class WrongWidget extends StatefulWidget {
+  const WrongWidget({super.key});
+
   // expect_lint: member-ordering
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
+  State<WrongWidget> createState() => _WrongWidgetState();
+}
 
-  // should be before init-state
+class _WrongWidgetState extends State<WrongWidget> {
+  @override
+  void dispose() => super.dispose();
+
   // expect_lint: member-ordering
   @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
+  void didUpdateWidget(covariant WrongWidget oldWidget) =>
+      super.didUpdateWidget(oldWidget);
+
+  // expect_lint: member-ordering
+  @override
+  void didChangeDependencies() => super.didChangeDependencies();
+
+  // expect_lint: member-ordering
+  @override
+  void initState() => super.initState();
+
+  // expect_lint: member-ordering
+  @override
+  Widget build(BuildContext context) => throw UnimplementedError();
+
+  // expect_lint: member-ordering
+  _WrongWidgetState();
+
+  // expect_lint: member-ordering
+  void _privateDoStuff() {}
+
+  // expect_lint: member-ordering
+  void publicDoStuff() {}
+
+  // expect_lint: member-ordering
+  final _privateField = 1;
+
+  // expect_lint: member-ordering
+  final publicField = 1;
+
+  // expect_lint: member-ordering
+  static void staticDoStuff() {}
+
+  // expect_lint: member-ordering
+  static final staticField = 1;
+
+  // expect_lint: member-ordering
+  static const constField = 1;
+}
+
+class PartiallyCorrectWidget extends StatefulWidget {
+  @override
+  State<PartiallyCorrectWidget> createState() => _PartiallyCorrectWidgetState();
+
+  const PartiallyCorrectWidget({super.key});
+}
+
+class _PartiallyCorrectWidgetState extends State<PartiallyCorrectWidget> {
+  static final staticField = 1;
+
+  // expect_lint: member-ordering
+  static const constField = 1;
+
+  static void staticDoStuff() {}
+
+  final _privateField = 1;
+
+  // expect_lint: member-ordering
+  final publicField = 1;
+
+  void publicDoStuff() {}
+
+  void _privateDoStuff() {}
+
+  _PartiallyCorrectWidgetState();
 
   @override
-  void dispose() {
-    super.dispose();
-  }
+  Widget build(BuildContext context) => throw UnimplementedError();
+
+  @override
+  void didChangeDependencies() => super.didChangeDependencies();
+
+  // expect_lint: member-ordering
+  @override
+  void initState() => super.initState();
+
+  @override
+  void didUpdateWidget(covariant PartiallyCorrectWidget oldWidget) =>
+      super.didUpdateWidget(oldWidget);
+
+  @override
+  void dispose() => super.dispose();
 }

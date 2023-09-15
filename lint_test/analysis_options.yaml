@@ -37,7 +37,7 @@ custom_lint:
         - private-fields
         - public-methods
         - private-methods
-        - constructor
+        - constructors
         - build-method
         - init-state-method
         - did-change-dependencies-method
