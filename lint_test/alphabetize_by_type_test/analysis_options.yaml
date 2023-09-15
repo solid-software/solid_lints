@@ -1,0 +1,8 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - member-ordering:
+      alphabetize-by-type: true
