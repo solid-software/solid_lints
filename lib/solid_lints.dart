@@ -13,6 +13,7 @@ import 'package:solid_lints/lints/avoid_unused_parameters/avoid_unused_parameter
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/lints/function_lines_of_code/function_lines_of_code_metric.dart';
+import 'package:solid_lints/lints/newline_before_return/newline_before_return_rule.dart';
 import 'package:solid_lints/lints/number_of_parameters/number_of_parameters_metric.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
@@ -37,6 +38,7 @@ class _SolidLints extends PluginBase {
       AvoidUnnecessaryTypeCastsRule.createRule(configs),
       AvoidUnrelatedTypeAssertionsRule.createRule(configs),
       AvoidUnusedParametersRule.createRule(configs),
+      NewlineBeforeReturnRule.createRule(configs),
     ];
 
     // Return only enabled rules
