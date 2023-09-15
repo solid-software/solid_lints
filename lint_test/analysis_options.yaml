@@ -48,3 +48,4 @@ custom_lint:
         - did-change-dependencies-method
         - did-update-widget-method
         - dispose-method
+    - no-magic-number
