@@ -19,6 +19,7 @@ custom_lint:
     - avoid-unnecessary-type-assertions
     - avoid-unnecessary-type-casts
     - avoid-unrelated-type-assertions
+    - avoid-unused-parameters
     - newline-before-return
     - no-empty-block
     - no-equal-then-else
@@ -47,4 +48,5 @@ custom_lint:
         - did-change-dependencies-method
         - did-update-widget-method
         - dispose-method
+    - no-magic-number
     - prefer-conditional-expressions
