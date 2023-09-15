@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_declarations
 // ignore_for_file: unused_local_variable
 // ignore_for_file: cyclomatic_complexity
+// ignore_for_file: avoid-unused-parameters
 
 /// Check the `no-empty-block` rule
 
