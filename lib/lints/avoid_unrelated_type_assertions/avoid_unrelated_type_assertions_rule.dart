@@ -34,9 +34,8 @@ class AvoidUnrelatedTypeAssertionsRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    final visitor = AvoidUnrelatedTypeAssertionsVisitor();
-
     context.registry.addIsExpression((node) {
+      final visitor = AvoidUnrelatedTypeAssertionsVisitor();
       visitor.visitIsExpression(node);
 
       for (final element in visitor.expressions.entries) {
