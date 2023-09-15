@@ -56,9 +56,8 @@ class NewlineBeforeReturnRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    final visitor = NewLineBeforeReturnVisitor(resolver.lineInfo);
-
     context.registry.addReturnStatement((node) {
+      final visitor = NewLineBeforeReturnVisitor(resolver.lineInfo);
       visitor.visitReturnStatement(node);
 
       for (final element in visitor.statements) {
