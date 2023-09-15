@@ -13,6 +13,9 @@ import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_me
 import 'package:solid_lints/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/lints/function_lines_of_code/function_lines_of_code_metric.dart';
 import 'package:solid_lints/lints/member_ordering/member_ordering_rule.dart';
+import 'package:solid_lints/lints/newline_before_return/newline_before_return_rule.dart';
+import 'package:solid_lints/lints/no_empty_block/no_empty_block_rule.dart';
+import 'package:solid_lints/lints/no_equal_then_else/no_equal_then_else_rule.dart';
 import 'package:solid_lints/lints/number_of_parameters/number_of_parameters_metric.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
@@ -36,6 +39,9 @@ class _SolidLints extends PluginBase {
       AvoidUnnecessarySetStateRule.createRule(configs),
       AvoidUnnecessaryTypeCastsRule.createRule(configs),
       AvoidUnrelatedTypeAssertionsRule.createRule(configs),
+      NewlineBeforeReturnRule.createRule(configs),
+      NoEmptyBlockRule.createRule(configs),
+      NoEqualThenElseRule.createRule(configs),
       MemberOrderingRule.createRule(configs),
     ];
 
