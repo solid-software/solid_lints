@@ -1,4 +1,5 @@
 // ignore_for_file: unused_local_variable
+// ignore_for_file: avoid-unused-parameters
 
 /// Check the `newline-before-return` rule
 class Foo {
