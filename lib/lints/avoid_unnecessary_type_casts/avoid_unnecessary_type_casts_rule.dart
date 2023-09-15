@@ -36,9 +36,8 @@ class AvoidUnnecessaryTypeCastsRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    final visitor = AvoidUnnecessaryTypeCastsVisitor();
-
     context.registry.addAsExpression((node) {
+      final visitor = AvoidUnnecessaryTypeCastsVisitor();
       visitor.visitAsExpression(node);
 
       for (final element in visitor.expressions.entries) {
