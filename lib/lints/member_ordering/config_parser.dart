@@ -23,13 +23,13 @@
 
 import 'package:collection/collection.dart';
 import 'package:solid_lints/lints/member_ordering/models/annotation.dart';
-import 'package:solid_lints/lints/member_ordering/models/constructor_member_group.dart';
 import 'package:solid_lints/lints/member_ordering/models/field_keyword.dart';
-import 'package:solid_lints/lints/member_ordering/models/field_member_group.dart';
-import 'package:solid_lints/lints/member_ordering/models/get_set_member_group.dart';
-import 'package:solid_lints/lints/member_ordering/models/member_group.dart';
+import 'package:solid_lints/lints/member_ordering/models/member_group/constructor_member_group.dart';
+import 'package:solid_lints/lints/member_ordering/models/member_group/field_member_group.dart';
+import 'package:solid_lints/lints/member_ordering/models/member_group/get_set_member_group.dart';
+import 'package:solid_lints/lints/member_ordering/models/member_group/member_group.dart';
+import 'package:solid_lints/lints/member_ordering/models/member_group/method_member_group.dart';
 import 'package:solid_lints/lints/member_ordering/models/member_type.dart';
-import 'package:solid_lints/lints/member_ordering/models/method_member_group.dart';
 import 'package:solid_lints/lints/member_ordering/models/modifier.dart';
 
 /// Helper class to parse member-ordering rule config

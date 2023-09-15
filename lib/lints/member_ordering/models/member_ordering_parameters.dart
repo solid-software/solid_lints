@@ -22,7 +22,7 @@
 // SOFTWARE.
 
 import 'package:solid_lints/lints/member_ordering/config_parser.dart';
-import 'package:solid_lints/lints/member_ordering/models/member_group.dart';
+import 'package:solid_lints/lints/member_ordering/models/member_group/member_group.dart';
 
 /// A data model class that represents the member ordering input
 /// parameters.
