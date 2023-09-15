@@ -37,6 +37,27 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
   Iterable<FormalParameter> get unusedParameters => _unusedParameters;
 
   @override
+  void visitConstructorDeclaration(ConstructorDeclaration node) {
+    super.visitConstructorDeclaration(node);
+
+    final parent = node.parent;
+    final parameters = node.parameters;
+
+    if (parent is ClassDeclaration && parent.abstractKeyword != null ||
+        node.externalKeyword != null ||
+        parameters.parameters.isEmpty) {
+      return;
+    }
+
+    _unusedParameters.addAll(
+      _getUnusedParameters(
+        node.body,
+        parameters.parameters,
+      ).whereNot(nameConsistsOfUnderscoresOnly),
+    );
+  }
+
+  @override
   void visitMethodDeclaration(MethodDeclaration node) {
     super.visitMethodDeclaration(node);
 
@@ -93,8 +114,27 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
 
     for (final parameter in parameters) {
       final name = parameter.name;
+      final isPresentInAll = allIdentifierElements.contains(
+        parameter.declaredElement,
+      );
+
+      /// Variables declared and initialized as 'Foo(this.param)'
+      final isFieldFormalParameter = parameter is FieldFormalParameter;
+
+      /// Variables declared and initialized as 'Foo(super.param)'
+      bool isSuperFormalParameter = parameter is SuperFormalParameter;
+
+      if (parameter is DefaultFormalParameter) {
+        /// Variables as 'Foo({super.param})' is being reported
+        /// as [DefaultFormalParameter] instead of [SuperFormalParameter]
+        /// it seems to be an issue in DartSDK
+        isSuperFormalParameter = parameter.toSource().startsWith('super.');
+      }
+
       if (name != null &&
-          !allIdentifierElements.contains(parameter.declaredElement)) {
+          !isPresentInAll &&
+          !isFieldFormalParameter &&
+          !isSuperFormalParameter) {
         result.add(parameter);
       }
     }

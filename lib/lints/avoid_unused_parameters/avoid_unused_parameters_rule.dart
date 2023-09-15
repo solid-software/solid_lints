@@ -50,5 +50,14 @@ class AvoidUnusedParametersRule extends SolidLintRule {
         reporter.reportErrorForNode(code, element);
       }
     });
+
+    context.registry.addClassDeclaration((node) {
+      final visitor = AvoidUnusedParametersVisitor();
+      visitor.visitClassDeclaration(node);
+
+      for (final element in visitor.unusedParameters) {
+        reporter.reportErrorForNode(code, element);
+      }
+    });
   }
 }

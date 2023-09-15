@@ -3,6 +3,8 @@
 // ignore_for_file: unused_local_variable
 // ignore_for_file: unused_element
 
+import 'package:flutter/material.dart';
+
 /// Check the `avoid-unused-parameters` rule
 
 // expect_lint: avoid-unused-parameters
@@ -11,10 +13,6 @@ void fun(String s) {
 }
 
 class TestClass {
-  final int b;
-
-  TestClass(this.b);
-
   // expect_lint: avoid-unused-parameters
   static void staticMethod(int a) {}
 
@@ -70,3 +68,39 @@ typedef MaxFun = int Function(int a, int b);
 
 // Allowed same way as override
 final MaxFun maxFunInstance = (int a, int b) => 1;
+
+class Foo {
+  final int a;
+  final int? b;
+
+  Foo._(this.a, this.b);
+
+  Foo.name(this.a, this.b);
+
+  // expect_lint: avoid-unused-parameters
+  Foo.another({required int c})
+      : a = 1,
+        b = 0;
+
+  // expect_lint: avoid-unused-parameters
+  factory Foo.aOnly(int a) {
+    return Foo._(1, null);
+  }
+}
+
+class Bar extends Foo {
+  Bar.name(super.a, super.b) : super.name();
+}
+
+class TestWidget extends StatelessWidget {
+  const TestWidget({
+    super.key,
+    // expect_lint: avoid-unused-parameters
+    int a = 1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
