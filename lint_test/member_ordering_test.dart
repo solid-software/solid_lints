@@ -5,6 +5,26 @@ import 'package:flutter/widgets.dart';
 
 /// Check the `member-ordering` rule
 
+class AlphabeticalClass {
+  final b = 1;
+
+  // expect_lint: member-ordering
+  final a = 1;
+  final c = 1;
+
+  void bStuff() {}
+
+  // expect_lint: member-ordering
+  void aStuff() {}
+
+  void cStuff() {}
+
+  void visitStatement() {}
+
+  // expect_lint: member-ordering
+  void visitStanford() {}
+}
+
 class CorrectOrder {
   final publicField = 1;
   int _privateField = 2;
