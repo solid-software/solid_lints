@@ -21,4 +21,5 @@ custom_lint:
     - avoid-unrelated-type-assertions
     - newline-before-return
     - no-empty-block
+    - no-equal-then-else
     - no-magic-number
