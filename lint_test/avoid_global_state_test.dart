@@ -1,4 +1,4 @@
-// ignore_for_file: type_annotate_public_apis
+// ignore_for_file: type_annotate_public_apis, prefer-match-file-name
 
 /// Check global mutable variable fail
 /// `avoid_global_state`

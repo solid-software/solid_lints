@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_declarations, unused_local_variable
+// ignore_for_file: prefer_const_declarations, unused_local_variable, prefer-match-file-name
 // ignore_for_file: avoid_global_state
 
 /// Check "late" keyword fail
