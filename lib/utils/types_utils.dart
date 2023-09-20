@@ -24,6 +24,7 @@
 
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 
 bool hasWidgetType(DartType type) =>
     (isWidgetOrSubclass(type) ||
@@ -162,3 +163,9 @@ bool _isFutureInheritedProvider(DartType type) =>
     type.isDartAsyncFuture &&
     type is InterfaceType &&
     _isSubclassOfInheritedProvider(type.typeArguments.firstOrNull);
+
+bool isIterableOrSubclass(DartType? type) =>
+    _checkSelfOrSupertypes(type, (t) => t?.isDartCoreIterable ?? false);
+
+bool isListOrSubclass(DartType? type) =>
+    _checkSelfOrSupertypes(type, (t) => t?.isDartCoreList ?? false);
