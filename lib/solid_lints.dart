@@ -22,6 +22,7 @@ import 'package:solid_lints/lints/number_of_parameters/number_of_parameters_metr
 import 'package:solid_lints/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
 import 'package:solid_lints/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/lints/prefer_last/prefer_last_rule.dart';
+
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// Creates a plugin for our custom linter
