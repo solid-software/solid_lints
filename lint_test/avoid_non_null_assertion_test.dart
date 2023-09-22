@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_global_state
+// ignore_for_file: avoid_global_state, prefer-match-file-name
 // ignore_for_file: member-ordering
 
 /// Check "bang" operator fail
