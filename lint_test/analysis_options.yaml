@@ -52,3 +52,4 @@ custom_lint:
     - prefer-conditional-expressions
     - prefer-first
     - prefer-last
+    - prefer-match-file-name
