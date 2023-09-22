@@ -23,6 +23,7 @@ import 'package:solid_lints/lints/prefer_conditional_expressions/prefer_conditio
 import 'package:solid_lints/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
+
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// Creates a plugin for our custom linter

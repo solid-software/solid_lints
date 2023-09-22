@@ -6,7 +6,7 @@
 void fun() {
   int _result = 0;
 
-  // Allowed because ignore-nested flag is set tot true
+  // Allowed because ignore-nested flag is enabled
   if (1 > 0) {
     _result = 1 > 2 ? 2 : 1;
   } else {
