@@ -51,3 +51,4 @@ custom_lint:
     - no-magic-number
     - prefer-conditional-expressions
     - prefer-first
+    - prefer-last
