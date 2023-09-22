@@ -50,3 +50,4 @@ custom_lint:
         - dispose-method
     - no-magic-number
     - prefer-conditional-expressions
+    - prefer-first
