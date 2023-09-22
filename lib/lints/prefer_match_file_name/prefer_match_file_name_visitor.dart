@@ -5,17 +5,23 @@ import 'package:solid_lints/lints/prefer_match_file_name/models/declaration_toke
 /// The AST visitor that will collect all Class, Enum, Extension and Mixin
 /// declarations
 class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
-  final _declarations = <DeclarationTokeInfo>[];
+  final _declarations = <DeclarationTokenInfo>[];
 
   /// List of all declarations
-  Iterable<DeclarationTokeInfo> get declarations =>
-      _declarations..sort(_compareByPrivateType);
+  Iterable<DeclarationTokenInfo> get declarations => _declarations
+    ..sort(
+      // partition into public and private
+      // put public ones first
+      // each partition sorted by declaration order
+      // TODO: unit-test to check correctness
+      (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
+    );
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
     super.visitClassDeclaration(node);
 
-    _declarations.add(DeclarationTokeInfo(node.name, node));
+    _declarations.add((token: node.name, parent: node));
   }
 
   @override
@@ -24,7 +30,7 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
 
     final name = node.name;
     if (name != null) {
-      _declarations.add(DeclarationTokeInfo(name, node));
+      _declarations.add((token: name, parent: node));
     }
   }
 
@@ -32,17 +38,20 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   void visitMixinDeclaration(MixinDeclaration node) {
     super.visitMixinDeclaration(node);
 
-    _declarations.add(DeclarationTokeInfo(node.name, node));
+    _declarations.add((token: node.name, parent: node));
   }
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
     super.visitEnumDeclaration(node);
 
-    _declarations.add(DeclarationTokeInfo(node.name, node));
+    _declarations.add((token: node.name, parent: node));
   }
 
-  int _compareByPrivateType(DeclarationTokeInfo a, DeclarationTokeInfo b) {
+  int? _publicDeclarationsFirst(
+    DeclarationTokenInfo a,
+    DeclarationTokenInfo b,
+  ) {
     final isAPrivate = Identifier.isPrivateName(a.token.lexeme);
     final isBPrivate = Identifier.isPrivateName(b.token.lexeme);
     if (!isAPrivate && isBPrivate) {
@@ -50,7 +59,11 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
     } else if (isAPrivate && !isBPrivate) {
       return 1;
     }
+    // no reorder needed;
+    return null;
+  }
 
+  int _byDeclarationOrder(DeclarationTokenInfo a, DeclarationTokenInfo b) {
     return a.token.offset.compareTo(b.token.offset);
   }
 }
