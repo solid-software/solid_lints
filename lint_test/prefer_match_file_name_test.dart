@@ -3,7 +3,6 @@
 /// Check the `prefer-match-file-name` rule
 class _AnotherPrivateClass {}
 
-// expect_lint: prefer-match-file-name
 class PreferMatchFileNameTest {}
 
 /// Only first public element declaration is checked
