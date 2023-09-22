@@ -13,7 +13,6 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
       // partition into public and private
       // put public ones first
       // each partition sorted by declaration order
-      // TODO: unit-test to check correctness
       (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
     );
 
