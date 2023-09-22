@@ -49,3 +49,4 @@ custom_lint:
         - did-update-widget-method
         - dispose-method
     - no-magic-number
+    - prefer-conditional-expressions
