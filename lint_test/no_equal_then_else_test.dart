@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable
 // ignore_for_file: cyclomatic_complexity
 // ignore_for_file: no-magic-number
+// ignore_for_file: prefer-conditional-expressions
 
 /// Check the `no-equal-then-else` rule
 void fun() {
