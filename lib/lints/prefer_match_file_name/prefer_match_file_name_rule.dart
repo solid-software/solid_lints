@@ -42,33 +42,40 @@ class PreferMatchFileNameRule extends SolidLintRule {
 
       if (visitor.declarations.isEmpty) return;
 
-      final info = visitor.declarations.first;
-      if (!_hasMatchName(resolver.source.fullName, info.token.lexeme)) {
-        final nodeType = humanReadableNodeType(info.parent).toLowerCase();
+      final firstDeclaration = visitor.declarations.first;
 
-        reporter.reportErrorForToken(
-          LintCode(
-            name: lintName,
-            problemMessage:
-                'File name does not match with first $nodeType name.',
-          ),
-          info.token,
-        );
-      }
+      if (_doNormalizedNamesMatch(
+        resolver.source.fullName,
+        firstDeclaration.token.lexeme,
+      )) return;
+
+      final nodeType =
+          humanReadableNodeType(firstDeclaration.parent).toLowerCase();
+
+      reporter.reportErrorForToken(
+        LintCode(
+          name: lintName,
+          problemMessage: 'File name does not match with first $nodeType name.',
+        ),
+        firstDeclaration.token,
+      );
     });
   }
 
-  bool _hasMatchName(String path, String identifierName) {
-    final identifierNameFormatted =
-        identifierName.replaceAll(_onlySymbolsRegex, '').toLowerCase();
+  bool _doNormalizedNamesMatch(String path, String identifierName) {
+    final fileName = _normalizePath(path);
+    final dartIdentifier = _normalizeDartIdentifierName(identifierName);
 
-    final fileNameFormatted = p
-        .basename(path)
-        .split('.')
-        .first
-        .replaceAll(_onlySymbolsRegex, '')
-        .toLowerCase();
-
-    return identifierNameFormatted == fileNameFormatted;
+    return fileName == dartIdentifier;
   }
+
+  String _normalizePath(String s) => p
+      .basename(s)
+      .split('.')
+      .first
+      .replaceAll(_onlySymbolsRegex, '')
+      .toLowerCase();
+
+  String _normalizeDartIdentifierName(String s) =>
+      s.replaceAll(_onlySymbolsRegex, '').toLowerCase();
 }
