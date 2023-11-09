@@ -5,7 +5,7 @@ import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/prefer_conditional_expressions/prefer_conditional_expressions_visitor.dart';
 
-/// A Quick fix for `avoid-unnecessary-type-assertions` rule
+/// A Quick fix for `prefer_conditional_expressions` rule
 /// Suggests to remove unnecessary assertions
 class PreferConditionalExpressionsFix extends DartFix {
   @override

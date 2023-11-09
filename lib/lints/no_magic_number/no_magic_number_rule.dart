@@ -29,11 +29,11 @@ import 'package:solid_lints/lints/no_magic_number/no_magic_number_visitor.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A `no-magic-number` rule which forbids having numbers without variable
+/// A `no_magic_number` rule which forbids having numbers without variable
 class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error when having magic number.
-  static const String lintName = 'no-magic-number';
+  static const String lintName = 'no_magic_number';
 
   NoMagicNumberRule._(super.config);
 

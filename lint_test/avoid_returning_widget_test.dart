@@ -1,5 +1,5 @@
-// ignore_for_file: unused_element, prefer-match-file-name
-// ignore_for_file: member-ordering
+// ignore_for_file: unused_element, prefer_match_file_name
+// ignore_for_file: member_ordering
 
 /// Check returning a widget fail
 /// `avoid_returning_widgets`

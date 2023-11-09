@@ -4,5 +4,5 @@ analyzer:
 
 custom_lint:
   rules:
-    - prefer-conditional-expressions:
-      ignore-nested: true
+    - prefer_conditional_expressions:
+      ignore_nested: true

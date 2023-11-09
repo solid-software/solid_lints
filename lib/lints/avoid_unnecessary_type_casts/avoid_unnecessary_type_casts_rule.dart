@@ -9,12 +9,12 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 part 'avoid_unnecessary_type_casts_fix.dart';
 
-/// A `avoid-unnecessary-type-casts` rule which
+/// An `avoid_unnecessary_type_casts` rule which
 /// warns about unnecessary usage of `as` operator
 class AvoidUnnecessaryTypeCastsRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
-  static const lintName = 'avoid-unnecessary-type-casts';
+  static const lintName = 'avoid_unnecessary_type_casts';
 
   AvoidUnnecessaryTypeCastsRule._(super.config);
 

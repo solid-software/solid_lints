@@ -17,12 +17,12 @@ const operatorIsName = 'is';
 /// The name of 'whereType' method
 const whereTypeMethodName = 'whereType';
 
-/// A `avoid-unnecessary-type-assertions` rule which
+/// An `avoid_unnecessary_type_assertions` rule which
 /// warns about unnecessary usage of `is` and `whereType` operators
 class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
-  static const lintName = 'avoid-unnecessary-type-assertions';
+  static const lintName = 'avoid_unnecessary_type_assertions';
 
   static const _unnecessaryIsCode = LintCode(
     name: lintName,

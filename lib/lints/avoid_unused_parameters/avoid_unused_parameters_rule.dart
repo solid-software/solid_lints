@@ -4,12 +4,12 @@ import 'package:solid_lints/lints/avoid_unused_parameters/avoid_unused_parameter
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A `avoid-unused-parameters` rule which
+/// A `avoid_unused_parameters` rule which
 /// warns about unused parameters
 class AvoidUnusedParametersRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
-  static const String lintName = 'avoid-unused-parameters';
+  static const String lintName = 'avoid_unused_parameters';
 
   AvoidUnusedParametersRule._(super.config);
 

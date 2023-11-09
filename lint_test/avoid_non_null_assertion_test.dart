@@ -1,5 +1,5 @@
-// ignore_for_file: avoid_global_state, prefer-match-file-name
-// ignore_for_file: member-ordering
+// ignore_for_file: avoid_global_state, prefer_match_file_name
+// ignore_for_file: member_ordering
 
 /// Check "bang" operator fail
 ///

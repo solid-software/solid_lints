@@ -8,7 +8,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 part 'double_literal_format_fix.dart';
 part 'double_literal_format_utils.dart';
 
-/// A `double-literal-format` rule which
+/// A `double_literal_format` rule which
 /// checks that double literals should begin with 0. instead of just .,
 /// and should not end with a trailing 0.
 /// BAD:
@@ -18,7 +18,7 @@ part 'double_literal_format_utils.dart';
 class DoubleLiteralFormatRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
-  static const lintName = 'double-literal-format';
+  static const lintName = 'double_literal_format';
 
   // Use different messages for different issues
   /// The [LintCode] of this lint rule that represents
