@@ -1,5 +1,5 @@
 // ignore_for_file: unused_element, unused_field
 
-/// Check the `prefer-match-file-name` rule
-// expect_lint: prefer-match-file-name
+/// Check the `prefer_match_file_name` rule
+// expect_lint: prefer_match_file_name
 enum WrongMixin { a, b }

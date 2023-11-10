@@ -29,12 +29,12 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 // Inspired by ESLint (https://eslint.org/docs/rules/newline-before-return)
 
-/// A `newline-before-return` rule which
+/// A `newline_before_return` rule which
 /// warns about missing newline before return
 class NewlineBeforeReturnRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if
   /// newline is missing before return statement
-  static const String lintName = 'newline-before-return';
+  static const String lintName = 'newline_before_return';
 
   NewlineBeforeReturnRule._(super.config);
 

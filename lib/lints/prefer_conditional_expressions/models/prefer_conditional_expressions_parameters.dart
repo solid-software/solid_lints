@@ -1,7 +1,7 @@
 /// A data model class that represents the "prefer conditional expressions"
 /// input parameters.
 class PreferConditionalExpressionsParameters {
-  static const _ignoreNestedConfig = 'ignore-nested';
+  static const _ignoreNestedConfig = 'ignore_nested';
 
   /// Should rule ignore nested if statements
   final bool ignoreNested;

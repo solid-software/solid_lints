@@ -6,12 +6,12 @@ import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 import 'package:solid_lints/utils/node_utils.dart';
 
-/// A `prefer-match-file-name` rule which warns about
+/// A `prefer_match_file_name` rule which warns about
 /// mismatch between file name and declared element inside
 class PreferMatchFileNameRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if iterable
   /// access can be simplified.
-  static const String lintName = 'prefer-match-file-name';
+  static const String lintName = 'prefer_match_file_name';
   static final _onlySymbolsRegex = RegExp('[^a-zA-Z0-9]');
 
   PreferMatchFileNameRule._(super.config);

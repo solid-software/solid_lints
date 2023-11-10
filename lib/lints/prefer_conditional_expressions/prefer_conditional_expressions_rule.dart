@@ -8,13 +8,13 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 // Inspired by TSLint (https://palantir.github.io/tslint/rules/prefer-conditional-expression/)
 
-/// A `prefer-conditional-expressions` rule which warns about
+/// A `prefer_conditional_expressions` rule which warns about
 /// simple if statements that can be replaced with conditional expressions
 class PreferConditionalExpressionsRule
     extends SolidLintRule<PreferConditionalExpressionsParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of
   /// parameters reaches the maximum value.
-  static const lintName = 'prefer-conditional-expressions';
+  static const lintName = 'prefer_conditional_expressions';
 
   PreferConditionalExpressionsRule._(super.config);
 

@@ -32,37 +32,37 @@ import 'package:solid_lints/lints/member_ordering/models/member_group/method_mem
 import 'package:solid_lints/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/lints/member_ordering/models/modifier.dart';
 
-/// Helper class to parse member-ordering rule config
+/// Helper class to parse member_ordering rule config
 class MemberOrderingConfigParser {
   static const _defaultOrderList = [
-    'public-fields',
-    'private-fields',
-    'public-getters',
-    'private-getters',
-    'public-setters',
-    'private-setters',
+    'public_fields',
+    'private_fields',
+    'public_getters',
+    'private_getters',
+    'public_setters',
+    'private_setters',
     'constructors',
-    'public-methods',
-    'private-methods',
+    'public_methods',
+    'private_methods',
   ];
 
   static const _defaultWidgetsOrderList = [
     'constructor',
-    'named-constructor',
-    'const-fields',
-    'static-methods',
-    'final-fields',
-    'init-state-method',
-    'var-fields',
-    'init-state-method',
-    'private-methods',
-    'overridden-public-methods',
-    'build-method',
+    'named_constructor',
+    'const_fields',
+    'static_methods',
+    'final_fields',
+    'init_state_method',
+    'var_fields',
+    'init_state_method',
+    'private_methods',
+    'overridden_public_methods',
+    'build_method',
   ];
 
   static final _regExp = RegExp(
-    '(overridden-|protected-)?(private-|public-)?(static-)?(late-)?'
-    '(var-|final-|const-)?(nullable-)?(named-)?(factory-)?',
+    '(overridden_|protected_)?(private_|public_)?(static_)?(late_)?'
+    '(var_|final_|const_)?(nullable_)?(named_)?(factory_)?',
   );
 
   /// Parse rule config for regular class order rules
@@ -84,15 +84,15 @@ class MemberOrderingConfigParser {
   }
 
   static MemberGroup? _parseGroup(String group) {
-    final lastGroup = group.endsWith('getters-setters')
-        ? 'getters-setters'
-        : group.split('-').lastOrNull;
+    final lastGroup = group.endsWith('getters_setters')
+        ? 'getters_setters'
+        : group.split('_').lastOrNull;
     final type = MemberType.parse(lastGroup);
     final result = _regExp.allMatches(group.toLowerCase());
 
-    final isNamedMethod = group.endsWith('-method');
+    final isNamedMethod = group.endsWith('_method');
     if (isNamedMethod) {
-      final name = group.split('-method').first.replaceAll('-', '');
+      final name = group.split('_method').first.replaceAll('_', '');
 
       return MethodMemberGroup.named(
         name: name,
@@ -105,11 +105,11 @@ class MemberOrderingConfigParser {
     if (hasGroups && type != null) {
       final match = result.first;
 
-      final annotation = Annotation.parse(match.group(1)?.replaceAll('-', ''));
-      final modifier = Modifier.parse(match.group(2)?.replaceAll('-', ''));
+      final annotation = Annotation.parse(match.group(1)?.replaceAll('_', ''));
+      final modifier = Modifier.parse(match.group(2)?.replaceAll('_', ''));
       final isStatic = match.group(3) != null;
       final isLate = match.group(4) != null;
-      final keyword = FieldKeyword.parse(match.group(5)?.replaceAll('-', ''));
+      final keyword = FieldKeyword.parse(match.group(5)?.replaceAll('_', ''));
       final isNullable = match.group(6) != null;
       final isNamed = match.group(7) != null;
       final isFactory = match.group(8) != null;

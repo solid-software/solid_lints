@@ -5,9 +5,9 @@ import 'package:collection/collection.dart';
 // Useful types for testing expressions' types
 
 // TODO: consider to move here common functions for rules
-// avoid-unnecessary-type-assertions
-// avoid-unnecessary-type-casts (after implementation)
-// avoid-unrelated-type-assertions (after implementation)
+// avoid_unnecessary_type_assertions
+// avoid_unnecessary_type_casts (after implementation)
+// avoid_unrelated_type_assertions (after implementation)
 
 /// A class for representing arguments for types checking methods
 class TypeCast {

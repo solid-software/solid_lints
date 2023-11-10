@@ -1,17 +1,17 @@
-// ignore_for_file: prefer_const_declarations, prefer-match-file-name
+// ignore_for_file: prefer_const_declarations, prefer_match_file_name
 // ignore_for_file: unused_local_variable
 // ignore_for_file: cyclomatic_complexity
-// ignore_for_file: avoid-unused-parameters
+// ignore_for_file: avoid_unused_parameters
 
-/// Check the `no-empty-block` rule
+/// Check the `no_empty_block` rule
 
-// expect_lint: no-empty-block
+// expect_lint: no_empty_block
 void fun() {}
 
 void anotherFun() {
   if (true) {
     if (true) {
-      // expect_lint: no-empty-block
+      // expect_lint: no_empty_block
       if (true) {}
     }
   }
@@ -23,7 +23,7 @@ void toDoStuff() {
 }
 
 void catchStuff() {
-  // expect_lint: no-empty-block
+  // expect_lint: no_empty_block
   try {} catch (e) {}
 
   try {
@@ -37,12 +37,12 @@ void nestedFun(void Function() fun) {
 }
 
 void doStuff() {
-  // expect_lint: no-empty-block
+  // expect_lint: no_empty_block
   nestedFun(() {});
 }
 
 class A {
-  // expect_lint: no-empty-block
+  // expect_lint: no_empty_block
   void method() {}
 
   void toDoMethod() {

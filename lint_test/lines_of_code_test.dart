@@ -1,4 +1,4 @@
-// ignore_for_file: no-magic-number
+// ignore_for_file: no_magic_number
 
 import 'package:test/test.dart';
 

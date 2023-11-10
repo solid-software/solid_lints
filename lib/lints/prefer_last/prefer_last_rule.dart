@@ -5,12 +5,12 @@ import 'package:solid_lints/lints/prefer_last/prefer_last_visitor.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A `prefer-last` rule which warns about
+/// A `prefer_last` rule which warns about
 /// usage of iterable[length-1] or iterable.elementAt(length-1)
 class PreferLastRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if iterable
   /// access can be simplified.
-  static const lintName = 'prefer-last';
+  static const lintName = 'prefer_last';
 
   PreferLastRule._(super.config);
 

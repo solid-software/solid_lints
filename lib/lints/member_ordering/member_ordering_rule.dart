@@ -5,13 +5,13 @@ import 'package:solid_lints/lints/member_ordering/models/member_ordering_paramet
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A `member-ordering` rule which
+/// A `member_ordering` rule which
 /// warns about class members being in wrong order
 /// Custom order can be provided through config
 class MemberOrderingRule extends SolidLintRule<MemberOrderingParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
-  static const lintName = 'member-ordering';
+  static const lintName = 'member_ordering';
 
   static const _warningMessage = 'should be before';
   static const _warningAlphabeticalMessage = 'should be alphabetically before';

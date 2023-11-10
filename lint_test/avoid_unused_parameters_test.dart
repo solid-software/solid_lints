@@ -1,25 +1,25 @@
-// ignore_for_file: prefer_const_declarations, prefer-match-file-name
+// ignore_for_file: prefer_const_declarations, prefer_match_file_name
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations
 // ignore_for_file: unused_local_variable
 // ignore_for_file: unused_element
-// ignore_for_file: newline-before-return
-// ignore_for_file: no-empty-block
-// ignore_for_file: member-ordering
+// ignore_for_file: newline_before_return
+// ignore_for_file: no_empty_block
+// ignore_for_file: member_ordering
 
 import 'package:flutter/material.dart';
 
-/// Check the `avoid-unused-parameters` rule
+/// Check the `avoid_unused_parameters` rule
 
-// expect_lint: avoid-unused-parameters
+// expect_lint: avoid_unused_parameters
 void fun(String s) {
   return;
 }
 
 class TestClass {
-  // expect_lint: avoid-unused-parameters
+  // expect_lint: avoid_unused_parameters
   static void staticMethod(int a) {}
 
-  // expect_lint: avoid-unused-parameters
+  // expect_lint: avoid_unused_parameters
   void method(String s) {
     return;
   }
@@ -34,7 +34,7 @@ class TestClass2 {
 }
 
 class SomeOtherClass {
-  // expect_lint: avoid-unused-parameters
+  // expect_lint: avoid_unused_parameters
   void method(String s) {
     return;
   }
@@ -56,11 +56,11 @@ class SomeOtherAnotherClass {
     return;
   }
 
-  // expect_lint: avoid-unused-parameters
+  // expect_lint: avoid_unused_parameters
   void anonymousCallback(Function(int a) cb) {}
 }
 
-// expect_lint: avoid-unused-parameters
+// expect_lint: avoid_unused_parameters
 void closure(int a) {
   void internal(int a) {
     print(a);
@@ -82,12 +82,12 @@ class Foo {
 
   Foo.coolName({required this.a, required this.b});
 
-  // expect_lint: avoid-unused-parameters
+  // expect_lint: avoid_unused_parameters
   Foo.another({required int c})
       : a = 1,
         b = 0;
 
-  // expect_lint: avoid-unused-parameters
+  // expect_lint: avoid_unused_parameters
   factory Foo.aOnly(int a) {
     return Foo._(1, null);
   }
@@ -100,7 +100,7 @@ class Bar extends Foo {
 class TestWidget extends StatelessWidget {
   const TestWidget({
     super.key,
-    // expect_lint: avoid-unused-parameters
+    // expect_lint: avoid_unused_parameters
     int a = 1,
   });
 

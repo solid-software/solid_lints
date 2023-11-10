@@ -1,6 +1,6 @@
 part of 'double_literal_format_rule.dart';
 
-/// A Quick fix for `double-literal-format` rule
+/// A Quick fix for `double_literal_format` rule
 /// Suggests the correct value for an issue
 class _DoubleLiteralFormatFix extends DartFix {
   @override

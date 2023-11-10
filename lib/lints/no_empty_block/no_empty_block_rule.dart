@@ -6,12 +6,12 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 // Inspired by TSLint (https://palantir.github.io/tslint/rules/no-empty/)
 
-/// A `no-empty-block` rule which forbids having empty blocks.
+/// A `no_empty_block` rule which forbids having empty blocks.
 /// Excluding catch blocks and to-do comments
 class NoEmptyBlockRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether left empty block.
-  static const String lintName = 'no-empty-block';
+  static const String lintName = 'no_empty_block';
 
   NoEmptyBlockRule._(super.config);
 

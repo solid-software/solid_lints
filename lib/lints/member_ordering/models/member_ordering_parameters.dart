@@ -29,9 +29,9 @@ import 'package:solid_lints/lints/member_ordering/models/member_group/member_gro
 class MemberOrderingParameters {
   /// Config keys
   static const _orderConfig = 'order';
-  static const _widgetsOrderConfig = 'widgets-order';
+  static const _widgetsOrderConfig = 'widgets_order';
   static const _alphabetizeConfig = 'alphabetize';
-  static const _alphabetizeByTypeConfig = 'alphabetize-by-type';
+  static const _alphabetizeByTypeConfig = 'alphabetize_by_type';
 
   /// Config used for members of regular class
   final List<MemberGroup> groupsOrder;
