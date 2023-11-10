@@ -1,18 +1,18 @@
-// ignore_for_file: unused_local_variable, prefer-match-file-name
-// ignore_for_file: member-ordering
-// ignore_for_file: avoid-unused-parameters
+// ignore_for_file: unused_local_variable, prefer_match_file_name
+// ignore_for_file: member_ordering
+// ignore_for_file: avoid_unused_parameters
 
-/// Check the `newline-before-return` rule
+/// Check the `newline_before_return` rule
 class Foo {
   int method() {
     final a = 0;
-    // expect_lint: newline-before-return
+    // expect_lint: newline_before_return
     return 1;
   }
 
   void anotherMethod() {
     final a = 1;
-    // expect_lint: newline-before-return
+    // expect_lint: newline_before_return
     return;
   }
 
@@ -29,9 +29,9 @@ void fun() {
   });
   foo.bar(() {
     final a = 1;
-    // expect_lint: newline-before-return
+    // expect_lint: newline_before_return
     return;
   });
-  // expect_lint: newline-before-return
+  // expect_lint: newline_before_return
   return;
 }

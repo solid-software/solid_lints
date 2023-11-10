@@ -1,6 +1,6 @@
 part of 'avoid_unnecessary_type_casts_rule.dart';
 
-/// A Quick fix for `avoid-unnecessary-type-assertions` rule
+/// A Quick fix for `avoid_unnecessary_type_casts` rule
 /// Suggests to remove unnecessary assertions
 class _UnnecessaryTypeCastsFix extends DartFix {
   @override

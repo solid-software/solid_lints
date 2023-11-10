@@ -1,28 +1,28 @@
-// ignore_for_file: unused_field, prefer-match-file-name
+// ignore_for_file: unused_field, prefer_match_file_name
 // ignore_for_file: unused_element
-// ignore_for_file: no-empty-block
+// ignore_for_file: no_empty_block
 
 import 'package:flutter/widgets.dart';
 
-/// Check the `member-ordering` rule
+/// Check the `member_ordering` rule
 
 class AlphabeticalClass {
   final b = 1;
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   final a = 1;
   final c = 1;
 
   void bStuff() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   void aStuff() {}
 
   void cStuff() {}
 
   void visitStatement() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   void visitStanford() {}
 }
 
@@ -48,27 +48,27 @@ class CorrectOrder {
 class WrongOrder {
   void close() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   void _privateDoStuff() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   void publicDoStuff() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   void set privateFieldSetter(int value) {
     _privateField = value;
   }
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   int get privateFieldGetter => _privateField;
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   WrongOrder();
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   int _privateField = 2;
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   final publicField = 1;
 }
 
@@ -77,7 +77,7 @@ class PartiallyWrongOrder {
 
   PartiallyWrongOrder();
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   int _privateField = 2;
 
   int get privateFieldGetter => _privateField;
@@ -88,7 +88,7 @@ class PartiallyWrongOrder {
 
   void _privateDoStuff() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   void publicDoStuff() {}
 
   void close() {}
@@ -136,7 +136,7 @@ class _CorrectWidgetState extends State<CorrectWidget> {
 class WrongWidget extends StatefulWidget {
   const WrongWidget({super.key});
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   @override
   State<WrongWidget> createState() => _WrongWidgetState();
 }
@@ -145,45 +145,45 @@ class _WrongWidgetState extends State<WrongWidget> {
   @override
   void dispose() => super.dispose();
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   @override
   void didUpdateWidget(covariant WrongWidget oldWidget) =>
       super.didUpdateWidget(oldWidget);
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   @override
   void didChangeDependencies() => super.didChangeDependencies();
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   @override
   void initState() => super.initState();
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   @override
   Widget build(BuildContext context) => throw UnimplementedError();
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   _WrongWidgetState();
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   void _privateDoStuff() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   void publicDoStuff() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   final _privateField = 1;
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   final publicField = 1;
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   static void staticDoStuff() {}
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   static final staticField = 1;
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   static const constField = 1;
 }
 
@@ -197,14 +197,14 @@ class PartiallyCorrectWidget extends StatefulWidget {
 class _PartiallyCorrectWidgetState extends State<PartiallyCorrectWidget> {
   static final staticField = 1;
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   static const constField = 1;
 
   static void staticDoStuff() {}
 
   final _privateField = 1;
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   final publicField = 1;
 
   void publicDoStuff() {}
@@ -219,7 +219,7 @@ class _PartiallyCorrectWidgetState extends State<PartiallyCorrectWidget> {
   @override
   void didChangeDependencies() => super.didChangeDependencies();
 
-  // expect_lint: member-ordering
+  // expect_lint: member_ordering
   @override
   void initState() => super.initState();
 

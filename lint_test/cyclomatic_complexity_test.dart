@@ -1,5 +1,5 @@
 // ignore_for_file: literal_only_boolean_expressions
-// ignore_for_file: no-empty-block
+// ignore_for_file: no_empty_block
 
 /// Check complexity fail
 ///

@@ -6,12 +6,12 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 // Inspired by PVS-Studio (https://www.viva64.com/en/w/v6004/)
 
-/// A `no-equal-then-else` rule which warns about
+/// A `no_equal_then_else` rule which warns about
 /// unnecessary if statements and conditional expressions
 class NoEqualThenElseRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if
   /// 'if' statements or conditional expression is redundant
-  static const String lintName = 'no-equal-then-else';
+  static const String lintName = 'no_equal_then_else';
 
   NoEqualThenElseRule._(super.config);
 

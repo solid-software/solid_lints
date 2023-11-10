@@ -15,41 +15,41 @@ custom_lint:
     - avoid_global_state
     - avoid_returning_widgets
     - avoid_unnecessary_setstate
-    - double-literal-format
-    - avoid-unnecessary-type-assertions
-    - avoid-unnecessary-type-casts
-    - avoid-unrelated-type-assertions
-    - avoid-unused-parameters
-    - newline-before-return
-    - no-empty-block
-    - no-equal-then-else
-    - member-ordering:
+    - double_literal_format
+    - avoid_unnecessary_type_assertions
+    - avoid_unnecessary_type_casts
+    - avoid_unrelated_type_assertions
+    - avoid_unused_parameters
+    - newline_before_return
+    - no_empty_block
+    - no_equal_then_else
+    - member_ordering:
       alphabetize: true
       order:
-        - public-fields
-        - private-fields
+        - public_fields
+        - private_fields
         - constructors
         - getters
         - setters
-        - public-methods
-        - private-methods
-        - close-method
-      widgets-order:
-        - const-fields
-        - static-fields
-        - static-methods
-        - public-fields
-        - private-fields
-        - public-methods
-        - private-methods
+        - public_methods
+        - private_methods
+        - close_method
+      widgets_order:
+        - const_fields
+        - static_fields
+        - static_methods
+        - public_fields
+        - private_fields
+        - public_methods
+        - private_methods
         - constructors
-        - build-method
-        - init-state-method
-        - did-change-dependencies-method
-        - did-update-widget-method
-        - dispose-method
-    - no-magic-number
-    - prefer-conditional-expressions
-    - prefer-first
-    - prefer-last
-    - prefer-match-file-name
+        - build_method
+        - init_state_method
+        - did_change_dependencies_method
+        - did_update_widget_method
+        - dispose_method
+    - no_magic_number
+    - prefer_conditional_expressions
+    - prefer_first
+    - prefer_last
+    - prefer_match_file_name

@@ -1,6 +1,6 @@
 // ignore_for_file: unused_element, unused_field
 
-/// Check the `prefer-match-file-name` rule
+/// Check the `prefer_match_file_name` rule
 class _AnotherPrivateClass {}
 
 class PreferMatchFileNameTest {}

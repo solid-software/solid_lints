@@ -1,18 +1,18 @@
-// ignore_for_file: unused_local_variable, prefer-match-file-name
+// ignore_for_file: unused_local_variable, prefer_match_file_name
 
-/// Check the `no-magic-number` rule
+/// Check the `no_magic_number` rule
 
 const pi = 3.14;
 const radiusToDiameterCoefficient = 2;
 
-// expect_lint: no-magic-number
+// expect_lint: no_magic_number
 double circumference(double radius) => 2 * 3.14 * radius;
 
 double correctCircumference(double radius) =>
     radiusToDiameterCoefficient * pi * radius;
 
 bool canDrive(int age, {bool isUSA = false}) {
-// expect_lint: no-magic-number
+// expect_lint: no_magic_number
   return isUSA ? age >= 16 : age > 18;
 }
 
