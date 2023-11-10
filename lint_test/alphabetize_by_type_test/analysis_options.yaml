@@ -5,4 +5,4 @@ analyzer:
 custom_lint:
   rules:
     - member_ordering:
-      alphabetize-by-type: true
+      alphabetize_by_type: true
