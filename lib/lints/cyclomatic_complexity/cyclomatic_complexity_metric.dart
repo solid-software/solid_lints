@@ -21,7 +21,7 @@ class CyclomaticComplexityMetric
       configs: configs,
       name: lintName,
       paramsParser: CyclomaticComplexityParameters.fromJson,
-      problemMessage: (value) => ''
+      problemMessage: (value) =>
           'The maximum allowed complexity of a function is '
           '${value.maxComplexity}. Please decrease it.',
     );

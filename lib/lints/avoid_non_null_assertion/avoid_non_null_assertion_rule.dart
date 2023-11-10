@@ -21,8 +21,7 @@ class AvoidNonNullAssertionRule extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      problemMessage: (_) => ''
-          'Avoid using the bang operator. '
+      problemMessage: (_) => 'Avoid using the bang operator. '
           'It may result in runtime exceptions.',
     );
 

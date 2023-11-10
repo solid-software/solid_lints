@@ -22,7 +22,7 @@ class NumberOfParametersMetric
       configs: configs,
       name: lintName,
       paramsParser: NumberOfParametersParameters.fromJson,
-      problemMessage: (value) => ''
+      problemMessage: (value) =>
           'The maximum allowed number of parameters is ${value.maxParameters}. '
           'Try reducing the number of parameters.',
     );

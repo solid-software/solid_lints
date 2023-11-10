@@ -22,7 +22,7 @@ class FunctionLinesOfCodeMetric
       configs: configs,
       name: lintName,
       paramsParser: FunctionLinesOfCodeParameters.fromJson,
-      problemMessage: (value) => ''
+      problemMessage: (value) =>
           'The maximum allowed number of lines is ${value.maxLines}. '
           'Try splitting this function into smaller parts.',
     );

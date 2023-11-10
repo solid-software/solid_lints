@@ -19,7 +19,7 @@ class AvoidReturningWidgetsRule extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      problemMessage: (_) => ''
+      problemMessage: (_) =>
           'Returning a widget from a function is considered an anti-pattern. '
           'Extract your widget to a separate class.',
     );

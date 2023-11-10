@@ -17,8 +17,7 @@ class AvoidLateKeywordRule extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      problemMessage: (_) => ''
-          'Avoid using the "late" keyword. '
+      problemMessage: (_) => 'Avoid using the "late" keyword. '
           'It may result in runtime exceptions.',
     );
 
