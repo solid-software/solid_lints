@@ -53,6 +53,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       _getUnusedParameters(
         node.body,
         parameters.parameters,
+        initializers: node.initializers,
       ).whereNot(nameConsistsOfUnderscoresOnly),
     );
   }
@@ -104,11 +105,13 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
 
   Set<FormalParameter> _getUnusedParameters(
     AstNode body,
-    Iterable<FormalParameter> parameters,
-  ) {
+    Iterable<FormalParameter> parameters, {
+    NodeList<AstNode>? initializers,
+  }) {
     final result = <FormalParameter>{};
     final visitor = _IdentifiersVisitor();
     body.visitChildren(visitor);
+    initializers?.accept(visitor);
 
     final allIdentifierElements = visitor.elements;
 

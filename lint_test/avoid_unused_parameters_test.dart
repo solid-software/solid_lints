@@ -109,3 +109,13 @@ class TestWidget extends StatelessWidget {
     return const Placeholder();
   }
 }
+
+class UsingConstructorParameterInInitializer {
+  final int _value;
+
+  UsingConstructorParameterInInitializer(int value) : _value = value;
+
+  void printValue() {
+    print(_value);
+  }
+}
