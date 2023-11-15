@@ -1,4 +1,7 @@
-// ignore_for_file: unused_local_variable, prefer_match_file_name
+// ignore_for_file: unused_local_variable
+// ignore_for_file: prefer_match_file_name
+// ignore_for_file: avoid_unused_parameters
+// ignore_for_file: no_empty_block
 
 /// Check the `no_magic_number` rule
 
@@ -54,4 +57,21 @@ void fun() {
 
   // Allowed in DateTime because it doesn't have cons constructor
   final apocalypse = DateTime(2012, 12, 21);
+}
+
+// Allowed for defaults in constructors and methods.
+class DefaultValues {
+  final int value;
+
+  DefaultValues.named({
+    this.value = 2,
+  });
+
+  DefaultValues.positional([
+    this.value = 3,
+  ]);
+
+  void methodWithNamedParam({int value = 4}) {}
+
+  void methodWithPositionalParam([int value = 5]) {}
 }
