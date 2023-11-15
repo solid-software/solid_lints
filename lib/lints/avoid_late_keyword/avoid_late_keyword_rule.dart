@@ -33,7 +33,7 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((node) {
-      final initializedDynamically = config.parameters.initializedDynamically;
+      final initializedDynamically = config.parameters.allowInitialized;
       final isLateDeclaration = node.declaredElement?.isLate ?? false;
       final hasInitializer = node.initializer != null;
 

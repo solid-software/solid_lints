@@ -2,19 +2,19 @@
 /// parameters.
 class AvoidLateKeywordParameters {
   /// Maximum number of parameters
-  final bool initializedDynamically;
+  final bool allowInitialized;
 
-  static const _defaulInitializedDynamically = false;
+  static const _defaultAllowInitialized = false;
 
   /// Constructor for [AvoidLateKeywordParameters] model
   const AvoidLateKeywordParameters({
-    required this.initializedDynamically,
+    required this.allowInitialized,
   });
 
   /// Method for creating from json data
   factory AvoidLateKeywordParameters.fromJson(Map<String, Object?> json) =>
       AvoidLateKeywordParameters(
-        initializedDynamically: json['allow-initialized'] as bool? ??
-            _defaulInitializedDynamically,
+        allowInitialized: json['allow-initialized'] as bool? ??
+            _defaultAllowInitialized,
       );
 }
