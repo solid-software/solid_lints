@@ -54,4 +54,18 @@ void fun() {
 
   // Allowed in DateTime because it doesn't have cons constructor
   final apocalypse = DateTime(2012, 12, 21);
+
+  const count = 5;
+  const total = 10;
+  // expect_lint: no_magic_number
+  final percent = TestMagicNumber(percent: (count / total) * 100);
+
+  // expect_lint: no_magic_number
+  TestMagicNumber(percent: (count / total) * 100);
+}
+
+class TestMagicNumber {
+  final double percent;
+
+  TestMagicNumber({required this.percent});
 }

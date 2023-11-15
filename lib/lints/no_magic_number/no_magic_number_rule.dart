@@ -83,11 +83,16 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
       (l is IntegerLiteral &&
           !config.parameters.allowedNumbers.contains(l.value));
 
-  bool _isNotInsideVariable(Literal l) =>
-      l.thisOrAncestorMatching(
-        (ancestor) => ancestor is VariableDeclaration,
-      ) ==
-      null;
+  bool _isNotInsideVariable(Literal l) {
+    AstNode? node = l;
+    while (node != null && node is! InstanceCreationExpression) {
+      if (node is VariableDeclaration) return false;
+
+      node = node.parent;
+    }
+
+    return true;
+  }
 
   bool _isNotInDateTime(Literal l) =>
       l.thisOrAncestorMatching(
