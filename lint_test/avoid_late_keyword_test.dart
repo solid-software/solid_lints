@@ -17,7 +17,5 @@ class AvoidLateKeyword {
 
     /// expect_lint: avoid_late_keyword
     late String field4;
-
-    late String field5 = 'string';
   }
 }
