@@ -14,7 +14,7 @@ class AvoidLateKeywordParameters {
   /// Method for creating from json data
   factory AvoidLateKeywordParameters.fromJson(Map<String, Object?> json) =>
       AvoidLateKeywordParameters(
-        allowInitialized: json['allow-initialized'] as bool? ??
+        allowInitialized: json['allow_initialized'] as bool? ??
             _defaultAllowInitialized,
       );
 }

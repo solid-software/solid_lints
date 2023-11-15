@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/avoid_late_keyword/models/avoid_late_keyword_parameters.dart';
@@ -33,15 +34,20 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((node) {
-      final initializedDynamically = config.parameters.allowInitialized;
-      final isLateDeclaration = node.declaredElement?.isLate ?? false;
-      final hasInitializer = node.initializer != null;
-
-      if ((!initializedDynamically || !hasInitializer) && isLateDeclaration) {
+      if (_shouldLint(node)) {
         reporter.reportErrorForNode(code, node);
-      } else if (initializedDynamically && hasInitializer) {
-        return;
       }
     });
+  }
+
+  bool _shouldLint(VariableDeclaration node) {
+    final isLateDeclaration = node.declaredElement?.isLate ?? false;
+    if (!isLateDeclaration) return false;
+
+    final allowInitialized = config.parameters.allowInitialized;
+    if (!allowInitialized) return true; // all late`s are linted
+
+    final hasInitializer = node.initializer != null;
+    return !hasInitializer;
   }
 }
