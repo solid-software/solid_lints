@@ -10,8 +10,6 @@ class AvoidLateKeyword {
   /// expect_lint: avoid_late_keyword
   late String field2;
 
-  
-
   void test() {
     late final field3 = 'string';
 

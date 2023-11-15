@@ -31,11 +31,9 @@ class AvoidLateKeywordRule extends SolidLintRule {
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((node) {
-      if (node.declaredElement?.isLate ?? false) {
-        if (node.initializer != null) {
-          // Ignore late variables that are initialized right away
-          return;
-        }
+      final isLateDeclaration = node.declaredElement?.isLate ?? false;
+      final hasInitializer = node.initializer != null;
+      if (isLateDeclaration && !hasInitializer) {
         reporter.reportErrorForNode(code, node);
       }
     });
