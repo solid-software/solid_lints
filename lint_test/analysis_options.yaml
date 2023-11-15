@@ -12,7 +12,7 @@ custom_lint:
       max_lines: 50
     - avoid_non_null_assertion
     - avoid_late_keyword:
-      allow-initialized: true
+      allow_initialized: true
     - avoid_global_state
     - avoid_returning_widgets
     - avoid_unnecessary_setstate
