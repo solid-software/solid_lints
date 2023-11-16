@@ -6,22 +6,26 @@ import 'package:flutter/material.dart';
 /// Check "late" keyword fail
 ///
 /// `avoid_late_keyword`
-/// allow_initialized option enabled
+/// allow_initialized option disabled
 class AvoidLateKeyword {
+  /// expect_lint: avoid_late_keyword
   late final ColorTween colorTween;
 
   late final AnimationController controller1;
 
+  /// expect_lint: avoid_late_keyword
   late final field1 = 'string';
 
   /// expect_lint: avoid_late_keyword
   late String field2;
 
   void test() {
+    /// expect_lint: avoid_late_keyword
     late final ColorTween colorTween;
 
     late final AnimationController controller2;
 
+    /// expect_lint: avoid_late_keyword
     late final field3 = 'string';
 
     /// expect_lint: avoid_late_keyword
