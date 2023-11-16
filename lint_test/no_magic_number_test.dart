@@ -79,3 +79,10 @@ class DefaultValues {
 void topLevelFunctionWithDefaultParam({int value = 6}) {
   ({int value = 7}) {};
 }
+
+// Allowed for numbers in constructor initializer.
+class ConstructorInitializer {
+  final int value;
+
+  ConstructorInitializer() : value = 10;
+}
