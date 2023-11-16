@@ -86,3 +86,18 @@ class ConstructorInitializer {
 
   ConstructorInitializer() : value = 10;
 }
+
+// Allowed for numbers in a Widget subtype parameters.
+abstract interface class Widget {}
+
+class StatelessWidget implements Widget {}
+
+class MyWidget extends StatelessWidget {
+  final int size;
+
+  MyWidget({required this.size});
+}
+
+Widget build() {
+  return MyWidget(size: 12);
+}
