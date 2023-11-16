@@ -44,10 +44,19 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
     final isLateDeclaration = node.declaredElement?.isLate ?? false;
     if (!isLateDeclaration) return false;
 
+    final ignoredTypes = _hasIgnoredType(node);
+    if (ignoredTypes) return false;
+
     final allowInitialized = config.parameters.allowInitialized;
-    if (!allowInitialized) return true; // all late`s are linted
+    if (!allowInitialized) return true;
 
     final hasInitializer = node.initializer != null;
     return !hasInitializer;
   }
+
+  bool _hasIgnoredType(VariableDeclaration node) =>
+      config.parameters.ignoredTypes.contains(
+        // ignore: deprecated_member_use
+        node.declaredElement2?.type.getDisplayString(withNullability: false),
+      );
 }
