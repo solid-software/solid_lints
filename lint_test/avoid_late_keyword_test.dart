@@ -18,9 +18,9 @@ class AvoidLateKeyword {
 
   void test() {
     late final ColorTween colorTween;
-    
+
     late final AnimationController controller2;
-    
+
     late final field3 = 'string';
 
     /// expect_lint: avoid_late_keyword
