@@ -28,7 +28,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 
 extension Subtypes on DartType {
-  Iterable<DartType> get subtypes {
+  Iterable<DartType> get supertypes {
     final element = this.element;
     return element is InterfaceElement ? element.allSupertypes : [];
   }
