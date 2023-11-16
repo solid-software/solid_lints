@@ -4,6 +4,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/avoid_late_keyword/models/avoid_late_keyword_parameters.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
+import 'package:solid_lints/utils/types_utils.dart';
 
 /// A `late` keyword rule which forbids using it to avoid runtime exceptions.
 class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
@@ -54,8 +55,16 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
     return !hasInitializer;
   }
 
-  bool _hasIgnoredType(VariableDeclaration node) =>
-      config.parameters.ignoredTypes.contains(
-        (node.parent! as VariableDeclarationList).type?.toSource() ?? '',
-      );
+  bool _hasIgnoredType(VariableDeclaration node) {
+    final variableType = node.declaredElement?.type;
+    if (variableType == null) return false;
+
+    final checkedTypes = [variableType, ...variableType.subtypes]
+        .map((t) => t.getDisplayString(withNullability: false))
+        .toSet();
+
+    final ignoredTypes = config.parameters.ignoredTypes.toSet();
+
+    return checkedTypes.intersection(ignoredTypes).isNotEmpty;
+  }
 }

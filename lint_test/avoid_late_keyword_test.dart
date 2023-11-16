@@ -1,7 +1,13 @@
 // ignore_for_file: prefer_const_declarations, unused_local_variable, prefer_match_file_name
 // ignore_for_file: avoid_global_state
 
-import 'package:flutter/material.dart';
+class ColorTween {}
+
+class AnimationController {}
+
+class SubAnimationController extends AnimationController {}
+
+class NotAllowed {}
 
 /// Check "late" keyword fail
 ///
@@ -11,6 +17,11 @@ class AvoidLateKeyword {
   late final ColorTween colorTween;
 
   late final AnimationController controller1;
+
+  late final SubAnimationController controller2;
+
+  /// expect_lint: avoid_late_keyword
+  late final NotAllowed na;
 
   late final field1 = 'string';
 

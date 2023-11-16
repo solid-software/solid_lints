@@ -22,9 +22,17 @@
 // SOFTWARE.
 // ignore_for_file: public_member_api_docs
 
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+
+extension Subtypes on DartType {
+  Iterable<DartType> get subtypes {
+    final element = this.element;
+    return element is InterfaceElement ? element.allSupertypes : [];
+  }
+}
 
 bool hasWidgetType(DartType type) =>
     (isWidgetOrSubclass(type) ||
