@@ -2,7 +2,7 @@
 /// parameters.
 class AvoidLateKeywordParameters {
   /// Allow immediately initialised late variables.
-  /// 
+  ///
   /// ```dart
   /// late var ok = 0; // ok when allowInitialized == true
   /// late var notOk; // initialized elsewhere, not allowed
@@ -22,6 +22,7 @@ class AvoidLateKeywordParameters {
   factory AvoidLateKeywordParameters.fromJson(Map<String, Object?> json) =>
       AvoidLateKeywordParameters(
         allowInitialized: json['allow_initialized'] as bool? ?? false,
-        ignoredTypes: json['ignored_types'] as List<String>?,
+        ignoredTypes:
+            List<String>.from(json['ignored_types'] as Iterable? ?? []),
       );
 }
