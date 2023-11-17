@@ -13,7 +13,6 @@ class ProperSuperCallsTest1 extends StatefulWidget {
 }
 
 class _ProperSuperCallsTest1State extends State<ProperSuperCallsTest1> {
-   
   @override
   Widget build(BuildContext context) {
     return Container();
@@ -25,7 +24,7 @@ class _ProperSuperCallsTest1State extends State<ProperSuperCallsTest1> {
     print('');
     super.initState();
   }
-  
+
   // expect_lint: proper_super_calls
   @override
   void dispose() {
@@ -42,7 +41,6 @@ class ProperSuperCallsTest2 extends StatefulWidget {
 }
 
 class _ProperSuperCallsTest2State extends State<ProperSuperCallsTest2> {
-   
   @override
   Widget build(BuildContext context) {
     return Container();
@@ -51,7 +49,7 @@ class _ProperSuperCallsTest2State extends State<ProperSuperCallsTest2> {
   @override
   void initState() {
     super.initState();
-    print(''); 
+    print('');
   }
 
   @override
@@ -69,7 +67,6 @@ class ProperSuperCallsTest3 extends StatefulWidget {
 }
 
 class _ProperSuperCallsTest3State extends State<ProperSuperCallsTest3> {
-   
   @override
   Widget build(BuildContext context) {
     return Container();
@@ -78,7 +75,7 @@ class _ProperSuperCallsTest3State extends State<ProperSuperCallsTest3> {
   // expect_lint: proper_super_calls
   @override
   void initState() {
-    print(''); 
+    print('');
   }
 
   // expect_lint: proper_super_calls

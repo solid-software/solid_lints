@@ -53,14 +53,14 @@ class ProperSuperCallsRule extends SolidLintRule {
 
         if (methodName == 'initState' || methodName == 'dispose') {
           final statements = (node.body as BlockFunctionBody).block.statements;
-          
+
           checkSuperCalls(node, methodName, statements, reporter);
         }
       },
     );
   }
 
-  /// This method report an error whether `super.initState()` 
+  /// This method report an error whether `super.initState()`
   /// or `super.dispose()` are called incorrect
   void checkSuperCalls(
     MethodDeclaration node,
