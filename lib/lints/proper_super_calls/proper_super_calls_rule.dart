@@ -86,14 +86,14 @@ class ProperSuperCallsRule extends SolidLintRule {
   /// `initState` method, `false` otherwise.
   bool isSuperInitStateCalledFirst(List<Statement> statements) {
     if (statements.isEmpty) return false;
-    final firstStatement = statements[0];
+    final firstStatement = statements.first;
 
     if (firstStatement is ExpressionStatement) {
       final expression = firstStatement.expression;
 
       final isSuperInitStateCalledFirst = expression is MethodInvocation &&
           expression.target is SuperExpression &&
-          expression.methodName.toString() == 'initState';
+          expression.methodName.toString() == _initState
 
       if (isSuperInitStateCalledFirst) return true;
     }
@@ -105,12 +105,12 @@ class ProperSuperCallsRule extends SolidLintRule {
   /// method, `false` otherwise.
   bool isSuperDisposeCalledLast(List<Statement> statements) {
     if (statements.isEmpty) return false;
-    final lastStatement = statements[statements.length - 1];
+    final lastStatement = statements.last;
 
     if (lastStatement is ExpressionStatement) {
       final expression = lastStatement.expression;
 
-      final isSuperDisposeCalledLast = expression is MethodInvocation &&
+      final lastStatementIsSuperDispose = expression is MethodInvocation &&
           expression.target is SuperExpression &&
           expression.methodName.toString() == 'dispose';
 
