@@ -1,6 +1,20 @@
-// ignore_for_file: prefer_match_file_name
+// ignore_for_file: prefer_match_file_name, no_empty_block
 
-import 'package:flutter/material.dart';
+class Widget {}
+
+abstract class State<T> {
+  build();
+// ignore: proper_super_calls
+  dispose() {}
+// ignore: proper_super_calls
+  initState() {}
+}
+
+abstract class StatefulWidget extends Widget {
+  State createState();
+
+  StatefulWidget();
+}
 
 /// Check "check super" keyword fail
 ///
@@ -9,13 +23,13 @@ class ProperSuperCallsTest1 extends StatefulWidget {
   @override
   State<ProperSuperCallsTest1> createState() => _ProperSuperCallsTest1State();
 
-  const ProperSuperCallsTest1({super.key});
+  ProperSuperCallsTest1();
 }
 
 class _ProperSuperCallsTest1State extends State<ProperSuperCallsTest1> {
   @override
-  Widget build(BuildContext context) {
-    return Container();
+  Widget build() {
+    return Widget();
   }
 
   // expect_lint: proper_super_calls
@@ -37,13 +51,13 @@ class ProperSuperCallsTest2 extends StatefulWidget {
   @override
   State<ProperSuperCallsTest2> createState() => _ProperSuperCallsTest2State();
 
-  const ProperSuperCallsTest2({super.key});
+  ProperSuperCallsTest2();
 }
 
 class _ProperSuperCallsTest2State extends State<ProperSuperCallsTest2> {
   @override
-  Widget build(BuildContext context) {
-    return Container();
+  Widget build() {
+    return Widget();
   }
 
   @override
@@ -56,31 +70,5 @@ class _ProperSuperCallsTest2State extends State<ProperSuperCallsTest2> {
   void dispose() {
     print('');
     super.dispose();
-  }
-}
-
-class ProperSuperCallsTest3 extends StatefulWidget {
-  @override
-  State<ProperSuperCallsTest3> createState() => _ProperSuperCallsTest3State();
-
-  const ProperSuperCallsTest3({super.key});
-}
-
-class _ProperSuperCallsTest3State extends State<ProperSuperCallsTest3> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-
-  // expect_lint: proper_super_calls
-  @override
-  void initState() {
-    print('');
-  }
-
-  // expect_lint: proper_super_calls
-  @override
-  void dispose() {
-    print('');
   }
 }

@@ -12,6 +12,8 @@ class ProperSuperCallsRule extends SolidLintRule {
   /// the error whether the initState and dispose methods
   /// are called in the incorrect order
   static const lintName = 'proper_super_calls';
+  static const _initState = 'initState';
+  static const _dispose = 'dispose';
 
   /// The [LintCode] of this lint rule that represents
   /// the error whether super.initState() should be called first
@@ -93,9 +95,9 @@ class ProperSuperCallsRule extends SolidLintRule {
 
       final isSuperInitStateCalledFirst = expression is MethodInvocation &&
           expression.target is SuperExpression &&
-          expression.methodName.toString() == _initState
+          expression.methodName.toString() == _initState;
 
-      if (isSuperInitStateCalledFirst) return true;
+      return isSuperInitStateCalledFirst;
     }
 
     return false;
@@ -112,9 +114,9 @@ class ProperSuperCallsRule extends SolidLintRule {
 
       final lastStatementIsSuperDispose = expression is MethodInvocation &&
           expression.target is SuperExpression &&
-          expression.methodName.toString() == 'dispose';
+          expression.methodName.toString() == _dispose;
 
-      if (isSuperDisposeCalledLast) return true;
+      return lastStatementIsSuperDispose;
     }
 
     return false;
