@@ -23,6 +23,7 @@ import 'package:solid_lints/lints/prefer_conditional_expressions/prefer_conditio
 import 'package:solid_lints/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
+import 'package:solid_lints/lints/proper_super_calls/proper_super_calls_rule.dart';
 
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
@@ -56,6 +57,7 @@ class _SolidLints extends PluginBase {
       PreferFirstRule.createRule(configs),
       PreferLastRule.createRule(configs),
       PreferMatchFileNameRule.createRule(configs),
+      ProperSuperCallsRule.createRule(configs),
     ];
 
     // Return only enabled rules
