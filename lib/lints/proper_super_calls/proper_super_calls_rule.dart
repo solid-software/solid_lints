@@ -57,15 +57,11 @@ class ProperSuperCallsRule extends SolidLintRule {
         if (methodName == _initState || methodName == _dispose) {
           final statements = (node.body as BlockFunctionBody).block.statements;
 
-          final hasOverrideAnnotation = node.metadata
-              .any((annotation) => annotation.name.name == _override);
-
           _checkSuperCalls(
             node,
             methodName,
             statements,
             reporter,
-            hasOverrideAnnotation: hasOverrideAnnotation,
           );
         }
       },
@@ -78,9 +74,11 @@ class ProperSuperCallsRule extends SolidLintRule {
     MethodDeclaration node,
     String methodName,
     List<Statement> statements,
-    ErrorReporter reporter, {
-    required bool hasOverrideAnnotation,
-  }) {
+    ErrorReporter reporter,
+  ) {
+    final hasOverrideAnnotation =
+        node.metadata.any((annotation) => annotation.name.name == _override);
+
     if (!hasOverrideAnnotation) return;
     if (methodName == _initState && !_isSuperInitStateCalledFirst(statements)) {
       reporter.reportErrorForNode(
