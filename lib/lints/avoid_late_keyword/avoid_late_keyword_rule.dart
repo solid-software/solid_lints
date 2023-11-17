@@ -45,8 +45,8 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
     final isLateDeclaration = node.declaredElement?.isLate ?? false;
     if (!isLateDeclaration) return false;
 
-    final ignoredTypes = _hasIgnoredType(node);
-    if (ignoredTypes) return false;
+    final hasIgnoredType = _hasIgnoredType(node);
+    if (hasIgnoredType) return false;
 
     final allowInitialized = config.parameters.allowInitialized;
     if (!allowInitialized) return true;
