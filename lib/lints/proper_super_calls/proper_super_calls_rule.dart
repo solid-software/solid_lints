@@ -53,7 +53,7 @@ class ProperSuperCallsRule extends SolidLintRule {
       (node) {
         final methodName = node.name.toString();
 
-        if (methodName == 'initState' || methodName == 'dispose') {
+        if (methodName == _initState || methodName == _dispose) {
           final statements = (node.body as BlockFunctionBody).block.statements;
 
           checkSuperCalls(node, methodName, statements, reporter);
