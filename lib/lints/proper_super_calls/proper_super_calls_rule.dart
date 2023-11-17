@@ -14,6 +14,7 @@ class ProperSuperCallsRule extends SolidLintRule {
   static const lintName = 'proper_super_calls';
   static const _initState = 'initState';
   static const _dispose = 'dispose';
+  static const _override = 'override';
 
   /// The [LintCode] of this lint rule that represents
   /// the error whether super.initState() should be called first
@@ -56,7 +57,16 @@ class ProperSuperCallsRule extends SolidLintRule {
         if (methodName == _initState || methodName == _dispose) {
           final statements = (node.body as BlockFunctionBody).block.statements;
 
-          checkSuperCalls(node, methodName, statements, reporter);
+          final hasOverrideAnnotation = node.metadata
+              .any((annotation) => annotation.name.name == _override);
+
+          _checkSuperCalls(
+            node,
+            methodName,
+            statements,
+            reporter,
+            hasOverrideAnnotation: hasOverrideAnnotation,
+          );
         }
       },
     );
@@ -64,19 +74,21 @@ class ProperSuperCallsRule extends SolidLintRule {
 
   /// This method report an error whether `super.initState()`
   /// or `super.dispose()` are called incorrect
-  void checkSuperCalls(
+  void _checkSuperCalls(
     MethodDeclaration node,
     String methodName,
     List<Statement> statements,
-    ErrorReporter reporter,
-  ) {
-    if (methodName == 'initState' && !isSuperInitStateCalledFirst(statements)) {
+    ErrorReporter reporter, {
+    required bool hasOverrideAnnotation,
+  }) {
+    if (!hasOverrideAnnotation) return ;
+    if (methodName == _initState && !_isSuperInitStateCalledFirst(statements)) {
       reporter.reportErrorForNode(
         _superInitStateCode,
         node,
       );
     }
-    if (methodName == 'dispose' && !isSuperDisposeCalledLast(statements)) {
+    if (methodName == _dispose && !_isSuperDisposeCalledLast(statements)) {
       reporter.reportErrorForNode(
         _superDisposeCode,
         node,
@@ -86,7 +98,7 @@ class ProperSuperCallsRule extends SolidLintRule {
 
   /// Returns `true` if `super.initState()` is called before other code in the
   /// `initState` method, `false` otherwise.
-  bool isSuperInitStateCalledFirst(List<Statement> statements) {
+  bool _isSuperInitStateCalledFirst(List<Statement> statements) {
     if (statements.isEmpty) return false;
     final firstStatement = statements.first;
 
@@ -105,7 +117,7 @@ class ProperSuperCallsRule extends SolidLintRule {
 
   /// Returns `true` if `super.dispose()` is called at the end of the `dispose`
   /// method, `false` otherwise.
-  bool isSuperDisposeCalledLast(List<Statement> statements) {
+  bool _isSuperDisposeCalledLast(List<Statement> statements) {
     if (statements.isEmpty) return false;
     final lastStatement = statements.last;
 

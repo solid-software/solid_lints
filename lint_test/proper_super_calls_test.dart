@@ -4,9 +4,7 @@ class Widget {}
 
 abstract class State<T> {
   build();
-// ignore: proper_super_calls
   dispose() {}
-// ignore: proper_super_calls
   initState() {}
 }
 
@@ -71,4 +69,9 @@ class _ProperSuperCallsTest2State extends State<ProperSuperCallsTest2> {
     print('');
     super.dispose();
   }
+}
+
+class MyClass {
+  dispose() {}
+  initState() {}
 }
