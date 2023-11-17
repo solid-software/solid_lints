@@ -81,7 +81,7 @@ class ProperSuperCallsRule extends SolidLintRule {
     ErrorReporter reporter, {
     required bool hasOverrideAnnotation,
   }) {
-    if (!hasOverrideAnnotation) return ;
+    if (!hasOverrideAnnotation) return;
     if (methodName == _initState && !_isSuperInitStateCalledFirst(statements)) {
       reporter.reportErrorForNode(
         _superInitStateCode,
