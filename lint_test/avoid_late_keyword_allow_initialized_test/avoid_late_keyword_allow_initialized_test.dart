@@ -1,13 +1,33 @@
 // ignore_for_file: prefer_const_declarations, unused_local_variable, prefer_match_file_name
 // ignore_for_file: avoid_global_state
 
+abstract class Animation {}
+
+class AnimationController implements Animation {}
+
+class SubAnimationController extends AnimationController {}
+
+class ColorTween {}
+
 /// Check "late" keyword fail
 ///
 /// `avoid_late_keyword`
 /// allow_initialized option disabled
 class AvoidLateKeyword {
+  late final Animation animation1;
+
+  late final animation2 = AnimationController();
+
+  late final animation3 = SubAnimationController();
+
   /// expect_lint: avoid_late_keyword
-  late final ColorTween colorTween;
+  late final ColorTween colorTween1;
+
+  /// expect_lint: avoid_late_keyword
+  late final colorTween2 = ColorTween();
+
+  /// expect_lint: avoid_late_keyword
+  late final colorTween3 = colorTween2;
 
   late final AnimationController controller1;
 
@@ -15,24 +35,42 @@ class AvoidLateKeyword {
   late final field1 = 'string';
 
   /// expect_lint: avoid_late_keyword
-  late String field2;
+  late final String field2;
+
+  /// expect_lint: avoid_late_keyword
+  late final String field3 = 'string';
+
+  /// expect_lint: avoid_late_keyword
+  late final field4;
 
   void test() {
-    /// expect_lint: avoid_late_keyword
-    late final ColorTween colorTween;
-    
-    late final AnimationController controller2;
+    late final Animation animation1;
+
+    late final animation2 = AnimationController();
+
+    late final animation3 = SubAnimationController();
 
     /// expect_lint: avoid_late_keyword
-    late final field3 = 'string';
+    late final ColorTween colorTween1;
 
     /// expect_lint: avoid_late_keyword
-    late String field4;
+    late final colorTween2 = ColorTween();
+
+    /// expect_lint: avoid_late_keyword
+    late final colorTween3 = colorTween2;
+
+    late final AnimationController controller1;
+
+    /// expect_lint: avoid_late_keyword
+    late final local1 = 'string';
+
+    /// expect_lint: avoid_late_keyword
+    late final String local2;
+
+    /// expect_lint: avoid_late_keyword
+    late final String local4 = 'string';
+
+    /// expect_lint: avoid_late_keyword
+    late final local3;
   }
 }
-
-abstract class Animation {}
-
-class AnimationController implements Animation {}
-
-class ColorTween {}
