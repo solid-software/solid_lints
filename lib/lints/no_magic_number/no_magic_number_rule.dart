@@ -69,7 +69,9 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
           .where(_isNotInsideConstConstructor)
           .where(_isNotInDateTime)
           .where(_isNotInsideIndexExpression)
-          .where(_isNotInsideEnumConstantArguments);
+          .where(_isNotInsideEnumConstantArguments)
+          .where(_isNotDefaultValue)
+          .where(_isNotInConstructorInitializer);
 
       for (final magicNumber in magicNumbers) {
         reporter.reportErrorForNode(code, magicNumber);
@@ -122,4 +124,12 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
       null;
 
   bool _isNotInsideIndexExpression(Literal l) => l.parent is! IndexExpression;
+
+  bool _isNotDefaultValue(Literal literal) {
+    return literal.thisOrAncestorOfType<DefaultFormalParameter>() == null;
+  }
+
+  bool _isNotInConstructorInitializer(Literal literal) {
+    return literal.thisOrAncestorOfType<ConstructorInitializer>() == null;
+  }
 }
