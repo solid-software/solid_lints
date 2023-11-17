@@ -6,3 +6,5 @@ custom_lint:
   rules:
     - avoid_late_keyword:
       allow_initialized: false
+      ignored_types:
+        - Animation

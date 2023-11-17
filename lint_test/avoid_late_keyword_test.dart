@@ -20,14 +20,14 @@ class AvoidLateKeyword {
 
   late final SubAnimationController controller2;
 
-  /// expect_lint: avoid_late_keyword
-  late final NotAllowed na;
-
   late final field1 = 'string';
 
-  /// expect_lint: avoid_late_keyword
+   /// expect_lint: avoid_late_keyword
   late String field2;
 
+  /// expect_lint: avoid_late_keyword
+  late final NotAllowed na;
+  
   void test() {
     late final ColorTween colorTween;
 

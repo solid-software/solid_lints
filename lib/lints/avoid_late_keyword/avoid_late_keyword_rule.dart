@@ -54,7 +54,7 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
     final hasInitializer = node.initializer != null;
     return !hasInitializer;
   }
-
+  
   bool _hasIgnoredType(VariableDeclaration node) {
     final ignoredTypes = config.parameters.ignoredTypes.toSet();
     if (ignoredTypes.isEmpty) return false;
