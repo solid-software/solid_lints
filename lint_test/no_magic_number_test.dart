@@ -87,7 +87,6 @@ class ConstructorInitializer {
   ConstructorInitializer() : value = 10;
 }
 
-// Allowed for numbers in a Widget subtype parameters.
 abstract interface class Widget {}
 
 class StatelessWidget implements Widget {}
@@ -110,7 +109,9 @@ class MyWidgetDecoration {
 
 Widget build() {
   return MyWidget(
+    // expect_lint: no_magic_number
     decoration: MyWidgetDecoration(size: 12),
+    // expect_lint: no_magic_number
     value: 23,
   );
 }
