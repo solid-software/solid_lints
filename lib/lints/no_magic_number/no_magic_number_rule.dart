@@ -137,6 +137,8 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   }
 
   bool _isNotWidgetParameter(Literal literal) {
+    if (!config.parameters.allowedInWidgetParams) return true;
+
     final instanceCreationExpression =
         literal.thisOrAncestorOfType<InstanceCreationExpression>();
 

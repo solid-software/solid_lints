@@ -48,7 +48,8 @@ custom_lint:
         - did_change_dependencies_method
         - did_update_widget_method
         - dispose_method
-    - no_magic_number
+    - no_magic_number:
+      allowed_in_widget_params: true
     - prefer_conditional_expressions
     - prefer_first
     - prefer_last
