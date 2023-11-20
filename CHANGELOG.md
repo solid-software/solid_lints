@@ -1,3 +1,9 @@
+## 0.1.0
+
+- **BREAKING CHANGE**:
+  - Drop support for Dart 2 while preparing for `custom_lint` support
+- Add support for `cyclomatic_complexity_metric` via `custom_lint`
+
 ## 0.0.19
 
 - Add rules

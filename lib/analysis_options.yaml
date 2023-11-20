@@ -20,11 +20,6 @@ analyzer:
     # test_coverage
     - test/.test_coverage.dart
 
-  # Dart Code Metrics plugin (https://dartcodemetrics.dev/) provides many additional rules
-  # that helped to automate some pieces of our internal team code style based on the best
-  # industry practices.
-  plugins:
-    - dart_code_metrics
   language:
     # We've seen errors tied to use of implicit operations similar to the ones described in
     # https://dart.dev/guides/language/analysis-options#enabling-additional-type-checks.
@@ -158,13 +153,14 @@ linter:
     - implementation_imports
     # deprecated rule in Flutter 3.7
     # - invariant_booleans
-    - iterable_contains_unrelated_type
+    # - iterable_contains_unrelated_type
+    - collection_methods_unrelated_type
     - join_return_with_assignment
     - leading_newlines_in_multiline_strings
     - library_names
     - library_prefixes
     - lines_longer_than_80_chars
-    - list_remove_unrelated_type
+    # - list_remove_unrelated_type
     - literal_only_boolean_expressions
     - no_adjacent_strings_in_list
     - no_duplicate_case_values
