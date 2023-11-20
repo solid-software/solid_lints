@@ -32,55 +32,77 @@ analyzer:
     missing_return: error
     parameter_assignments: error
 
-dart_code_metrics:
-  metrics:
-    # NIST 500-235 item 2.5
-    cyclomatic-complexity: 10
+custom_lint:
+  rules:
+    - avoid_global_state
 
-    # McConnell, S. (2004), Chapter 7.5: High-Quality Routines: How To Use Routine Parameters. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 174-180
-    number-of-parameters: 7
+    - avoid_late_keyword:
+      allow_initialized: true
+      ignored_types:
+        - AnimationController
+
+    - avoid_non_null_assertion
+    - avoid_returning_widgets
+    - avoid_unnecessary_setstate
+    - avoid_unnecessary_type_assertions
+    - avoid_unnecessary_type_casts
+    - avoid_unrelated_type_assertions
+    - avoid_unused_parameters
+
+    # NIST 500-235 item 2.5
+    - cyclomatic_complexity:
+      max_complexity: 10
+
+    - double_literal_format
 
     # McConnell, S. (2004), Chapter 7.4: High-Quality Routines: How Long Can a Routine Be?. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 173-174
-    source-lines-of-code: 200
+    - function_lines_of_code:
+      max_lines: 200
 
-    # We use source-lines-of-code instead of this as we don't want to count comment or blank lines.
-    # lines-of-code: 50
-  rules:
-    - avoid-global-state
-    - avoid-late-keyword
-    - avoid-non-null-assertion
-    - avoid-returning-widgets
-    - avoid-unnecessary-setstate
-    - avoid-unnecessary-type-assertions
-    - avoid-unnecessary-type-casts
-    - avoid-unrelated-type-assertions
-    - avoid-unused-parameters
-    - double-literal-format
-    - member-ordering:
-        order:
-          - fields
-          - getters-setters
-          - constructors
-          - methods
-        widgets-order:
-          - init-state-method
-          - build-method
-          - did-change-dependencies-method
-          - did-update-widget-method
-          - deactivate-method
-          - dispose-method
-    - newline-before-return
-    - no-empty-block
-    - no-equal-then-else
-    - no-magic-number
-    - prefer-conditional-expressions
-    - prefer-first
-    - prefer-last
-    # This improves navigation by matching file content and file name.
-    - prefer-match-file-name
-  anti-patterns:
-    - long-method
-    - long-parameter-list
+    - member_ordering:
+      alphabetize: true
+      order:
+        - public_fields
+        - private_fields
+        - getters
+        - setters
+        - constructors
+        - public_methods
+        - private_methods
+        - close_method
+      widgets_order:
+        - const_fields
+        - static_fields
+        - static_methods
+        - public_fields
+        - private_fields
+        - constructors
+        - public_methods
+        - private_methods
+        - init_state_method
+        - build_method
+        - did_change_dependencies_method
+        - did_update_widget_method
+        - dispose_method
+
+    - newline_before_return
+    - no_empty_block
+    - no_equal_then_else
+
+    - no_magic_number:
+      allowed_in_widget_params: true
+
+    # McConnell, S. (2004), Chapter 7.5: High-Quality Routines: How To Use Routine Parameters. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 174-180
+    - number_of_parameters:
+      max_parameters: 7
+
+    - prefer_conditional_expressions:
+      ignore_nested: true
+
+    - prefer_first
+    - prefer_last
+    - prefer_match_file_name
+    - proper_super_calls
 
 linter:
   rules:
