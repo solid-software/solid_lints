@@ -139,20 +139,27 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   bool _isNotWidgetParameter(Literal literal) {
     if (!config.parameters.allowedInWidgetParams) return true;
 
-    final instanceCreationExpression =
-        literal.thisOrAncestorOfType<InstanceCreationExpression>();
+    final widgetCreationExpression = literal.thisOrAncestorMatching(
+      _isWidgetCreationExpression,
+    );
 
-    if (instanceCreationExpression == null) return true;
+    return widgetCreationExpression == null;
+  }
 
-    final staticType = instanceCreationExpression.staticType;
+  bool _isWidgetCreationExpression(
+    AstNode node,
+  ) {
+    if (node is! InstanceCreationExpression) return false;
 
-    if (staticType is! InterfaceType) return true;
+    final staticType = node.staticType;
+
+    if (staticType is! InterfaceType) return false;
 
     final widgetSupertype = staticType.allSupertypes.firstWhereOrNull(
       (supertype) =>
           supertype.getDisplayString(withNullability: false) == 'Widget',
     );
 
-    return widgetSupertype == null;
+    return widgetSupertype != null;
   }
 }
