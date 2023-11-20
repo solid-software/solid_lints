@@ -22,7 +22,9 @@
 // SOFTWARE.
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/no_magic_number/models/no_magic_number_parameters.dart';
 import 'package:solid_lints/lints/no_magic_number/no_magic_number_visitor.dart';
@@ -71,7 +73,8 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
           .where(_isNotInsideIndexExpression)
           .where(_isNotInsideEnumConstantArguments)
           .where(_isNotDefaultValue)
-          .where(_isNotInConstructorInitializer);
+          .where(_isNotInConstructorInitializer)
+          .where(_isNotWidgetParameter);
 
       for (final magicNumber in magicNumbers) {
         reporter.reportErrorForNode(code, magicNumber);
@@ -131,5 +134,32 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
 
   bool _isNotInConstructorInitializer(Literal literal) {
     return literal.thisOrAncestorOfType<ConstructorInitializer>() == null;
+  }
+
+  bool _isNotWidgetParameter(Literal literal) {
+    if (!config.parameters.allowedInWidgetParams) return true;
+
+    final widgetCreationExpression = literal.thisOrAncestorMatching(
+      _isWidgetCreationExpression,
+    );
+
+    return widgetCreationExpression == null;
+  }
+
+  bool _isWidgetCreationExpression(
+    AstNode node,
+  ) {
+    if (node is! InstanceCreationExpression) return false;
+
+    final staticType = node.staticType;
+
+    if (staticType is! InterfaceType) return false;
+
+    final widgetSupertype = staticType.allSupertypes.firstWhereOrNull(
+      (supertype) =>
+          supertype.getDisplayString(withNullability: false) == 'Widget',
+    );
+
+    return widgetSupertype != null;
   }
 }

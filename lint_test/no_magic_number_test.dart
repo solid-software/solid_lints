@@ -86,3 +86,32 @@ class ConstructorInitializer {
 
   ConstructorInitializer() : value = 10;
 }
+
+abstract interface class Widget {}
+
+class StatelessWidget implements Widget {}
+
+class MyWidget extends StatelessWidget {
+  final MyWidgetDecoration decoration;
+  final int value;
+
+  MyWidget({
+    required this.decoration,
+    required this.value,
+  });
+}
+
+class MyWidgetDecoration {
+  final int size;
+
+  MyWidgetDecoration({required this.size});
+}
+
+Widget build() {
+  return MyWidget(
+    // expect_lint: no_magic_number
+    decoration: MyWidgetDecoration(size: 12),
+    // expect_lint: no_magic_number
+    value: 23,
+  );
+}
