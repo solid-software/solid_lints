@@ -1,8 +1,30 @@
 ## 0.1.0
 
-- **BREAKING CHANGE**:
-  - Drop support for Dart 2 while preparing for `custom_lint` support
-- Add support for `cyclomatic_complexity_metric` via `custom_lint`
+- Remove DCM as a dependency
+- Add `custom_lint` and integrate/redo lints from DCM using `custom_lint`:
+  - avoid_global_state
+  - avoid_late_keyword
+  - avoid_non_null_assertion
+  - avoid_returning_widgets
+  - avoid_unnecessary_setstate
+  - avoid_unnecessary_type_assertions
+  - avoid_unnecessary_type_casts
+  - avoid_unrelated_type_assertions
+  - avoid_unused_parameters
+  - cyclomatic_complexity
+  - double_literal_format
+  - function_lines_of_code
+  - member_ordering
+  - newline_before_return
+  - no_empty_block
+  - no_equal_then_else
+  - no_magic_number
+  - number_of_parameters
+  - prefer_conditional_expressions
+  - prefer_first
+  - prefer_last
+  - prefer_match_file_name
+  - proper_super_calls
 
 ## 0.0.19
 
