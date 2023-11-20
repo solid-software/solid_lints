@@ -1,3 +1,4 @@
+import 'package:analyzer/error/error.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Type definition of a value factory which allows us to map data from
@@ -37,5 +38,6 @@ class RuleConfig<T extends Object?> {
   LintCode get lintCode => LintCode(
         name: name,
         problemMessage: _problemMessageFactory(parameters),
+        errorSeverity: ErrorSeverity.WARNING,
       );
 }
