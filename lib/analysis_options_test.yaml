@@ -1,24 +1,20 @@
 include: package:solid_lints/analysis_options.yaml
 
-dart_code_metrics:
-  metrics:
-
+custom_lint:
+  rules:
 # Tests usually organized in one large main() function making this rule not applicable.
 # Given the quite large threshold configured for this metric we considered extracting
 # test body into separate function, but that means that we'll have to either pass
 # Test Context that contains all defined variables in main to every function call
 # or moving them to the Global State.
 # Both options didn't look right, so we decided that tests are ok to be long.
-    source-lines-of-code: false
-
+    - function_lines_of_code: false
 # Since we're not using the source-lines-of-code rule, `main()` function in test can 
 # have high cyclomatic complexity.
 # For rationale against splitting up `main()` in tests, see `source-lines-of-code` comments.
-# Also there is a bug in metric calculation: https://github.com/dart-code-checker/dart-code-metrics/issues/663
-    cyclomatic-complexity: false
+# Also, there is a bug in metric calculation: https://github.com/dart-code-checker/dart-code-metrics/issues/663
+    - cyclomatic_complexity: false
 
-  rules:
-  
 # Late keyword is allowed in tests in order to enable the use of custom mocks and
 # fakes.
 
@@ -36,7 +32,7 @@ dart_code_metrics:
 # 1. Making the mocks `final` and non-nullable, and adding a `reset()` method
 #    to them, which would return the mock/fake to its initial state.
 #    - Works well with generated code from testing libraries like `mockito`.
-#    - It's less practical with hand-written mocks, where it's possible to add a
+#    - It's less practical with handwritten mocks, where it's possible to add a
 #      piece of state and forget to reset it, which might lead to hard-to-trace
 #      errors. Usually re-instantiating a test mock simplifies its code and
 #      prevents such errors altogether, but that requires making the field
@@ -52,10 +48,7 @@ dart_code_metrics:
 # 4. Making the mocks nullable and using the "bang" operator (`!`):
 #    - In terms of behavior similar to `late`, but requires using the operator in
 #      many places inside the test code, adding uninformative visual noise.
-#    - The use of this operator is also discouraged by the main ruleset.
-    avoid-late-keyword: false
+#    - The use of this operator is also discouraged by the main rule set.
+    - avoid_late_keyword: false
 # It's acceptable to include stubs or other helper classes into the test file.
-    prefer-match-file-name: false
-  anti-patterns:
-# Same as for `source-lines-of-code`
-    long-method: false
+    - prefer_match_file_name: false
