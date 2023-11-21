@@ -1,4 +1,6 @@
 analyzer:
+  plugins:
+    - custom_lint
   exclude:
     # General generated files
     - '**/*.g.dart'
