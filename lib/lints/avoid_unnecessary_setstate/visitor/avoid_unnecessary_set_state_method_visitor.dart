@@ -28,7 +28,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 /// necessary
 class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
   final Set<String> _classMethodsNames;
-  final Iterable<FunctionBody> _bodies;
+  final Set<FunctionBody> _bodies;
 
   final _setStateInvocations = <MethodInvocation>[];
 
@@ -47,9 +47,13 @@ class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
 
     if (name == 'setState' && notInBody) {
       _setStateInvocations.add(node);
-    } else if (_classMethodsNames.contains(name) &&
-        notInBody &&
-        node.realTarget == null) {
+      return;
+    }
+
+    final isClassMethod = _classMethodsNames.contains(name);
+    final isReturnValueUsed = node.realTarget != null;
+
+    if (isClassMethod && notInBody && !isReturnValueUsed) {
       _setStateInvocations.add(node);
     }
   }

@@ -32,9 +32,8 @@ class AvoidUnnecessarySetStateRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    final visitor = AvoidUnnecessarySetStateVisitor();
-
     context.registry.addClassDeclaration((node) {
+      final visitor = AvoidUnnecessarySetStateVisitor();
       visitor.visitClassDeclaration(node);
       for (final element in visitor.setStateInvocations) {
         reporter.reportErrorForNode(code, element);
