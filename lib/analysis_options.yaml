@@ -62,7 +62,6 @@ custom_lint:
       max_lines: 200
 
     - member_ordering:
-      alphabetize: true
       order:
         - public_fields
         - private_fields
