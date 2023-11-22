@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
@@ -36,17 +37,22 @@ class FunctionLinesOfCodeMetric
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
-
     context.registry.addDeclaration((node) {
-      node.visitChildren(visitor);
+      if (node
+          case FunctionDeclaration() ||
+              MethodDeclaration() ||
+              FunctionExpression() ||
+              FunctionBody()) {
+        final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
+        node.visitChildren(visitor);
 
-      if (visitor.linesWithCode.length > config.parameters.maxLines) {
-        reporter.reportErrorForOffset(
-          code,
-          node.firstTokenAfterCommentAndMetadata.offset,
-          node.end,
-        );
+        if (visitor.linesWithCode.length > config.parameters.maxLines) {
+          reporter.reportErrorForOffset(
+            code,
+            node.firstTokenAfterCommentAndMetadata.offset,
+            node.end,
+          );
+        }
       }
     });
   }
