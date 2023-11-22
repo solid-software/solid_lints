@@ -35,9 +35,8 @@ class CyclomaticComplexityMetric
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    final visitor = CyclomaticComplexityFlowVisitor();
-
     context.registry.addBlockFunctionBody((node) {
+      final visitor = CyclomaticComplexityFlowVisitor();
       node.visitChildren(visitor);
 
       if (visitor.complexityEntities.length + 1 >
