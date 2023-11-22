@@ -63,27 +63,16 @@ custom_lint:
 
     - member_ordering:
       order:
-        - public_fields
-        - private_fields
-        - getters
-        - setters
+        - fields
+        - getters_setters
         - constructors
-        - public_methods
-        - private_methods
-        - close_method
+        - methods
       widgets_order:
-        - const_fields
-        - static_fields
-        - static_methods
-        - public_fields
-        - private_fields
-        - constructors
-        - public_methods
-        - private_methods
         - init_state_method
         - build_method
         - did_change_dependencies_method
         - did_update_widget_method
+        - deactivate_method
         - dispose_method
 
     - newline_before_return

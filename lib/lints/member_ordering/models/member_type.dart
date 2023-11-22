@@ -41,7 +41,7 @@ enum MemberType {
   setter('setters'),
 
   /// Indicates affiliation with both getters and setters
-  getterAndSetter('getters-setters');
+  getterAndSetter('getters_setters');
 
   /// String representation of member group type
   final String type;
