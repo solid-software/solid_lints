@@ -58,7 +58,7 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
     final checkedMethods = methods.where(_isMethodChecked);
     final uncheckedMethods = methods.whereNot(_isMethodChecked);
 
-    // memo for visited methods; prevents checking
+    // memo for visited methods; prevents checking the same method twice
     final methodToHasSetState = <String, bool>{};
 
     for (final method in checkedMethods) {
