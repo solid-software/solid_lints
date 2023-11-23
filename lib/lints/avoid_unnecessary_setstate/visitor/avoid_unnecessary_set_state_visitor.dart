@@ -52,6 +52,8 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
     final declarations = node.members.whereType<MethodDeclaration>();
     final classMethodsCallingSetState = declarations
         .where(_hasSetStateInvocation)
+        // allow asynchronous triggers
+        .where((d) => !d.body.isAsynchronous)
         .map((declaration) => declaration.name.lexeme)
         .toSet();
     final bodies = declarations.map((declaration) => declaration.body).toSet();
