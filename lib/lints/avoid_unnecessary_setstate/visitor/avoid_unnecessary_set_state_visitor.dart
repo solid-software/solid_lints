@@ -50,21 +50,45 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
     }
 
     final declarations = node.members.whereType<MethodDeclaration>();
-    final classMethodsNames =
-        declarations.map((declaration) => declaration.name.lexeme).toSet();
+    final classMethodsCallingSetState = declarations
+        .where(_hasSetStateInvocation)
+        .map((declaration) => declaration.name.lexeme)
+        .toSet();
     final bodies = declarations.map((declaration) => declaration.body).toSet();
     final methods = declarations
         .where((member) => _checkedMethods.contains(member.name.lexeme))
         .toList();
 
     for (final method in methods) {
-      final visitor =
-          AvoidUnnecessarySetStateMethodVisitor(classMethodsNames, bodies);
+      final visitor = AvoidUnnecessarySetStateMethodVisitor(
+        classMethodsCallingSetState,
+        bodies,
+      );
       method.visitChildren(visitor);
 
       _setStateInvocations.addAll([
         ...visitor.setStateInvocations,
       ]);
     }
+  }
+
+  bool _hasSetStateInvocation(MethodDeclaration node) {
+    final visitor = _HasSetStateMethodVisitor();
+    node.visitChildren(visitor);
+    return visitor.hasSetStateCalls;
+  }
+}
+
+class _HasSetStateMethodVisitor extends RecursiveAstVisitor<void> {
+  bool _hasSetStateCalls = false;
+
+  bool get hasSetStateCalls => _hasSetStateCalls;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'setState') {
+      _hasSetStateCalls = true;
+    }
+    super.visitMethodInvocation(node);
   }
 }
