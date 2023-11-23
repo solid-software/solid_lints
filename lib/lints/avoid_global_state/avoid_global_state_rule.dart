@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
@@ -30,12 +31,24 @@ class AvoidGlobalStateRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addVariableDeclaration((node) {
-      final isPrivate = node.declaredElement?.isPrivate ?? false;
-
-      if (!isPrivate && !node.isFinal && !node.isConst) {
-        reporter.reportErrorForNode(code, node);
-      }
+    context.registry.addTopLevelVariableDeclaration(
+      (node) => node.variables.variables
+          .where((variable) => variable.isPublicMutable)
+          .forEach((node) => reporter.reportErrorForNode(code, node)),
+    );
+    context.registry.addFieldDeclaration((node) {
+      if (!node.isStatic) return;
+      node.fields.variables
+          .where((variable) => variable.isPublicMutable)
+          .forEach((node) => reporter.reportErrorForNode(code, node));
     });
   }
+}
+
+extension on VariableDeclaration {
+  bool get isMutable => !isFinal && !isConst;
+
+  bool get isPrivate => declaredElement?.isPrivate ?? false;
+
+  bool get isPublicMutable => isMutable && !isPrivate;
 }
