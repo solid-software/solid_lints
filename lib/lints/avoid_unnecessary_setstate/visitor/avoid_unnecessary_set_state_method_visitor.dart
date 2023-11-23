@@ -51,7 +51,7 @@ class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
 
     final name = node.methodName.name;
-    final isNotInCallback = _isNotInCallback(node);
+    final isNotInCallback = !_isInCallback(node);
 
     if (name == 'setState' && isNotInCallback) {
       _setStateInvocations.add(node);
@@ -65,10 +65,10 @@ class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
     }
   }
 
-  bool _isNotInCallback(MethodInvocation node) =>
+  bool _isInCallback(MethodInvocation node) =>
       node.thisOrAncestorMatching(
         (parent) =>
             parent is FunctionBody && !_classMethodBodies.contains(parent),
-      ) ==
+      ) !=
       null;
 }
