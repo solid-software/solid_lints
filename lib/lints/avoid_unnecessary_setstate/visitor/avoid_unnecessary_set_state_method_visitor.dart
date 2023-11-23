@@ -27,18 +27,23 @@ import 'package:analyzer/dart/ast/visitor.dart';
 /// AST Visitor which finds all setState invocations and checks if they are
 /// necessary
 class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
-  final Set<String> _classMethodsCallingSetState;
-  final Set<FunctionBody> _bodies;
+  final Set<String> _classMethodsNames;
+  final Set<FunctionBody> _classMethodBodies;
 
   final _setStateInvocations = <MethodInvocation>[];
+  final _classMethodsInvocations = <MethodInvocation>[];
 
-  /// All setState invocations
+  /// Invocations of setState within visited methods.
   Iterable<MethodInvocation> get setStateInvocations => _setStateInvocations;
 
-  /// Constructor for AvoidUnnecessarySetStateMethodVisitor
+  /// Invocations of methods within visited methods.
+  Iterable<MethodInvocation> get classMethodsInvocations =>
+      _classMethodsInvocations;
+
+  ///
   AvoidUnnecessarySetStateMethodVisitor(
-    this._classMethodsCallingSetState,
-    this._bodies,
+    this._classMethodsNames,
+    this._classMethodBodies,
   );
 
   @override
@@ -46,25 +51,24 @@ class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
 
     final name = node.methodName.name;
-    final notInBody = _isNotInFunctionBody(node);
+    final isNotInCallback = _isNotInCallback(node);
 
-    if (name == 'setState' && notInBody) {
+    if (name == 'setState' && isNotInCallback) {
       _setStateInvocations.add(node);
       return;
     }
-
-    final isClassMethodCallingSetState =
-        _classMethodsCallingSetState.contains(name);
+    final isClassMethod = _classMethodsNames.contains(name);
     final isReturnValueUsed = node.realTarget != null;
 
-    if (isClassMethodCallingSetState && notInBody && !isReturnValueUsed) {
-      _setStateInvocations.add(node);
+    if (isClassMethod && isNotInCallback && !isReturnValueUsed) {
+      _classMethodsInvocations.add(node);
     }
   }
 
-  bool _isNotInFunctionBody(MethodInvocation node) =>
+  bool _isNotInCallback(MethodInvocation node) =>
       node.thisOrAncestorMatching(
-        (parent) => parent is FunctionBody && !_bodies.contains(parent),
+        (parent) =>
+            parent is FunctionBody && !_classMethodBodies.contains(parent),
       ) ==
       null;
 }
