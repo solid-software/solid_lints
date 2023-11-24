@@ -40,7 +40,7 @@ class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
   Iterable<MethodInvocation> get classMethodsInvocations =>
       _classMethodsInvocations;
 
-  ///
+  /// Constructor for [AvoidUnnecessarySetStateMethodVisitor]
   AvoidUnnecessarySetStateMethodVisitor(
     this._classMethodsNames,
     this._classMethodBodies,
