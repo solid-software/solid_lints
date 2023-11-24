@@ -7,6 +7,38 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// A rule which warns when setState is called inside initState, didUpdateWidget
 /// or build methods and when it's called from a sync method that is called
 /// inside those methods.
+///
+/// Cases where setState is unnecessary:
+/// - synchronous calls inside State lifecycle methods:
+///   - initState
+///   - didUpdateWidget
+///   - didChangeDependencies
+/// - synchronous calls inside `build` method
+///
+/// Nested synchronous setState invocations are also disallowed.
+///
+/// Calling setState in the aforementioned methods is allowed for:
+/// - async methods
+/// - callbacks
+///
+/// Example:
+/// ```dart
+/// void initState() {
+///   setState(() => foo = 'bar');  // lint
+///   changeState();                // lint
+///   triggerFetch();               // OK
+///   stream.listen((event) => setState(() => foo = event)); // OK
+/// }
+///
+/// void changeState() {
+///   setState(() => foo = 'bar');
+/// }
+///
+/// void triggerFetch() async {
+///   await fetch();
+///   if (mounted) setState(() => foo = 'bar');
+/// }
+/// ```
 class AvoidUnnecessarySetStateRule extends SolidLintRule {
   /// The lint name of this lint rule that represents
   /// the error whether we use setState in inappropriate way.
@@ -32,9 +64,8 @@ class AvoidUnnecessarySetStateRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    final visitor = AvoidUnnecessarySetStateVisitor();
-
     context.registry.addClassDeclaration((node) {
+      final visitor = AvoidUnnecessarySetStateVisitor();
       visitor.visitClassDeclaration(node);
       for (final element in visitor.setStateInvocations) {
         reporter.reportErrorForNode(code, element);

@@ -23,6 +23,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:collection/collection.dart';
 import 'package:solid_lints/lints/avoid_unnecessary_setstate/visitor/avoid_unnecessary_set_state_method_visitor.dart';
 import 'package:solid_lints/utils/types_utils.dart';
 
@@ -37,7 +38,7 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
 
   final _setStateInvocations = <MethodInvocation>[];
 
-  /// All setState invocations in checkedMethods
+  /// Unnecessary setState invocations
   Iterable<MethodInvocation> get setStateInvocations => _setStateInvocations;
 
   @override
@@ -49,22 +50,69 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    final declarations = node.members.whereType<MethodDeclaration>().toList();
+    final methods = node.members.whereType<MethodDeclaration>();
     final classMethodsNames =
-        declarations.map((declaration) => declaration.name.lexeme).toSet();
-    final bodies = declarations.map((declaration) => declaration.body).toList();
-    final methods = declarations
-        .where((member) => _checkedMethods.contains(member.name.lexeme))
-        .toList();
+        methods.map((declaration) => declaration.name.lexeme).toSet();
+    final methodBodies = methods.map((declaration) => declaration.body).toSet();
 
-    for (final method in methods) {
-      final visitor =
-          AvoidUnnecessarySetStateMethodVisitor(classMethodsNames, bodies);
+    final checkedMethods = methods.where(_isMethodChecked);
+    final uncheckedMethods = methods.whereNot(_isMethodChecked);
+
+    // memo for visited methods; prevents checking the same method twice
+    final methodToHasSetState = <String, bool>{};
+
+    for (final method in checkedMethods) {
+      final visitor = AvoidUnnecessarySetStateMethodVisitor(
+        classMethodsNames,
+        methodBodies,
+      );
       method.visitChildren(visitor);
 
-      _setStateInvocations.addAll([
-        ...visitor.setStateInvocations,
-      ]);
+      _setStateInvocations.addAll(visitor.setStateInvocations);
+      _setStateInvocations.addAll(
+        visitor.classMethodsInvocations
+            .where(
+              (invocation) => _containsSetState(
+                methodToHasSetState,
+                classMethodsNames,
+                methodBodies,
+                uncheckedMethods.firstWhere(
+                  (method) => method.name.lexeme == invocation.methodName.name,
+                ),
+              ),
+            )
+            .toList(),
+      );
     }
+  }
+
+  bool _isMethodChecked(MethodDeclaration m) =>
+      _checkedMethods.contains(m.name.lexeme);
+
+  bool _containsSetState(
+    Map<String, bool> methodToHasSetState,
+    Set<String> classMethodsNames,
+    Set<FunctionBody> bodies,
+    MethodDeclaration declaration,
+  ) {
+    final type = declaration.returnType?.type;
+    if (type != null && (type.isDartAsyncFuture || type.isDartAsyncFutureOr)) {
+      return false;
+    }
+
+    final name = declaration.name.lexeme;
+    if (methodToHasSetState.containsKey(name) && methodToHasSetState[name]!) {
+      return true;
+    }
+
+    final visitor =
+        AvoidUnnecessarySetStateMethodVisitor(classMethodsNames, bodies);
+    declaration.visitChildren(visitor);
+
+    final hasSetState = visitor.setStateInvocations.isNotEmpty;
+
+    methodToHasSetState[name] = hasSetState;
+
+    return hasSetState;
   }
 }

@@ -40,6 +40,8 @@ class _MyWidgetState extends State<MyWidget> {
   void initState() {
     super.initState();
 
+    methodWithoutSetState();
+
     // expect_lint: avoid_unnecessary_setstate
     setState(() {
       _myString = "Hello";
@@ -71,6 +73,10 @@ class _MyWidgetState extends State<MyWidget> {
     });
   }
 
+  void methodWithoutSetState() {
+    _myString = 'hey';
+  }
+
   @override
   Widget build(BuildContext context) {
     // expect_lint: avoid_unnecessary_setstate
@@ -90,6 +96,7 @@ class _MyWidgetState extends State<MyWidget> {
 
     return ElevatedButton(
       onPressed: myStateUpdateMethod,
+      onHover: (_) => methodWithoutSetState(),
       onLongPress: () {
         setState(() {
           _myString = 'data';

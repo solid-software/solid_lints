@@ -28,35 +28,47 @@ import 'package:analyzer/dart/ast/visitor.dart';
 /// necessary
 class AvoidUnnecessarySetStateMethodVisitor extends RecursiveAstVisitor<void> {
   final Set<String> _classMethodsNames;
-  final Iterable<FunctionBody> _bodies;
+  final Set<FunctionBody> _classMethodBodies;
 
   final _setStateInvocations = <MethodInvocation>[];
+  final _classMethodsInvocations = <MethodInvocation>[];
 
-  /// All setState invocations
+  /// Invocations of setState within visited methods.
   Iterable<MethodInvocation> get setStateInvocations => _setStateInvocations;
 
-  /// Constructor for AvoidUnnecessarySetStateMethodVisitor
-  AvoidUnnecessarySetStateMethodVisitor(this._classMethodsNames, this._bodies);
+  /// Invocations of methods within visited methods.
+  Iterable<MethodInvocation> get classMethodsInvocations =>
+      _classMethodsInvocations;
+
+  /// Constructor for [AvoidUnnecessarySetStateMethodVisitor]
+  AvoidUnnecessarySetStateMethodVisitor(
+    this._classMethodsNames,
+    this._classMethodBodies,
+  );
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     super.visitMethodInvocation(node);
 
     final name = node.methodName.name;
-    final notInBody = _isNotInFunctionBody(node);
+    final isNotInCallback = !_isInCallback(node);
 
-    if (name == 'setState' && notInBody) {
+    if (name == 'setState' && isNotInCallback) {
       _setStateInvocations.add(node);
-    } else if (_classMethodsNames.contains(name) &&
-        notInBody &&
-        node.realTarget == null) {
-      _setStateInvocations.add(node);
+      return;
+    }
+    final isClassMethod = _classMethodsNames.contains(name);
+    final isReturnValueUsed = node.realTarget != null;
+
+    if (isClassMethod && isNotInCallback && !isReturnValueUsed) {
+      _classMethodsInvocations.add(node);
     }
   }
 
-  bool _isNotInFunctionBody(MethodInvocation node) =>
+  bool _isInCallback(MethodInvocation node) =>
       node.thisOrAncestorMatching(
-        (parent) => parent is FunctionBody && !_bodies.contains(parent),
-      ) ==
+        (parent) =>
+            parent is FunctionBody && !_classMethodBodies.contains(parent),
+      ) !=
       null;
 }
