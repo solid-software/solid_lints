@@ -4,7 +4,7 @@ analyzer:
 
 custom_lint:
   rules:
-    banned_external_code:
+    - banned_external_code:
       severity: warning
       entries:
         - source: dart:collection

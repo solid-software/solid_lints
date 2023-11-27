@@ -1,0 +1,7 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - banned_external_code:

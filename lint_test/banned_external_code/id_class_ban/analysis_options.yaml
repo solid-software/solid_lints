@@ -3,7 +3,7 @@ analyzer:
     - ../custom_lint
 
 custom_lint:
-  banned_external_code:
+  - banned_external_code:
     severity: warning
     entries:
       - class_name: BannedCodeUsage
