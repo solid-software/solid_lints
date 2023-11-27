@@ -21,24 +21,24 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 ///         reason: "Future.waitAll from dart:async isnt allowed"
 ///         severity: warning
 /// ```
-class BannedExternalCodeRuleParameters {
+class BannedExternalCodeParameters {
   /// A list of BannedCodeOption parameters.
   final List<BannedExternalCodeEntryParameters> entries;
 
   /// The default severity of the lint for each entry.
   final ErrorSeverity? severity;
 
-  /// Constructor for [BannedExternalCodeRuleParameters] model
-  const BannedExternalCodeRuleParameters({
+  /// Constructor for [BannedExternalCodeParameters] model
+  const BannedExternalCodeParameters({
     this.entries = const [],
     this.severity,
   });
 
   /// Method for creating from json data
-  factory BannedExternalCodeRuleParameters.fromJson(
+  factory BannedExternalCodeParameters.fromJson(
     Map<String, Object?> json,
   ) =>
-      BannedExternalCodeRuleParameters(
+      BannedExternalCodeParameters(
         entries: List<BannedExternalCodeEntryParameters>.from(
           (json['entries'] as Iterable?)?.map(
                 (e) => BannedExternalCodeEntryParameters.fromJson(

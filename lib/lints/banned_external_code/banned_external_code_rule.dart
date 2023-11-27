@@ -12,7 +12,7 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// A `banned_external_code` rule which
 /// warns about usages of banned external code
 class BannedExternalCodeRule
-    extends SolidLintRule<BannedExternalCodeRuleParameters> {
+    extends SolidLintRule<BannedExternalCodeParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
   static const String lintName = 'banned_external_code';
@@ -24,10 +24,10 @@ class BannedExternalCodeRule
   factory BannedExternalCodeRule.createRule(
     CustomLintConfigs configs,
   ) {
-    final RuleConfig<BannedExternalCodeRuleParameters> rule = RuleConfig(
+    final RuleConfig<BannedExternalCodeParameters> rule = RuleConfig(
       configs: configs,
       name: lintName,
-      paramsParser: BannedExternalCodeRuleParameters.fromJson,
+      paramsParser: BannedExternalCodeParameters.fromJson,
       problemMessage: (_) =>
           'Usage of this code has been discouraged by your project.',
     );
@@ -48,7 +48,7 @@ class BannedExternalCodeRule
       config: config,
     );
 
-    final BannedExternalCodeRuleParameters(
+    final BannedExternalCodeParameters(
       :entries,
       severity: ruleSeverity,
     ) = config.parameters;
@@ -106,7 +106,7 @@ class _BannedCodeLinter {
   final CustomLintResolver resolver;
   final ErrorReporter reporter;
   final CustomLintContext context;
-  final RuleConfig<BannedExternalCodeRuleParameters?> config;
+  final RuleConfig<BannedExternalCodeParameters?> config;
 
   bool _matchesSource(String? parentSourcePath, String source) {
     if (parentSourcePath == null) {
