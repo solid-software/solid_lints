@@ -1,6 +1,7 @@
 import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/lints/banned_external_code/models/banned_external_code_entry_parameters.dart';
 import 'package:solid_lints/utils/parameter_utils.dart';
+import 'package:yaml/yaml.dart';
 
 /// A data model class that represents the "banned_external_code" input
 /// parameters.
@@ -42,7 +43,7 @@ class BannedExternalCodeParameters {
         entries: List<BannedExternalCodeEntryParameters>.from(
           (json['entries'] as Iterable?)?.map(
                 (e) => BannedExternalCodeEntryParameters.fromJson(
-                  e as Map<String, Object?>,
+                  (e as YamlMap).toMap(),
                 ),
               ) ??
               [],

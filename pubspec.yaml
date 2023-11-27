@@ -13,6 +13,7 @@ dependencies:
   collection: ^1.17.2
   custom_lint_builder: ^0.5.6
   path: ^1.8.3
+  yaml: ^3.1.2
 
 dev_dependencies:
   # These packages are mandatory for some of tests
