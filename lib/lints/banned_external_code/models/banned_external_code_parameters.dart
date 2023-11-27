@@ -12,7 +12,7 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// Example:
 /// ```yaml
 /// rules:
-///   - banned_code:
+///   - banned_external_code:
 ///     severity: error
 ///     entries:
 ///       - id: waitAll

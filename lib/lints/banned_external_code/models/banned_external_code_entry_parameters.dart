@@ -15,10 +15,10 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// Example:
 /// ```yaml
 /// entries:
-///   - id: waitAll
+///   - id: wait
 ///     class_name: Future
 ///     source: dart:async
-///     reason: "Future.waitAll from dart:async isnt allowed"
+///     reason: "Future.wait from dart:async isnt allowed"
 ///     severity: warning
 /// ```
 class BannedExternalCodeEntryParameters {
