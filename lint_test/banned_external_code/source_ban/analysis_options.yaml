@@ -1,0 +1,11 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    banned_external_code:
+      severity: warning
+      entries:
+        - source: dart:collection
+          reason: "dart:collection should not be used"

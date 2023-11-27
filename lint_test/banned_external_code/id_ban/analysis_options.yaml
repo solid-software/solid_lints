@@ -1,0 +1,11 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - banned_external_code:
+      severity: warning
+      entries:
+        - id: test
+          reason: "Global test methods/variables should not be used"

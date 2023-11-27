@@ -1,0 +1,11 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  banned_external_code:
+    severity: warning
+    entries:
+      - id: test
+        source: package:id_source
+        reason: "test methods from package:id_source is not allowed"
