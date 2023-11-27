@@ -8,20 +8,20 @@ custom_lint:
     entries:
       - id: test4
         class_name: BannedCodeUsage
-        source: package:id_class_package
-        reason: "BannedCodeUsage.test4 from the example package is not allowed"
+        source: package:id_class_source_ban
+        reason: "BannedCodeUsage.test4 from the id_class_source_ban package is not allowed"
       - id: test3
         class_name: BannedCodeUsage
-        source: package:id_class_package
-        reason: "BannedCodeUsage.test3 from the example package is not allowed"
+        source: package:id_class_source_ban
+        reason: "BannedCodeUsage.test3 from the id_class_source_ban package is not allowed"
       - id: test2
         class_name: BannedCodeUsage
-        source: package:id_class_package
-        reason: "BannedCodeUsage.test2 from the example package is not allowed"
+        source: package:id_class_source_ban
+        reason: "BannedCodeUsage.test2 from the id_class_source_ban package is not allowed"
       - id: test
         class_name: BannedCodeUsage
-        source: package:id_class_package
-        reason: "BannedCodeUsage.test from the example package is not allowed"
+        source: package:id_class_source_ban
+        reason: "BannedCodeUsage.test from the id_class_source_ban package is not allowed"
       - class_name: UnmodifiableListView
         source: dart:collection
         reason: "UnmodifiableListView from dart:collection is not allowed"
@@ -29,7 +29,7 @@ custom_lint:
         id: first
         source: dart:collection
         reason: "UnmodifiableListView from dart:collection is not allowed"
-      - id: waitAll
+      - id: wait
         class_name: Future
         source: dart:async
         reason: "Future.wait from dart:async is not allowed"

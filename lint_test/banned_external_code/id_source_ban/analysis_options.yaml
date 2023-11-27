@@ -7,5 +7,5 @@ custom_lint:
     severity: warning
     entries:
       - id: test
-        source: package:id_source
+        source: package:id_source_ban
         reason: "test methods from package:id_source is not allowed"
