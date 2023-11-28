@@ -14,7 +14,7 @@ bool nameConsistsOfUnderscoresOnly(FormalParameter parameter) {
 
 /// Decodes the severity parameter from the string
 ErrorSeverity? decodeErrorSeverity(String? severity) {
-  return switch (severity) {
+  return switch (severity?.toLowerCase()) {
     'info' => ErrorSeverity.INFO,
     'warning' => ErrorSeverity.WARNING,
     'error' => ErrorSeverity.ERROR,
