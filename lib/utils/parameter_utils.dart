@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
 /// Checks if parameter name consists only of underscores
@@ -68,4 +69,10 @@ extension YamlMapConverter on YamlMap {
     );
     return map;
   }
+}
+
+/// Normalizes the path using posix style and
+/// replaces backslashes with forward slashes
+String normalizePath(String path) {
+  return p.posix.normalize(path.replaceAll(r'\', '/'));
 }
