@@ -1,35 +1,36 @@
 analyzer:
   plugins:
-    - ../custom_lint
+    - ../../custom_lint
 
 custom_lint:
-  - banned_external_code:
-    severity: warning
-    entries:
-      - id: test4
-        class_name: BannedCodeUsage
-        source: package:id_class_source_ban
-        reason: "BannedCodeUsage.test4 from the id_class_source_ban package is not allowed"
-      - id: test3
-        class_name: BannedCodeUsage
-        source: package:id_class_source_ban
-        reason: "BannedCodeUsage.test3 from the id_class_source_ban package is not allowed"
-      - id: test2
-        class_name: BannedCodeUsage
-        source: package:id_class_source_ban
-        reason: "BannedCodeUsage.test2 from the id_class_source_ban package is not allowed"
-      - id: test
-        class_name: BannedCodeUsage
-        source: package:id_class_source_ban
-        reason: "BannedCodeUsage.test from the id_class_source_ban package is not allowed"
-      - class_name: UnmodifiableListView
-        source: dart:collection
-        reason: "UnmodifiableListView from dart:collection is not allowed"
-      - class_name: UnmodifiableListView
-        id: first
-        source: dart:collection
-        reason: "UnmodifiableListView from dart:collection is not allowed"
-      - id: wait
-        class_name: Future
-        source: dart:async
-        reason: "Future.wait from dart:async is not allowed"
+  rules:
+    - banned_external_code:
+      severity: warning
+      entries:
+        - id: test4
+          class_name: BannedCodeUsage
+          source: package:id_class_source_ban
+          reason: "BannedCodeUsage.test4 from the id_class_source_ban package is not allowed"
+        - id: test3
+          class_name: BannedCodeUsage
+          source: package:id_class_source_ban
+          reason: "BannedCodeUsage.test3 from the id_class_source_ban package is not allowed"
+        - id: test2
+          class_name: BannedCodeUsage
+          source: package:id_class_source_ban
+          reason: "BannedCodeUsage.test2 from the id_class_source_ban package is not allowed"
+        - id: test
+          class_name: BannedCodeUsage
+          source: package:id_class_source_ban
+          reason: "BannedCodeUsage.test from the id_class_source_ban package is not allowed"
+        - class_name: UnmodifiableListView
+          source: dart:collection
+          reason: "UnmodifiableListView from dart:collection is not allowed"
+        - class_name: UnmodifiableListView
+          id: first
+          source: dart:collection
+          reason: "UnmodifiableListView from dart:collection is not allowed"
+        - id: wait
+          class_name: Future
+          source: dart:async
+          reason: "Future.wait from dart:async is not allowed"

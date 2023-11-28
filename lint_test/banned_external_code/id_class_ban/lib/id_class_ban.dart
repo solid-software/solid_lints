@@ -1,5 +1,5 @@
-import 'src/class_1.dart' as id_class_1;
-import 'src/class_2.dart' as id_class_2;
+import 'package:id_class_ban/src/class_1.dart' as id_class_1;
+import 'package:id_class_ban/src/class_2.dart' as id_class_2;
 
 void testingBannedCodeLint() {
   final bannedCodeUsage = id_class_1.BannedCodeUsage();
