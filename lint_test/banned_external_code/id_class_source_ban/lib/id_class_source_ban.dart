@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-void testingBannedCodeLint() {
+void testingBannedCodeLint() async {
   final bannedCodeUsage = BannedCodeUsage();
   // expect_lint: banned_external_code
   BannedCodeUsage.test2();
@@ -30,6 +30,8 @@ void testingBannedCodeLint() {
 
   // expect_lint: banned_external_code
   Future.wait([Future.value(1), Future.value(2)]);
+
+  await (Future.value(1), Future.value(2)).wait;
 }
 
 const test2 = 'Hello World';
