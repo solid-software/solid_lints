@@ -2,6 +2,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:path/path.dart' as path;
 import 'package:solid_lints/lints/banned_external_code/models/banned_external_code_entry_parameters.dart';
 import 'package:solid_lints/lints/banned_external_code/models/banned_external_code_parameters.dart';
 import 'package:solid_lints/models/rule_config.dart';
@@ -108,12 +109,28 @@ class _BannedCodeLinter {
   final CustomLintContext context;
   final RuleConfig<BannedExternalCodeParameters?> config;
 
-  bool _matchesSource(String? parentSourcePath, String source) {
+  bool _matchesSource(String? parentSourcePath, String sourceToMatch) {
     if (parentSourcePath == null) {
       return false;
     }
 
-    return parentSourcePath.split('/').first == source;
+    final libraryPathParts = parentSourcePath.split('/');
+    final libraryName = libraryPathParts.first;
+
+    final sourceLibraryPathParts = sourceToMatch.split('/');
+    final sourceLibraryName = sourceLibraryPathParts.first;
+
+    final matchesLibraryName = libraryName == sourceLibraryName;
+    final shouldLintFileFromSource = sourceLibraryPathParts.length > 1;
+    if (shouldLintFileFromSource) {
+      final sourceFile = (sourceLibraryPathParts..removeAt(0)).join('/');
+      final libraryFile = (libraryPathParts..removeAt(0)).join('/');
+
+      final matchesFile = path.equals(sourceFile, libraryFile);
+      return matchesLibraryName && matchesFile;
+    }
+
+    return matchesLibraryName;
   }
 
   void banId(

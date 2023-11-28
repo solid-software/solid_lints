@@ -9,3 +9,5 @@ custom_lint:
       entries:
         - source: dart:collection
           reason: "dart:collection should not be used"
+        - source: package:source_ban/src/banned_library.dart
+          reason: "src/banned_library.dart should not be used anymore"
