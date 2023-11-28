@@ -37,6 +37,12 @@ class BannedExternalCodeEntryParameters {
   /// Explain why the code is banned
   final String? reason;
 
+  /// Regex patterns for files to include
+  final List<String> includes;
+
+  /// Regex patterns for files to exclude
+  final List<String> excludes;
+
   /// Constructor for [BannedExternalCodeEntryParameters] model
   const BannedExternalCodeEntryParameters({
     this.id,
@@ -44,6 +50,8 @@ class BannedExternalCodeEntryParameters {
     this.source,
     this.severity,
     this.reason,
+    this.includes = const [],
+    this.excludes = const [],
   });
 
   /// Method for creating from json data
@@ -56,5 +64,11 @@ class BannedExternalCodeEntryParameters {
         source: json['source'] as String?,
         severity: decodeErrorSeverity(json['severity'] as String?),
         reason: json['reason'] as String?,
+        includes: (json['includes'] as List<Object?>? ?? [])
+            .whereType<String>()
+            .toList(),
+        excludes: (json['excludes'] as List<Object?>? ?? [])
+            .whereType<String>()
+            .toList(),
       );
 }

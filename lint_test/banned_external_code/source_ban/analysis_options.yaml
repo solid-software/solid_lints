@@ -9,5 +9,10 @@ custom_lint:
       entries:
         - source: dart:collection
           reason: "dart:collection should not be used"
+          # Uses Glob notation, test using https://www.digitalocean.com/community/tools/glob
+          includes:
+            - "**/domain/**.dart"
+          excludes:
+            - "**/domain/**.ex.dart"
         - source: package:source_ban/src/banned_library.dart
           reason: "src/banned_library.dart should not be used anymore"

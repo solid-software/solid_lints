@@ -2,7 +2,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:path/path.dart' as path;
+import 'package:path/path.dart' as p;
 import 'package:solid_lints/lints/banned_external_code/models/banned_external_code_entry_parameters.dart';
 import 'package:solid_lints/lints/banned_external_code/models/banned_external_code_parameters.dart';
 import 'package:solid_lints/models/rule_config.dart';
@@ -49,16 +49,18 @@ class BannedExternalCodeRule
       config: config,
     );
 
-    final BannedExternalCodeParameters(
-      :entries,
-      severity: ruleSeverity,
-    ) = config.parameters;
+    final parameters = config.parameters;
+    for (final entry in parameters.entries) {
+      if (shouldSkipFile(entry.includes, entry.excludes, resolver.path)) {
+        continue;
+      }
 
-    for (final entry in entries) {
-      final entryCode = code.copyWith(
-        errorSeverity: entry.severity ?? ruleSeverity ?? code.errorSeverity,
-        problemMessage: entry.reason,
-      );
+      final entryCode = super.code.copyWith(
+            errorSeverity: entry.severity ??
+                parameters.severity ??
+                super.code.errorSeverity,
+            problemMessage: entry.reason,
+          );
 
       switch (entry) {
         // all non null
@@ -126,7 +128,7 @@ class _BannedCodeLinter {
       final sourceFile = (sourceLibraryPathParts..removeAt(0)).join('/');
       final libraryFile = (libraryPathParts..removeAt(0)).join('/');
 
-      final matchesFile = path.equals(sourceFile, libraryFile);
+      final matchesFile = p.equals(sourceFile, libraryFile);
       return matchesLibraryName && matchesFile;
     }
 

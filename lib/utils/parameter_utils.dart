@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
@@ -71,8 +72,70 @@ extension YamlMapConverter on YamlMap {
   }
 }
 
+/// Determines whether the file should be skipped using Glob patterns
+///
+/// See https://pub.dev/packages/glob
+bool shouldSkipFile(
+  List<String> includeGlobs,
+  List<String> excludeGlobs,
+  String path,
+) {
+  if (includeGlobs.isEmpty && excludeGlobs.isEmpty) {
+    return false;
+  }
+
+  final bool isIncludeOnly = excludeGlobs.isEmpty && includeGlobs.isNotEmpty;
+  final bool isExcludeOnly = includeGlobs.isEmpty && excludeGlobs.isNotEmpty;
+  final pathNormalized = normalizePath(path);
+  if (isIncludeOnly) {
+    return _isFileNotIncluded(includeGlobs, path);
+  }
+
+  if (isExcludeOnly) {
+    return _isFileExcluded(includeGlobs, pathNormalized);
+  }
+
+  final isFileNotIncluded = _isFileNotIncluded(includeGlobs, pathNormalized);
+  final isFileExcluded = _isFileExcluded(excludeGlobs, pathNormalized);
+  return isFileNotIncluded || isFileExcluded;
+}
+
+bool _isFileExcluded(List<String> excludes, String path) {
+  final hasMatch =
+      excludes.map(Glob.new).toList().any((glob) => glob.matches(path));
+  return hasMatch;
+}
+
+bool _isFileIncluded(List<String> includes, String path) {
+  final hasMatch =
+      includes.map(Glob.new).toList().any((glob) => glob.matches(path));
+  return hasMatch;
+}
+
+bool _isFileNotIncluded(List<String> includes, String path) {
+  return !_isFileIncluded(includes, path);
+}
+
 /// Normalizes the path using posix style and
 /// replaces backslashes with forward slashes
 String normalizePath(String path) {
-  return p.posix.normalize(path.replaceAll(r'\', '/'));
+  // Remove drive letter from path
+  final String subpath = _removeDriveLetter(path);
+
+  return p.posix.relative(subpath.replaceAll(r'\', '/'), from: '/');
+}
+
+String _removeDriveLetter(String path) {
+  if (p.context.style != p.Style.windows) {
+    return path;
+  }
+
+  if (path.contains(":")) {
+    final indexOfColon = path.indexOf(':');
+    if (indexOfColon == 1 && indexOfColon < path.length - 1) {
+      return path.substring(indexOfColon + 1);
+    }
+  }
+
+  return path;
 }
