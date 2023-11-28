@@ -11,6 +11,8 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// * source: Package (e.g., dart:async or package:example)
 /// * severity: The default severity of the lint for each entry.
 /// * reason: Explain why the code is banned
+/// * includes: Glob patterns for files to include
+/// * excludes: Glob patterns for files to exclude
 ///
 /// Example:
 /// ```yaml
@@ -20,6 +22,8 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 ///     source: dart:async
 ///     reason: "Future.wait from dart:async isnt allowed"
 ///     severity: warning
+///     includes: []
+///     excludes: []
 /// ```
 class BannedExternalCodeEntryParameters {
   /// Variable/method name
