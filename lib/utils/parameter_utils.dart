@@ -75,18 +75,22 @@ extension YamlMapConverter on YamlMap {
 /// Determines whether the file should be skipped using Glob patterns
 ///
 /// See https://pub.dev/packages/glob
-bool shouldSkipFile(
-  List<String> includeGlobs,
-  List<String> excludeGlobs,
-  String path,
-) {
+bool shouldSkipFile({
+  required List<String> includeGlobs,
+  required List<String> excludeGlobs,
+  required String path,
+  String? rootPath,
+}) {
   if (includeGlobs.isEmpty && excludeGlobs.isEmpty) {
     return false;
   }
 
   final bool isIncludeOnly = excludeGlobs.isEmpty && includeGlobs.isNotEmpty;
   final bool isExcludeOnly = includeGlobs.isEmpty && excludeGlobs.isNotEmpty;
-  final pathNormalized = normalizePath(path);
+  final pathNormalized = normalizePath(
+    path,
+    rootPath != null ? normalizePath(rootPath) : null,
+  );
   if (isIncludeOnly) {
     return _isFileNotIncluded(includeGlobs, path);
   }
@@ -118,11 +122,11 @@ bool _isFileNotIncluded(List<String> includes, String path) {
 
 /// Normalizes the path using posix style and
 /// replaces backslashes with forward slashes
-String normalizePath(String path) {
+String normalizePath(String path, [String? root]) {
   // Remove drive letter from path
   final String subpath = _removeDriveLetter(path);
 
-  return p.posix.relative(subpath.replaceAll(r'\', '/'), from: '/');
+  return p.posix.relative(subpath.replaceAll(r'\', '/'), from: root);
 }
 
 String _removeDriveLetter(String path) {

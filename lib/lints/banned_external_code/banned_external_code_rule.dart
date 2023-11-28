@@ -37,11 +37,17 @@ class BannedExternalCodeRule
   }
 
   @override
-  void run(
+  Future<void> run(
     CustomLintResolver resolver,
     ErrorReporter reporter,
     CustomLintContext context,
-  ) {
+  ) async {
+    final rootPath = (await resolver.getResolvedUnitResult())
+        .session
+        .analysisContext
+        .contextRoot
+        .root
+        .path;
     final linter = _BannedCodeLinter(
       resolver: resolver,
       reporter: reporter,
@@ -51,7 +57,12 @@ class BannedExternalCodeRule
 
     final parameters = config.parameters;
     for (final entry in parameters.entries) {
-      if (shouldSkipFile(entry.includes, entry.excludes, resolver.path)) {
+      if (shouldSkipFile(
+        includeGlobs: entry.includes,
+        excludeGlobs: entry.excludes,
+        path: resolver.path,
+        rootPath: rootPath,
+      )) {
         continue;
       }
 
