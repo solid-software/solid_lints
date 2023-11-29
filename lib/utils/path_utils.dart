@@ -16,7 +16,7 @@ bool shouldSkipFile({
 
   final bool isIncludeOnly = excludeGlobs.isEmpty && includeGlobs.isNotEmpty;
   final bool isExcludeOnly = includeGlobs.isEmpty && excludeGlobs.isNotEmpty;
-  final pathNormalized = relativePath(
+  final pathRelativeFromRoot = relativePath(
     path,
     rootPath,
   );
@@ -25,11 +25,12 @@ bool shouldSkipFile({
   }
 
   if (isExcludeOnly) {
-    return _isFileExcluded(includeGlobs, pathNormalized);
+    return _isFileExcluded(includeGlobs, pathRelativeFromRoot);
   }
 
-  final isFileNotIncluded = _isFileNotIncluded(includeGlobs, pathNormalized);
-  final isFileExcluded = _isFileExcluded(excludeGlobs, pathNormalized);
+  final isFileNotIncluded =
+      _isFileNotIncluded(includeGlobs, pathRelativeFromRoot);
+  final isFileExcluded = _isFileExcluded(excludeGlobs, pathRelativeFromRoot);
   return isFileNotIncluded || isFileExcluded;
 }
 
