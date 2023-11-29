@@ -24,6 +24,10 @@ class BannedCodeUsage {
     print('Hello World');
   }
 
+  void useTest() {
+    test(); // implicit `this`, no lint expected
+  }
+
   factory BannedCodeUsage.test3() {
     return BannedCodeUsage();
   }
