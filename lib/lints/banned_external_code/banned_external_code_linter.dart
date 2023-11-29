@@ -54,6 +54,7 @@ class BannedExternalCodeLinter {
     return matchesLibraryName;
   }
 
+  /// Lints usages of a global variable or function
   void banId(
     LintCode entryCode,
     String id,
@@ -61,6 +62,7 @@ class BannedExternalCodeLinter {
     banIdFromSource(entryCode, id);
   }
 
+  /// Lints usages of a class and its members
   void banClass(
     LintCode entryCode,
     String className,
@@ -68,6 +70,7 @@ class BannedExternalCodeLinter {
     banClassFromSource(entryCode, className);
   }
 
+  /// Lints usages of a given source
   void banSource(LintCode entryCode, String package) {
     context.registry.addSimpleIdentifier((node) {
       final parentSourceName = node.sourceUrl;
@@ -92,6 +95,7 @@ class BannedExternalCodeLinter {
     });
   }
 
+  /// Lints usages of a global variable or function from a given source
   void banIdFromSource(LintCode entryCode, String id, [String? source]) {
     // only matches globals
     context.registry.addSimpleIdentifier((node) {
@@ -116,10 +120,12 @@ class BannedExternalCodeLinter {
     });
   }
 
+  /// Lints usages of a class member
   void banIdFromClass(LintCode entryCode, String id, String className) {
     banIdFromClassFromSource(entryCode, id, className);
   }
 
+  /// Lints usages of a class and its members from a given source
   void banClassFromSource(
     LintCode entryCode,
     String className, [
@@ -171,6 +177,7 @@ class BannedExternalCodeLinter {
     });
   }
 
+  /// Lints usages of a class member from a given source
   void banIdFromClassFromSource(
     LintCode entryCode,
     String id,
