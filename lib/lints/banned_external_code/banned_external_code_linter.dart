@@ -35,17 +35,17 @@ class BannedExternalCodeLinter {
       return false;
     }
 
-    final libraryPathParts = parentSourcePath.split('/');
-    final libraryName = libraryPathParts.first;
+    final Uri parentUri = p.toUri(parentSourcePath);
+    final Uri sourceUri = p.toUri(sourceToMatch);
 
-    final sourceLibraryPathParts = sourceToMatch.split('/');
-    final sourceLibraryName = sourceLibraryPathParts.first;
+    final libraryName = parentUri.pathSegments.first;
+    final sourceLibraryName = sourceUri.pathSegments.first;
 
     final matchesLibraryName = libraryName == sourceLibraryName;
-    final shouldLintFileFromSource = sourceLibraryPathParts.length > 1;
+    final shouldLintFileFromSource = sourceUri.pathSegments.length > 1;
     if (shouldLintFileFromSource) {
-      final sourceFile = (sourceLibraryPathParts..removeAt(0)).join('/');
-      final libraryFile = (libraryPathParts..removeAt(0)).join('/');
+      final sourceFile = sourceUri.pathSegments.sublist(1).join('/');
+      final libraryFile = parentUri.pathSegments.sublist(1).join('/');
 
       final matchesFile = p.equals(sourceFile, libraryFile);
       return matchesLibraryName && matchesFile;
