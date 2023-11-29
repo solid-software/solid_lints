@@ -71,15 +71,12 @@ class BannedExternalCodeRule
           );
 
       switch (entry) {
-        // all non null
         case BannedExternalCodeEntryParameters(
             :final id?,
             :final className?,
             :final source?
           ):
           linter.banIdFromClassFromSource(entryCode, id, className, source);
-
-        // two non nulls
         case BannedExternalCodeEntryParameters(
             :final className?,
             :final source?
@@ -89,16 +86,12 @@ class BannedExternalCodeRule
           linter.banIdFromClass(entryCode, id, className);
         case BannedExternalCodeEntryParameters(:final id?, :final source?):
           linter.banIdFromSource(entryCode, id, source);
-
-        // one non null
         case BannedExternalCodeEntryParameters(:final source?):
           linter.banSource(entryCode, source);
         case BannedExternalCodeEntryParameters(:final className?):
           linter.banClass(entryCode, className);
         case BannedExternalCodeEntryParameters(:final id?):
           linter.banId(entryCode, id);
-
-        // all null
         case BannedExternalCodeEntryParameters():
           break;
       }
