@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:path/path.dart' as p;
 import 'package:solid_lints/lints/banned_external_code/banned_external_code_rule.dart';
@@ -138,8 +139,15 @@ class BannedExternalCodeLinter {
       }
 
       final parent = node.parent;
-      final entityBeforeNode =
-          parent!.childEntities.firstWhere((element) => element != node);
+      if (parent == null) {
+        return;
+      }
+
+      if (parent is ConstructorDeclaration) {
+        return;
+      }
+
+      final entityBeforeNode = parent.childEntities.firstOrNull;
       switch (entityBeforeNode) {
         case InstanceCreationExpression(:final staticType?):
         case SimpleIdentifier(:final staticType?):
