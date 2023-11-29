@@ -204,8 +204,15 @@ class BannedExternalCodeLinter {
       }
 
       final parent = node.parent;
-      final entityBeforeNode =
-          parent!.childEntities.firstWhere((element) => element != node);
+      if (parent == null) {
+        return;
+      }
+
+      if (parent is ConstructorDeclaration) {
+        return;
+      }
+
+      final entityBeforeNode = parent.childEntities.firstOrNull;
       switch (entityBeforeNode) {
         case InstanceCreationExpression(:final staticType?):
         case SimpleIdentifier(:final staticType?):
