@@ -5,9 +5,9 @@ import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:path/path.dart' as p;
 import 'package:solid_lints/lints/banned_external_code/banned_external_code_rule.dart';
+import 'package:solid_lints/lints/banned_external_code/banned_external_code_utils.dart';
 import 'package:solid_lints/lints/banned_external_code/models/banned_external_code_parameters.dart';
 import 'package:solid_lints/models/rule_config.dart';
-import 'package:solid_lints/utils/node_utils.dart';
 
 /// Linter for [BannedExternalCodeRule]
 class BannedExternalCodeLinter {
