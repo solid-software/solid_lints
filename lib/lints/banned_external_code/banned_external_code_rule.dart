@@ -6,8 +6,7 @@ import 'package:solid_lints/lints/banned_external_code/models/banned_external_co
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 import 'package:solid_lints/utils/parameter_utils.dart';
-
-import '../../utils/path_utils.dart';
+import 'package:solid_lints/utils/path_utils.dart';
 
 /// A `banned_external_code` rule which
 /// warns about usages of banned external code
