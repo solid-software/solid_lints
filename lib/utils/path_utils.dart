@@ -16,9 +16,9 @@ bool shouldSkipFile({
 
   final bool isIncludeOnly = excludeGlobs.isEmpty && includeGlobs.isNotEmpty;
   final bool isExcludeOnly = includeGlobs.isEmpty && excludeGlobs.isNotEmpty;
-  final pathNormalized = normalizePath(
+  final pathNormalized = relativePath(
     path,
-    rootPath != null ? normalizePath(rootPath) : null,
+    rootPath,
   );
   if (isIncludeOnly) {
     return _isFileNotIncluded(includeGlobs, path);
@@ -49,26 +49,13 @@ bool _isFileNotIncluded(List<String> includes, String path) {
   return !_isFileIncluded(includes, path);
 }
 
-/// Normalizes the path using posix style and
+/// Converts path to relative using posix style and
 /// replaces backslashes with forward slashes
-String normalizePath(String path, [String? root]) {
-  // Remove drive letter from path
-  final String subpath = _removeDriveLetter(path);
+String relativePath(String path, [String? root]) {
+  final uriNormlizedPath = p.toUri(path).normalizePath().path;
+  final uriNormlizedRoot =
+      root != null ? p.toUri(root).normalizePath().path : null;
 
-  return p.posix.relative(subpath.replaceAll(r'\', '/'), from: root);
-}
-
-String _removeDriveLetter(String path) {
-  if (p.context.style != p.Style.windows) {
-    return path;
-  }
-
-  if (path.contains(":")) {
-    final indexOfColon = path.indexOf(':');
-    if (indexOfColon == 1 && indexOfColon < path.length - 1) {
-      return path.substring(indexOfColon + 1);
-    }
-  }
-
-  return path;
+  final relative = p.posix.relative(uriNormlizedPath, from: uriNormlizedRoot);
+  return relative;
 }
