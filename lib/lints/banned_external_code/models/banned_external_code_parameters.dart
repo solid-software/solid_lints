@@ -1,5 +1,6 @@
 import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/lints/banned_external_code/models/banned_external_code_entry_parameters.dart';
+import 'package:solid_lints/utils/object_utils.dart';
 import 'package:solid_lints/utils/parameter_utils.dart';
 import 'package:yaml/yaml.dart';
 
