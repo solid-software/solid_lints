@@ -3,6 +3,14 @@ import 'package:path/path.dart' as p;
 
 /// Determines whether the file should be skipped using Glob patterns
 ///
+/// There are three modes:
+/// 1. Include only - only files matching [includeGlobs] will be
+///    included
+/// 2. Exclude only - all files will be included except those
+///    matching [excludeGlobs]
+/// 3. Include and exclude - only files matching [includeGlobs]
+///    and not matching [excludeGlobs] will be included
+///
 /// See https://pub.dev/packages/glob
 bool shouldSkipFile({
   required List<String> includeGlobs,
@@ -10,44 +18,21 @@ bool shouldSkipFile({
   required String path,
   String? rootPath,
 }) {
-  if (includeGlobs.isEmpty && excludeGlobs.isEmpty) {
-    return false;
-  }
-
-  final bool isIncludeOnly = excludeGlobs.isEmpty && includeGlobs.isNotEmpty;
-  final bool isExcludeOnly = includeGlobs.isEmpty && excludeGlobs.isNotEmpty;
-  final pathRelativeFromRoot = relativePath(
-    path,
-    rootPath,
-  );
-  if (isIncludeOnly) {
-    return _isFileNotIncluded(includeGlobs, path);
-  }
-
-  if (isExcludeOnly) {
-    return _isFileExcluded(includeGlobs, pathRelativeFromRoot);
-  }
-
-  final isFileNotIncluded =
-      _isFileNotIncluded(includeGlobs, pathRelativeFromRoot);
-  final isFileExcluded = _isFileExcluded(excludeGlobs, pathRelativeFromRoot);
-  return isFileNotIncluded || isFileExcluded;
+  final relative = relativePath(path, rootPath);
+  final shouldAnalyzeFile =
+      (includeGlobs.isEmpty || _matchesAnyGlob(includeGlobs, relative)) &&
+          (excludeGlobs.isEmpty || _doesNotMatchGlobs(excludeGlobs, relative));
+  return !shouldAnalyzeFile;
 }
 
-bool _isFileExcluded(List<String> excludes, String path) {
+bool _matchesAnyGlob(List<String> globsList, String path) {
   final hasMatch =
-      excludes.map(Glob.new).toList().any((glob) => glob.matches(path));
+      globsList.map(Glob.new).toList().any((glob) => glob.matches(path));
   return hasMatch;
 }
 
-bool _isFileIncluded(List<String> includes, String path) {
-  final hasMatch =
-      includes.map(Glob.new).toList().any((glob) => glob.matches(path));
-  return hasMatch;
-}
-
-bool _isFileNotIncluded(List<String> includes, String path) {
-  return !_isFileIncluded(includes, path);
+bool _doesNotMatchGlobs(List<String> globList, String path) {
+  return !_matchesAnyGlob(globList, path);
 }
 
 /// Converts path to relative using posix style and
