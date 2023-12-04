@@ -5,7 +5,7 @@ void testingBannedCodeLint() {
   final bannedCodeUsage2 = BannedCodeUsage.test3();
   BannedCodeUsage.test3().test();
   bannedCodeUsage2.test();
-  print(test2);
+  test2;
 
   // expect_lint: banned_external_code
   test();
@@ -13,16 +13,12 @@ void testingBannedCodeLint() {
 
 const test2 = 'Hello World';
 
-void test() {
-  print('Hello World');
-}
+void test() {}
 
 class BannedCodeUsage {
   BannedCodeUsage();
 
-  void test() {
-    print('Hello World');
-  }
+  void test() {}
 
   void useTest() {
     test(); // implicit `this`, no lint expected

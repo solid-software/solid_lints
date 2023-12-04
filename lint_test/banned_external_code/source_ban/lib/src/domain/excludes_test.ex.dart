@@ -2,6 +2,5 @@ import 'dart:collection';
 
 void testingBannedCodeLint() {
   final unmodifiable = UnmodifiableListView([1, 2, 3]);
-  final first = unmodifiable.first;
-  print(first);
+  unmodifiable.first;
 }

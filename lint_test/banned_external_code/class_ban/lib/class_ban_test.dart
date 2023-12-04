@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:collection';
 
 void testingBannedCodeLint() {
@@ -7,7 +9,7 @@ void testingBannedCodeLint() {
   BannedCodeUsage.test2();
   // expect_lint: banned_external_code
   final res = BannedCodeUsage.test2();
-  print(res);
+
   // expect_lint: banned_external_code
   bannedCodeUsage.test();
 
@@ -17,9 +19,9 @@ void testingBannedCodeLint() {
   BannedCodeUsage.test3().test();
   // expect_lint: banned_external_code
   bannedCodeUsage2.test();
-  print(test2);
+  test2;
   // expect_lint: banned_external_code
-  print(bannedCodeUsage2.test4);
+  bannedCodeUsage2.test4;
   test();
 
   // expect_lint: banned_external_code
@@ -27,27 +29,21 @@ void testingBannedCodeLint() {
 
   // expect_lint: banned_external_code
   final first = unmodifiable.first;
-  print(first);
 }
 
 const test2 = 'Hello World';
 
-void test() {
-  print('Hello World');
-}
+void test() {}
 
 class BannedCodeUsage {
   BannedCodeUsage();
   static String test2() {
-    print('Hello World');
     return 'Hello World';
   }
 
   final String test4 = 'Hello World';
 
-  void test() {
-    print('Hello World');
-  }
+  void test() {}
 
   factory BannedCodeUsage.test3() {
     // expect_lint: banned_external_code

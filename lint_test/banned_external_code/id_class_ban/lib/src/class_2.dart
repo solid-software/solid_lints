@@ -1,8 +1,6 @@
 class BannedCodeUsage {
   BannedCodeUsage();
-  void test() {
-    print('Hello World');
-  }
+  void test() {}
 
   factory BannedCodeUsage.testFactory() {
     return BannedCodeUsage();

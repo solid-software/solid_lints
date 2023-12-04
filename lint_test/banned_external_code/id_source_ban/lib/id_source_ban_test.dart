@@ -6,14 +6,10 @@ void testingBannedCodeLint() {
   test();
 }
 
-void test() {
-  print('Hello World');
-}
+void test() {}
 
 class BannedCodeUsage {
   BannedCodeUsage();
 
-  void test() {
-    print('Hello World');
-  }
+  void test() {}
 }
