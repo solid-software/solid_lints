@@ -15,6 +15,7 @@ dependencies:
     git:
       url: https://github.com/solid-software/dart_custom_lint.git
       ref: main
+      path: packages/custom_lint_builder
   path: ^1.8.3
 
 dev_dependencies:
