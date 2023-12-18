@@ -1,0 +1,15 @@
+analyzer:
+  plugins:
+    - ../../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_using_api:
+      severity: warning
+      entries:
+        - class_name: BannedCodeUsage
+          source: package:class_source_ban
+          reason: "BannedCodeUsage from package:class_source_ban is not allowed"
+        - class_name: UnmodifiableListView
+          source: dart:collection
+          reason: "UnmodifiableListView from dart:collection is not allowed"
