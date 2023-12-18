@@ -72,6 +72,9 @@ class BannedExternalCodeRule
           );
 
       switch (entry) {
+        case BannedExternalCodeEntryParameters(:final source)
+            when source == null:
+          break;
         case BannedExternalCodeEntryParameters(
             :final id?,
             :final className?,
@@ -83,16 +86,10 @@ class BannedExternalCodeRule
             :final source?
           ):
           linter.banClassFromSource(entryCode, className, source);
-        case BannedExternalCodeEntryParameters(:final id?, :final className?):
-          linter.banIdFromClass(entryCode, id, className);
         case BannedExternalCodeEntryParameters(:final id?, :final source?):
           linter.banIdFromSource(entryCode, id, source);
         case BannedExternalCodeEntryParameters(:final source?):
           linter.banSource(entryCode, source);
-        case BannedExternalCodeEntryParameters(:final className?):
-          linter.banClass(entryCode, className);
-        case BannedExternalCodeEntryParameters(:final id?):
-          linter.banId(entryCode, id);
         case BannedExternalCodeEntryParameters():
           break;
       }
