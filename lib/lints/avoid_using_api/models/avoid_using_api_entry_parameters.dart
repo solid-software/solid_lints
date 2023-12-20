@@ -6,7 +6,7 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// classes, and entire packages to be linted.
 ///
 /// Parameters:
-/// * id: Variable/method name
+/// * identifier: Variable/method name
 /// * class_name: Name of the class containing the variable/method
 /// * source: Package (e.g., dart:async or package:example)
 /// * severity: The default severity of the lint for each entry.
@@ -17,7 +17,7 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// Example:
 /// ```yaml
 /// entries:
-///   - id: wait
+///   - identifier: wait
 ///     class_name: Future
 ///     source: dart:async
 ///     reason: "Future.wait from dart:async isnt allowed"
@@ -27,7 +27,7 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// ```
 class AvoidUsingApiEntryParameters {
   /// Variable/method name
-  final String? id;
+  final String? identifier;
 
   /// Name of the class containing the variable/method
   final String? className;
@@ -49,7 +49,7 @@ class AvoidUsingApiEntryParameters {
 
   /// Constructor for [AvoidUsingApiEntryParameters] model
   const AvoidUsingApiEntryParameters({
-    this.id,
+    this.identifier,
     this.className,
     this.source,
     this.severity,
@@ -63,7 +63,7 @@ class AvoidUsingApiEntryParameters {
     Map<String, Object?> json,
   ) =>
       AvoidUsingApiEntryParameters(
-        id: json['id'] as String?,
+        identifier: json['identifier'] as String?,
         className: json['class_name'] as String?,
         source: json['source'] as String?,
         severity: decodeErrorSeverity(json['severity'] as String?),

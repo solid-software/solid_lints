@@ -17,7 +17,7 @@ import 'package:yaml/yaml.dart';
 ///   - avoid_using_api:
 ///     severity: error
 ///     entries:
-///       - id: wait
+///       - identifier: wait
 ///         class_name: Future
 ///         source: dart:async
 ///         reason: "Future.wait from dart:async isnt allowed"

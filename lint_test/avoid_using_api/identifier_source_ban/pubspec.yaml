@@ -1,4 +1,4 @@
-name: id_source_ban
+name: identifier_source_ban
 description: A starting point for Dart libraries or applications.
 version: 1.0.0
 publish_to: none

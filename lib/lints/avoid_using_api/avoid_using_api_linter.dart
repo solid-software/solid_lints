@@ -81,11 +81,11 @@ class AvoidUsingApiLinter {
   }
 
   /// Lints usages of a global variable or function from a given source
-  void banIdFromSource(LintCode entryCode, String id, String source) {
+  void banIdFromSource(LintCode entryCode, String identifier, String source) {
     // only matches globals
     context.registry.addSimpleIdentifier((node) {
       final name = node.name;
-      if (name != id) {
+      if (name != identifier) {
         return;
       }
 
@@ -167,13 +167,13 @@ class AvoidUsingApiLinter {
   /// Lints usages of a class member from a given source
   void banIdFromClassFromSource(
     LintCode entryCode,
-    String id,
+    String identifier,
     String className,
     String source,
   ) {
     context.registry.addSimpleIdentifier((node) {
       final name = node.name;
-      if (name != id) {
+      if (name != identifier) {
         return;
       }
 

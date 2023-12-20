@@ -1,0 +1,36 @@
+analyzer:
+  plugins:
+    - ../../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_using_api:
+      severity: warning
+      entries:
+        - identifier: test4
+          class_name: BannedCodeUsage
+          source: package:identifier_class_source_ban
+          reason: "BannedCodeUsage.test4 from the identifier_class_source_ban package is not allowed"
+        - identifier: test3
+          class_name: BannedCodeUsage
+          source: package:identifier_class_source_ban
+          reason: "BannedCodeUsage.test3 from the identifier_class_source_ban package is not allowed"
+        - identifier: test2
+          class_name: BannedCodeUsage
+          source: package:identifier_class_source_ban
+          reason: "BannedCodeUsage.test2 from the identifier_class_source_ban package is not allowed"
+        - identifier: test
+          class_name: BannedCodeUsage
+          source: package:identifier_class_source_ban
+          reason: "BannedCodeUsage.test from the identifier_class_source_ban package is not allowed"
+        - class_name: UnmodifiableListView
+          source: dart:collection
+          reason: "UnmodifiableListView from dart:collection is not allowed"
+        - class_name: UnmodifiableListView
+          identifier: first
+          source: dart:collection
+          reason: "UnmodifiableListView from dart:collection is not allowed"
+        - identifier: wait
+          class_name: Future
+          source: dart:async
+          reason: "Future.wait from dart:async is not allowed"

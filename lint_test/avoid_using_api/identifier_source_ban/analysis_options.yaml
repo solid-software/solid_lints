@@ -1,0 +1,12 @@
+analyzer:
+  plugins:
+    - ../../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_using_api:
+      severity: warning
+      entries:
+        - identifier: test
+          source: package:identifier_source_ban
+          reason: "test methods from package:identifier_source_ban is not allowed"
