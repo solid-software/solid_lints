@@ -79,7 +79,11 @@ class AvoidUsingApiRule extends SolidLintRule<AvoidUsingApiParameters> {
             :final source?
           ):
           linter.banIdFromClassFromSource(
-              entryCode, identifier, className, source);
+            entryCode,
+            identifier,
+            className,
+            source,
+          );
         case AvoidUsingApiEntryParameters(:final className?, :final source?):
           linter.banClassFromSource(entryCode, className, source);
         case AvoidUsingApiEntryParameters(:final identifier?, :final source?):
