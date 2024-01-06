@@ -1,1 +1,0 @@
-int banned = 5;
