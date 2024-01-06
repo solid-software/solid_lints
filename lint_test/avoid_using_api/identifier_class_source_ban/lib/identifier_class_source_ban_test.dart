@@ -2,6 +2,8 @@
 
 import 'dart:collection';
 
+import 'package:external_source/external_source.dart';
+
 void testingBannedCodeLint() async {
   final bannedCodeUsage = BannedCodeUsage();
   // expect_lint: avoid_using_api
@@ -32,23 +34,4 @@ void testingBannedCodeLint() async {
   Future.wait([Future.value(1), Future.value(2)]);
 
   await (Future.value(1), Future.value(2)).wait;
-}
-
-const test2 = 'Hello World';
-
-void test() {}
-
-class BannedCodeUsage {
-  BannedCodeUsage();
-  static String test2() {
-    return 'Hello World';
-  }
-
-  final String test4 = 'Hello World';
-
-  void test() {}
-
-  factory BannedCodeUsage.test3() {
-    return BannedCodeUsage();
-  }
 }

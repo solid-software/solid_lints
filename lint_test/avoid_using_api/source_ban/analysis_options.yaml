@@ -14,5 +14,5 @@ custom_lint:
             - "**/domain/**.dart"
           excludes:
             - "**/domain/**.ex.dart"
-        - source: package:source_ban/src/banned_library.dart
-          reason: "src/banned_library.dart should not be used anymore"
+        - source: package:external_source/banned_library.dart
+          reason: "package:external_source/banned_library.dart should not be used anymore"

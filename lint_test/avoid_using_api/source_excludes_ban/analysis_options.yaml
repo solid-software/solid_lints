@@ -12,7 +12,7 @@ custom_lint:
           # Uses Glob notation, test using https://www.digitalocean.com/community/tools/glob
           excludes:
             - "**.ex.dart"
-        - source: package:source_excludes_ban/src/banned_library.dart
-          reason: "src/banned_library.dart should not be used anymore"
+        - source: package:external_source/banned_library.dart
+          reason: "package:external_source/banned_library.dart should not be used anymore"
           excludes:
             - "**.ex.dart"

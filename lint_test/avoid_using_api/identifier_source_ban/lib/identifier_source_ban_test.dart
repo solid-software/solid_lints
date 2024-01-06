@@ -1,3 +1,5 @@
+import 'package:external_source/external_source.dart';
+
 void testingBannedCodeLint() {
   final bannedCodeUsage = BannedCodeUsage();
   bannedCodeUsage.test();
@@ -7,9 +9,3 @@ void testingBannedCodeLint() {
 }
 
 void test() {}
-
-class BannedCodeUsage {
-  BannedCodeUsage();
-
-  void test() {}
-}

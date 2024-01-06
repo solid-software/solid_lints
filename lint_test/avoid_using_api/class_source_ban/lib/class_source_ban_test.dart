@@ -2,6 +2,8 @@
 
 import 'dart:collection';
 
+import 'package:external_source/external_source.dart';
+
 void testingBannedCodeLint() {
   // expect_lint: avoid_using_api
   final bannedCodeUsage = BannedCodeUsage();
@@ -16,6 +18,7 @@ void testingBannedCodeLint() {
   final bannedCodeUsage2 = BannedCodeUsage.test3();
   // expect_lint: avoid_using_api
   BannedCodeUsage.test3().test();
+  // TODO: Fix ban method from class not checking source
   // expect_lint: avoid_using_api
   bannedCodeUsage2.test();
   test2;
@@ -33,19 +36,3 @@ void testingBannedCodeLint() {
 const test2 = 'Hello World';
 
 void test() {}
-
-class BannedCodeUsage {
-  BannedCodeUsage();
-  static String test2() {
-    return 'Hello World';
-  }
-
-  final String test4 = 'Hello World';
-
-  void test() {}
-
-  factory BannedCodeUsage.test3() {
-    // expect_lint: avoid_using_api
-    return BannedCodeUsage();
-  }
-}
