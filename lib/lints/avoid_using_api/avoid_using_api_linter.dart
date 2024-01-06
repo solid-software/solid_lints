@@ -111,6 +111,20 @@ class AvoidUsingApiLinter {
     String className,
     String source,
   ) {
+    context.registry.addVariableDeclaration((node) {
+      final typeName = node.declaredElement?.type.element?.name;
+      if (typeName != className) {
+        return;
+      }
+
+      final sourceName =
+          node.declaredElement?.type.element?.librarySource?.uri.toString();
+      if (!_matchesSource(sourceName, source)) {
+        return;
+      }
+      reporter.reportErrorForNode(entryCode, node);
+    });
+
     context.registry.addSimpleIdentifier((node) {
       final parent = node.parent;
       if (parent == null) {

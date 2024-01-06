@@ -25,6 +25,9 @@ void testingBannedCodeLint() {
   bannedCodeUsage2.test4;
 
   // expect_lint: avoid_using_api
+  final typed = bannedCodeUsage;
+
+  // expect_lint: avoid_using_api
   final unmodifiable = UnmodifiableListView([1, 2, 3]);
 
   // expect_lint: avoid_using_api
