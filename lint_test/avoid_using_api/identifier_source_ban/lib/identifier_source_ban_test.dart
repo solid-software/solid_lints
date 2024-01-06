@@ -7,5 +7,3 @@ void testingBannedCodeLint() {
   // expect_lint: avoid_using_api
   test();
 }
-
-void test() {}

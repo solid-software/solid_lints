@@ -24,7 +24,6 @@ void testingBannedCodeLint() {
   test2;
   // expect_lint: avoid_using_api
   bannedCodeUsage2.test4;
-  test();
 
   // expect_lint: avoid_using_api
   final unmodifiable = UnmodifiableListView([1, 2, 3]);
@@ -34,5 +33,3 @@ void testingBannedCodeLint() {
 }
 
 const test2 = 'Hello World';
-
-void test() {}

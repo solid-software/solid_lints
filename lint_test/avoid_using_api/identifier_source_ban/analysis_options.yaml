@@ -8,5 +8,5 @@ custom_lint:
       severity: warning
       entries:
         - identifier: test
-          source: package:identifier_source_ban
-          reason: "test methods from package:identifier_source_ban is not allowed"
+          source: package:external_source
+          reason: "test methods from package:external_source is not allowed"
