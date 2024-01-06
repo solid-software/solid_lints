@@ -112,11 +112,6 @@ class AvoidUsingApiLinter {
     String source,
   ) {
     context.registry.addSimpleIdentifier((node) {
-      final parentSourceName = node.sourceUrl;
-      if (!_matchesSource(parentSourceName, source)) {
-        return;
-      }
-
       final parent = node.parent;
       if (parent == null) {
         return;
@@ -130,11 +125,23 @@ class AvoidUsingApiLinter {
       switch (entityBeforeNode) {
         case InstanceCreationExpression(:final staticType?):
         case SimpleIdentifier(:final staticType?):
+          final parentSourceName =
+              staticType.element?.librarySource?.uri.toString() ??
+                  node.sourceUrl;
+          if (!_matchesSource(parentSourceName, source)) {
+            return;
+          }
+
           final parentTypeName = staticType.element?.name;
           if (parentTypeName != className) {
             return;
           }
         case SimpleIdentifier(:final staticElement?):
+          final parentSourceName =
+              staticElement.librarySource?.uri.toString() ?? node.sourceUrl;
+          if (!_matchesSource(parentSourceName, source)) {
+            return;
+          }
           final parentElementName = staticElement.name;
           if (parentElementName != className) {
             return;

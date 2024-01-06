@@ -18,7 +18,6 @@ void testingBannedCodeLint() {
   final bannedCodeUsage2 = BannedCodeUsage.test3();
   // expect_lint: avoid_using_api
   BannedCodeUsage.test3().test();
-  // TODO: Fix ban method from class not checking source
   // expect_lint: avoid_using_api
   bannedCodeUsage2.test();
   test2;
