@@ -15,7 +15,7 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 /// * excludes: Glob patterns for files to exclude
 ///
 /// Note:
-/// * `source` must not be from the same package as the project you are trying 
+/// * `source` must not be from the same package as the project you are trying
 ///   to check for lints. Use `@Deprecated` instead.
 ///
 /// Example:
