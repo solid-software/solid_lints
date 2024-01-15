@@ -21,7 +21,7 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
       for (final parameter in rule.parameters) {
         formattedString.writeln(
           const HtmlEscape().convert(
-            '- *${parameter.name}* (_${parameter.type}_)  ',
+            '- **${parameter.name}** (_${parameter.type}_)  ',
           ),
         );
         formattedString.writeln('  ${parameter.doc}');
