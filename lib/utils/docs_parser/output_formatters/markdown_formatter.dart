@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:solid_lints/utils/docs_parser/models/rule_doc.dart';
 import 'package:solid_lints/utils/docs_parser/output_formatters/base_formatter.dart';
 
+/// Markdown output formatter
 class MarkdownFormatter extends BaseFormatter {
+  ///
   const MarkdownFormatter(super.rules);
 
   @override

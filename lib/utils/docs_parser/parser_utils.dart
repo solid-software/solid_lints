@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+/// Utils used by parsers
 class ParserUtils {
   /// Recursively get files dart with the `rule` suffix in the given [dir]
   static List<String> findRuleFiles(Directory dir) {
