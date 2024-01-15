@@ -29,7 +29,7 @@ class ParserUtils {
 
   /// Convert camelCase string to snake_case
   static String camelCaseToSnakeCase(String camelCaseString) {
-    final exp = RegExp(r'(?<=[a-z])[A-Z]');
+    final exp = RegExp('(?<=[a-z])[A-Z]');
 
     return camelCaseString
         .replaceAllMapped(exp, (Match m) => '_${m.group(0)}')
