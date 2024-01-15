@@ -1,16 +1,15 @@
 import 'dart:convert';
 
 import 'package:solid_lints/utils/docs_parser/models/rule_doc.dart';
-import 'package:solid_lints/utils/docs_parser/output_formatters/base_formatter.dart';
+import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
 
 /// Markdown output formatter
-class MarkdownFormatter extends BaseFormatter {
-  ///
-  const MarkdownFormatter(super.rules);
-
+class MarkdownFormatter implements RulesDocumentationFormatter<String> {
   @override
-  String formatRuleDoc(RuleDoc rule) {
-    const htmlEscape = HtmlEscape();
+  String format(List<RuleDoc> rules) =>
+      rules.map(_formatRuleToMarkdown).join('\n');
+
+  String _formatRuleToMarkdown(RuleDoc rule) {
     final formattedString = StringBuffer();
 
     formattedString.writeln('### ${rule.name}');
@@ -21,7 +20,9 @@ class MarkdownFormatter extends BaseFormatter {
 
       for (final parameter in rule.parameters) {
         formattedString.writeln(
-          htmlEscape.convert('- *${parameter.name}* (_${parameter.type}_)'),
+          const HtmlEscape().convert(
+            '- *${parameter.name}* (_${parameter.type}_)',
+          ),
         );
         formattedString.writeln('  ${parameter.doc}');
       }

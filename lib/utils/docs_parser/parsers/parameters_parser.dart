@@ -29,13 +29,11 @@ class ParametersParser {
       featureSet: FeatureSet.latestLanguageVersion(),
     );
 
-    final parameterDocs = <ParameterDoc>[];
-    for (final declaration in ast.unit.declarations) {
-      if (declaration is ClassDeclaration) {
-        parameterDocs.addAll(_parseParametersDocs(declaration));
-        if (parameterDocs.isNotEmpty) break;
-      }
-    }
+    final parameterDocs = ast.unit.declarations
+            .whereType<ClassDeclaration>()
+            .map(_parseParametersDocs)
+            .firstWhereOrNull((docs) => docs.isNotEmpty) ??
+        [];
 
     return parameterDocs;
   }
