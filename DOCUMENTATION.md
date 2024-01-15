@@ -7,7 +7,7 @@ A `prefer_match_file_name` rule which warns about
 A `prefer_conditional_expressions` rule which warns about
  simple if statements that can be replaced with conditional expressions
 #### Parameters:
-- *ignore_nested* (_bool_)
+- *ignore_nested* (_bool_)  
   Should rule ignore nested if statements
 
 
@@ -26,13 +26,13 @@ A `member_ordering` rule which
  warns about class members being in wrong order
  Custom order can be provided through config
 #### Parameters:
-- *groups_order* (_List&lt;MemberGroup&gt;_)
+- *groups_order* (_List&lt;MemberGroup&gt;_)  
   Config used for members of regular class
-- *widgets_groups_order* (_List&lt;MemberGroup&gt;_)
+- *widgets_groups_order* (_List&lt;MemberGroup&gt;_)  
   Config used for members of widget class
-- *alphabetize* (_bool_)
+- *alphabetize* (_bool_)  
   Indicates if params should be in alphabetical order
-- *alphabetize_by_type* (_bool_)
+- *alphabetize_by_type* (_bool_)  
   Indicates if params should be in alphabetical order of their type
 
 
@@ -44,9 +44,9 @@ An `avoid_unnecessary_type_assertions` rule which
 ### no_magic_number
 A `no_magic_number` rule which forbids having numbers without variable
 #### Parameters:
-- *allowed_numbers* (_Iterable&lt;num&gt;_)
+- *allowed_numbers* (_Iterable&lt;num&gt;_)  
   List of allowed numbers
-- *allowed_in_widget_params* (_bool_)
+- *allowed_in_widget_params* (_bool_)  
   The flag indicates whether magic numbers are allowed as a Widget instance
  parameter.
 
@@ -117,14 +117,14 @@ A rule which warns when setState is called inside initState, didUpdateWidget
 ### avoid_late_keyword
 A `late` keyword rule which forbids using it to avoid runtime exceptions.
 #### Parameters:
-- *allow_initialized* (_bool_)
+- *allow_initialized* (_bool_)  
   Allow immediately initialised late variables.
 
  ```dart
  late var ok = 0; // ok when allowInitialized == true
  late var notOk; // initialized elsewhere, not allowed
  ```
-- *ignored_types* (_Iterable&lt;String&gt;_)
+- *ignored_types* (_Iterable&lt;String&gt;_)  
   Types that would be ignored by avoid-late rule
 
 
