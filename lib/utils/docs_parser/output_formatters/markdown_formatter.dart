@@ -6,20 +6,18 @@ import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentat
 /// Markdown output formatter
 class MarkdownFormatter implements RulesDocumentationFormatter<String> {
   @override
-  String format(List<RuleDoc> rules) => [
-        _formatTableOfContents(rules),
-        rules.map(_formatRuleToMarkdown).join('\n'),
-      ].join('\n' * 3);
-
-  String _formatTableOfContents(List<RuleDoc> rules) {
-    final formattedString = StringBuffer();
-
-    for (final (index, rule) in rules.indexed) {
-      formattedString.writeln('${index + 1}. [${rule.name}](#${rule.name})');
-    }
-
-    return formattedString.toString();
+  String format(List<RuleDoc> rules) {
+    return [
+      '# Solid Lints Documentation',
+      '## Table of contents:',
+      _formatTableOfContents(rules),
+      '---',
+      ...rules.map(_formatRuleToMarkdown),
+    ].join('\n\n');
   }
+
+  String _formatTableOfContents(List<RuleDoc> rules) =>
+      rules.map((rule) => '1. [${rule.name}](#${rule.name})').join('\n');
 
   String _formatRuleToMarkdown(RuleDoc rule) {
     final formattedString = StringBuffer();

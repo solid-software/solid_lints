@@ -15,6 +15,9 @@ void main() async {
       .map((parser) => parser.parse())
       .toList(growable: false);
 
+  // sort rules alphabetically by names
+  rulesDocs.sort((a, b) => a.name.compareTo(b.name));
+
   final formatter = MarkdownFormatter();
   File('DOCUMENTATION.md').writeAsStringSync(formatter.format(rulesDocs));
 }
