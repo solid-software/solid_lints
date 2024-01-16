@@ -19,7 +19,8 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
 
   String _formatTableOfContents(List<RuleDoc> rules) => rules
       .mapIndexed(
-          (index, rule) => '${index + 1}. [${rule.name}](#${rule.name})')
+        (index, rule) => '${index + 1}. [${rule.name}](#${rule.name})',
+      )
       .join('\n');
 
   String _formatRuleToMarkdown(RuleDoc rule) {
