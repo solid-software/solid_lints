@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:solid_lints/utils/docs_parser/models/parameter_doc.dart';
+import 'package:collection/collection.dart';
 import 'package:solid_lints/utils/docs_parser/models/rule_doc.dart';
 import 'package:solid_lints/utils/docs_parser/parser_utils.dart';
 import 'package:solid_lints/utils/docs_parser/parsers/parameters_parser.dart';
@@ -20,40 +20,39 @@ class RuleParser {
 
   ///
   RuleDoc parse() {
-    String? name;
-    String? doc;
-    List<ParameterDoc>? parameters;
-
     final ast = parseFile(
       path: rulePath,
       featureSet: FeatureSet.latestLanguageVersion(),
     );
-    for (final declaration in ast.unit.declarations) {
-      if (declaration is ClassDeclaration) {
-        name = _parseClassName(declaration);
-        doc = ParserUtils.formatDocumentationComment(
-          declaration.documentationComment,
-        );
-        break;
-      }
+    final declaration =
+        ast.unit.declarations.whereType<ClassDeclaration>().firstWhereOrNull(
+              (declaration) =>
+                  declaration.documentationComment?.childEntities.isNotEmpty ??
+                  false,
+            );
+
+    if (declaration == null) {
+      throw 'Rule at the path "$rulePath" does not have documentation string';
     }
 
-    parameters = ParametersParser(
+    final name = _parseClassName(declaration);
+    final doc = ParserUtils.formatDocumentationComment(
+      declaration.documentationComment,
+    );
+
+    if (name == null || doc == null) {
+      throw 'Rule at the path "$rulePath" has invalid format.';
+    }
+
+    final parameters = ParametersParser(
       ruleDirectory: File(rulePath).parent,
     ).parse();
 
-    if (name != null && doc != null) {
-      return RuleDoc(
-        name: name,
-        doc: doc,
-        parameters: parameters,
-      );
-    } else {
-      throw 'Rule at the path "$rulePath" has invalid format - '
-          'neither the name or docstring are null:\n'
-          'Name: $name\n'
-          'Doc: $doc';
-    }
+    return RuleDoc(
+      name: name,
+      doc: doc,
+      parameters: parameters,
+    );
   }
 
   String? _parseClassName(ClassDeclaration classDeclaration) {
