@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:solid_lints/utils/docs_parser/models/rule_doc.dart';
 import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
 
@@ -16,8 +17,10 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
     ].join('\n\n');
   }
 
-  String _formatTableOfContents(List<RuleDoc> rules) =>
-      rules.map((rule) => '1. [${rule.name}](#${rule.name})').join('\n');
+  String _formatTableOfContents(List<RuleDoc> rules) => rules
+      .mapIndexed(
+          (index, rule) => '${index + 1}. [${rule.name}](#${rule.name})')
+      .join('\n');
 
   String _formatRuleToMarkdown(RuleDoc rule) {
     final formattedString = StringBuffer();
@@ -37,7 +40,6 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
         formattedString.writeln('  ${parameter.doc}');
       }
     }
-    formattedString.writeln();
 
     return formattedString.toString();
   }
