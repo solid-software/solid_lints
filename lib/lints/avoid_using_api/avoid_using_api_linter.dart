@@ -31,11 +31,7 @@ class AvoidUsingApiLinter {
   /// The configuration parameters for the lint
   final RuleConfig<AvoidUsingApiParameters?> config;
 
-  bool _matchesSource(String? parentSourcePath, String sourceToMatch) {
-    if (parentSourcePath == null) {
-      return false;
-    }
-
+  bool _matchesSource(String parentSourcePath, String sourceToMatch) {
     final Uri parentUri = p.toUri(parentSourcePath);
     final Uri sourceUri = p.toUri(sourceToMatch);
 
@@ -58,8 +54,8 @@ class AvoidUsingApiLinter {
   /// Lints usages of a given source
   void banSource(LintCode entryCode, String source) {
     context.registry.addSimpleIdentifier((node) {
-      final parentSourceName = node.sourceUrl;
-      if (!_matchesSource(parentSourceName, source)) {
+      final sourcePath = node.sourceUrl;
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
 
@@ -71,8 +67,8 @@ class AvoidUsingApiLinter {
     });
 
     context.registry.addNamedType((node) {
-      final parentSourceName = node.sourceUrl;
-      if (!_matchesSource(parentSourceName, source)) {
+      final sourceName = node.sourceUrl;
+      if (sourceName == null || !_matchesSource(sourceName, source)) {
         return;
       }
 
@@ -89,8 +85,8 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      final parentSourceName = node.sourceUrl;
-      if (!_matchesSource(parentSourceName, source)) {
+      final sourcePath = node.sourceUrl;
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
 
@@ -117,9 +113,9 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      final sourceName =
+      final sourcePath =
           node.declaredElement?.type.element?.librarySource?.uri.toString();
-      if (!_matchesSource(sourceName, source)) {
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
       reporter.reportErrorForNode(entryCode, node);
@@ -139,10 +135,11 @@ class AvoidUsingApiLinter {
       switch (entityBeforeNode) {
         case InstanceCreationExpression(:final staticType?):
         case SimpleIdentifier(:final staticType?):
-          final parentSourceName =
+          final parentSourcePath =
               staticType.element?.librarySource?.uri.toString() ??
                   node.sourceUrl;
-          if (!_matchesSource(parentSourceName, source)) {
+          if (parentSourcePath == null ||
+              !_matchesSource(parentSourcePath, source)) {
             return;
           }
 
@@ -151,9 +148,10 @@ class AvoidUsingApiLinter {
             return;
           }
         case SimpleIdentifier(:final staticElement?):
-          final parentSourceName =
+          final parentSourcePath =
               staticElement.librarySource?.uri.toString() ?? node.sourceUrl;
-          if (!_matchesSource(parentSourceName, source)) {
+          if (parentSourcePath == null ||
+              !_matchesSource(parentSourcePath, source)) {
             return;
           }
           final parentElementName = staticElement.name;
@@ -173,8 +171,8 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      final parentSourceName = node.sourceUrl;
-      if (!_matchesSource(parentSourceName, source)) {
+      final sourcePath = node.sourceUrl;
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
 
@@ -198,8 +196,8 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      final parentSourceName = node.sourceUrl;
-      if (!_matchesSource(parentSourceName, source)) {
+      final sourcePath = node.sourceUrl;
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
 
