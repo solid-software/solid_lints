@@ -11,12 +11,15 @@
 1. [avoid_unnecessary_type_casts](#avoid_unnecessary_type_casts)
 1. [avoid_unrelated_type_assertions](#avoid_unrelated_type_assertions)
 1. [avoid_unused_parameters](#avoid_unused_parameters)
+1. [cyclomatic_complexity](#cyclomatic_complexity)
 1. [double_literal_format](#double_literal_format)
+1. [function_lines_of_code](#function_lines_of_code)
 1. [member_ordering](#member_ordering)
 1. [newline_before_return](#newline_before_return)
 1. [no_empty_block](#no_empty_block)
 1. [no_equal_then_else](#no_equal_then_else)
 1. [no_magic_number](#no_magic_number)
+1. [number_of_parameters](#number_of_parameters)
 1. [prefer_conditional_expressions](#prefer_conditional_expressions)
 1. [prefer_first](#prefer_first)
 1. [prefer_last](#prefer_last)
@@ -120,6 +123,14 @@ A `avoid_unused_parameters` rule which
 
 
 
+## cyclomatic_complexity
+A Complexity metric checks content of block and detects more easier solution
+### Parameters:
+- **max_complexity** (_int_)  
+  Min value of complexity level
+
+
+
 ## double_literal_format
 A `double_literal_format` rule which
  checks that double literals should begin with 0. instead of just .,
@@ -130,6 +141,15 @@ A `double_literal_format` rule which
  GOOD:
  var a = 5.23, b = 0.16e+5, c = -0.25, d = -0.4e-5;
  ```
+
+
+
+## function_lines_of_code
+A number of lines metric which checks whether we didn't exceed
+ the maximum allowed number of lines for a function.
+### Parameters:
+- **max_lines** (_int_)  
+  Maximum number of lines
 
 
 
@@ -175,6 +195,15 @@ A `no_magic_number` rule which forbids having numbers without variable
 - **allowed_in_widget_params** (_bool_)  
   The flag indicates whether magic numbers are allowed as a Widget instance
  parameter.
+
+
+
+## number_of_parameters
+A number of parameters metric which checks whether we didn't exceed
+ the maximum allowed number of parameters for a function or a method
+### Parameters:
+- **max_parameters** (_int_)  
+  Maximum number of parameters
 
 
 

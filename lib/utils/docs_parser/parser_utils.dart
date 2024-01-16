@@ -4,12 +4,14 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 /// Utils used by parsers
 class ParserUtils {
+  static const _ruleFileSuffixes = ['rule', 'metric'];
+
   /// Recursively get files dart with the `rule` suffix in the given [dir]
   static List<String> findRuleFiles(Directory dir) {
     final rulesPaths = <String>[];
     for (final entity in dir.listSync()) {
       if (entity is File) {
-        if (fileNameSuffix(entity.uri) == 'rule') {
+        if (_ruleFileSuffixes.contains(fileNameSuffix(entity.uri))) {
           rulesPaths.add(entity.path);
         }
       } else if (entity is Directory) {
