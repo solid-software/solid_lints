@@ -10,6 +10,57 @@ import 'package:solid_lints/utils/path_utils.dart';
 
 /// A `avoid_using_api` rule which
 /// warns about usage of avoided APIs
+///
+///
+/// ### Usage
+///
+/// External code can be "deprecated" when there is a better option available:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - avoid_using_api:
+///       severity: info
+///       entries:
+///         - class_name: Future
+///           identifier: wait
+///           source: dart:async
+///           reason: "Future.wait should be avoided because it loses type
+///                    safety for the results. Use a Record's `wait` method
+///                    instead."
+///           severity: warning
+/// ```
+///
+/// Result:
+///
+/// ```dart
+/// void main() async {
+///   await Future.wait([...]); // LINT
+///   await (...).wait; // OK
+/// }
+/// ```
+///
+/// ### Advanced Usage
+///
+/// Each entry also has `includes` and `excludes` parameters.
+/// These paths utilize [Glob](https://pub.dev/packages/glob)
+/// patterns to determine if a lint entry should be applied to a file.
+///
+/// For example, a lint to prevent usage of a domain-only package outside of the
+/// domain folder:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - avoid_using_api:
+///       severity: info
+///       entries:
+///         - source: package:domain_models
+///           excludes:
+///             - "**/domain/**.dart"
+///           reason: "domain_models is only intended to be used in the domain
+///                    layer."
+/// ```
 class AvoidUsingApiRule extends SolidLintRule<AvoidUsingApiParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.
