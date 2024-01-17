@@ -5,8 +5,27 @@ import 'package:solid_lints/lints/prefer_first/prefer_first_visitor.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A `prefer_first` rule which warns about
-/// usage of iterable[0] or iterable.elementAt(0)
+/// Warns about usage of iterable[0] or iterable.elementAt(0) instead of
+/// iterable.first.
+///
+/// ## Example
+///
+/// ### BAD:
+///
+/// ```dart
+/// final a = [1, 2, 3];
+///
+/// a[0];           // LINT
+/// a.elementAt(0); // LINT
+/// ```
+///
+/// ### BAD:
+///
+/// ```dart
+/// final a = [1, 2, 3];
+///
+/// a.first; // OK
+/// ```
 class PreferFirstRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if number of
   /// parameters reaches the maximum value.
