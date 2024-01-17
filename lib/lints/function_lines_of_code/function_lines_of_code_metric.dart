@@ -6,8 +6,17 @@ import 'package:solid_lints/lints/function_lines_of_code/visitor/function_lines_
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A number of lines metric which checks whether we didn't exceed
-/// the maximum allowed number of lines for a function.
+/// An approximate metric of meaningful lines of source code inside a function,
+/// excluding blank lines and comments.
+///
+/// ## Example config:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - function_lines_of_code:
+///       max_lines: 100
+/// ```
 class FunctionLinesOfCodeMetric
     extends SolidLintRule<FunctionLinesOfCodeParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of
