@@ -29,8 +29,49 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 // Inspired by ESLint (https://eslint.org/docs/rules/newline-before-return)
 
-/// A `newline_before_return` rule which
-/// warns about missing newline before return
+/// Warns about missing newline before return in a code block
+///
+/// ## Example
+///
+/// ### BAD:
+/// ```dart
+/// int fn() {
+///   final a = 0;
+///   return 1; // LINT
+/// }
+///
+/// void fn2() {
+///   if (true) {
+///     final a = 0;
+///     return; // LINT
+///   }
+/// }
+/// ```
+///
+/// ### GOOD:
+/// ```dart
+/// int fn0() {
+///   return 1; // OK for single-line code blocks
+/// }
+///
+/// Function getCallback() {
+///   return () {
+///     return 1; // OK
+///   }
+/// }
+///
+/// int fn() {
+///   final a = 0;
+///
+///   return 1; // newline added -- OK
+/// }
+///
+/// void fn2() {
+///   if (true) {
+///     return; // right under a conditional -- OK
+///   }
+/// }
+/// ```
 class NewlineBeforeReturnRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if
   /// newline is missing before return statement
