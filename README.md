@@ -40,7 +40,6 @@ To indicate that your project is using Solid Lints, you can use the following ba
 ```markdown
 [![style: solid](https://img.shields.io/badge/style-solid-orange)](https://pub.dev/packages/solid_lints)
 ```
-
 # Solid Lints Documentation
 
 ## Table of contents:
@@ -54,20 +53,21 @@ To indicate that your project is using Solid Lints, you can use the following ba
 7. [avoid_unnecessary_type_casts](#avoid_unnecessary_type_casts)
 8. [avoid_unrelated_type_assertions](#avoid_unrelated_type_assertions)
 9. [avoid_unused_parameters](#avoid_unused_parameters)
-10. [cyclomatic_complexity](#cyclomatic_complexity)
-11. [double_literal_format](#double_literal_format)
-12. [function_lines_of_code](#function_lines_of_code)
-13. [member_ordering](#member_ordering)
-14. [newline_before_return](#newline_before_return)
-15. [no_empty_block](#no_empty_block)
-16. [no_equal_then_else](#no_equal_then_else)
-17. [no_magic_number](#no_magic_number)
-18. [number_of_parameters](#number_of_parameters)
-19. [prefer_conditional_expressions](#prefer_conditional_expressions)
-20. [prefer_first](#prefer_first)
-21. [prefer_last](#prefer_last)
-22. [prefer_match_file_name](#prefer_match_file_name)
-23. [proper_super_calls](#proper_super_calls)
+10. [avoid_using_api](#avoid_using_api)
+11. [cyclomatic_complexity](#cyclomatic_complexity)
+12. [double_literal_format](#double_literal_format)
+13. [function_lines_of_code](#function_lines_of_code)
+14. [member_ordering](#member_ordering)
+15. [newline_before_return](#newline_before_return)
+16. [no_empty_block](#no_empty_block)
+17. [no_equal_then_else](#no_equal_then_else)
+18. [no_magic_number](#no_magic_number)
+19. [number_of_parameters](#number_of_parameters)
+20. [prefer_conditional_expressions](#prefer_conditional_expressions)
+21. [prefer_first](#prefer_first)
+22. [prefer_last](#prefer_last)
+23. [prefer_match_file_name](#prefer_match_file_name)
+24. [proper_super_calls](#proper_super_calls)
 
 ---
 
@@ -106,9 +106,9 @@ inside those methods.
 
 Cases where setState is unnecessary:
 - synchronous calls inside State lifecycle methods:
-    - initState
-    - didUpdateWidget
-    - didChangeDependencies
+  - initState
+  - didUpdateWidget
+  - didChangeDependencies
 - synchronous calls inside `build` method
 
 Nested synchronous setState invocations are also disallowed.
@@ -155,6 +155,16 @@ warns about unnecessary usage of `as` operator
 ## avoid_unused_parameters
 A `avoid_unused_parameters` rule which
 warns about unused parameters
+
+
+## avoid_using_api
+A `avoid_using_api` rule which
+warns about usage of avoided APIs
+### Parameters:
+- **entries** (_List&lt;AvoidUsingApiEntryParameters&gt;_)  
+  A list of BannedCodeOption parameters.
+- **severity** (_ErrorSeverity?_)  
+  The default severity of the lint for each entry.
 
 
 ## cyclomatic_complexity
