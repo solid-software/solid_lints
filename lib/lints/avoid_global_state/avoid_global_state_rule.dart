@@ -4,8 +4,37 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A global state rule which forbids using variables
-/// that can be globally modified.
+/// Avoid top-level and static mutable variables.
+///
+/// Top-level variables can be modified from anywhere,
+/// which leads to hard to debug applications.
+///
+/// Prefer using a state management solution.
+///
+/// ### Example
+///
+/// #### BAD:
+///
+/// ```dart
+/// var globalMutable = 0; // LINT
+///
+/// class Test {
+///   static int globalMutable = 0; // LINT
+/// }
+/// ```
+///
+///
+/// #### GOOD:
+///
+/// ```dart
+/// final globalFinal = 1;
+/// const globalConst = 1;
+///
+/// class Test {
+///   static const int globalConst = 1;
+///   static final int globalFinal = 1;
+/// }
+/// ```
 class AvoidGlobalStateRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use global state.
