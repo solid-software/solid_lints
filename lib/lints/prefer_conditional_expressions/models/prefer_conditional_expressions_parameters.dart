@@ -3,7 +3,16 @@
 class PreferConditionalExpressionsParameters {
   static const _ignoreNestedConfig = 'ignore_nested';
 
-  /// Should rule ignore nested if statements
+  /// Determines whether to ignore nested if statements:
+  ///
+  /// ```dart
+  ///  // Allowed if ignore_nested flag is enabled
+  ///  if (1 > 0) {
+  ///    _result = 1 > 2 ? 2 : 1;
+  ///  } else {
+  ///    _result = 0;
+  ///  }
+  /// ```
   final bool ignoreNested;
 
   /// Constructor for [PreferConditionalExpressionsParameters] model
