@@ -6,7 +6,35 @@ import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 import 'package:solid_lints/utils/types_utils.dart';
 
-/// A `late` keyword rule which forbids using it to avoid runtime exceptions.
+/// Avoid `late` keyword
+///
+/// Using `late` disables compile time safety for what would else be a nullable
+/// variable. Instead, a runtime check is made, which may throw an unexpected
+/// exception for an uninitialized variable.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class AvoidLateKeyword {
+///   late final int field; // LINT
+///
+///   void test() {
+///     late final local = ''; // LINT
+///   }
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class AvoidLateKeyword {
+///   final int? field; // LINT
+///
+///   void test() {
+///     final local = ''; // LINT
+///   }
+/// }
+/// ```
 class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use `late` keyword.

@@ -10,6 +10,19 @@ class AvoidLateKeywordParameters {
   final bool allowInitialized;
 
   /// Types that would be ignored by avoid-late rule
+  ///
+  /// Example:
+  ///
+  /// ```yaml
+  /// - avoid_late_keyword:
+  ///   ignored_types:
+  ///     - ColorTween
+  /// ```
+  ///
+  /// ```dart
+  /// late ColorTween tween; // OK
+  /// late int colorValue; // LINT
+  /// ```
   final Iterable<String> ignoredTypes;
 
   /// Constructor for [AvoidLateKeywordParameters] model
