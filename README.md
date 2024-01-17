@@ -40,6 +40,7 @@ To indicate that your project is using Solid Lints, you can use the following ba
 ```markdown
 [![style: solid](https://img.shields.io/badge/style-solid-orange)](https://pub.dev/packages/solid_lints)
 ```
+
 # Solid Lints Documentation
 
 ## Table of contents:
@@ -72,12 +73,69 @@ To indicate that your project is using Solid Lints, you can use the following ba
 ---
 
 ## avoid_global_state
-A global state rule which forbids using variables
-that can be globally modified.
+Avoid top-level and static mutable variables.
+
+Top-level variables can be modified from anywhere,
+which leads to hard to debug applications.
+
+Prefer using a state management solution.
+
+### Example
+
+#### BAD:
+
+ ```dart
+ var globalMutable = 0; // LINT
+
+ class Test {
+   static int globalMutable = 0; // LINT
+ }
+ ```
+
+
+#### GOOD:
+
+ ```dart
+ final globalFinal = 1;
+ const globalConst = 1;
+
+ class Test {
+   static const int globalConst = 1;
+   static final int globalFinal = 1;
+ }
+ ```
 
 
 ## avoid_late_keyword
-A `late` keyword rule which forbids using it to avoid runtime exceptions.
+Avoid `late` keyword
+
+Using `late` disables compile time safety for what would else be a nullable
+variable. Instead, a runtime check is made, which may throw an unexpected
+exception for an uninitialized variable.
+
+### Example
+
+#### BAD:
+ ```dart
+ class AvoidLateKeyword {
+   late final int field; // LINT
+
+   void test() {
+     late final local = ''; // LINT
+   }
+ }
+ ```
+
+#### GOOD:
+ ```dart
+ class AvoidLateKeyword {
+   final int? field; // LINT
+
+   void test() {
+     final local = ''; // LINT
+   }
+ }
+ ```
 ### Parameters:
 - **allow_initialized** (_bool_)  
   Allow immediately initialised late variables.
@@ -89,14 +147,86 @@ A `late` keyword rule which forbids using it to avoid runtime exceptions.
 - **ignored_types** (_Iterable&lt;String&gt;_)  
   Types that would be ignored by avoid-late rule
 
+Example:
+
+ ```yaml
+ - avoid_late_keyword:
+   ignored_types:
+     - ColorTween
+ ```
+
+ ```dart
+ late ColorTween tween; // OK
+ late int colorValue; // LINT
+ ```
+
 
 ## avoid_non_null_assertion
-Rule which forbids using bang operator ("!")
-as it may result in runtime exceptions.
+Rule which warns about usages of bang operator ("!")
+as it may result in unexpected runtime exceptions.
+
+"Bang" operator with Maps is allowed, as [Dart docs](https://dart.dev/null-safety/understanding-null-safety#the-map-index-operator-is-nullable)
+recommend using it for accessing Map values that are known to be present.
+
+### Example
+#### BAD:
+
+ ```dart
+ Object? object;
+ int number?;
+
+ final int computed = 1 + number!; // LINT
+ object!.method(); // LINT
+ ```
+
+#### GOOD:
+ ```dart
+ Object? object;
+ int number?;
+
+ if (number != null) {
+   final int computed = 1 + number;
+ }
+ object?.method();
+
+ // No lint on maps
+ final map = {'key': 'value'};
+ map['key']!;
+ ```
 
 
 ## avoid_returning_widgets
-A rule which forbids returning widgets from functions and methods.
+A rule which warns about returning widgets from functions and methods.
+
+Using functions instead of Widget subclasses for decomposing Widget trees
+may cause unexpected behavior and performance issues.
+
+More details: https://github.com/flutter/flutter/issues/19269
+
+### Example
+
+#### BAD:
+
+ ```dart
+ Widget avoidReturningWidgets() => const SizedBox(); // LINT
+
+ class MyWidget extends StatelessWidget {
+   Widget _test1() => const SizedBox(); // LINT
+   Widget get _test3 => const SizedBox(); // LINT
+ }
+ ```
+
+
+#### GOOD:
+
+ ```dart
+ class MyWidget extends StatelessWidget {
+   @override
+   Widget build(BuildContext context) {
+     return const SizedBox();
+   }
+ }
+ ```
 
 
 ## avoid_unnecessary_setstate
@@ -117,11 +247,27 @@ Calling setState in the aforementioned methods is allowed for:
 - async methods
 - callbacks
 
-Example:
+## Example:
+### BAD:
  ```dart
  void initState() {
    setState(() => foo = 'bar');  // lint
    changeState();                // lint
+ }
+
+ void changeState() {
+   setState(() => foo = 'bar');
+ }
+
+ void triggerFetch() async {
+   await fetch();
+   if (mounted) setState(() => foo = 'bar');
+ }
+ ```
+
+### GOOD:
+ ```dart
+ void initState() {
    triggerFetch();               // OK
    stream.listen((event) => setState(() => foo = event)); // OK
  }
@@ -138,8 +284,29 @@ Example:
 
 
 ## avoid_unnecessary_type_assertions
-An `avoid_unnecessary_type_assertions` rule which
-warns about unnecessary usage of `is` and `whereType` operators
+Warns about unnecessary usage of `is` and `whereType` operators.
+
+## Example:
+### BAD:
+ ```dart
+ final testList = [1.0, 2.0, 3.0];
+ final result = testList is List<double>; // LINT
+ final negativeResult = testList is! List<double>; // LINT
+ testList.whereType<double>(); // LINT
+
+ final double d = 2.0;
+ final casted = d is double; // LINT
+ ```
+
+### OK:
+ ```dart
+ final dynamicList = <dynamic>[1.0, 2.0];
+ dynamicList.whereType<double>();
+
+ final double? nullableD = 2.0;
+ // casting `Type? is Type` is allowed
+ final castedD = nullableD is double;
+ ```
 
 
 ## avoid_unnecessary_type_casts
@@ -153,13 +320,100 @@ warns about unnecessary usage of `as` operator
 
 
 ## avoid_unused_parameters
-A `avoid_unused_parameters` rule which
-warns about unused parameters
+Warns about unused function, method, constructor or factory parameters.
+
+## Example:
+### BAD:
+ ```dart
+ void fun(String x) {} // LINT
+ void fun2(String x, String y) { // LINT
+   print(y);
+ }
+
+ class TestClass {
+   static void staticMethod(int a) {} // LINT
+   void method(String s) {} // LINT
+
+   TestClass([int a]); // LINT
+   factory TestClass.named(int a) { // LINT
+     return TestClass();
+   }
+ }
+ ```
+
+### OK:
+ ```dart
+ void fun(String _) {}; // Replacing with underscores silences the warning
+ void fun2(String _, String y) {
+   print(y);
+ }
+
+ class TestClass {
+   static void staticMethod(int _) {} // OK
+   void method(String _) {} // OK
+
+   TestClass([int _]); // OK
+   factory TestClass.named(int _) { // OK
+     return TestClass();
+   }
+ }
+ ```
 
 
 ## avoid_using_api
 A `avoid_using_api` rule which
 warns about usage of avoided APIs
+
+
+### Usage
+
+External code can be "deprecated" when there is a better option available:
+
+ ```yaml
+ custom_lint:
+   rules:
+     - avoid_using_api:
+       severity: info
+       entries:
+         - class_name: Future
+           identifier: wait
+           source: dart:async
+           reason: "Future.wait should be avoided because it loses type
+                    safety for the results. Use a Record's `wait` method
+                    instead."
+           severity: warning
+ ```
+
+Result:
+
+ ```dart
+ void main() async {
+   await Future.wait([...]); // LINT
+   await (...).wait; // OK
+ }
+ ```
+
+### Advanced Usage
+
+Each entry also has `includes` and `excludes` parameters.
+These paths utilize [Glob](https://pub.dev/packages/glob)
+patterns to determine if a lint entry should be applied to a file.
+
+For example, a lint to prevent usage of a domain-only package outside of the
+domain folder:
+
+ ```yaml
+ custom_lint:
+   rules:
+     - avoid_using_api:
+       severity: info
+       entries:
+         - source: package:domain_models
+           excludes:
+             - "**/domain/**.dart"
+           reason: "domain_models is only intended to be used in the domain
+                    layer."
+ ```
 ### Parameters:
 - **entries** (_List&lt;AvoidUsingApiEntryParameters&gt;_)  
   A list of BannedCodeOption parameters.
@@ -168,103 +422,599 @@ warns about usage of avoided APIs
 
 
 ## cyclomatic_complexity
-A Complexity metric checks content of block and detects more easier solution
+Limit for the number of linearly independent paths through a program's
+source code.
+
+Counts the number of code branches and loop statements within function and
+method bodies.
 ### Parameters:
 - **max_complexity** (_int_)  
-  Min value of complexity level
+  Threshold cyclomatic complexity level, exceeding it triggers a warning.
 
 
 ## double_literal_format
 A `double_literal_format` rule which
 checks that double literals should begin with 0. instead of just .,
 and should not end with a trailing 0.
+
+## Example
+
+### BAD:
+
  ```dart
- BAD:
  var a = 05.23, b = .16e+5, c = -0.250, d = -0.400e-5;
- GOOD:
+ ```
+
+### GOOD:
+
+ ```dart
  var a = 5.23, b = 0.16e+5, c = -0.25, d = -0.4e-5;
  ```
 
 
 ## function_lines_of_code
-A number of lines metric which checks whether we didn't exceed
-the maximum allowed number of lines for a function.
+An approximate metric of meaningful lines of source code inside a function,
+excluding blank lines and comments.
+
+## Example config:
+
+ ```yaml
+ custom_lint:
+   rules:
+     - function_lines_of_code:
+       max_lines: 100
+ ```
 ### Parameters:
 - **max_lines** (_int_)  
-  Maximum number of lines
+  Maximum allowed number of lines of code (LoC) per function,
+  exceeding this limit triggers a warning.
 
 
 ## member_ordering
-A `member_ordering` rule which
-warns about class members being in wrong order
-Custom order can be provided through config
+A lint which allows to enforce a particular class member ordering
+conventions.
+
+## Configuration format
+
+The configuration uses a custom syntax for specifying members for ordering:
+ ```
+ annotation_modifiers_membertype
+ ```
+Valid annotations: `overridden`, `protected`
+
+Valid modifiers, in order of how they may appear in the final expression:
+- `private` / `public`
+- `static`
+- `late`
+- `var` / `final` / `const`
+- `nullable`
+- `named`
+- `factory`
+- `fields` / `getters` / `getters_setters` / `setters` / `constructors` /
+  `methods` / `method`.
+
+
+Here are some examples of valid ordering group patterns:
+
+- `public_static_const_fields`
+- `private_late_fields`
+- `private_nullable_fields`
+- `public_methods`
+- `overridden_methods`
+
+It's also possible to specify ordering for custom-named class members:
+- `my_custom_name_method`
+- `dispose_method`
+
+## Example:
+
+Assuming config:
+
+ ```yaml
+ custom_lint:
+   rules:
+     - member_ordering:
+       alphabetize: true
+       order:
+         - fields
+         - getters_setters
+         - methods
+ ```
+
+### BAD:
+
+ ```dart
+ class Example {
+   int get getA => a; // LINT, getters-setters should be after fields
+
+   final b = 1;
+   final a = 1; // LINT, non-alphabetic order
+   final c = 1;
+
+   void method() {}
+ }
+ ```
+
+### GOOD:
+
+ ```dart
+ class Example {
+   final a = 1;
+   final b = 1;
+   final c = 1;
+
+   int get getA => a;
+
+   void method() {}
+ }
+ ```
 ### Parameters:
 - **groups_order** (_List&lt;MemberGroup&gt;_)  
   Config used for members of regular class
 - **widgets_groups_order** (_List&lt;MemberGroup&gt;_)  
-  Config used for members of widget class
+  Config used for members of Widget subclasses
 - **alphabetize** (_bool_)  
-  Indicates if params should be in alphabetical order
+  Boolean flag; indicates whether params should be in alphabetical order
 - **alphabetize_by_type** (_bool_)  
-  Indicates if params should be in alphabetical order of their type
+  Boolean flag; indicates whether params should be in alphabetical order by
+  their static type
 
 
 ## newline_before_return
-A `newline_before_return` rule which
-warns about missing newline before return
+Warns about missing newline before return in a code block
+
+## Example
+
+### BAD:
+ ```dart
+ int fn() {
+   final a = 0;
+   return 1; // LINT
+ }
+
+ void fn2() {
+   if (true) {
+     final a = 0;
+     return; // LINT
+   }
+ }
+ ```
+
+### GOOD:
+ ```dart
+ int fn0() {
+   return 1; // OK for single-line code blocks
+ }
+
+ Function getCallback() {
+   return () {
+     return 1; // OK
+   }
+ }
+
+ int fn() {
+   final a = 0;
+
+   return 1; // newline added -- OK
+ }
+
+ void fn2() {
+   if (true) {
+     return; // right under a conditional -- OK
+   }
+ }
+ ```
 
 
 ## no_empty_block
-A `no_empty_block` rule which forbids having empty blocks.
-Excluding catch blocks and to-do comments
+A `no_empty_block` rule which forbids having empty code blocks,
+including function/method bodies and conditionals,
+excluding catch blocks and to-do comments.
+
+An empty code block often indicates missing code.
+
+## Example
+
+### BAD:
+ ```dart
+ int fn() {} // LINT
+
+ Function getCallback() {
+   return (){}; // LINT
+ }
+
+ void main() {
+   if (true) {} // LINT
+ }
+ ```
+
+### GOOD:
+ ```dart
+ int fn() {
+  // TODO: complete this
+ }
+
+ Function getCallback() {
+   return () {
+     // TODO: actually do something
+   };
+ }
+
+ void main() {
+   if (true) {
+     print('');
+   }
+
+   try {
+     fn();
+   } catch (_) {} // ignored by this rule
+ }
+ ```
 
 
 ## no_equal_then_else
-A `no_equal_then_else` rule which warns about
-unnecessary if statements and conditional expressions
+Warns when "if"-"else" statements or ternary conditionals have identical
+if and else condition handlers.
+
+
+## Example
+
+### BAD:
+
+ ```dart
+ final valueA = 'a';
+ final valueB = 'b';
+
+ if (condition) { // LINT
+   selectedValue = valueA;
+ } else {
+   selectedValue = valueA;
+ }
+
+ selectedValue = condition ? valueA : valueA; // LINT
+ ```
+
+### GOOD:
+
+ ```dart
+ final valueA = 'a';
+ final valueB = 'b';
+
+ if (condition) {
+   selectedValue = valueA;
+ } else {
+   selectedValue = valueB;
+ }
+
+ selectedValue = condition ? valueA : valueB;
+ ```
 
 
 ## no_magic_number
 A `no_magic_number` rule which forbids having numbers without variable
+
+There is a number of exceptions, where number literals are allowed:
+- Collection literals;
+- DateTime constructor usages;
+- In constant constructors, including Enums;
+- As a default value for parameters;
+- In constructor initializer lists;
+
+## Example
+
+### BAD:
+ ```dart
+ double circumference(double radius) => 2 * 3.14 * radius; // LINT
+
+ bool canDrive(int age, {bool isUSA = false}) {
+   return isUSA ? age >= 16 : age > 18; // LINT
+ }
+ ```
+
+### GOOD:
+ ```dart
+ const pi = 3.14;
+ const radiusToDiameterCoefficient = 2;
+ double circumference(double radius) =>
+   radiusToDiameterCoefficient * pi * radius;
+
+ const usaDrivingAge = 16;
+ const worldWideDrivingAge = 18;
+
+ bool canDrive(int age, {bool isUSA = false}) {
+   return isUSA ? age >= usaDrivingAge : age > worldWideDrivingAge;
+ }
+ ```
+
+### Allowed
+ ```dart
+ class ConstClass {
+   final int a;
+   const ConstClass(this.a);
+   const ConstClass.init() : a = 10;
+ }
+
+ enum ConstEnum {
+   // Allowed in enum arguments
+   one(1),
+   two(2);
+
+   final int value;
+   const ConstEnum(this.value);
+ }
+
+ // Allowed in const constructors
+ const classInstance = ConstClass(1);
+
+ // Allowed in list literals
+ final list = [1, 2, 3];
+
+ // Allowed in map literals
+ final map = {1: 'One', 2: 'Two'};
+
+ // Allowed in indexed expression
+ final result = list[1];
+
+ // Allowed in DateTime because it doesn't have const constructor
+ final apocalypse = DateTime(2012, 12, 21);
+
+ // Allowed for defaults in constructors and methods.
+ class DefaultValues {
+   final int value;
+   DefaultValues.named({this.value = 2});
+   DefaultValues.positional([this.value = 3]);
+
+   void methodWithNamedParam({int value = 4}) {}
+   void methodWithPositionalParam([int value = 5]) {}
+ }
+ ```
 ### Parameters:
 - **allowed_numbers** (_Iterable&lt;num&gt;_)  
-  List of allowed numbers
+  List of numbers excluded from analysis
+
+Defaults to numbers commonly used for increments and index access:
+`[-1, 0, 1]`.
 - **allowed_in_widget_params** (_bool_)  
-  The flag indicates whether magic numbers are allowed as a Widget instance
-  parameter.
+  Boolean flag, toggles analysis for raw numbers within Widget constructor
+  call parameters.
+
+When flag is set to `false`, it warns about any non-const numbers in
+your layout:
+
+ ```dart
+ Widget build() {
+   return MyWidget(
+     decoration: MyWidgetDecoration(size: 12), // LINT
+     value: 23,                                // LINT
+     child: const SizedBox(width: 20)          // allowed for const
+   );
+ }
+ ```
+
+When flag is set to `true`, it allows non-const layouts with raw numbers:
+
+ ```dart
+ Widget build() {
+   return MyWidget(
+     decoration: MyWidgetDecoration(size: 12), // OK
+     value: 23, // OK
+     child: const SizedBox(width: 20) // OK as it was
+   );
+ }
+ ```
 
 
 ## number_of_parameters
 A number of parameters metric which checks whether we didn't exceed
-the maximum allowed number of parameters for a function or a method
+the maximum allowed number of parameters for a function, method or
+constructor.
+
+## Example:
+
+Assuming config:
+
+ ```yaml
+ custom_lint:
+   rules:
+     - number_of_parameters:
+       max_parameters: 2
+ ```
+
+### BAD:
+ ```dart
+ void fn(a, b, c) {} // LINT
+ class C {
+   void method(a, b, c) {} // LINT
+ }
+ ```
+
+### GOOD:
+ ```dart
+ void fn(a, b) {} // OK
+ class C {
+   void method(a, b) {} // OK
+ }
+ ```
 ### Parameters:
 - **max_parameters** (_int_)  
-  Maximum number of parameters
+  Maximum number of parameters allowed before a warning is triggered.
 
 
 ## prefer_conditional_expressions
-A `prefer_conditional_expressions` rule which warns about
-simple if statements that can be replaced with conditional expressions
+Highlights simple "if" statements that can be replaced with conditional
+expressions
+
+## Example
+
+### BAD:
+
+ ```dart
+ // LINT
+ if (x > 0) {
+   x = 1;
+ } else {
+   x = 2;
+ }
+
+ // LINT
+ if (x > 0) x = 1;
+ else x = 2;
+
+ int fn() {
+   // LINT
+   if (x > 0) {
+     return 1;
+   } else {
+     return 2;
+   }
+ }
+ ```
+
+### GOOD:
+
+ ```dart
+ x = x > 0 ? 1 : 2;
+
+ int fn() {
+   return x > 0 ? 1 : 2;
+ }
+ ```
 ### Parameters:
 - **ignore_nested** (_bool_)  
-  Should rule ignore nested if statements
+  Determines whether to ignore nested if statements:
+
+ ```dart
+  // Allowed if ignore_nested flag is enabled
+  if (1 > 0) {
+    _result = 1 > 2 ? 2 : 1;
+  } else {
+    _result = 0;
+  }
+ ```
 
 
 ## prefer_first
-A `prefer_first` rule which warns about
-usage of iterable[0] or iterable.elementAt(0)
+Warns about usage of iterable[0] or iterable.elementAt(0) instead of
+iterable.first.
+
+## Example
+
+### BAD:
+
+ ```dart
+ final a = [1, 2, 3];
+
+ a[0];           // LINT
+ a.elementAt(0); // LINT
+ ```
+
+### BAD:
+
+ ```dart
+ final a = [1, 2, 3];
+
+ a.first; // OK
+ ```
 
 
 ## prefer_last
-A `prefer_last` rule which warns about
-usage of iterable[length-1] or iterable.elementAt(length-1)
+Warns about usage of `iterable[length - 1]` or
+`iterable.elementAt(length - 1)` instead of `iterable.last`.
+
+## Example
+
+### BAD:
+
+ ```dart
+ final a = [1, 2, 3];
+
+ a[a.length - 1];           // LINT
+ a.elementAt(a.length - 1); // LINT
+ ```
+
+### BAD:
+
+ ```dart
+ final a = [1, 2, 3];
+
+ a.last; // OK
+ ```
 
 
 ## prefer_match_file_name
-A `prefer_match_file_name` rule which warns about
-mismatch between file name and declared element inside
+Warns about a mismatch between file name and first declared element inside.
+
+
+## Example
+
+### BAD:
+
+File name: my_class.dart
+
+ ```dart
+ class NotMyClass {} // LINT
+ ```
+
+File name: other_class.dart
+
+ ```dart
+ class _OtherClass {}
+ class SomethingPublic {}  // LINT
+ ```
+
+### GOOD:
+
+File name: my_class.dart
+
+ ```dart
+ class MyClass {} // OK
+ ```
+
+File name: something_public.dart
+
+ ```dart
+ class _OtherClass {}
+ class SomethingPublic {}  // OK
+ ```
 
 
 ## proper_super_calls
-Checks that `super` calls in the initState and
-dispose methods are called in the correct order.
+Ensures that `super` calls are made in the correct order for the following
+StatefulWidget methods:
+
+- `initState`
+- `dispose`
+
+## Example
+
+### BAD:
+
+ ```dart
+ @override
+ void initState() {
+   print('');
+   super.initState(); // LINT, super.initState should be called first.
+ }
+
+ @override
+ void dispose() {
+   super.dispose(); // LINT, super.dispose should be called last.
+   print('');
+ }
+ ```
+
+### GOOD:
+
+ ```dart
+ @override
+ void initState() {
+   super.initState(); // OK
+   print('');
+ }
+
+ @override
+ void dispose() {
+   print('');
+   super.dispose(); // OK
+ }
+ ```
