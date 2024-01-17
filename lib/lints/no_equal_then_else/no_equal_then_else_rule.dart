@@ -6,8 +6,41 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 // Inspired by PVS-Studio (https://www.viva64.com/en/w/v6004/)
 
-/// A `no_equal_then_else` rule which warns about
-/// unnecessary if statements and conditional expressions
+/// Warns when "if"-"else" statements or ternary conditionals have identical
+/// if and else condition handlers.
+///
+///
+/// ## Example
+///
+/// ### BAD:
+///
+/// ```dart
+/// final valueA = 'a';
+/// final valueB = 'b';
+///
+/// if (condition) { // LINT
+///   selectedValue = valueA;
+/// } else {
+///   selectedValue = valueA;
+/// }
+///
+/// selectedValue = condition ? valueA : valueA; // LINT
+/// ```
+///
+/// ### GOOD:
+///
+/// ```dart
+/// final valueA = 'a';
+/// final valueB = 'b';
+///
+/// if (condition) {
+///   selectedValue = valueA;
+/// } else {
+///   selectedValue = valueB;
+/// }
+///
+/// selectedValue = condition ? valueA : valueB;
+/// ```
 class NoEqualThenElseRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if
   /// 'if' statements or conditional expression is redundant
