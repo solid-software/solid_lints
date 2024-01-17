@@ -6,8 +6,49 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 // Inspired by TSLint (https://palantir.github.io/tslint/rules/no-empty/)
 
-/// A `no_empty_block` rule which forbids having empty blocks.
-/// Excluding catch blocks and to-do comments
+/// A `no_empty_block` rule which forbids having empty code blocks,
+/// including function/method bodies and conditionals,
+/// excluding catch blocks and to-do comments.
+///
+/// An empty code block often indicates missing code.
+///
+/// ## Example
+///
+/// ### BAD:
+/// ```dart
+/// int fn() {} // LINT
+///
+/// Function getCallback() {
+///   return (){}; // LINT
+/// }
+///
+/// void main() {
+///   if (true) {} // LINT
+/// }
+/// ```
+///
+/// ### GOOD:
+/// ```dart
+/// int fn() {
+///  // TODO: complete this
+/// }
+///
+/// Function getCallback() {
+///   return () {
+///     // TODO: actually do something
+///   };
+/// }
+///
+/// void main() {
+///   if (true) {
+///     print('');
+///   }
+///
+///   try {
+///     fn();
+///   } catch (_) {} // ignored by this rule
+/// }
+/// ```
 class NoEmptyBlockRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether left empty block.
