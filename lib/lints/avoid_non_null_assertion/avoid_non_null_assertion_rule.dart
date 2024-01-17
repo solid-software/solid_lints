@@ -6,8 +6,37 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// Rule which forbids using bang operator ("!")
-/// as it may result in runtime exceptions.
+/// Rule which warns about usages of bang operator ("!")
+/// as it may result in unexpected runtime exceptions.
+///
+/// "Bang" operator with Maps is allowed, as [Dart docs](https://dart.dev/null-safety/understanding-null-safety#the-map-index-operator-is-nullable)
+/// recommend using it for accessing Map values that are known to be present.
+///
+/// ### Example
+/// #### BAD:
+///
+/// ```dart
+/// Object? object;
+/// int number?;
+///
+/// final int computed = 1 + number!; // LINT
+/// object!.method(); // LINT
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// Object? object;
+/// int number?;
+///
+/// if (number != null) {
+///   final int computed = 1 + number;
+/// }
+/// object?.method();
+///
+/// // No lint on maps
+/// final map = {'key': 'value'};
+/// map['key']!;
+/// ```
 class AvoidNonNullAssertionRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bang operator.
