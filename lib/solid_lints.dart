@@ -10,6 +10,7 @@ import 'package:solid_lints/lints/avoid_unnecessary_type_assertions/avoid_unnece
 import 'package:solid_lints/lints/avoid_unnecessary_type_casts/avoid_unnecessary_type_casts_rule.dart';
 import 'package:solid_lints/lints/avoid_unrelated_type_assertions/avoid_unrelated_type_assertions_rule.dart';
 import 'package:solid_lints/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
+import 'package:solid_lints/lints/avoid_using_api/avoid_using_api_rule.dart';
 import 'package:solid_lints/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/lints/function_lines_of_code/function_lines_of_code_metric.dart';
@@ -24,7 +25,6 @@ import 'package:solid_lints/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
 import 'package:solid_lints/lints/proper_super_calls/proper_super_calls_rule.dart';
-
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// Creates a plugin for our custom linter
@@ -48,6 +48,7 @@ class _SolidLints extends PluginBase {
       AvoidUnnecessaryTypeCastsRule.createRule(configs),
       AvoidUnrelatedTypeAssertionsRule.createRule(configs),
       AvoidUnusedParametersRule.createRule(configs),
+      AvoidUsingApiRule.createRule(configs),
       NewlineBeforeReturnRule.createRule(configs),
       NoEmptyBlockRule.createRule(configs),
       NoEqualThenElseRule.createRule(configs),
