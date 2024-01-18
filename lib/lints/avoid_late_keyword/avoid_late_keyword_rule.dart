@@ -17,7 +17,7 @@ import 'package:solid_lints/utils/types_utils.dart';
 /// ```yaml
 /// custom_lint:
 ///    rules:
-///      - avoid_late_keyword
+///      - avoid_late_keyword:
 ///        allow_initialized: false
 ///        ignored_types:
 ///         - AnimationController

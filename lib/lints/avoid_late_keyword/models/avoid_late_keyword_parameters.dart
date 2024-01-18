@@ -1,7 +1,7 @@
 /// A data model class that represents the "avoid late keyword" input
 /// parameters.
 class AvoidLateKeywordParameters {
-  /// Allow immediately initialised late variables.
+  /// Allow immediately initialized late variables.
   ///
   /// ```dart
   /// late var ok = 0; // ok when allowInitialized == true

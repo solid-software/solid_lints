@@ -57,7 +57,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// Function getCallback() {
 ///   return () {
 ///     return 1; // OK
-///   }
+///   };
 /// }
 ///
 /// int fn() {

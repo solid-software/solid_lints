@@ -17,7 +17,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 ///
 /// ```dart
 /// Object? object;
-/// int number?;
+/// int? number;
 ///
 /// final int computed = 1 + number!; // LINT
 /// object!.method(); // LINT
@@ -26,7 +26,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// #### GOOD:
 /// ```dart
 /// Object? object;
-/// int number?;
+/// int? number;
 ///
 /// if (number != null) {
 ///   final int computed = 1 + number;

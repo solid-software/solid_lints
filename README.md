@@ -40,6 +40,7 @@ To indicate that your project is using Solid Lints, you can use the following ba
 ```markdown
 [![style: solid](https://img.shields.io/badge/style-solid-orange)](https://pub.dev/packages/solid_lints)
 ```
+
 # Solid Lints Documentation
 
 ## Table of contents:
@@ -117,7 +118,7 @@ exception for an uninitialized variable.
  ```yaml
  custom_lint:
     rules:
-      - avoid_late_keyword
+      - avoid_late_keyword:
         allow_initialized: false
         ignored_types:
          - AnimationController
@@ -149,7 +150,7 @@ exception for an uninitialized variable.
  ```
 ### Parameters:
 - **allow_initialized** (_bool_)  
-  Allow immediately initialised late variables.
+  Allow immediately initialized late variables.
 
  ```dart
  late var ok = 0; // ok when allowInitialized == true
@@ -186,7 +187,7 @@ recommend using it for accessing Map values that are known to be present.
 
  ```dart
  Object? object;
- int number?;
+ int? number;
 
  final int computed = 1 + number!; // LINT
  object!.method(); // LINT
@@ -195,7 +196,7 @@ recommend using it for accessing Map values that are known to be present.
 #### GOOD:
  ```dart
  Object? object;
- int number?;
+ int? number;
 
  if (number != null) {
    final int computed = 1 + number;
@@ -356,7 +357,7 @@ Warns about unused function, method, constructor or factory parameters.
 
 ### OK:
  ```dart
- void fun(String _) {}; // Replacing with underscores silences the warning
+ void fun(String _) {} // Replacing with underscores silences the warning
  void fun2(String _, String y) {
    print(y);
  }
@@ -449,7 +450,7 @@ triggering a warning.
  ```yaml
  custom_lint:
    rules:
-     - cyclomatic_complexity
+     - cyclomatic_complexity:
        max_complexity: 10
  ```
 ### Parameters:
@@ -614,7 +615,7 @@ Warns about missing newline before return in a code block
  Function getCallback() {
    return () {
      return 1; // OK
-   }
+   };
  }
 
  int fn() {
@@ -1051,14 +1052,14 @@ StatefulWidget methods:
 
  ```dart
  @override
- void initState() {
-   super.initState(); // OK
-   print('');
- }
+void initState() {
+  super.initState(); // OK
+  print('');
+}
 
- @override
- void dispose() {
-   print('');
-   super.dispose(); // OK
- }
+@override
+void dispose() {
+  print('');
+  super.dispose(); // OK
+}
  ```

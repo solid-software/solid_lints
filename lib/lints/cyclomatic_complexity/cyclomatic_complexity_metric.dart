@@ -19,7 +19,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// ```yaml
 /// custom_lint:
 ///   rules:
-///     - cyclomatic_complexity
+///     - cyclomatic_complexity:
 ///       max_complexity: 10
 /// ```
 class CyclomaticComplexityMetric

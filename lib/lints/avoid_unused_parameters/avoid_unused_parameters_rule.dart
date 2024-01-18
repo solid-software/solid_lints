@@ -27,7 +27,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 ///
 /// ### OK:
 /// ```dart
-/// void fun(String _) {}; // Replacing with underscores silences the warning
+/// void fun(String _) {} // Replacing with underscores silences the warning
 /// void fun2(String _, String y) {
 ///   print(y);
 /// }
