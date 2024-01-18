@@ -31,7 +31,7 @@ const whereTypeMethodName = 'whereType';
 /// final casted = d is double; // LINT
 /// ```
 ///
-/// ### OK:
+/// #### OK:
 /// ```dart
 /// final dynamicList = <dynamic>[1.0, 2.0];
 /// dynamicList.whereType<double>();

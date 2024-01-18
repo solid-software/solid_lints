@@ -312,7 +312,7 @@ Warns about unnecessary usage of `is` and `whereType` operators.
  final casted = d is double; // LINT
  ```
 
-### OK:
+#### OK:
  ```dart
  final dynamicList = <dynamic>[1.0, 2.0];
  dynamicList.whereType<double>();
@@ -355,7 +355,7 @@ Warns about unused function, method, constructor or factory parameters.
  }
  ```
 
-### OK:
+#### OK:
  ```dart
  void fun(String _) {} // Replacing with underscores silences the warning
  void fun2(String _, String y) {
