@@ -40,7 +40,6 @@ To indicate that your project is using Solid Lints, you can use the following ba
 ```markdown
 [![style: solid](https://img.shields.io/badge/style-solid-orange)](https://pub.dev/packages/solid_lints)
 ```
-
 # Solid Lints Documentation
 
 ## Table of contents:
@@ -113,6 +112,18 @@ Using `late` disables compile time safety for what would else be a nullable
 variable. Instead, a runtime check is made, which may throw an unexpected
 exception for an uninitialized variable.
 
+## Example config:
+
+ ```yaml
+ custom_lint:
+    rules:
+      - avoid_late_keyword
+        allow_initialized: false
+        ignored_types:
+         - AnimationController
+         - ColorTween
+ ```
+
 ### Example
 
 #### BAD:
@@ -150,9 +161,11 @@ exception for an uninitialized variable.
 Example:
 
  ```yaml
- - avoid_late_keyword:
-   ignored_types:
-     - ColorTween
+ custom_lint:
+   rules:
+     - avoid_late_keyword:
+       ignored_types:
+         - ColorTween
  ```
 
  ```dart
@@ -427,6 +440,18 @@ source code.
 
 Counts the number of code branches and loop statements within function and
 method bodies.
+
+## Example config:
+
+This configuration will allow 10 code branchings per function body before
+triggering a warning.
+
+ ```yaml
+ custom_lint:
+   rules:
+     - cyclomatic_complexity
+       max_complexity: 10
+ ```
 ### Parameters:
 - **max_complexity** (_int_)  
   Threshold cyclomatic complexity level, exceeding it triggers a warning.
@@ -700,6 +725,16 @@ There is a number of exceptions, where number literals are allowed:
 - As a default value for parameters;
 - In constructor initializer lists;
 
+## Example config:
+
+ ```yaml
+ custom_lint:
+   rules:
+     - no_magic_number:
+       allowed: [12, 42]
+       allowed_in_widget_params: true
+ ```
+
 ## Example
 
 ### BAD:
@@ -843,6 +878,15 @@ Assuming config:
 ## prefer_conditional_expressions
 Highlights simple "if" statements that can be replaced with conditional
 expressions
+
+## Example config:
+
+ ```yaml
+ custom_lint:
+   rules:
+     - prefer_conditional_expressions:
+       ignore_nested: true
+ ```
 
 ## Example
 
