@@ -11,7 +11,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// Counts the number of code branches and loop statements within function and
 /// method bodies.
 ///
-/// ## Example config:
+/// ### Example config:
 ///
 /// This configuration will allow 10 code branchings per function body before
 /// triggering a warning.

@@ -9,7 +9,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// An approximate metric of meaningful lines of source code inside a function,
 /// excluding blank lines and comments.
 ///
-/// ## Example config:
+/// ### Example config:
 ///
 /// ```yaml
 /// custom_lint:

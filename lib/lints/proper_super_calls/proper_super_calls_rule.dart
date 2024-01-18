@@ -10,9 +10,9 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// - `initState`
 /// - `dispose`
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// ```dart
 /// @override
@@ -28,7 +28,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 ///
 /// ```dart
 /// @override

@@ -12,7 +12,7 @@ import 'package:solid_lints/utils/types_utils.dart';
 /// variable. Instead, a runtime check is made, which may throw an unexpected
 /// exception for an uninitialized variable.
 ///
-/// ## Example config:
+/// ### Example config:
 ///
 /// ```yaml
 /// custom_lint:

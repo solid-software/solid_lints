@@ -11,7 +11,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// Highlights simple "if" statements that can be replaced with conditional
 /// expressions
 ///
-/// ## Example config:
+/// ### Example config:
 ///
 /// ```yaml
 /// custom_lint:
@@ -20,9 +20,9 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 ///       ignore_nested: true
 /// ```
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// ```dart
 /// // LINT
@@ -46,7 +46,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 ///
 /// ```dart
 /// x = x > 0 ? 1 : 2;

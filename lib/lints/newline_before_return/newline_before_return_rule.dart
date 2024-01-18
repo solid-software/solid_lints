@@ -31,9 +31,9 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// Warns about missing newline before return in a code block
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 /// ```dart
 /// int fn() {
 ///   final a = 0;
@@ -48,7 +48,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 /// ```dart
 /// int fn0() {
 ///   return 1; // OK for single-line code blocks

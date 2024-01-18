@@ -12,9 +12,9 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 ///
 /// An empty code block often indicates missing code.
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 /// ```dart
 /// int fn() {} // LINT
 ///
@@ -27,7 +27,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 /// ```dart
 /// int fn() {
 ///  // TODO: complete this

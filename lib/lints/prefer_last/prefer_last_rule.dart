@@ -8,9 +8,9 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// Warns about usage of `iterable[length - 1]` or
 /// `iterable.elementAt(length - 1)` instead of `iterable.last`.
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// ```dart
 /// final a = [1, 2, 3];
@@ -19,7 +19,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// a.elementAt(a.length - 1); // LINT
 /// ```
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// ```dart
 /// final a = [1, 2, 3];

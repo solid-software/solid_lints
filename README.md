@@ -113,7 +113,7 @@ Using `late` disables compile time safety for what would else be a nullable
 variable. Instead, a runtime check is made, which may throw an unexpected
 exception for an uninitialized variable.
 
-## Example config:
+### Example config:
 
  ```yaml
  custom_lint:
@@ -261,8 +261,8 @@ Calling setState in the aforementioned methods is allowed for:
 - async methods
 - callbacks
 
-## Example:
-### BAD:
+### Example:
+#### BAD:
  ```dart
  void initState() {
    setState(() => foo = 'bar');  // lint
@@ -279,7 +279,7 @@ Calling setState in the aforementioned methods is allowed for:
  }
  ```
 
-### GOOD:
+#### GOOD:
  ```dart
  void initState() {
    triggerFetch();               // OK
@@ -300,8 +300,8 @@ Calling setState in the aforementioned methods is allowed for:
 ## avoid_unnecessary_type_assertions
 Warns about unnecessary usage of `is` and `whereType` operators.
 
-## Example:
-### BAD:
+### Example:
+#### BAD:
  ```dart
  final testList = [1.0, 2.0, 3.0];
  final result = testList is List<double>; // LINT
@@ -336,8 +336,8 @@ warns about unnecessary usage of `as` operator
 ## avoid_unused_parameters
 Warns about unused function, method, constructor or factory parameters.
 
-## Example:
-### BAD:
+### Example:
+#### BAD:
  ```dart
  void fun(String x) {} // LINT
  void fun2(String x, String y) { // LINT
@@ -442,7 +442,7 @@ source code.
 Counts the number of code branches and loop statements within function and
 method bodies.
 
-## Example config:
+### Example config:
 
 This configuration will allow 10 code branchings per function body before
 triggering a warning.
@@ -463,15 +463,15 @@ A `double_literal_format` rule which
 checks that double literals should begin with 0. instead of just .,
 and should not end with a trailing 0.
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
 
  ```dart
  var a = 05.23, b = .16e+5, c = -0.250, d = -0.400e-5;
  ```
 
-### GOOD:
+#### GOOD:
 
  ```dart
  var a = 5.23, b = 0.16e+5, c = -0.25, d = -0.4e-5;
@@ -482,7 +482,7 @@ and should not end with a trailing 0.
 An approximate metric of meaningful lines of source code inside a function,
 excluding blank lines and comments.
 
-## Example config:
+### Example config:
 
  ```yaml
  custom_lint:
@@ -500,7 +500,7 @@ excluding blank lines and comments.
 A lint which allows to enforce a particular class member ordering
 conventions.
 
-## Configuration format
+### Configuration format
 
 The configuration uses a custom syntax for specifying members for ordering:
  ```
@@ -532,7 +532,7 @@ It's also possible to specify ordering for custom-named class members:
 - `my_custom_name_method`
 - `dispose_method`
 
-## Example:
+### Example:
 
 Assuming config:
 
@@ -547,7 +547,7 @@ Assuming config:
          - methods
  ```
 
-### BAD:
+#### BAD:
 
  ```dart
  class Example {
@@ -561,7 +561,7 @@ Assuming config:
  }
  ```
 
-### GOOD:
+#### GOOD:
 
  ```dart
  class Example {
@@ -589,9 +589,9 @@ Assuming config:
 ## newline_before_return
 Warns about missing newline before return in a code block
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
  ```dart
  int fn() {
    final a = 0;
@@ -606,7 +606,7 @@ Warns about missing newline before return in a code block
  }
  ```
 
-### GOOD:
+#### GOOD:
  ```dart
  int fn0() {
    return 1; // OK for single-line code blocks
@@ -639,9 +639,9 @@ excluding catch blocks and to-do comments.
 
 An empty code block often indicates missing code.
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
  ```dart
  int fn() {} // LINT
 
@@ -654,7 +654,7 @@ An empty code block often indicates missing code.
  }
  ```
 
-### GOOD:
+#### GOOD:
  ```dart
  int fn() {
   // TODO: complete this
@@ -683,9 +683,9 @@ Warns when "if"-"else" statements or ternary conditionals have identical
 if and else condition handlers.
 
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
 
  ```dart
  final valueA = 'a';
@@ -700,7 +700,7 @@ if and else condition handlers.
  selectedValue = condition ? valueA : valueA; // LINT
  ```
 
-### GOOD:
+#### GOOD:
 
  ```dart
  final valueA = 'a';
@@ -726,7 +726,7 @@ There is a number of exceptions, where number literals are allowed:
 - As a default value for parameters;
 - In constructor initializer lists;
 
-## Example config:
+### Example config:
 
  ```yaml
  custom_lint:
@@ -736,9 +736,9 @@ There is a number of exceptions, where number literals are allowed:
        allowed_in_widget_params: true
  ```
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
  ```dart
  double circumference(double radius) => 2 * 3.14 * radius; // LINT
 
@@ -747,7 +747,7 @@ There is a number of exceptions, where number literals are allowed:
  }
  ```
 
-### GOOD:
+#### GOOD:
  ```dart
  const pi = 3.14;
  const radiusToDiameterCoefficient = 2;
@@ -845,7 +845,7 @@ A number of parameters metric which checks whether we didn't exceed
 the maximum allowed number of parameters for a function, method or
 constructor.
 
-## Example:
+### Example:
 
 Assuming config:
 
@@ -856,7 +856,7 @@ Assuming config:
        max_parameters: 2
  ```
 
-### BAD:
+#### BAD:
  ```dart
  void fn(a, b, c) {} // LINT
  class C {
@@ -864,7 +864,7 @@ Assuming config:
  }
  ```
 
-### GOOD:
+#### GOOD:
  ```dart
  void fn(a, b) {} // OK
  class C {
@@ -880,7 +880,7 @@ Assuming config:
 Highlights simple "if" statements that can be replaced with conditional
 expressions
 
-## Example config:
+### Example config:
 
  ```yaml
  custom_lint:
@@ -889,9 +889,9 @@ expressions
        ignore_nested: true
  ```
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
 
  ```dart
  // LINT
@@ -915,7 +915,7 @@ expressions
  }
  ```
 
-### GOOD:
+#### GOOD:
 
  ```dart
  x = x > 0 ? 1 : 2;
@@ -942,9 +942,9 @@ expressions
 Warns about usage of iterable[0] or iterable.elementAt(0) instead of
 iterable.first.
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
 
  ```dart
  final a = [1, 2, 3];
@@ -953,7 +953,7 @@ iterable.first.
  a.elementAt(0); // LINT
  ```
 
-### BAD:
+#### BAD:
 
  ```dart
  final a = [1, 2, 3];
@@ -966,9 +966,9 @@ iterable.first.
 Warns about usage of `iterable[length - 1]` or
 `iterable.elementAt(length - 1)` instead of `iterable.last`.
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
 
  ```dart
  final a = [1, 2, 3];
@@ -977,7 +977,7 @@ Warns about usage of `iterable[length - 1]` or
  a.elementAt(a.length - 1); // LINT
  ```
 
-### BAD:
+#### BAD:
 
  ```dart
  final a = [1, 2, 3];
@@ -990,9 +990,9 @@ Warns about usage of `iterable[length - 1]` or
 Warns about a mismatch between file name and first declared element inside.
 
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
 
 File name: my_class.dart
 
@@ -1007,7 +1007,7 @@ File name: other_class.dart
  class SomethingPublic {}  // LINT
  ```
 
-### GOOD:
+#### GOOD:
 
 File name: my_class.dart
 
@@ -1030,9 +1030,9 @@ StatefulWidget methods:
 - `initState`
 - `dispose`
 
-## Example
+### Example
 
-### BAD:
+#### BAD:
 
  ```dart
  @override
@@ -1048,7 +1048,7 @@ StatefulWidget methods:
  }
  ```
 
-### GOOD:
+#### GOOD:
 
  ```dart
  @override

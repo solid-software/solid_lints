@@ -19,8 +19,8 @@ const whereTypeMethodName = 'whereType';
 
 /// Warns about unnecessary usage of `is` and `whereType` operators.
 ///
-/// ## Example:
-/// ### BAD:
+/// ### Example:
+/// #### BAD:
 /// ```dart
 /// final testList = [1.0, 2.0, 3.0];
 /// final result = testList is List<double>; // LINT

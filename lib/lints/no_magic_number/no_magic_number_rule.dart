@@ -40,7 +40,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// - As a default value for parameters;
 /// - In constructor initializer lists;
 ///
-/// ## Example config:
+/// ### Example config:
 ///
 /// ```yaml
 /// custom_lint:
@@ -50,9 +50,9 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 ///       allowed_in_widget_params: true
 /// ```
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 /// ```dart
 /// double circumference(double radius) => 2 * 3.14 * radius; // LINT
 ///
@@ -61,7 +61,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 /// ```dart
 /// const pi = 3.14;
 /// const radiusToDiameterCoefficient = 2;

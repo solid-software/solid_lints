@@ -21,8 +21,8 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// - async methods
 /// - callbacks
 ///
-/// ## Example:
-/// ### BAD:
+/// ### Example:
+/// #### BAD:
 /// ```dart
 /// void initState() {
 ///   setState(() => foo = 'bar');  // lint
@@ -39,7 +39,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 /// ```dart
 /// void initState() {
 ///   triggerFetch();               // OK

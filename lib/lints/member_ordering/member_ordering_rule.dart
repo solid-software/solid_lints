@@ -8,7 +8,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// A lint which allows to enforce a particular class member ordering
 /// conventions.
 ///
-/// ## Configuration format
+/// ### Configuration format
 ///
 /// The configuration uses a custom syntax for specifying members for ordering:
 /// ```
@@ -40,7 +40,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// - `my_custom_name_method`
 /// - `dispose_method`
 ///
-/// ## Example:
+/// ### Example:
 ///
 /// Assuming config:
 ///
@@ -55,7 +55,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 ///         - methods
 /// ```
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// ```dart
 /// class Example {
@@ -69,7 +69,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 ///
 /// ```dart
 /// class Example {

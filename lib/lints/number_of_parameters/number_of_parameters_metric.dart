@@ -9,7 +9,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// the maximum allowed number of parameters for a function, method or
 /// constructor.
 ///
-/// ## Example:
+/// ### Example:
 ///
 /// Assuming config:
 ///
@@ -20,7 +20,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 ///       max_parameters: 2
 /// ```
 ///
-/// ### BAD:
+/// #### BAD:
 /// ```dart
 /// void fn(a, b, c) {} // LINT
 /// class C {
@@ -28,7 +28,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 /// ```dart
 /// void fn(a, b) {} // OK
 /// class C {

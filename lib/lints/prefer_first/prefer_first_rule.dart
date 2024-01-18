@@ -8,9 +8,9 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// Warns about usage of iterable[0] or iterable.elementAt(0) instead of
 /// iterable.first.
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// ```dart
 /// final a = [1, 2, 3];
@@ -19,7 +19,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// a.elementAt(0); // LINT
 /// ```
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// ```dart
 /// final a = [1, 2, 3];

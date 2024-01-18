@@ -9,9 +9,9 @@ import 'package:solid_lints/utils/node_utils.dart';
 /// Warns about a mismatch between file name and first declared element inside.
 ///
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// File name: my_class.dart
 ///
@@ -26,7 +26,7 @@ import 'package:solid_lints/utils/node_utils.dart';
 /// class SomethingPublic {}  // LINT
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 ///
 /// File name: my_class.dart
 ///

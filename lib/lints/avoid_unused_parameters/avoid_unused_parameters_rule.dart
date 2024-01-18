@@ -6,8 +6,8 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// Warns about unused function, method, constructor or factory parameters.
 ///
-/// ## Example:
-/// ### BAD:
+/// ### Example:
+/// #### BAD:
 /// ```dart
 /// void fun(String x) {} // LINT
 /// void fun2(String x, String y) { // LINT

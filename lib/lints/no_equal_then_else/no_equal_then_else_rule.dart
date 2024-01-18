@@ -10,9 +10,9 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// if and else condition handlers.
 ///
 ///
-/// ## Example
+/// ### Example
 ///
-/// ### BAD:
+/// #### BAD:
 ///
 /// ```dart
 /// final valueA = 'a';
@@ -27,7 +27,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// selectedValue = condition ? valueA : valueA; // LINT
 /// ```
 ///
-/// ### GOOD:
+/// #### GOOD:
 ///
 /// ```dart
 /// final valueA = 'a';
