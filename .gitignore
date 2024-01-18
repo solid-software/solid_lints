@@ -1,6 +1,9 @@
 #IDEA Files
 /.idea/
 
+# MacOS Files
+.DS_Store
+
 # Files and directories created by pub.
 .dart_tool/
 .packages

@@ -11,31 +11,41 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
     return [
       '# Solid Lints Documentation',
       '## Table of contents:',
-      _formatTableOfContents(rules),
+      formatTableOfContents(rules),
       '---',
-      ...rules.map(_formatRuleToMarkdown),
+      ...rules.map(formatRuleToMarkdown),
     ].join('\n\n');
   }
 
-  String _formatTableOfContents(List<RuleDoc> rules) => rules
+  ///
+  String formatTableOfContents(List<RuleDoc> rules) => rules
       .mapIndexed(
         (index, rule) => '${index + 1}. [${rule.name}](#${rule.name})',
       )
       .join('\n');
 
-  String _formatRuleToMarkdown(RuleDoc rule) {
+  ///
+  String formatRuleToMarkdown(
+    RuleDoc rule, {
+    bool includeName = true,
+    bool parametersAsList = true,
+  }) {
     final formattedString = StringBuffer();
 
-    formattedString.writeln('## ${rule.name}');
+    if (includeName) {
+      formattedString.writeln('## ${rule.name}');
+    }
+
     formattedString.writeln(rule.doc);
 
     if (rule.parameters.isNotEmpty) {
-      formattedString.writeln('### Parameters:');
+      formattedString.writeln('### Parameters');
 
       for (final parameter in rule.parameters) {
         formattedString.writeln(
           const HtmlEscape().convert(
-            '- **${parameter.name}** (_${parameter.type}_)  ',
+            '${parametersAsList ? '-' : '####'} **${parameter.name}**'
+            ' (_${parameter.type}_)  ',
           ),
         );
         formattedString.writeln('  ${parameter.doc}');
