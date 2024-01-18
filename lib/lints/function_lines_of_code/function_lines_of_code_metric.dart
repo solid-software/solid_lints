@@ -48,10 +48,9 @@ class FunctionLinesOfCodeMetric
   ) {
     void checkNode(AstNode node) => _checkNode(resolver, reporter, node);
 
-    context.registry.addFunctionDeclaration(checkNode);
+    context.registry.addMethodDeclaration(checkNode);
     context.registry.addFunctionExpression(checkNode);
     context.registry.addFunctionBody(checkNode);
-    context.registry.addMethodDeclaration(checkNode);
   }
 
   void _checkNode(
@@ -63,18 +62,18 @@ class FunctionLinesOfCodeMetric
     node.visitChildren(visitor);
 
     if (visitor.linesWithCode.length > config.parameters.maxLines) {
-      if (node is AnnotatedNode) {
-        final startOffset = node.firstTokenAfterCommentAndMetadata.offset;
-        final lengthDifference = startOffset - node.offset;
-
-        reporter.reportErrorForOffset(
-          code,
-          startOffset,
-          node.length - lengthDifference,
-        );
-      } else {
-        reporter.reportErrorForNode(code, node);
+      if (node is! AnnotatedNode) {
+        return reporter.reportErrorForNode(code, node);
       }
+
+      final startOffset = node.firstTokenAfterCommentAndMetadata.offset;
+      final lengthDifference = startOffset - node.offset;
+
+      reporter.reportErrorForOffset(
+        code,
+        startOffset,
+        node.length - lengthDifference,
+      );
     }
   }
 }
