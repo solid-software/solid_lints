@@ -45,11 +45,15 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      tableOfContents: {
+        minHeadingLevel: 2,
+        maxHeadingLevel: 6,
+      },
       navbar: {
         title: 'solid_lints',
         logo: {
           alt: 'solid_lints Logo',
-          src: 'img/favicon.png',
+          src: 'img/favicon-xs.png',
         },
         items: [
           {
