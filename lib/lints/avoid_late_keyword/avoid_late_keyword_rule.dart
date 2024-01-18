@@ -12,6 +12,18 @@ import 'package:solid_lints/utils/types_utils.dart';
 /// variable. Instead, a runtime check is made, which may throw an unexpected
 /// exception for an uninitialized variable.
 ///
+/// ## Example config:
+///
+/// ```yaml
+/// custom_lint:
+///    rules:
+///      - avoid_late_keyword
+///        allow_initialized: false
+///        ignored_types:
+///         - AnimationController
+///         - ColorTween
+/// ```
+///
 /// ### Example
 ///
 /// #### BAD:

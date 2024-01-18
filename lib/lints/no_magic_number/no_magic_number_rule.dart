@@ -40,6 +40,16 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// - As a default value for parameters;
 /// - In constructor initializer lists;
 ///
+/// ## Example config:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - no_magic_number:
+///       allowed: [12, 42]
+///       allowed_in_widget_params: true
+/// ```
+///
 /// ## Example
 ///
 /// ### BAD:

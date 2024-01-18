@@ -20,14 +20,16 @@ import 'package:solid_lints/utils/parameter_utils.dart';
 ///
 /// Example:
 /// ```yaml
-/// entries:
-///   - identifier: wait
-///     class_name: Future
-///     source: dart:async
-///     reason: "Future.wait from dart:async isnt allowed"
-///     severity: warning
-///     includes: []
-///     excludes: []
+/// custom_lint:
+///   rules:
+///     entries:
+///       - identifier: wait
+///         class_name: Future
+///         source: dart:async
+///         reason: "Future.wait from dart:async isnt allowed"
+///         severity: warning
+///         includes: []
+///         excludes: []
 /// ```
 class AvoidUsingApiEntryParameters {
   /// Variable/method name

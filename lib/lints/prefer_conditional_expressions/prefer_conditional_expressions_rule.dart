@@ -11,6 +11,15 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// Highlights simple "if" statements that can be replaced with conditional
 /// expressions
 ///
+/// ## Example config:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - prefer_conditional_expressions:
+///       ignore_nested: true
+/// ```
+///
 /// ## Example
 ///
 /// ### BAD:

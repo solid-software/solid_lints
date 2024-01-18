@@ -14,9 +14,11 @@ class AvoidLateKeywordParameters {
   /// Example:
   ///
   /// ```yaml
-  /// - avoid_late_keyword:
-  ///   ignored_types:
-  ///     - ColorTween
+  /// custom_lint:
+  ///   rules:
+  ///     - avoid_late_keyword:
+  ///       ignored_types:
+  ///         - ColorTween
   /// ```
   ///
   /// ```dart
