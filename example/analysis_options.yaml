@@ -19,3 +19,11 @@ custom_lint:
     - avoid_unnecessary_setstate
     - double_literal_format
     - avoid_unnecessary_type_assertions
+    - avoid_using_api:
+      severity: info
+      entries:
+        - class_name: Future
+          identifier: wait
+          source: dart:async
+          reason: "Future.wait should be avoided because it looses type safety for the results. Use a Record's `wait` method instead."
+          severity: warning
