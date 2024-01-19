@@ -61,6 +61,8 @@ import 'package:solid_lints/utils/path_utils.dart';
 ///           reason: "domain_models is only intended to be used in the domain
 ///                    layer."
 /// ```
+///
+/// Contributed by getBoolean (https://github.com/getBoolean).
 class AvoidUsingApiRule extends SolidLintRule<AvoidUsingApiParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.

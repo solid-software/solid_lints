@@ -428,6 +428,9 @@ domain folder:
            reason: "domain_models is only intended to be used in the domain
                     layer."
  ```
+
+Contributed by getBoolean (https://github.com/getBoolean).
+
 ### Parameters:
 - **entries** (_List&lt;AvoidUsingApiEntryParameters&gt;_)  
   A list of BannedCodeOption parameters.

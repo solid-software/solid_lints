@@ -11,6 +11,8 @@
   - avoid_unnecessary_type_casts
   - avoid_unrelated_type_assertions
   - avoid_unused_parameters
+  - avoid_using_api
+    Credits: getBoolean (https://github.com/getBoolean)
   - cyclomatic_complexity
   - double_literal_format
   - function_lines_of_code
