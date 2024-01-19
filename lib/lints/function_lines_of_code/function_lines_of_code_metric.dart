@@ -46,23 +46,35 @@ class FunctionLinesOfCodeMetric
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addDeclaration((node) {
-      if (node
-          case FunctionDeclaration() ||
-              MethodDeclaration() ||
-              FunctionExpression() ||
-              FunctionBody()) {
-        final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
-        node.visitChildren(visitor);
+    void checkNode(AstNode node) => _checkNode(resolver, reporter, node);
 
-        if (visitor.linesWithCode.length > config.parameters.maxLines) {
-          reporter.reportErrorForOffset(
-            code,
-            node.firstTokenAfterCommentAndMetadata.offset,
-            node.end,
-          );
-        }
+    context.registry.addFunctionDeclaration(checkNode);
+    context.registry.addFunctionExpression(checkNode);
+    context.registry.addFunctionBody(checkNode);
+    context.registry.addMethodDeclaration(checkNode);
+  }
+
+  void _checkNode(
+    CustomLintResolver resolver,
+    ErrorReporter reporter,
+    AstNode node,
+  ) {
+    final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
+    node.visitChildren(visitor);
+
+    if (visitor.linesWithCode.length > config.parameters.maxLines) {
+      if (node is AnnotatedNode) {
+        final startOffset = node.firstTokenAfterCommentAndMetadata.offset;
+        final lengthDifference = startOffset - node.offset;
+
+        reporter.reportErrorForOffset(
+          code,
+          startOffset,
+          node.length - lengthDifference,
+        );
+      } else {
+        reporter.reportErrorForNode(code, node);
       }
-    });
+    }
   }
 }
