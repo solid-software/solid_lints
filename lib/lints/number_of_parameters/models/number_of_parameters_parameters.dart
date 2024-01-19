@@ -1,7 +1,7 @@
 /// A data model class that represents the "number of parameters" input
 /// parameters.
 class NumberOfParametersParameters {
-  /// Maximum number of parameters
+  /// Maximum number of parameters allowed before a warning is triggered.
   final int maxParameters;
 
   static const _defaultMaxParameters = 2;

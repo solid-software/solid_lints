@@ -8,8 +8,53 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 
 // Inspired by TSLint (https://palantir.github.io/tslint/rules/prefer-conditional-expression/)
 
-/// A `prefer_conditional_expressions` rule which warns about
-/// simple if statements that can be replaced with conditional expressions
+/// Highlights simple "if" statements that can be replaced with conditional
+/// expressions
+///
+/// ### Example config:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - prefer_conditional_expressions:
+///       ignore_nested: true
+/// ```
+///
+/// ### Example
+///
+/// #### BAD:
+///
+/// ```dart
+/// // LINT
+/// if (x > 0) {
+///   x = 1;
+/// } else {
+///   x = 2;
+/// }
+///
+/// // LINT
+/// if (x > 0) x = 1;
+/// else x = 2;
+///
+/// int fn() {
+///   // LINT
+///   if (x > 0) {
+///     return 1;
+///   } else {
+///     return 2;
+///   }
+/// }
+/// ```
+///
+/// #### GOOD:
+///
+/// ```dart
+/// x = x > 0 ? 1 : 2;
+///
+/// int fn() {
+///   return x > 0 ? 1 : 2;
+/// }
+/// ```
 class PreferConditionalExpressionsRule
     extends SolidLintRule<PreferConditionalExpressionsParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of

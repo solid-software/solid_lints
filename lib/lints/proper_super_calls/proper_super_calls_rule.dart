@@ -4,9 +4,45 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// Checks that `super` calls in the initState and
-/// dispose methods are called in the correct order.
-
+/// Ensures that `super` calls are made in the correct order for the following
+/// StatefulWidget methods:
+///
+/// - `initState`
+/// - `dispose`
+///
+/// ### Example
+///
+/// #### BAD:
+///
+/// ```dart
+/// @override
+/// void initState() {
+///   print('');
+///   super.initState(); // LINT, super.initState should be called first.
+/// }
+///
+/// @override
+/// void dispose() {
+///   super.dispose(); // LINT, super.dispose should be called last.
+///   print('');
+/// }
+/// ```
+///
+/// #### GOOD:
+///
+/// ```dart
+/// @override
+/// void initState() {
+///   super.initState(); // OK
+///   print('');
+/// }
+///
+/// @override
+/// void dispose() {
+///   print('');
+///   super.dispose(); // OK
+/// }
+/// ```
 class ProperSuperCallsRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether the initState and dispose methods

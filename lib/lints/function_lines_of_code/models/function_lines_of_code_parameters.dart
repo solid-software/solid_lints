@@ -1,7 +1,8 @@
 /// A data model class that represents the "function lines of code" input
 /// parameters.
 class FunctionLinesOfCodeParameters {
-  /// Maximum number of lines
+  /// Maximum allowed number of lines of code (LoC) per function,
+  /// exceeding this limit triggers a warning.
   final int maxLines;
 
   static const _defaultMaxLines = 200;

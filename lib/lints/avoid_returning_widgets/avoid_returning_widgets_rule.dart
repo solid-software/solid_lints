@@ -5,7 +5,37 @@ import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 import 'package:solid_lints/utils/types_utils.dart';
 
-/// A rule which forbids returning widgets from functions and methods.
+/// A rule which warns about returning widgets from functions and methods.
+///
+/// Using functions instead of Widget subclasses for decomposing Widget trees
+/// may cause unexpected behavior and performance issues.
+///
+/// More details: https://github.com/flutter/flutter/issues/19269
+///
+/// ### Example
+///
+/// #### BAD:
+///
+/// ```dart
+/// Widget avoidReturningWidgets() => const SizedBox(); // LINT
+///
+/// class MyWidget extends StatelessWidget {
+///   Widget _test1() => const SizedBox(); // LINT
+///   Widget get _test3 => const SizedBox(); // LINT
+/// }
+/// ```
+///
+///
+/// #### GOOD:
+///
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     return const SizedBox();
+///   }
+/// }
+/// ```
 class AvoidReturningWidgetsRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we return a widget.

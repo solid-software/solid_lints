@@ -36,13 +36,14 @@ class MemberOrderingParameters {
   /// Config used for members of regular class
   final List<MemberGroup> groupsOrder;
 
-  /// Config used for members of widget class
+  /// Config used for members of Widget subclasses
   final List<MemberGroup> widgetsGroupsOrder;
 
-  /// Indicates if params should be in alphabetical order
+  /// Boolean flag; indicates whether params should be in alphabetical order
   final bool alphabetize;
 
-  /// Indicates if params should be in alphabetical order of their type
+  /// Boolean flag; indicates whether params should be in alphabetical order by
+  /// their static type
   final bool alphabetizeByType;
 
   /// Constructor for [MemberOrderingParameters] model

@@ -1,7 +1,6 @@
-/// A data model class that represents the cyclomatic complexity input
-/// paramters.
+/// Cyclomatic complexity metric limits configuration.
 class CyclomaticComplexityParameters {
-  /// Min value of complexity level
+  /// Threshold cyclomatic complexity level, exceeding it triggers a warning.
   final int maxComplexity;
 
   static const _defaultMaxComplexity = 2;

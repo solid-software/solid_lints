@@ -6,7 +6,35 @@ import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A number of parameters metric which checks whether we didn't exceed
-/// the maximum allowed number of parameters for a function or a method
+/// the maximum allowed number of parameters for a function, method or
+/// constructor.
+///
+/// ### Example:
+///
+/// Assuming config:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - number_of_parameters:
+///       max_parameters: 2
+/// ```
+///
+/// #### BAD:
+/// ```dart
+/// void fn(a, b, c) {} // LINT
+/// class C {
+///   void method(a, b, c) {} // LINT
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void fn(a, b) {} // OK
+/// class C {
+///   void method(a, b) {} // OK
+/// }
+/// ```
 class NumberOfParametersMetric
     extends SolidLintRule<NumberOfParametersParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of

@@ -5,7 +5,23 @@ import 'package:solid_lints/lints/cyclomatic_complexity/visitor/cyclomatic_compl
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A Complexity metric checks content of block and detects more easier solution
+/// Limit for the number of linearly independent paths through a program's
+/// source code.
+///
+/// Counts the number of code branches and loop statements within function and
+/// method bodies.
+///
+/// ### Example config:
+///
+/// This configuration will allow 10 code branchings per function body before
+/// triggering a warning.
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - cyclomatic_complexity:
+///       max_complexity: 10
+/// ```
 class CyclomaticComplexityMetric
     extends SolidLintRule<CyclomaticComplexityParameters> {
   /// The [LintCode] of this lint rule that represents the error if complexity

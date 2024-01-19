@@ -4,8 +4,44 @@ import 'package:solid_lints/lints/avoid_unused_parameters/avoid_unused_parameter
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A `avoid_unused_parameters` rule which
-/// warns about unused parameters
+/// Warns about unused function, method, constructor or factory parameters.
+///
+/// ### Example:
+/// #### BAD:
+/// ```dart
+/// void fun(String x) {} // LINT
+/// void fun2(String x, String y) { // LINT
+///   print(y);
+/// }
+///
+/// class TestClass {
+///   static void staticMethod(int a) {} // LINT
+///   void method(String s) {} // LINT
+///
+///   TestClass([int a]); // LINT
+///   factory TestClass.named(int a) { // LINT
+///     return TestClass();
+///   }
+/// }
+/// ```
+///
+/// #### OK:
+/// ```dart
+/// void fun(String _) {} // Replacing with underscores silences the warning
+/// void fun2(String _, String y) {
+///   print(y);
+/// }
+///
+/// class TestClass {
+///   static void staticMethod(int _) {} // OK
+///   void method(String _) {} // OK
+///
+///   TestClass([int _]); // OK
+///   factory TestClass.named(int _) { // OK
+///     return TestClass();
+///   }
+/// }
+/// ```
 class AvoidUnusedParametersRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.

@@ -13,15 +13,16 @@ import 'package:yaml/yaml.dart';
 ///
 /// Example:
 /// ```yaml
-/// rules:
-///   - avoid_using_api:
-///     severity: error
-///     entries:
-///       - identifier: wait
-///         class_name: Future
-///         source: dart:async
-///         reason: "Future.wait from dart:async isnt allowed"
-///         severity: warning
+/// custom_lint:
+///   rules:
+///     - avoid_using_api:
+///       severity: error
+///       entries:
+///         - identifier: wait
+///           class_name: Future
+///           source: dart:async
+///           reason: "Future.wait from dart:async isnt allowed"
+///           severity: warning
 /// ```
 class AvoidUsingApiParameters {
   /// A list of BannedCodeOption parameters.

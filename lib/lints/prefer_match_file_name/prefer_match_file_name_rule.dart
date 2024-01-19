@@ -6,8 +6,41 @@ import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 import 'package:solid_lints/utils/node_utils.dart';
 
-/// A `prefer_match_file_name` rule which warns about
-/// mismatch between file name and declared element inside
+/// Warns about a mismatch between file name and first declared element inside.
+///
+///
+/// ### Example
+///
+/// #### BAD:
+///
+/// File name: my_class.dart
+///
+/// ```dart
+/// class NotMyClass {} // LINT
+/// ```
+///
+/// File name: other_class.dart
+///
+/// ```dart
+/// class _OtherClass {}
+/// class SomethingPublic {}  // LINT
+/// ```
+///
+/// #### GOOD:
+///
+/// File name: my_class.dart
+///
+/// ```dart
+/// class MyClass {} // OK
+/// ```
+///
+/// File name: something_public.dart
+///
+/// ```dart
+/// class _OtherClass {}
+/// class SomethingPublic {}  // OK
+/// ```
+///
 class PreferMatchFileNameRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if iterable
   /// access can be simplified.

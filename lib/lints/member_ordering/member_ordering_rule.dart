@@ -5,9 +5,83 @@ import 'package:solid_lints/lints/member_ordering/models/member_ordering_paramet
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
-/// A `member_ordering` rule which
-/// warns about class members being in wrong order
-/// Custom order can be provided through config
+/// A lint which allows to enforce a particular class member ordering
+/// conventions.
+///
+/// ### Configuration format
+///
+/// The configuration uses a custom syntax for specifying members for ordering:
+/// ```
+/// annotation_modifiers_membertype
+/// ```
+/// Valid annotations: `overridden`, `protected`
+///
+/// Valid modifiers, in order of how they may appear in the final expression:
+/// - `private` / `public`
+/// - `static`
+/// - `late`
+/// - `var` / `final` / `const`
+/// - `nullable`
+/// - `named`
+/// - `factory`
+/// - `fields` / `getters` / `getters_setters` / `setters` / `constructors` /
+///   `methods` / `method`.
+///
+///
+/// Here are some examples of valid ordering group patterns:
+///
+/// - `public_static_const_fields`
+/// - `private_late_fields`
+/// - `private_nullable_fields`
+/// - `public_methods`
+/// - `overridden_methods`
+///
+/// It's also possible to specify ordering for custom-named class members:
+/// - `my_custom_name_method`
+/// - `dispose_method`
+///
+/// ### Example:
+///
+/// Assuming config:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - member_ordering:
+///       alphabetize: true
+///       order:
+///         - fields
+///         - getters_setters
+///         - methods
+/// ```
+///
+/// #### BAD:
+///
+/// ```dart
+/// class Example {
+///   int get getA => a; // LINT, getters-setters should be after fields
+///
+///   final b = 1;
+///   final a = 1; // LINT, non-alphabetic order
+///   final c = 1;
+///
+///   void method() {}
+/// }
+/// ```
+///
+/// #### GOOD:
+///
+/// ```dart
+/// class Example {
+///   final a = 1;
+///   final b = 1;
+///   final c = 1;
+///
+///   int get getA => a;
+///
+///   void method() {}
+/// }
+/// ```
 class MemberOrderingRule extends SolidLintRule<MemberOrderingParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.

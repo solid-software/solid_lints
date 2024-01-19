@@ -32,6 +32,92 @@ import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
 
 /// A `no_magic_number` rule which forbids having numbers without variable
+///
+/// There is a number of exceptions, where number literals are allowed:
+/// - Collection literals;
+/// - DateTime constructor usages;
+/// - In constant constructors, including Enums;
+/// - As a default value for parameters;
+/// - In constructor initializer lists;
+///
+/// ### Example config:
+///
+/// ```yaml
+/// custom_lint:
+///   rules:
+///     - no_magic_number:
+///       allowed: [12, 42]
+///       allowed_in_widget_params: true
+/// ```
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// double circumference(double radius) => 2 * 3.14 * radius; // LINT
+///
+/// bool canDrive(int age, {bool isUSA = false}) {
+///   return isUSA ? age >= 16 : age > 18; // LINT
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// const pi = 3.14;
+/// const radiusToDiameterCoefficient = 2;
+/// double circumference(double radius) =>
+///   radiusToDiameterCoefficient * pi * radius;
+///
+/// const usaDrivingAge = 16;
+/// const worldWideDrivingAge = 18;
+///
+/// bool canDrive(int age, {bool isUSA = false}) {
+///   return isUSA ? age >= usaDrivingAge : age > worldWideDrivingAge;
+/// }
+/// ```
+///
+/// ### Allowed
+/// ```dart
+/// class ConstClass {
+///   final int a;
+///   const ConstClass(this.a);
+///   const ConstClass.init() : a = 10;
+/// }
+///
+/// enum ConstEnum {
+///   // Allowed in enum arguments
+///   one(1),
+///   two(2);
+///
+///   final int value;
+///   const ConstEnum(this.value);
+/// }
+///
+/// // Allowed in const constructors
+/// const classInstance = ConstClass(1);
+///
+/// // Allowed in list literals
+/// final list = [1, 2, 3];
+///
+/// // Allowed in map literals
+/// final map = {1: 'One', 2: 'Two'};
+///
+/// // Allowed in indexed expression
+/// final result = list[1];
+///
+/// // Allowed in DateTime because it doesn't have const constructor
+/// final apocalypse = DateTime(2012, 12, 21);
+///
+/// // Allowed for defaults in constructors and methods.
+/// class DefaultValues {
+///   final int value;
+///   DefaultValues.named({this.value = 2});
+///   DefaultValues.positional([this.value = 3]);
+///
+///   void methodWithNamedParam({int value = 4}) {}
+///   void methodWithPositionalParam([int value = 5]) {}
+/// }
+/// ```
 class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error when having magic number.

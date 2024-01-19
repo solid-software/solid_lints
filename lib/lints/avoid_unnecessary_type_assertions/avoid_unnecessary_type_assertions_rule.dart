@@ -17,8 +17,29 @@ const operatorIsName = 'is';
 /// The name of 'whereType' method
 const whereTypeMethodName = 'whereType';
 
-/// An `avoid_unnecessary_type_assertions` rule which
-/// warns about unnecessary usage of `is` and `whereType` operators
+/// Warns about unnecessary usage of `is` and `whereType` operators.
+///
+/// ### Example:
+/// #### BAD:
+/// ```dart
+/// final testList = [1.0, 2.0, 3.0];
+/// final result = testList is List<double>; // LINT
+/// final negativeResult = testList is! List<double>; // LINT
+/// testList.whereType<double>(); // LINT
+///
+/// final double d = 2.0;
+/// final casted = d is double; // LINT
+/// ```
+///
+/// #### OK:
+/// ```dart
+/// final dynamicList = <dynamic>[1.0, 2.0];
+/// dynamicList.whereType<double>();
+///
+/// final double? nullableD = 2.0;
+/// // casting `Type? is Type` is allowed
+/// final castedD = nullableD is double;
+/// ```
 class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.

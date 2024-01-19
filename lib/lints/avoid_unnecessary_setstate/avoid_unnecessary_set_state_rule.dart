@@ -21,11 +21,27 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// - async methods
 /// - callbacks
 ///
-/// Example:
+/// ### Example:
+/// #### BAD:
 /// ```dart
 /// void initState() {
 ///   setState(() => foo = 'bar');  // lint
 ///   changeState();                // lint
+/// }
+///
+/// void changeState() {
+///   setState(() => foo = 'bar');
+/// }
+///
+/// void triggerFetch() async {
+///   await fetch();
+///   if (mounted) setState(() => foo = 'bar');
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void initState() {
 ///   triggerFetch();               // OK
 ///   stream.listen((event) => setState(() => foo = event)); // OK
 /// }
