@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+defaults:
+  run:
+    working-directory: ./doc/docusaurus
+
 jobs:
   test-deploy:
     name: Test deployment
@@ -17,6 +21,7 @@ jobs:
         with:
           node-version: 18
           cache: npm
+          cache-dependency-path: ./doc/docusaurus/package-lock.json
 
       - name: Install dependencies
         run: npm install --frozen-lockfile

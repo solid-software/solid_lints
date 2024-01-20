@@ -8,15 +8,16 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'solid_lints',
   tagline: 'solid_lints are cool',
-  url: 'https://solid-daniilmarchenko.github.io/',
+  url: 'https://solid-software.github.io/',
   baseUrl: '/solid_lints/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.png',
-  organizationName: 'solid-daniilmarchenko', // Usually your GitHub org/user name.
+  organizationName: 'solid_software', // Usually your GitHub org/user name.
   projectName: 'solid_lints', // Usually your repo name.
-  trailingSlash: false,
   deploymentBranch: 'web-docs-deployment',
+  trailingSlash: false,
+
    plugins: [
     [
       require.resolve("@easyops-cn/docusaurus-search-local"),
