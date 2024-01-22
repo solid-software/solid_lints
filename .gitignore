@@ -1,8 +1,4 @@
-#IDEA Files
-/.idea/
-
-# MacOS Files
-.DS_Store
+.idea/
 
 # Files and directories created by pub.
 .dart_tool/
@@ -15,5 +11,4 @@ build/
 # https://dart.dev/guides/libraries/private-files#pubspeclock.
 pubspec.lock
 
-# Logs from custom_lint package
 custom_lint.log
