@@ -12,3 +12,4 @@ build/
 pubspec.lock
 
 custom_lint.log
+solid_lints.iml
