@@ -126,6 +126,7 @@ class A {
 class B {
   /// expect_lint: function_lines_of_code
   void anon() {
+    /// expect_lint: function_lines_of_code
     test("addition", () {
       expect(1 + 1, equals(2));
       test("addition", () {
