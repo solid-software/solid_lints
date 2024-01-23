@@ -13,3 +13,6 @@ pubspec.lock
 
 custom_lint.log
 solid_lints.iml
+
+# Documentation generated files
+doc/docusaurus/docs
