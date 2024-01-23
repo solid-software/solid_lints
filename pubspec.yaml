@@ -1,12 +1,24 @@
 name: solid_lints
-description: Lints for Dart and Flutter based on software industry standards and best practices.
-version: 0.0.7
+description:
+  Lints for Dart and Flutter based on software industry standards and best
+  practices.
+version: 0.1.1
 homepage: https://github.com/solid-software/solid_lints/
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  collection: ^1.18.0
-  dart_code_metrics: ^4.9.0
-  path: ^1.9.0
+  analyzer: ^6.2.0
+  collection: ^1.17.2
+  custom_lint_builder: ^0.5.8
+  glob: ^2.1.2
+  path: ^1.8.3
+  yaml: ^3.1.2
+
+dev_dependencies:
+  # These packages are mandatory for some of tests
+  flutter:
+    sdk: flutter
+  test: ^1.24.6
+

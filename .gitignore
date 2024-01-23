@@ -1,4 +1,6 @@
-.idea/
+#IDEA Files
+/.idea/
+solid_lints.iml
 
 # Files and directories created by pub.
 .dart_tool/
@@ -11,8 +13,8 @@ build/
 # https://dart.dev/guides/libraries/private-files#pubspeclock.
 pubspec.lock
 
+# Logs from custom_lint package
 custom_lint.log
-solid_lints.iml
 
 # Documentation generated files
 doc/docusaurus/docs
