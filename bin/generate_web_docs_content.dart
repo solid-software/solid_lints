@@ -28,7 +28,7 @@ void main(List<String> rawArgs) async {
       defaultsTo: docusaurusDefaultPath,
     )
     ..addOption(
-      'output-dir',
+      'output-dirname',
       abbr: 'n',
       help: 'Output directory name for generated lints documentation files',
       defaultsTo: 'Lints Documentation',
@@ -62,7 +62,7 @@ void main(List<String> rawArgs) async {
   DocsParser(
     formatter: DocusaurusFormatter(
       docusaurusDocsDirPath: args['docs-dir'],
-      outputDirName: args['output-dir'],
+      outputDirName: args['output-dirname'],
       readmePath: args['readme'],
     ),
     ruleFileSuffixes: args['suffixes'],
