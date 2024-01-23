@@ -20,7 +20,7 @@ class DocsParser<T> extends BaseParser {
   });
 
   ///
-  T parse(Directory dir, {required bool sortRulesAlphabetically}) {
+  T parse(Directory dir, {bool sortRulesAlphabetically = true}) {
     final rulesDocs = _findRuleFiles(dir)
         .map(RuleParser.new)
         .map((parser) => parser.parse())
