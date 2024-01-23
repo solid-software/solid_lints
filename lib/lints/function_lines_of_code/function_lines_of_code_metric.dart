@@ -50,7 +50,6 @@ class FunctionLinesOfCodeMetric
 
     context.registry.addMethodDeclaration(checkNode);
     context.registry.addFunctionExpression(checkNode);
-    context.registry.addFunctionBody(checkNode);
   }
 
   void _checkNode(
