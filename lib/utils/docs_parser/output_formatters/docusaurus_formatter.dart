@@ -9,18 +9,27 @@ import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentat
 class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
   static final _markdownFormatter = MarkdownFormatter();
 
-  static const _docsDirectoryName = 'Lints Documentation';
-  static const _readmeFileName = 'README.md';
+  ///
+  final String docusaurusDocsDirPath;
 
-  static final _outputDirectoryPath = join(
-    Directory.current.path,
-    'doc/docusaurus/docs',
-  );
-  static final _outputDirectory = Directory(_outputDirectoryPath);
-  static final _docsDirectory =
-      Directory(join(_outputDirectoryPath, _docsDirectoryName));
-  static final _readmeFile =
-      File(join(Directory.current.path, _readmeFileName));
+  ///
+  final String outputDirName;
+
+  ///
+  final String readmePath;
+
+  final Directory _outputDirectory;
+  final Directory _docsDirectory;
+  final File _readmeFile;
+
+  ///
+  DocusaurusFormatter({
+    required this.docusaurusDocsDirPath,
+    required this.outputDirName,
+    required this.readmePath,
+  })  : _outputDirectory = Directory(docusaurusDocsDirPath),
+        _docsDirectory = Directory(join(docusaurusDocsDirPath, outputDirName)),
+        _readmeFile = File(readmePath);
 
   @override
   void format(List<RuleDoc> rules) {
@@ -29,9 +38,7 @@ class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
     }
     _docsDirectory.createSync(recursive: true);
 
-    File(
-      join(_outputDirectoryPath, 'intro.md'),
-    )
+    File(join(docusaurusDocsDirPath, 'intro.md'))
       ..createSync()
       ..writeAsStringSync(_readmeFile.readAsStringSync());
 
