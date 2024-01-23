@@ -10,16 +10,17 @@ permissions:
 
 jobs:
   build:
+    name: Generate docs content
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          sdk: 'stable'
+          channel: 'stable'
 
       - name: Install Dependencies
         run: dart pub get
@@ -27,7 +28,14 @@ jobs:
       - name: Generate documentation files
         run: dart run bin/generate_web_docs_content.dart -p lib/lints -o doc/docusaurus/docs -r README.md -s
 
+      - name: Create generated docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-docs
+          path: doc/docusaurus/docs
+
   deploy:
+    needs: build
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     defaults:
@@ -37,6 +45,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -45,8 +54,16 @@ jobs:
 
       - name: Install dependencies
         run: npm install --frozen-lockfile
+
+      - name: Download generated docs
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-docs
+          path: doc/docusaurus/docs
+
       - name: Build website
         run: npm run build
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
