@@ -9,7 +9,7 @@ const config = {
   title: 'solid_lints',
   tagline: 'solid_lints are cool',
   url: 'https://solid-software.github.io/',
-  baseUrl: '/solid_lints/',
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.png',
