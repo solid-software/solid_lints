@@ -1,8 +1,0 @@
-analyzer:
-  plugins:
-    - ../custom_lint
-
-custom_lint:
-  rules:
-    - prefer_conditional_expressions:
-      ignore_nested: true

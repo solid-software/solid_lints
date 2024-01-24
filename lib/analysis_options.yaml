@@ -1,104 +1,57 @@
 analyzer:
+  # Dart Code Metrics plugin (https://dartcodemetrics.dev/) provides many additional rules
+  # that helped to automate some pieces of our internal team code style based on the best
+  # industry practices.
   plugins:
-    - custom_lint
-  exclude:
-    # General generated files
-    - '**/*.g.dart'
-    - '**/*.gr.dart'
-
-    # Flutter
-    - 'lib/generated_plugin_registrant.dart'
-
-    # mockito
-    - '*.mocks.dart'
-    - '**/*.mocks.dart'
-
-    # freezed
-    - '**/*.freezed.dart'
-
-    # protobuf
-    - '**/*.pb.dart'
-
-    # test_coverage
-    - test/.test_coverage.dart
-
-  language:
-    # We've seen errors tied to use of implicit operations similar to the ones described in
-    # https://dart.dev/guides/language/analysis-options#enabling-additional-type-checks.
-    # When we do things explicitly there is less room for errors.
-    strict-casts: true
-    strict-raw-types: true
+    - dart_code_metrics
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
 
   errors:
     missing_required_param: error
     missing_return: error
     parameter_assignments: error
 
-custom_lint:
+dart_code_metrics:
+  metrics:
+    cyclomatic-complexity: 10
+    number-of-parameters: 7
+    source-lines-of-code: 200
+
+    # lines-of-code: 50
   rules:
-    - avoid_global_state
-
-    - avoid_late_keyword:
-      allow_initialized: true
-      ignored_types:
-        - AnimationController
-
-    - avoid_non_null_assertion
-    - avoid_returning_widgets
-    - avoid_unnecessary_setstate
-    - avoid_unnecessary_type_assertions
-    - avoid_unnecessary_type_casts
-    - avoid_unrelated_type_assertions
-    - avoid_unused_parameters
-
-    # NIST 500-235 item 2.5
-    - cyclomatic_complexity:
-      max_complexity: 10
-
-    - double_literal_format
-
-    # McConnell, S. (2004), Chapter 7.4: High-Quality Routines: How Long Can a Routine Be?. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 173-174
-    - function_lines_of_code:
-      max_lines: 200
-
-    - member_ordering:
-      order:
-        - fields
-        - getters_setters
-        - constructors
-        - methods
-      widgets_order:
-        - init_state_method
-        - build_method
-        - did_change_dependencies_method
-        - did_update_widget_method
-        - deactivate_method
-        - dispose_method
-
-    - newline_before_return
-    - no_empty_block
-    - no_equal_then_else
-
-    - no_magic_number:
-      allowed_in_widget_params: true
-
-    # McConnell, S. (2004), Chapter 7.5: High-Quality Routines: How To Use Routine Parameters. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 174-180
-    - number_of_parameters:
-      max_parameters: 7
-
-    - prefer_conditional_expressions:
-      ignore_nested: true
-
-    - prefer_first
-    - prefer_last
-   # This improves navigation by matching file content and file name.
-    - prefer_match_file_name
-    - proper_super_calls
+    - avoid-global-state
+    - avoid-late-keyword
+    - avoid-non-null-assertion
+    - avoid-returning-widgets
+    - avoid-unnecessary-setstate
+    - avoid-unnecessary-type-assertions
+    - avoid-unnecessary-type-casts
+    - avoid-unrelated-type-assertions
+    - avoid-unused-parameters
+    - double-literal-format
+    - member-ordering-extended:
+        order:
+          - fields
+          - getters-setters
+          - constructors
+          - methods
+    - newline-before-return
+    - no-empty-block
+    - no-equal-then-else
+    - no-magic-number
+    - prefer-conditional-expressions
+    - prefer-first
+    - prefer-last
+    - prefer-match-file-name
+  anti-patterns:
+    - long-method
+    - long-parameter-list
 
 linter:
   rules:
     - always_declare_return_types
-    - always_put_required_named_parameters_first
     - always_require_non_null_named_parameters
     - always_use_package_imports
     - annotate_overrides
@@ -109,10 +62,8 @@ linter:
     - avoid_empty_else
     - avoid_escaping_inner_quotes
     - avoid_field_initializers_in_const_classes
-    # We are already using the `parameter_assignments` lint.
-    # Adding final to parameters has the same effect as `parameter_assignments`
-    # so it doesn't make sense to use final parameters with `parameter_assignments`.
-    - avoid_final_parameters
+# available in later releases
+#    - avoid_final_parameters
     - avoid_function_literals_in_foreach_calls
     - avoid_implementing_value_types
     - avoid_init_to_null
@@ -121,7 +72,6 @@ linter:
     - avoid_positional_boolean_parameters
     - avoid_print
     - avoid_private_typedef_functions
-    - avoid_redundant_argument_values
     - avoid_relative_lib_imports
     - avoid_renaming_method_parameters
     - avoid_return_types_on_setters
@@ -139,23 +89,18 @@ linter:
     - camel_case_extensions
     - camel_case_types
     - cancel_subscriptions
-    # Similar to avoid-non-null-assertion, which is already used,
-    # basically it suggests to not ignore possible null value
-    - cast_nullable_to_non_nullable
     - close_sinks
     - comment_references
-    - conditional_uri_does_not_exist
+# available in later releases
+#    - conditional_uri_does_not_exist
     - constant_identifier_names
     - control_flow_in_finally
     - curly_braces_in_flow_control_structures
     - depend_on_referenced_packages
     - deprecated_consistency
-    # - diagnostic_describe_all_properties
+    - diagnostic_describe_all_properties
     - directives_ordering
-    # Pretty much agree with Passy & linter package.
-    # Our use case for Flutter for web where there are no flavors yet.
-    # So using dart-define is helpful.
-    #- do_not_use_environment
+    - do_not_use_environment
     - empty_catches
     - empty_constructor_bodies
     - empty_statements
@@ -164,31 +109,28 @@ linter:
     - file_names
     - hash_and_equals
     - implementation_imports
-    # deprecated rule in Flutter 3.7
-    # - invariant_booleans
-    # - iterable_contains_unrelated_type
-    - collection_methods_unrelated_type
+    - invariant_booleans
+    - iterable_contains_unrelated_type
     - join_return_with_assignment
     - leading_newlines_in_multiline_strings
     - library_names
     - library_prefixes
     - lines_longer_than_80_chars
-    # - list_remove_unrelated_type
+    - list_remove_unrelated_type
     - literal_only_boolean_expressions
     - no_adjacent_strings_in_list
     - no_duplicate_case_values
-    - no_leading_underscores_for_library_prefixes
-    - no_leading_underscores_for_local_identifiers
+# available in later releases
+#    - no_leading_underscores_for_library_prefixes
+#    - no_leading_underscores_for_local_identifiers
     - no_logic_in_create_state
     - no_runtimeType_toString
     - non_constant_identifier_names
-    - noop_primitive_operations
     - null_check_on_nullable_type_parameter
     - overridden_fields
     - package_names
     - package_prefixed_library_names
     - parameter_assignments
-    - prefer_adjacent_string_concatenation
     - prefer_asserts_in_initializer_lists
     - prefer_collection_literals
     - prefer_conditional_assignment
@@ -198,24 +140,11 @@ linter:
     - prefer_const_literals_to_create_immutables
     - prefer_constructors_over_static_methods
     - prefer_contains
-    # These two are incompatible, and one should be selected depending on your project's style.
-    # - prefer_double_quotes
-    # - prefer_single_quotes
-    # removed in Dart 3.0.0
-    # - prefer_equal_for_default_values
-    # Not used, as the default app template has a single statement return code generated.
-    # While this could be beneficial for Dart projects and maintaining code style, we are unaware
-    # of any substantial evidence that improves code when using expression function body
-    # vs single statement return. We are considering including this in Dart only lints.
-    #   - prefer_expression_function_bodies
+    - prefer_equal_for_default_values
+#   - prefer_expression_function_bodies
     - prefer_final_fields
     - prefer_final_in_for_each
     - prefer_final_locals
-    # While it is similar to `unnecessary_lambdas`,
-    # it forcefully replaces structural/procedural semantics with
-    # their functional counterparts.
-    # We think this is a stylistic choice and will leave it up to users.
-    # - prefer_foreach
     - prefer_for_elements_to_map_fromIterable
     - prefer_function_declarations_over_variables
     - prefer_generic_function_type_aliases
@@ -237,14 +166,14 @@ linter:
     - public_member_api_docs
     - recursive_getters
     - require_trailing_commas
-    - secure_pubspec_urls
+# available in later releases
+#    - secure_pubspec_urls
     - sized_box_for_whitespace
-    - sized_box_shrink_expand
+# available in later releases
+#    - sized_box_shrink_expand
     - slash_for_doc_comments
     - sort_child_properties_last
-    # We tend to use class organization close to standard Java convention, where fields come first.
-    # Martin, R. C. & Coplien, J. O. (2013), Chapter 10: Classes. Clean code: a handbook of agile software craftsmanship , Prentice Hall , Upper Saddle River, NJ [etc.] . 136
-    #    - sort_constructors_first
+#    - sort_constructors_first
     - sort_pub_dependencies
     - sort_unnamed_constructors_first
     - test_types_in_equals
@@ -255,10 +184,8 @@ linter:
     - unawaited_futures
     - unnecessary_await_in_return
     - unnecessary_brace_in_string_interps
-    - unnecessary_breaks
     - unnecessary_const
     - unnecessary_getters_setters
-    - unnecessary_lambdas
     - unnecessary_new
     - unnecessary_null_aware_assignments
     - unnecessary_null_checks
@@ -271,22 +198,19 @@ linter:
     - unnecessary_string_escapes
     - unnecessary_string_interpolations
     - unnecessary_this
-    - unnecessary_to_list_in_spreads
     - unrelated_type_equality_checks
     - unsafe_html
     - use_build_context_synchronously
-    - use_colored_box
-    - use_decorated_box
+# available in later releases
+#    - use_decorated_box
     - use_full_hex_values_for_flutter_colors
     - use_function_type_syntax_for_parameters
     - use_if_null_to_convert_nulls_to_bools
     - use_is_even_rather_than_modulo
     - use_named_constants
-    - use_raw_strings
     - use_rethrow_when_possible
     - use_setters_to_change_properties
     - use_string_buffers
-    - use_super_parameters
     - use_test_throws_matchers
     - valid_regexps
     - void_checks
