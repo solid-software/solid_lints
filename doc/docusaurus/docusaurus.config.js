@@ -8,13 +8,15 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'solid_lints',
   tagline: 'solid_lints are cool',
-  url: 'pub.dev/solid_lints',
-  baseUrl: '/',
+  url: 'https://solid-software.github.io/',
+  baseUrl: '/solid_lints/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.png',
   organizationName: 'solid_software', // Usually your GitHub org/user name.
   projectName: 'solid_lints', // Usually your repo name.
+  deploymentBranch: 'web-docs-deployment',
+  trailingSlash: false,
 
    plugins: [
     [
@@ -45,11 +47,15 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      tableOfContents: {
+        minHeadingLevel: 2,
+        maxHeadingLevel: 6,
+      },
       navbar: {
         title: 'solid_lints',
         logo: {
           alt: 'solid_lints Logo',
-          src: 'img/favicon.png',
+          src: 'img/favicon-xs.png',
         },
         items: [
           {

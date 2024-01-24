@@ -1,0 +1,74 @@
+name: Build and Deploy documentation to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Generate docs content
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: dart pub get
+
+      - name: Generate documentation files
+        run: dart run bin/generate_web_docs_content.dart -p lib/lints -o doc/docusaurus/docs -r README.md -s
+
+      - name: Create generated docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-docs
+          path: doc/docusaurus/docs
+
+  deploy:
+    needs: build
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: doc/docusaurus
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: doc/docusaurus/package-lock.json
+
+      - name: Install dependencies
+        run: npm install --frozen-lockfile
+
+      - name: Download generated docs
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-docs
+          path: doc/docusaurus/docs
+
+      - name: Build website
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: doc/docusaurus/build
+          publish_branch: web-docs-deployment
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com
