@@ -7,6 +7,14 @@ import 'package:solid_lints/src/utils/docs_parser/output_formatters/rules_docume
 
 /// Formatter that generates markdown files for every separate rule
 class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
+  static const _introFileMetadata = '''
+---
+sidebar_label: Overview
+sidebar_position: 0
+---  
+
+
+''';
   static final _markdownFormatter = MarkdownFormatter();
 
   final Directory _outputDirectory;
@@ -21,14 +29,13 @@ class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
 
   @override
   void format(List<RuleDoc> rules) {
-    if (_outputDirectory.existsSync()) {
-      _outputDirectory.deleteSync(recursive: true);
+    if (!_outputDirectory.existsSync()) {
+      _outputDirectory.createSync(recursive: true);
     }
-    _outputDirectory.createSync(recursive: true);
 
     File(join(_outputDirectory.parent.path, 'intro.md'))
       ..createSync()
-      ..writeAsStringSync(_readmeFile.readAsStringSync());
+      ..writeAsStringSync(_introFileMetadata + _readmeFile.readAsStringSync());
 
     rules.forEach(_createMarkdownFileForRule);
   }
