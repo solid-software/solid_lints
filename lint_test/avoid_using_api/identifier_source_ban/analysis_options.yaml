@@ -1,0 +1,12 @@
+analyzer:
+  plugins:
+    - ../../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_using_api:
+      severity: warning
+      entries:
+        - identifier: test
+          source: package:external_source
+          reason: "test methods from package:external_source is not allowed"

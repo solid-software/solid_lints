@@ -1,0 +1,11 @@
+name: avoid_late_keyword_allow_initialized_test
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+
+dev_dependencies:
+  solid_lints:
+    path: ../../
