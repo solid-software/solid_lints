@@ -36,12 +36,6 @@ void main(List<String> rawArgs) async {
           ' copied as docusaurus intro.md',
       defaultsTo: readmeDefaultPath,
     )
-    ..addFlag(
-      'sort-rules',
-      abbr: 's',
-      help: 'Sort rules alphabetically',
-      negatable: false,
-    )
     ..addMultiOption(
       'suffixes',
       help: 'Filename suffixes that should be parsed',
@@ -61,8 +55,5 @@ void main(List<String> rawArgs) async {
       readmePath: args['readme'],
     ),
     ruleFileSuffixes: args['suffixes'],
-  ).parse(
-    Directory(path),
-    sortRulesAlphabetically: args['sort-rules'],
-  );
+  ).parse(Directory(path));
 }
