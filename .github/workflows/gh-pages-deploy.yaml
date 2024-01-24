@@ -31,7 +31,6 @@ jobs:
             --path lib/lints
             --docs-dir doc/docusaurus/docs/generated
             --readme README.md
-            --sort-rules
 
       - name: Create generated docs artifact
         uses: actions/upload-artifact@v4
