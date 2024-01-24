@@ -5,14 +5,14 @@ import 'package:solid_lints/utils/docs_parser/models/rule_doc.dart';
 import 'package:solid_lints/utils/docs_parser/output_formatters/markdown_formatter.dart';
 import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
 
-///
+/// Formatter that generates markdown files for every separate rule
 class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
   static final _markdownFormatter = MarkdownFormatter();
 
   final Directory _outputDirectory;
   final File _readmeFile;
 
-  ///
+  /// DocusaurusFormatter
   DocusaurusFormatter({
     required String docusaurusDocsDirPath,
     required String readmePath,
