@@ -17,7 +17,7 @@ const config = {
   projectName: 'solid_lints',
   deploymentBranch: 'web-docs-deployment',
   trailingSlash: false,
-
+  staticDirectories: ['static'],
    plugins: [
     [
       require.resolve("@easyops-cn/docusaurus-search-local"),

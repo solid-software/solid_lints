@@ -11,7 +11,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'Write clean, maintainable code',
-    image: '/img/gears-gear-svgrepo-com.svg',
+    image: '/solid_lints/img/gears-gear-svgrepo-com.svg',
     description: (
       <>
         Focus on the logic, not the language.
@@ -20,7 +20,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Detect problems early',
-    image: '/img/wrenches-wrench-svgrepo-com.svg',
+    image: '/solid_lints/img/wrenches-wrench-svgrepo-com.svg',
     description: (
       <>
         Instantly detect and fix common problems.
