@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'solid_lints',
-  tagline: 'solid_lints are cool',
+  tagline: 'An opinionated set of lint rules based on industry standards.',
   url: 'https://solid-software.github.io/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
