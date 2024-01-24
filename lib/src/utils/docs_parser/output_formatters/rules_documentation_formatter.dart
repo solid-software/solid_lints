@@ -1,4 +1,4 @@
-import 'package:solid_lints/utils/docs_parser/models/rule_doc.dart';
+import 'package:solid_lints/src/utils/docs_parser/models/rule_doc.dart';
 
 /// Documentation formatter interface
 abstract class RulesDocumentationFormatter<T> {

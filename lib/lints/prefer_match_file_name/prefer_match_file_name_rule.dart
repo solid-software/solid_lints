@@ -4,7 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:solid_lints/lints/prefer_match_file_name/prefer_match_file_name_visitor.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
-import 'package:solid_lints/utils/node_utils.dart';
+import 'package:solid_lints/src/utils/node_utils.dart';
 
 /// Warns about a mismatch between file name and first declared element inside.
 ///

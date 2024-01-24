@@ -25,8 +25,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
-import 'package:solid_lints/utils/node_utils.dart';
-import 'package:solid_lints/utils/parameter_utils.dart';
+import 'package:solid_lints/src/utils/node_utils.dart';
+import 'package:solid_lints/src/utils/parameter_utils.dart';
 
 /// AST Visitor which finds all is expressions and checks if they are
 /// unrelated (result always false)

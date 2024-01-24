@@ -25,7 +25,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/lints/avoid_unnecessary_setstate/visitor/avoid_unnecessary_set_state_method_visitor.dart';
-import 'package:solid_lints/utils/types_utils.dart';
+import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// AST visitor which checks if class is State, in case yes checks its methods
 class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {

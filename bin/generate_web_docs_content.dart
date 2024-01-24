@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:path/path.dart';
-import 'package:solid_lints/utils/docs_parser/output_formatters/docusaurus_formatter.dart';
-import 'package:solid_lints/utils/docs_parser/parsers/docs_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/output_formatters/docusaurus_formatter.dart';
+import 'package:solid_lints/src/utils/docs_parser/parsers/docs_parser.dart';
 
 void main(List<String> rawArgs) async {
   final readmeDefaultPath = join(Directory.current.parent.path, 'README.md');
@@ -12,6 +12,7 @@ void main(List<String> rawArgs) async {
     'doc',
     'docusaurus',
     'docs',
+    'Lints Documentation',
   );
 
   final argsParser = ArgParser()
@@ -24,14 +25,9 @@ void main(List<String> rawArgs) async {
     ..addOption(
       'docs-dir',
       abbr: 'o',
-      help: 'Parser output path. i.e "docusaurus/docs" directory',
+      help: 'Parser output path. i.e "docusaurus/docs/Solid Lints" directory.'
+          'Please note that parent directory would be used to place the intro.md file',
       defaultsTo: docusaurusDefaultPath,
-    )
-    ..addOption(
-      'output-dirname',
-      abbr: 'n',
-      help: 'Output directory name for generated lints documentation files',
-      defaultsTo: 'Lints Documentation',
     )
     ..addOption(
       'readme',
@@ -39,12 +35,6 @@ void main(List<String> rawArgs) async {
       help: 'Path to the README.md file that should be'
           ' copied as docusaurus intro.md',
       defaultsTo: readmeDefaultPath,
-    )
-    ..addFlag(
-      'sort-rules',
-      abbr: 's',
-      help: 'Sort rules alphabetically',
-      negatable: false,
     )
     ..addMultiOption(
       'suffixes',
@@ -62,12 +52,8 @@ void main(List<String> rawArgs) async {
   DocsParser(
     formatter: DocusaurusFormatter(
       docusaurusDocsDirPath: args['docs-dir'],
-      outputDirName: args['output-dirname'],
       readmePath: args['readme'],
     ),
     ruleFileSuffixes: args['suffixes'],
-  ).parse(
-    Directory(path),
-    sortRulesAlphabetically: args['sort-rules'],
-  );
+  ).parse(Directory(path));
 }

@@ -33,7 +33,7 @@ import 'package:solid_lints/lints/member_ordering/models/member_group/member_gro
 import 'package:solid_lints/lints/member_ordering/models/member_group/method_member_group.dart';
 import 'package:solid_lints/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/lints/member_ordering/models/modifier.dart';
-import 'package:solid_lints/utils/types_utils.dart';
+import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// AST Visitor which finds all class members and checks if they are
 /// in order provided from rule config or default config

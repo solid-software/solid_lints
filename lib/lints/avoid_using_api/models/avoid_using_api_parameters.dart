@@ -1,7 +1,7 @@
 import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/lints/avoid_using_api/models/avoid_using_api_entry_parameters.dart';
-import 'package:solid_lints/utils/object_utils.dart';
-import 'package:solid_lints/utils/parameter_utils.dart';
+import 'package:solid_lints/src/utils/object_utils.dart';
+import 'package:solid_lints/src/utils/parameter_utils.dart';
 import 'package:yaml/yaml.dart';
 
 /// A data model class that represents the "avoid_using_api" input

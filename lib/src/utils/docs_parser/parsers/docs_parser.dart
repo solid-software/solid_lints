@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
-import 'package:solid_lints/utils/docs_parser/parsers/base_parser.dart';
-import 'package:solid_lints/utils/docs_parser/parsers/rule_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
+import 'package:solid_lints/src/utils/docs_parser/parsers/base_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/parsers/rule_parser.dart';
 
 ///
 class DocsParser<T> extends BaseParser {
