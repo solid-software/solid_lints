@@ -1,4 +1,4 @@
-# prefer-match-file-name
+# prefer_match_file_name
 
 This improves navigation by matching file content and file name.
 

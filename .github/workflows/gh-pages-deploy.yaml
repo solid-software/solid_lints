@@ -26,7 +26,11 @@ jobs:
         run: dart pub get
 
       - name: Generate documentation files
-        run: dart run bin/generate_web_docs_content.dart -p lib/lints -o doc/docusaurus/docs -r README.md -s
+        run: >
+          dart run bin/generate_web_docs_content.dart
+            --path lib/lints
+            --docs-dir doc/docusaurus/docs/generated
+            --readme README.md
 
       - name: Create generated docs artifact
         uses: actions/upload-artifact@v4

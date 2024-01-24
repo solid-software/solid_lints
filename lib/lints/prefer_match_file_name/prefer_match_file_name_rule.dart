@@ -8,6 +8,13 @@ import 'package:solid_lints/src/utils/node_utils.dart';
 
 /// Warns about a mismatch between file name and first declared element inside.
 ///
+/// This improves navigation by matching file content and file name.
+///
+/// ## Tests
+///
+/// State: **Disabled**.
+///
+/// It's acceptable to include stubs or other helper classes into the test file.
 ///
 /// ### Example
 ///

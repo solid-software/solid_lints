@@ -19,4 +19,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+docs/generated/*.md
+docs/intro.md
 package-lock.json
