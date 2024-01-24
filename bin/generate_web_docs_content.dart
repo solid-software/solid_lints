@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:path/path.dart';
-import 'package:solid_lints/utils/docs_parser/output_formatters/docusaurus_formatter.dart';
-import 'package:solid_lints/utils/docs_parser/parsers/docs_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/output_formatters/docusaurus_formatter.dart';
+import 'package:solid_lints/src/utils/docs_parser/parsers/docs_parser.dart';
 
 void main(List<String> rawArgs) async {
   final readmeDefaultPath = join(Directory.current.parent.path, 'README.md');

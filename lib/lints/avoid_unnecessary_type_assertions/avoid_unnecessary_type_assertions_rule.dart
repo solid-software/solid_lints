@@ -6,8 +6,8 @@ import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
-import 'package:solid_lints/utils/typecast_utils.dart';
-import 'package:solid_lints/utils/types_utils.dart';
+import 'package:solid_lints/src/utils/typecast_utils.dart';
+import 'package:solid_lints/src/utils/types_utils.dart';
 
 part 'avoid_unnecessary_type_assertions_fix.dart';
 

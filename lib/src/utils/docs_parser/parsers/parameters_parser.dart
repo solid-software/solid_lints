@@ -5,8 +5,8 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
-import 'package:solid_lints/utils/docs_parser/models/parameter_doc.dart';
-import 'package:solid_lints/utils/docs_parser/parsers/base_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/models/parameter_doc.dart';
+import 'package:solid_lints/src/utils/docs_parser/parsers/base_parser.dart';
 
 ///
 class ParametersParser extends BaseParser {

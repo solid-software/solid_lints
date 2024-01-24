@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:path/path.dart';
-import 'package:solid_lints/utils/docs_parser/models/rule_doc.dart';
-import 'package:solid_lints/utils/docs_parser/output_formatters/markdown_formatter.dart';
-import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
+import 'package:solid_lints/src/utils/docs_parser/models/rule_doc.dart';
+import 'package:solid_lints/src/utils/docs_parser/output_formatters/markdown_formatter.dart';
+import 'package:solid_lints/src/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
 
 /// Formatter that generates markdown files for every separate rule
 class DocusaurusFormatter implements RulesDocumentationFormatter<void> {

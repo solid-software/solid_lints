@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
-import 'package:solid_lints/utils/docs_parser/models/rule_doc.dart';
-import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
+import 'package:solid_lints/src/utils/docs_parser/models/rule_doc.dart';
+import 'package:solid_lints/src/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
 
 /// Markdown output formatter
 class MarkdownFormatter implements RulesDocumentationFormatter<String> {

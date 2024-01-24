@@ -1,4 +1,4 @@
-import 'package:solid_lints/utils/docs_parser/models/parameter_doc.dart';
+import 'package:solid_lints/src/utils/docs_parser/models/parameter_doc.dart';
 
 /// Lint rule documentation
 class RuleDoc {
