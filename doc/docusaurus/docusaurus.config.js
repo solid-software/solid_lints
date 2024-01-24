@@ -9,12 +9,12 @@ const config = {
   title: 'solid_lints',
   tagline: 'An opinionated set of lint rules based on industry standards.',
   url: 'https://solid-software.github.io/',
-  baseUrl: '/',
+  baseUrl: '/solid_lints/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.png',
-  organizationName: 'solid_software', // Usually your GitHub org/user name.
-  projectName: 'solid_lints', // Usually your repo name.
+  organizationName: 'solid_software',
+  projectName: 'solid_lints',
   deploymentBranch: 'web-docs-deployment',
   trailingSlash: false,
 

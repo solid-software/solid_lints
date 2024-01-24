@@ -28,9 +28,9 @@ jobs:
       - name: Generate documentation files
         run: >
           dart run bin/generate_web_docs_content.dart
-            --path lib/lints
-            --docs-dir doc/docusaurus/docs/generated
-            --readme README.md
+          --path lib/lints
+          --docs-dir doc/docusaurus/docs/generated
+          --readme README.md
 
       - name: Create generated docs artifact
         uses: actions/upload-artifact@v4
@@ -53,11 +53,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: npm
-          cache-dependency-path: doc/docusaurus/package-lock.json
+          cache: yarn
+          cache-dependency-path: doc/docusaurus/yarn.lock
 
       - name: Install dependencies
-        run: npm install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
       - name: Download generated docs
         uses: actions/download-artifact@v4
@@ -66,7 +66,7 @@ jobs:
           path: doc/docusaurus/docs
 
       - name: Build website
-        run: npm run build
+        run: yarn build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
