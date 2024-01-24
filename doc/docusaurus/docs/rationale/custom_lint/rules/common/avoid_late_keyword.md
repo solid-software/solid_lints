@@ -1,4 +1,4 @@
-# avoid-late-keyword
+# avoid_late_keyword
 
 ## Tests
 

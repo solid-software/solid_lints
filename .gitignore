@@ -15,6 +15,3 @@ pubspec.lock
 
 # Logs from custom_lint package
 custom_lint.log
-
-# Documentation generated files
-doc/docusaurus/docs

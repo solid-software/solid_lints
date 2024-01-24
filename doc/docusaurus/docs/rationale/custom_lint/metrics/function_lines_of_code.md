@@ -1,4 +1,4 @@
-# source-lines-of-code
+# function_lines_of_code
 
 We use the recommended value of **200** SLoC.
 
