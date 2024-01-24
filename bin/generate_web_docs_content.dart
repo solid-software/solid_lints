@@ -12,6 +12,7 @@ void main(List<String> rawArgs) async {
     'doc',
     'docusaurus',
     'docs',
+    'Lints Documentation',
   );
 
   final argsParser = ArgParser()
@@ -24,14 +25,9 @@ void main(List<String> rawArgs) async {
     ..addOption(
       'docs-dir',
       abbr: 'o',
-      help: 'Parser output path. i.e "docusaurus/docs" directory',
+      help: 'Parser output path. i.e "docusaurus/docs/Solid Lints" directory.'
+          'Please note that parent directory would be used to place the intro.md file',
       defaultsTo: docusaurusDefaultPath,
-    )
-    ..addOption(
-      'output-dirname',
-      abbr: 'n',
-      help: 'Output directory name for generated lints documentation files',
-      defaultsTo: 'Lints Documentation',
     )
     ..addOption(
       'readme',
@@ -62,7 +58,6 @@ void main(List<String> rawArgs) async {
   DocsParser(
     formatter: DocusaurusFormatter(
       docusaurusDocsDirPath: args['docs-dir'],
-      outputDirName: args['output-dirname'],
       readmePath: args['readme'],
     ),
     ruleFileSuffixes: args['suffixes'],

@@ -9,26 +9,14 @@ import 'package:solid_lints/utils/docs_parser/output_formatters/rules_documentat
 class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
   static final _markdownFormatter = MarkdownFormatter();
 
-  ///
-  final String docusaurusDocsDirPath;
-
-  ///
-  final String outputDirName;
-
-  ///
-  final String readmePath;
-
   final Directory _outputDirectory;
-  final Directory _docsDirectory;
   final File _readmeFile;
 
   ///
   DocusaurusFormatter({
-    required this.docusaurusDocsDirPath,
-    required this.outputDirName,
-    required this.readmePath,
+    required String docusaurusDocsDirPath,
+    required String readmePath,
   })  : _outputDirectory = Directory(docusaurusDocsDirPath),
-        _docsDirectory = Directory(join(docusaurusDocsDirPath, outputDirName)),
         _readmeFile = File(readmePath);
 
   @override
@@ -36,9 +24,9 @@ class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
     if (_outputDirectory.existsSync()) {
       _outputDirectory.deleteSync(recursive: true);
     }
-    _docsDirectory.createSync(recursive: true);
+    _outputDirectory.createSync(recursive: true);
 
-    File(join(docusaurusDocsDirPath, 'intro.md'))
+    File(join(_outputDirectory.parent.path, 'intro.md'))
       ..createSync()
       ..writeAsStringSync(_readmeFile.readAsStringSync());
 
@@ -46,7 +34,7 @@ class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
   }
 
   void _createMarkdownFileForRule(RuleDoc rule) => File(
-        join(_docsDirectory.path, '${rule.name}.md'),
+        join(_outputDirectory.path, '${rule.name}.md'),
       )
         ..createSync()
         ..writeAsString(
