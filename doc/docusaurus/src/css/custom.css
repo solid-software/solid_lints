@@ -6,26 +6,27 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: rgb(232,81,21);
-  --ifm-color-primary-dark: rgb(200, 75, 20);
-  --ifm-color-primary-darker: rgb(170, 70, 15);
-  --ifm-color-primary-darkest: rgb(217, 75, 20);
-  --ifm-color-primary-light:  rgb(200,75,20);
-  --ifm-color-primary-lighter: rgb(232,81,21);
-  --ifm-color-primary-lightest: rgb(240,90,30);
+  --ifm-color-primary: #0A54DB;
+  --ifm-color-primary-dark: #0847BA;
+  --ifm-color-primary-darker: #0847BA;
+  --ifm-color-primary-darkest: #073B99;
+  --ifm-color-primary-light: #0843AF;
+  --ifm-color-primary-lighter: #0948BC;
+  --ifm-color-primary-lightest: #0846B6;
+
   --ifm-code-font-size: 95%;
   
   /* Fixes text overflowing the sidebar. */
   --doc-sidebar-width: 350px !important;
 }
 
-.docusaurus-highlight-code-line {
-  background-color: rgba(0, 0, 0, 0.1);
-  display: block;
-  margin: 0 calc(-1 * var(--ifm-pre-padding));
-  padding: 0 var(--ifm-pre-padding);
-}
-
-html[data-theme='dark'] .docusaurus-highlight-code-line {
-  background-color: rgba(0, 0, 0, 0.3);
+[data-theme=‘dark’] {
+  --ifm-color-primary: #f2561d;
+  --ifm-color-primary-dark: #ee4a0e;
+  --ifm-color-primary-darker: #ec490e;
+  --ifm-color-primary-darkest: #f14e13;
+  --ifm-color-primary-light: #e9480d;
+  --ifm-color-primary-lighter: #f47343;
+  --ifm-color-primary-lightest: #f68f6a;
+  --ifm-background-color: #19191a;
 }
