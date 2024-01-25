@@ -3,7 +3,7 @@ sidebar_label: Main
 sidebar_position: 1
 ---
 
-# Main rule set
+# Main
 
 This is a pre-configured set of rules meant to be used for static analysis of application code.
 

@@ -3,7 +3,7 @@ sidebar_label: Test
 sidebar_position: 2
 ---
 
-# Test rule set
+# Test
 
 This is a pre-configured set of rules meant to be used in autotests.
 
