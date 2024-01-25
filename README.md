@@ -43,4 +43,5 @@ To indicate that your project is using Solid Lints, you can use the following ba
 
 # Documentation
 
-For more detailed information and guidelines on using Solid Lints, please refer to the documentation: https://solid-software.github.io/solid_lints/
+For more detailed information and guidelines on using Solid Lints, please refer to the documentation: 
+* https://solid-software.github.io/solid_lints/
