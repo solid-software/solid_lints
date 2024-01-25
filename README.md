@@ -40,3 +40,7 @@ To indicate that your project is using Solid Lints, you can use the following ba
 ```markdown
 [![style: solid](https://img.shields.io/badge/style-solid-orange)](https://pub.dev/packages/solid_lints)
 ```
+
+# Documentation
+
+For more detailed information and guidelines on using Solid Lints, please refer to the documentation: https://solid-software.github.io/solid_lints/
