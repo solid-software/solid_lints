@@ -75,22 +75,12 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Intro',
-                to: '/docs/intro',
-              },
-            ],
+            label: 'Docs',
+            to: '/docs/intro',
           },
           {
-            title: 'More',
-            items: [
-              {
-                label: 'GitHub',
-                href: 'https://github.com/solid-software/solid_lints',
-              },
-            ],
+            label: 'GitHub',
+            href: 'https://github.com/solid-software/solid_lints',
           },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Solid Software. Built with Docusaurus.`,
