@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:solid_lints/utils/types_utils.dart';
+import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// The AST visitor that will collect all Iterable access expressions
 /// which can be replaced with .last

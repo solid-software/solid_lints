@@ -4,7 +4,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/lints/avoid_late_keyword/models/avoid_late_keyword_parameters.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
-import 'package:solid_lints/utils/types_utils.dart';
+import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// Avoid `late` keyword
 ///

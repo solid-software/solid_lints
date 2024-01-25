@@ -1,18 +1,18 @@
-/// Single parameter documentation
+/// Lint rule parameter documentation
 class ParameterDoc {
   /// Parameter name
   final String name;
 
-  /// Parameter type
-  final String type;
-
   /// Parameter documentation
   final String doc;
 
-  /// ParameterDoc constructor
+  /// Parameter type
+  final String type;
+
+  ///
   const ParameterDoc({
     required this.name,
-    required this.type,
     required this.doc,
+    required this.type,
   });
 }

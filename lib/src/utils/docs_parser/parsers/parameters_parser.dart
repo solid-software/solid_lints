@@ -5,11 +5,11 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
-import 'package:solid_lints/utils/docs_parser/models/parameter_doc.dart';
-import 'package:solid_lints/utils/docs_parser/parser_utils.dart';
+import 'package:solid_lints/src/utils/docs_parser/models/parameter_doc.dart';
+import 'package:solid_lints/src/utils/docs_parser/parsers/base_parser.dart';
 
 ///
-class ParametersParser {
+class ParametersParser extends BaseParser {
   static const _parametersDir = 'models';
   static const _parametersSuffix = 'parameters';
 
@@ -47,9 +47,9 @@ class ParametersParser {
         final variableName = variable.lexeme.trim();
         if (variableName.startsWith('_')) continue;
 
-        final name = ParserUtils.camelCaseToSnakeCase(variableName);
+        final name = camelCaseToSnakeCase(variableName);
         final type = member.fields.type.toString();
-        final doc = ParserUtils.formatDocumentationComment(
+        final doc = formatDocumentationComment(
           member.documentationComment,
         );
 
@@ -78,8 +78,7 @@ class ParametersParser {
     return dir
         .listSync()
         .firstWhereOrNull(
-          (entity) =>
-              ParserUtils.fileNameSuffix(entity.uri) == _parametersSuffix,
+          (entity) => fileNameSuffix(entity.uri) == _parametersSuffix,
         )
         ?.path;
   }

@@ -1,6 +1,6 @@
-import 'package:solid_lints/utils/docs_parser/models/parameter_doc.dart';
+import 'package:solid_lints/src/utils/docs_parser/models/parameter_doc.dart';
 
-/// RuleDoc class defining documentation for the single linter rule
+/// Lint rule documentation
 class RuleDoc {
   /// Rule name
   final String name;
@@ -11,7 +11,7 @@ class RuleDoc {
   /// Rule parameters
   final List<ParameterDoc> parameters;
 
-  /// RuleDoc constructor
+  ///
   const RuleDoc({
     required this.name,
     required this.doc,

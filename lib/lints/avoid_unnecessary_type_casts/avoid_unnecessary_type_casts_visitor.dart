@@ -23,7 +23,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:solid_lints/utils/typecast_utils.dart';
+import 'package:solid_lints/src/utils/typecast_utils.dart';
 
 /// AST Visitor which finds all as expressions and checks if they are
 /// necessary

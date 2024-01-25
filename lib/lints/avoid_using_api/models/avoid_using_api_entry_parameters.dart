@@ -1,5 +1,5 @@
 import 'package:analyzer/error/error.dart';
-import 'package:solid_lints/utils/parameter_utils.dart';
+import 'package:solid_lints/src/utils/parameter_utils.dart';
 
 /// A data model class that represents the "entries" input
 /// parameters. All parameters are optional, which allows global variables,

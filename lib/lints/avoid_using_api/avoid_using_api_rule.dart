@@ -5,8 +5,8 @@ import 'package:solid_lints/lints/avoid_using_api/models/avoid_using_api_entry_p
 import 'package:solid_lints/lints/avoid_using_api/models/avoid_using_api_parameters.dart';
 import 'package:solid_lints/models/rule_config.dart';
 import 'package:solid_lints/models/solid_lint_rule.dart';
-import 'package:solid_lints/utils/parameter_utils.dart';
-import 'package:solid_lints/utils/path_utils.dart';
+import 'package:solid_lints/src/utils/parameter_utils.dart';
+import 'package:solid_lints/src/utils/path_utils.dart';
 
 /// A `avoid_using_api` rule which
 /// warns about usage of avoided APIs
