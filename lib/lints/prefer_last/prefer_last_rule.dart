@@ -19,7 +19,7 @@ import 'package:solid_lints/models/solid_lint_rule.dart';
 /// a.elementAt(a.length - 1); // LINT
 /// ```
 ///
-/// #### BAD:
+/// #### GOOD:
 ///
 /// ```dart
 /// final a = [1, 2, 3];
