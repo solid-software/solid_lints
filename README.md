@@ -5,6 +5,11 @@
 
 Flutter/Dart lints configuration based on software engineering industry standards (ISO/IEC, NIST) and best practices.
 
+# Documentation
+
+For more detailed information and guidelines on using Solid Lints, please refer to the documentation: 
+* https://solid-software.github.io/solid_lints/docs/intro
+
 # Usage
 
 Add dependency in your pubspec.yaml:
