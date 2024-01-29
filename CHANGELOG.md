@@ -1,7 +1,11 @@
+## 0.1.2
+
+- Moved implementation into the `src` folder
+
 ## 0.1.1
 
--Add example readme
--Update dependencies
+- Add example readme
+- Update dependencies
 
 ## 0.1.0
 

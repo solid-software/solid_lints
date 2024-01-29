@@ -51,13 +51,11 @@ custom_lint:
     - avoid_unrelated_type_assertions
     - avoid_unused_parameters
 
-    # NIST 500-235 item 2.5
     - cyclomatic_complexity:
       max_complexity: 10
 
     - double_literal_format
 
-    # McConnell, S. (2004), Chapter 7.4: High-Quality Routines: How Long Can a Routine Be?. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 173-174
     - function_lines_of_code:
       max_lines: 200
 
@@ -82,7 +80,6 @@ custom_lint:
     - no_magic_number:
       allowed_in_widget_params: true
 
-    # McConnell, S. (2004), Chapter 7.5: High-Quality Routines: How To Use Routine Parameters. Code Complete, Second Edition, Redmond, WA, USA: Microsoft Press. 174-180
     - number_of_parameters:
       max_parameters: 7
 
@@ -91,7 +88,6 @@ custom_lint:
 
     - prefer_first
     - prefer_last
-   # This improves navigation by matching file content and file name.
     - prefer_match_file_name
     - proper_super_calls
 
