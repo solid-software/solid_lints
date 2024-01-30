@@ -27,7 +27,7 @@ jobs:
 
       - name: Generate documentation files
         run: >
-          dart run bin/generate_web_docs_content.dart
+          dart run tool/generate_web_docs_content.dart
           --path lib/src/lints
           --docs-dir doc/docusaurus/docs/2_custom_lints
           --readme README.md

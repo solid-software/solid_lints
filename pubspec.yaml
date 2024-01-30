@@ -4,6 +4,8 @@ description:
   practices.
 version: 0.1.2
 homepage: https://github.com/solid-software/solid_lints/
+documentation: https://solid-software.github.io/solid_lints/docs/intro
+topics: [lints, linter, lint, analysis, analyzer]
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -17,15 +19,8 @@ dependencies:
   yaml: ^3.1.2
 
 dev_dependencies:
+  args: ^2.4.2
   # These packages are mandatory for some of tests
   flutter:
     sdk: flutter
   test: ^1.24.6
-
-platforms:
-  android:
-  ios:
-  linux:
-  macos:
-  web:
-  windows:
