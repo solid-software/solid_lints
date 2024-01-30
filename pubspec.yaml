@@ -4,6 +4,8 @@ description:
   practices.
 version: 0.1.2
 homepage: https://github.com/solid-software/solid_lints/
+documentation: https://solid-software.github.io/solid_lints/docs/intro
+topics: [lints, linter, lint, analysis, analyzer]
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
