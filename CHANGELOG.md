@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Bumped custom_lint package to 0.6.0 version
+
 ## 0.1.2
 
 - Moved implementation into the `src` folder
