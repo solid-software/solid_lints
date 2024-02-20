@@ -36,6 +36,7 @@ Then you can see suggestions in your IDE or you can run checks manually:
 
 ```bash
 dart analyze;
+dart run custom_lint;
 ```
 
 # Badge
