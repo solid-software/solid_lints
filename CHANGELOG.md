@@ -1,3 +1,9 @@
+## 0.1.4
+
+- Removed deprecated lints:
+  - `always_require_non_null_named_parameters`
+  - `avoid_returning_null_for_future`
+
 ## 0.1.3
 
 - Bumped custom_lint package to 0.6.0 version
