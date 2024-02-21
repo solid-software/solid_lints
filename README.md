@@ -8,7 +8,7 @@ Flutter/Dart lints configuration based on software engineering industry standard
 # Documentation
 
 For more detailed information and guidelines on using Solid Lints, please refer to the documentation: 
-* https://solid-software.github.io/solid_lints/docs/intro
+* https://lints.solid.software
 
 # Usage
 
@@ -36,6 +36,7 @@ Then you can see suggestions in your IDE or you can run checks manually:
 
 ```bash
 dart analyze;
+dart run custom_lint;
 ```
 
 # Badge
