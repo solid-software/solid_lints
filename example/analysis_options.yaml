@@ -19,6 +19,7 @@ custom_lint:
     - avoid_unnecessary_setstate
     - double_literal_format
     - avoid_unnecessary_type_assertions
+    - avoid_using_debug_print
     - avoid_using_api:
       severity: info
       entries:

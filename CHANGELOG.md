@@ -46,6 +46,7 @@
   - prefer_last
   - prefer_match_file_name
   - proper_super_calls
+  - avoid_using_debug_print
 
 ## 0.0.19
 
