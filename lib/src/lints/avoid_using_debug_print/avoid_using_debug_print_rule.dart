@@ -10,7 +10,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// debugPrint function from flutter/foundation.
 ///
 /// ### Example
-/// 
+///
 /// #### BAD:
 ///
 /// ```dart
@@ -64,15 +64,14 @@ class AvoidUsingDebugPrint extends SolidLintRule {
       },
     );
 
-    // addFunctionReference does not get triggered. 
-    // addVariableDeclaration and addAssignmentExpression 
+    // addFunctionReference does not get triggered.
+    // addVariableDeclaration and addAssignmentExpression
     // are used as a workaround for simple cases
 
     context.registry.addVariableDeclaration((node) {
       _handleVariableAssignmentDeclaration(
         node: node,
         reporter: reporter,
-        childEntities: node.childEntities,
       );
     });
 
@@ -80,7 +79,6 @@ class AvoidUsingDebugPrint extends SolidLintRule {
       _handleVariableAssignmentDeclaration(
         node: node,
         reporter: reporter,
-        childEntities: node.childEntities,
       );
     });
   }
@@ -111,15 +109,10 @@ class AvoidUsingDebugPrint extends SolidLintRule {
   void _handleVariableAssignmentDeclaration({
     required AstNode node,
     required ErrorReporter reporter,
-    required Iterable<SyntacticEntity> childEntities,
   }) {
     final rightOperand = _getRightOperand(node.childEntities.toList());
 
-    if (rightOperand == null) {
-      return;
-    }
-
-    if (rightOperand is! Identifier) {
+    if (rightOperand == null || rightOperand is! Identifier) {
       return;
     }
 
