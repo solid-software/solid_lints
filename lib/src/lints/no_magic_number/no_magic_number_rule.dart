@@ -60,7 +60,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   return isUSA ? age >= 16 : age > 18; // LINT
 /// }
 ///
-/// class Circle{
+/// class Circle {
 ///   final int r;
 ///   const Circle({required this.r});
 /// }
@@ -83,7 +83,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   return isUSA ? age >= usaDrivingAge : age > worldWideDrivingAge;
 /// }
 ///
-/// class Circle{
+/// class Circle {
 ///   final int r;
 ///   const Circle({required this.r});
 /// }
