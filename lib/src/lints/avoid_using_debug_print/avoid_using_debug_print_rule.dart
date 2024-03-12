@@ -6,11 +6,24 @@ import 'package:solid_lints/src/lints/avoid_using_debug_print/models/avoid_using
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-/// Gives warnings about using debugPrint
+/// A `avoid_using_debug_print` rule which forbids calling or referencing
+/// debugPrint function from flutter/foundation.
 ///
-/// ### Example:
+/// ### Example
+/// 
+/// #### BAD:
+///
 /// ```dart
-/// debugPrint(info)
+/// debugPrint(''); // LINT
+/// var ref = debugPrint; // LINT
+/// var ref2;
+/// ref2 = debugPrint; // LINT
+/// ```
+///
+/// #### GOOD:
+///
+/// ```dart
+/// log('');
 /// ```
 class AvoidUsingDebugPrint extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
@@ -52,38 +65,18 @@ class AvoidUsingDebugPrint extends SolidLintRule {
     );
 
     context.registry.addVariableDeclaration((node) {
-      final rightOperand = _getRightOperand(node.childEntities.toList());
-
-      if (rightOperand == null) {
-        return;
-      }
-
-      if (rightOperand is! Identifier) {
-        return;
-      }
-
-      _checkIdentifier(
-        identifier: rightOperand,
+      _handleVariableAssignmentDeclaration(
         node: node,
         reporter: reporter,
+        childEntities: node.childEntities,
       );
     });
 
     context.registry.addAssignmentExpression((node) {
-      final rightOperand = _getRightOperand(node.childEntities.toList());
-
-      if (rightOperand == null) {
-        return;
-      }
-
-      if (rightOperand is! Identifier) {
-        return;
-      }
-
-      _checkIdentifier(
-        identifier: rightOperand,
+      _handleVariableAssignmentDeclaration(
         node: node,
         reporter: reporter,
+        childEntities: node.childEntities,
       );
     });
   }
@@ -94,10 +87,6 @@ class AvoidUsingDebugPrint extends SolidLintRule {
     required AstNode node,
     required ErrorReporter reporter,
   }) {
-    if (!AvoidUsingDebugPrintFuncModel.canParseIdentifier(identifier)) {
-      return;
-    }
-
     final funcModel = AvoidUsingDebugPrintFuncModel.parseExpression(identifier);
 
     if (funcModel.hasSameName && funcModel.hasTheSameSource) {
@@ -112,5 +101,28 @@ class AvoidUsingDebugPrint extends SolidLintRule {
       return null;
     }
     return entities[2];
+  }
+
+  /// Handles variable assignment and declaration
+  void _handleVariableAssignmentDeclaration({
+    required AstNode node,
+    required ErrorReporter reporter,
+    required Iterable<SyntacticEntity> childEntities,
+  }) {
+    final rightOperand = _getRightOperand(node.childEntities.toList());
+
+    if (rightOperand == null) {
+      return;
+    }
+
+    if (rightOperand is! Identifier) {
+      return;
+    }
+
+    _checkIdentifier(
+      identifier: rightOperand,
+      node: node,
+      reporter: reporter,
+    );
   }
 }
