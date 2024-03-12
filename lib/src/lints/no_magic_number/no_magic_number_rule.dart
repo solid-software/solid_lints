@@ -59,6 +59,14 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// bool canDrive(int age, {bool isUSA = false}) {
 ///   return isUSA ? age >= 16 : age > 18; // LINT
 /// }
+///
+/// class Circle {
+///   final int r;
+///   const Circle({required this.r});
+/// }
+/// Circle(r: 5); // LINT
+/// var circle = Circle(r: 10); // LINT
+/// final circle2 = Circle(r: 10); // LINT
 /// ```
 ///
 /// #### GOOD:
@@ -74,6 +82,13 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// bool canDrive(int age, {bool isUSA = false}) {
 ///   return isUSA ? age >= usaDrivingAge : age > worldWideDrivingAge;
 /// }
+///
+/// class Circle {
+///   final int r;
+///   const Circle({required this.r});
+/// }
+/// const Circle(r: 5);
+/// const circle = Circle(r: 10)
 /// ```
 ///
 /// ### Allowed
@@ -174,11 +189,24 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
       (l is IntegerLiteral &&
           !config.parameters.allowedNumbers.contains(l.value));
 
-  bool _isNotInsideVariable(Literal l) =>
-      l.thisOrAncestorMatching(
-        (ancestor) => ancestor is VariableDeclaration,
-      ) ==
-      null;
+  bool _isNotInsideVariable(Literal l) {
+    // Whether we encountered such node,
+    // This is tracked because [InstanceCreationExpression] can be
+    // inside [VariableDeclaration] removing unwanted literals
+
+    bool isInstanceCreationExpression = false;
+    return l.thisOrAncestorMatching((ancestor) {
+          if (ancestor is InstanceCreationExpression) {
+            isInstanceCreationExpression = true;
+          }
+          if (isInstanceCreationExpression) {
+            return false;
+          } else {
+            return ancestor is VariableDeclaration;
+          }
+        }) ==
+        null;
+  }
 
   bool _isNotInDateTime(Literal l) =>
       l.thisOrAncestorMatching(
@@ -206,10 +234,9 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   }
 
   bool _isNotInsideConstConstructor(Literal l) =>
-      l.thisOrAncestorMatching(
-        (ancestor) =>
-            ancestor is InstanceCreationExpression && ancestor.isConst,
-      ) ==
+      l.thisOrAncestorMatching((ancestor) {
+        return ancestor is InstanceCreationExpression && ancestor.isConst;
+      }) ==
       null;
 
   bool _isNotInsideIndexExpression(Literal l) => l.parent is! IndexExpression;
