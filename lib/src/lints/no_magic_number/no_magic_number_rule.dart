@@ -59,6 +59,14 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// bool canDrive(int age, {bool isUSA = false}) {
 ///   return isUSA ? age >= 16 : age > 18; // LINT
 /// }
+///
+/// class Circle{
+///   final int r;
+///   const Circle({required this.r});
+/// }
+/// Circle(r: 5); // LINT
+/// var circle = Circle(r: 10); // LINT
+/// final circle2 = Circle(r: 10); // LINT
 /// ```
 ///
 /// #### GOOD:
@@ -74,6 +82,13 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// bool canDrive(int age, {bool isUSA = false}) {
 ///   return isUSA ? age >= usaDrivingAge : age > worldWideDrivingAge;
 /// }
+///
+/// class Circle{
+///   final int r;
+///   const Circle({required this.r});
+/// }
+/// const Circle(r: 5);
+/// const circle = Circle(r: 10)
 /// ```
 ///
 /// ### Allowed
