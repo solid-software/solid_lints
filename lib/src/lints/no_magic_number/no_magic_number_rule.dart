@@ -174,11 +174,24 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
       (l is IntegerLiteral &&
           !config.parameters.allowedNumbers.contains(l.value));
 
-  bool _isNotInsideVariable(Literal l) =>
-      l.thisOrAncestorMatching(
-        (ancestor) => ancestor is VariableDeclaration,
-      ) ==
-      null;
+  bool _isNotInsideVariable(Literal l) {
+    // Whether we encountered such node,
+    // This is tracked because [InstanceCreationExpression] can be
+    // inside [VariableDeclaration] removing unwanted literals
+
+    bool isInstanceCreationExpression = false;
+    return l.thisOrAncestorMatching((ancestor) {
+          if (ancestor is InstanceCreationExpression) {
+            isInstanceCreationExpression = true;
+          }
+          if (isInstanceCreationExpression) {
+            return false;
+          } else {
+            return ancestor is VariableDeclaration;
+          }
+        }) ==
+        null;
+  }
 
   bool _isNotInDateTime(Literal l) =>
       l.thisOrAncestorMatching(
@@ -206,10 +219,9 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   }
 
   bool _isNotInsideConstConstructor(Literal l) =>
-      l.thisOrAncestorMatching(
-        (ancestor) =>
-            ancestor is InstanceCreationExpression && ancestor.isConst,
-      ) ==
+      l.thisOrAncestorMatching((ancestor) {
+        return ancestor is InstanceCreationExpression && ancestor.isConst;
+      }) ==
       null;
 
   bool _isNotInsideIndexExpression(Literal l) => l.parent is! IndexExpression;
