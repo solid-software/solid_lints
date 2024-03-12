@@ -1,3 +1,7 @@
+## 0.1.5
+
+- Add `avoid_using_debug_print` rule
+
 ## 0.1.4
 
 - Removed deprecated lints:

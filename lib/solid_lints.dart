@@ -11,6 +11,7 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_type_casts/avoid_unneces
 import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unrelated_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
 import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart';
+import 'package:solid_lints/src/lints/avoid_using_debug_print/avoid_using_debug_print_rule.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_metric.dart';
@@ -59,6 +60,7 @@ class _SolidLints extends PluginBase {
       PreferLastRule.createRule(configs),
       PreferMatchFileNameRule.createRule(configs),
       ProperSuperCallsRule.createRule(configs),
+      AvoidUsingDebugPrint.createRule(configs),
     ];
 
     // Return only enabled rules
