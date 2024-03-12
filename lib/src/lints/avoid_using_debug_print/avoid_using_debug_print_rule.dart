@@ -64,6 +64,10 @@ class AvoidUsingDebugPrint extends SolidLintRule {
       },
     );
 
+    // addFunctionReference does not get triggered. 
+    // addVariableDeclaration and addAssignmentExpression 
+    // are used as a workaround for simple cases
+
     context.registry.addVariableDeclaration((node) {
       _handleVariableAssignmentDeclaration(
         node: node,
