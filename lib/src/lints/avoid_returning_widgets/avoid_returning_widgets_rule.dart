@@ -1,5 +1,4 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
@@ -65,29 +64,21 @@ class AvoidReturningWidgetsRule extends SolidLintRule {
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
-
-
-        if(node is! FunctionDeclaration || node is! MethodDeclaration){
-          return;
-        }
-
-       final isWidgetReturned= switch (node) {
-            
+      final isWidgetReturned = switch (node) {
         FunctionDeclaration(returnType: TypeAnnotation(:final type?)) ||
         MethodDeclaration(returnType: TypeAnnotation(:final type?)) =>
           hasWidgetType(type),
         _ => false,
       };
 
-      final isOverriden = switch (node) {
-    
-        MethodDeclaration(returnType: TypeAnnotation(:final type?)) =>
-          node.declaredElement.hasOverride;
-        _ => false,
-      };
+      if (node is! MethodDeclaration && node is! FunctionDeclaration) {
+        return;
+      }
+      print(node);
+      final isOverriden = node.declaredElement?.hasOverride ?? false;
 
       // `build` methods return widgets by nature
-      if (isWidgetReturned && node.declaredElement?.name != "build") {
+      if (isWidgetReturned && !isOverriden) {
         reporter.reportErrorForNode(code, node);
       }
     });
