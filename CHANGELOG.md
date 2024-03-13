@@ -1,6 +1,6 @@
 ## 0.1.5
 
-- Added `avoid_using_debug_print` rule
+- Added `avoid_debug_print` rule
 - Fixed an issue with no_magic_number lint
 
 ## 0.1.4
