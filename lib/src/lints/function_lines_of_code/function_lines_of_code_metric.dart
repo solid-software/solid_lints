@@ -51,6 +51,7 @@ class FunctionLinesOfCodeMetric
     void checkNode(AstNode node) => _checkNode(resolver, reporter, node);
 
     context.registry.addMethodDeclaration(checkNode);
+    context.registry.addFunctionDeclaration(checkNode);
     context.registry.addFunctionExpression(checkNode);
   }
 
@@ -59,8 +60,19 @@ class FunctionLinesOfCodeMetric
     ErrorReporter reporter,
     AstNode node,
   ) {
-    if (node is MethodDeclaration &&
-        config.parameters.excludeNames.contains(node.name.lexeme)) {
+    final name = () {
+      if (node is FunctionDeclaration) {
+        return node.name.lexeme;
+      } else if (node is MethodDeclaration) {
+        return node.name.lexeme;
+      } else if (node is FunctionExpression) {
+        return node.declaredElement?.name;
+      } else {
+        return null;
+      }
+    }();
+
+    if (name != null && config.parameters.excludeNames.contains(name)) {
       return;
     }
 
