@@ -2,11 +2,11 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_using_debug_print/models/avoid_using_debug_print_func_model.dart';
+import 'package:solid_lints/src/lints/avoid_debug_print/models/avoid_debug_print_func_model.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-/// A `avoid_using_debug_print` rule which forbids calling or referencing
+/// A `avoid_debug_print` rule which forbids calling or referencing
 /// debugPrint function from flutter/foundation.
 ///
 /// ### Example
@@ -25,23 +25,23 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```dart
 /// log('');
 /// ```
-class AvoidUsingDebugPrint extends SolidLintRule {
+class AvoidDebugPrint extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error when debugPrint is called
-  static const lintName = 'avoid_using_debug_print';
+  static const lintName = 'avoid_debug_print';
 
-  AvoidUsingDebugPrint._(super.config);
+  AvoidDebugPrint._(super.config);
 
-  /// Creates a new instance of [AvoidUsingDebugPrint]
+  /// Creates a new instance of [AvoidDebugPrint]
   /// based on the lint configuration.
-  factory AvoidUsingDebugPrint.createRule(CustomLintConfigs configs) {
+  factory AvoidDebugPrint.createRule(CustomLintConfigs configs) {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
       problemMessage: (_) => "Avoid using 'debugPrint'",
     );
 
-    return AvoidUsingDebugPrint._(rule);
+    return AvoidDebugPrint._(rule);
   }
 
   @override
@@ -89,7 +89,7 @@ class AvoidUsingDebugPrint extends SolidLintRule {
     required AstNode node,
     required ErrorReporter reporter,
   }) {
-    final funcModel = AvoidUsingDebugPrintFuncModel.parseExpression(identifier);
+    final funcModel = AvoidDebugPrintFuncModel.parseExpression(identifier);
 
     if (funcModel.hasSameName && funcModel.hasTheSameSource) {
       reporter.reportErrorForNode(code, node);

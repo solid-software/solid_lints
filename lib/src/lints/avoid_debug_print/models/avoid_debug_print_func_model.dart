@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
 /// A class used to parse function expression
-class AvoidUsingDebugPrintFuncModel {
+class AvoidDebugPrintFuncModel {
   /// Function name
   final String name;
 
@@ -9,36 +9,36 @@ class AvoidUsingDebugPrintFuncModel {
   final String sourcePath;
 
   /// A class used to parse function expression
-  const AvoidUsingDebugPrintFuncModel({
+  const AvoidDebugPrintFuncModel({
     required this.name,
     required this.sourcePath,
   });
 
   /// A constructor that parses identifier into [name] and [sourcePath]
-  factory AvoidUsingDebugPrintFuncModel.parseExpression(
+  factory AvoidDebugPrintFuncModel.parseExpression(
     Identifier identifier,
   ) {
     switch (identifier) {
       case PrefixedIdentifier():
         final prefix = identifier.prefix.name;
-        return AvoidUsingDebugPrintFuncModel(
+        return AvoidDebugPrintFuncModel(
           name: identifier.name.replaceAll('$prefix.', ''),
           sourcePath:
               identifier.staticElement?.librarySource?.uri.toString() ?? '',
         );
       case SimpleIdentifier():
-        return AvoidUsingDebugPrintFuncModel(
+        return AvoidDebugPrintFuncModel(
           name: identifier.name,
           sourcePath:
               identifier.staticElement?.librarySource?.uri.toString() ?? '',
         );
       default:
-        return AvoidUsingDebugPrintFuncModel._empty();
+        return AvoidDebugPrintFuncModel._empty();
     }
   }
 
-  factory AvoidUsingDebugPrintFuncModel._empty() {
-    return const AvoidUsingDebugPrintFuncModel(
+  factory AvoidDebugPrintFuncModel._empty() {
+    return const AvoidDebugPrintFuncModel(
       name: '',
       sourcePath: '',
     );
