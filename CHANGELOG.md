@@ -3,7 +3,7 @@
 - Added `avoid_using_debug_print` rule
 - Fixed an issue with no_magic_number lint
 - Improvement for `avoid_returning_widget` lint:
-  - allows overrides
+  - ignores methods that override ones that return widget (build() for example)
   - no longer allows returning widgets from methods/functions named build 
 
 ## 0.1.4
