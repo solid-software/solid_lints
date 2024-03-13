@@ -9,6 +9,11 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example:
 /// #### BAD:
 /// ```dart
+/// typedef MaxFun = int Function(int a, int b);
+/// final MaxFun bad = (int a, int b) => 1; // LINT
+/// final MaxFun tetsFun = (int a, int b) { // LINT
+///   return 4;
+/// };
 /// void fun(String x) {} // LINT
 /// void fun2(String x, String y) { // LINT
 ///   print(y);
@@ -27,6 +32,11 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///
 /// #### GOOD:
 /// ```dart
+/// typedef MaxFun = int Function(int a, int b);
+/// final MaxFun good = (int a, int b) => a + b;
+/// final MaxFun tetsFun = (int a, int b) {
+///   return a + b;
+/// };
 /// void fun(String _) {} // Replacing with underscores silences the warning
 /// void fun2(String _, String y) {
 ///   print(y);

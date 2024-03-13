@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_declarations, prefer_match_file_name
+// ignore_for_file: prefer_const_declarations, prefer_match_file_name, avoid_global_state
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations
 // ignore_for_file: unused_local_variable
 // ignore_for_file: unused_element
@@ -10,8 +10,41 @@ import 'package:flutter/material.dart';
 
 /// Check the `avoid_unused_parameters` rule
 
+typedef MaxFun = int Function(int a, int b);
+
+// expect_lint: avoid_unused_parameters
+final MaxFun bad = (int a, int b) => 1;
+
+final MaxFun good = (int a, _) => a;
+
+final MaxFun ok = (int _, int __) => 1;
+
+final MaxFun goodMax = (int a, int b) {
+  return a + b;
+};
+
+// good
+var k = (String g) {
+  return g;
+};
+
+// expect_lint: avoid_unused_parameters
+var c = (String g) {
+  return '0';
+};
+
+// expect_lint: avoid_unused_parameters
+final MaxFun tetsFun = (int a, int b) {
+  return 4;
+};
+
 // expect_lint: avoid_unused_parameters
 void fun(String s) {
+  return;
+}
+
+// expect_lint: avoid_unused_parameters
+void fun2(String s) {
   return;
 }
 
@@ -34,6 +67,14 @@ class TestClass2 {
 }
 
 class SomeOtherClass {
+  // expect_lint: avoid_unused_parameters
+  final MaxFun maxFunLint = (int a, int b) => 1;
+
+  // Good
+  final MaxFun good = (int a, int b) {
+    return a * b;
+  };
+
   // expect_lint: avoid_unused_parameters
   void method(String s) {
     return;
@@ -67,10 +108,10 @@ void closure(int a) {
   }
 }
 
-typedef MaxFun = int Function(int a, int b);
-
-// Allowed same way as override
+// expect_lint: avoid_unused_parameters
 final MaxFun maxFunInstance = (int a, int b) => 1;
+
+final MaxFun m = (_, __) => 1;
 
 class Foo {
   final int a;

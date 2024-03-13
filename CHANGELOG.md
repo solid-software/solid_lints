@@ -2,6 +2,7 @@
 
 - Added `avoid_using_debug_print` rule
 - Fixed an issue with no_magic_number lint
+- Fixed `avoid_unused_parameters` lint's bug regarding function variable assignment/declaration 
 
 ## 0.1.4
 

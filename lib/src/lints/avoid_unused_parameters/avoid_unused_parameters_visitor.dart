@@ -85,20 +85,17 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
-  void visitFunctionDeclaration(FunctionDeclaration node) {
-    super.visitFunctionDeclaration(node);
-
-    final parameters = node.functionExpression.parameters;
-
-    if (node.externalKeyword != null ||
-        (parameters == null || parameters.parameters.isEmpty)) {
+  void visitFunctionExpression(FunctionExpression node) {
+    super.visitFunctionExpression(node);
+    final params = node.parameters;
+    if (params == null) {
       return;
     }
 
     _unusedParameters.addAll(
       _getUnusedParameters(
-        node.functionExpression.body,
-        parameters.parameters,
+        node.body,
+        params.parameters,
       ).whereNot(nameConsistsOfUnderscoresOnly),
     );
   }
