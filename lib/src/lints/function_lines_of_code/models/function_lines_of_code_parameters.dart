@@ -5,7 +5,7 @@ class FunctionLinesOfCodeParameters {
   /// exceeding this limit triggers a warning.
   final int maxLines;
 
-  /// Method names to be excluded from the rule check
+  /// Function names to be excluded from the rule check
   final List<String> excludeNames;
 
   static const _defaultMaxLines = 200;

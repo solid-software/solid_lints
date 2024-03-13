@@ -60,19 +60,9 @@ class FunctionLinesOfCodeMetric
     ErrorReporter reporter,
     AstNode node,
   ) {
-    final name = () {
-      if (node is FunctionDeclaration) {
-        return node.name.lexeme;
-      } else if (node is MethodDeclaration) {
-        return node.name.lexeme;
-      } else if (node is FunctionExpression) {
-        return node.declaredElement?.name;
-      } else {
-        return null;
-      }
-    }();
-
-    if (name != null && config.parameters.excludeNames.contains(name)) {
+    final functionName = _getFunctionName(node);
+    if (functionName != null &&
+        config.parameters.excludeNames.contains(functionName)) {
       return;
     }
 
@@ -92,6 +82,18 @@ class FunctionLinesOfCodeMetric
         startOffset,
         node.length - lengthDifference,
       );
+    }
+  }
+
+  String? _getFunctionName(AstNode node) {
+    if (node is FunctionDeclaration) {
+      return node.name.lexeme;
+    } else if (node is MethodDeclaration) {
+      return node.name.lexeme;
+    } else if (node is FunctionExpression) {
+      return node.declaredElement?.name;
+    } else {
+      return null;
     }
   }
 }
