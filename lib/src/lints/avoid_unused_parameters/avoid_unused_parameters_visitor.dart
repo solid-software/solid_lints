@@ -76,13 +76,12 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     final isTearOff = _usedAsTearOff(node);
 
     if (!isOverride(node.metadata) && !isTearOff) {
-      final unused = _getUnusedParameters(
-        node.body,
-        parameters.parameters,
+      _unusedParameters.addAll(
+        _filterForFunctionsAndMethods(
+          node.body,
+          parameters.parameters,
+        ),
       );
-      final filteredUnused = _filterUnusedForFunctionAndMethods(unused);
-
-      _unusedParameters.addAll(filteredUnused);
     }
   }
 
@@ -93,13 +92,26 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     if (params == null) {
       return;
     }
-    final unused = _getUnusedParameters(
-      node.body,
-      params.parameters,
-    );
-    final filteredUnused = _filterUnusedForFunctionAndMethods(unused);
 
-    _unusedParameters.addAll(filteredUnused);
+    _unusedParameters.addAll(
+      _filterForFunctionsAndMethods(
+        node.body,
+        params.parameters,
+      ),
+    );
+  }
+
+  Iterable<FormalParameter> _filterForFunctionsAndMethods(
+    AstNode body,
+    Iterable<FormalParameter> parameters,
+  ) {
+    final unused = _getUnusedParameters(
+      body,
+      parameters,
+    );
+    return unused.whereNot(nameConsistsOfUnderscoresOnly).where(
+          (param) => !param.isNamed,
+        );
   }
 
   Set<FormalParameter> _getUnusedParameters(
@@ -144,15 +156,6 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     }
 
     return result;
-  }
-
-  Iterable<FormalParameter> _filterUnusedForFunctionAndMethods(
-    Iterable<FormalParameter> parameters,
-  ) {
-    //Removes all posible optional parameters
-    return parameters.whereNot(nameConsistsOfUnderscoresOnly).where(
-          (param) => !param.isNamed,
-        );
   }
 
   bool _usedAsTearOff(MethodDeclaration node) {
