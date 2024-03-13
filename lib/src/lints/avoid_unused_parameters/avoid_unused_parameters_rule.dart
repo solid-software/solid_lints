@@ -52,6 +52,18 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   }
 /// }
 /// ```
+///
+/// #### Allowed:
+/// ```dart
+/// typedef Named = String Function({required String text});
+/// final Named named = ({required text}) {
+///  return '';
+/// };
+/// final optional = (int a, [int b = 0]) {
+///   return a;
+/// };
+///
+/// ```
 class AvoidUnusedParametersRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we use bad formatted double literals.

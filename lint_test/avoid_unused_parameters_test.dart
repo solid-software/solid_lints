@@ -9,10 +9,18 @@
 import 'package:flutter/material.dart';
 
 /// Check the `avoid_unused_parameters` rule
+///
+void testNamed() {
+  SomeAnotherClass(
+    func: ({required text}) {},
+  );
+}
 
 typedef MaxFun = int Function(int a, int b);
 
 typedef Named = String Function({required String text});
+
+typedef ReqNamed = void Function({required String text});
 
 // expect_lint: avoid_unused_parameters
 final MaxFun bad = (int a, int b) => 1;
@@ -25,16 +33,16 @@ final MaxFun goodMax = (int a, int b) {
   return a + b;
 };
 
-// expect_lint: avoid_unused_parameters
 final Named _named = ({required text}) {
   return '';
 };
+
+void ch({String text = ''}) {}
 
 final Named _named2 = ({required text}) {
   return text;
 };
 
-// expect_lint: avoid_unused_parameters
 final Named _named3 = ({required text}) => '';
 
 final Named _named4 = ({required text}) => text;
@@ -46,7 +54,7 @@ final optional = (int a, [int b = 0]) {
 
 // expect_lint: avoid_unused_parameters
 final named = (int a, {required int b, int c = 0}) {
-  return a + c;
+  return c;
 };
 
 // good
@@ -108,6 +116,12 @@ class SomeOtherClass {
 }
 
 class SomeAnotherClass extends SomeOtherClass {
+  final ReqNamed func;
+
+  SomeAnotherClass({
+    required this.func,
+  });
+
   @override
   void method(String s) {}
 }
@@ -169,7 +183,14 @@ class TestWidget extends StatelessWidget {
     super.key,
     // expect_lint: avoid_unused_parameters
     int a = 1,
+    // expect_lint: avoid_unused_parameters
+    String k = '',
   });
+
+  // expect_lint: avoid_unused_parameters
+  factory TestWidget.a([int b = 0]) {
+    return TestWidget(k: '');
+  }
 
   @override
   Widget build(BuildContext context) {
