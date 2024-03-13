@@ -4,6 +4,7 @@ class FunctionLinesOfCodeParameters {
   /// Maximum allowed number of lines of code (LoC) per function,
   /// exceeding this limit triggers a warning.
   final int maxLines;
+
   /// Method names to be excluded from the rule check
   final List<String> excludeNames;
 
