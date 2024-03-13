@@ -14,6 +14,9 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// final MaxFun testFun = (int a, int b) { // LINT
 ///   return 4;
 /// };
+/// final optional = (int a, [int b = 0]) { // LINT
+///   return a;
+/// };
 /// void fun(String x) {} // LINT
 /// void fun2(String x, String y) { // LINT
 ///   print(y);
@@ -58,9 +61,6 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// typedef Named = String Function({required String text});
 /// final Named named = ({required text}) {
 ///  return '';
-/// };
-/// final optional = (int a, [int b = 0]) {
-///   return a;
 /// };
 ///
 /// ```
