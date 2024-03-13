@@ -77,7 +77,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
 
     if (!isOverride(node.metadata) && !isTearOff) {
       _unusedParameters.addAll(
-        _filterForFunctionsAndMethods(
+        _filterOutUnderscoresAndNamed(
           node.body,
           parameters.parameters,
         ),
@@ -94,14 +94,14 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     }
 
     _unusedParameters.addAll(
-      _filterForFunctionsAndMethods(
+      _filterOutUnderscoresAndNamed(
         node.body,
         params.parameters,
       ),
     );
   }
 
-  Iterable<FormalParameter> _filterForFunctionsAndMethods(
+  Iterable<FormalParameter> _filterOutUnderscoresAndNamed(
     AstNode body,
     Iterable<FormalParameter> parameters,
   ) {
