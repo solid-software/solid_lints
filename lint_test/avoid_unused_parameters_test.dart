@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 
 typedef MaxFun = int Function(int a, int b);
 
+typedef Named = String Function({required String text});
+
 // expect_lint: avoid_unused_parameters
 final MaxFun bad = (int a, int b) => 1;
 
@@ -21,6 +23,30 @@ final MaxFun ok = (int _, int __) => 1;
 
 final MaxFun goodMax = (int a, int b) {
   return a + b;
+};
+
+// expect_lint: avoid_unused_parameters
+final Named _named = ({required text}) {
+  return '';
+};
+
+final Named _named2 = ({required text}) {
+  return text;
+};
+
+// expect_lint: avoid_unused_parameters
+final Named _named3 = ({required text}) => '';
+
+final Named _named4 = ({required text}) => text;
+
+// expect_lint: avoid_unused_parameters
+final optional = (int a, [int b = 0]) {
+  return a;
+};
+
+// expect_lint: avoid_unused_parameters
+final named = (int a, {required int b, int c = 0}) {
+  return a + c;
 };
 
 // good
