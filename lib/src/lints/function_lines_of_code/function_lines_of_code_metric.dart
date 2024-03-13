@@ -16,6 +16,8 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   rules:
 ///     - function_lines_of_code:
 ///       max_lines: 100
+///       excludeNames:
+///         - "Build"
 /// ```
 class FunctionLinesOfCodeMetric
     extends SolidLintRule<FunctionLinesOfCodeParameters> {
@@ -57,6 +59,11 @@ class FunctionLinesOfCodeMetric
     ErrorReporter reporter,
     AstNode node,
   ) {
+    if (node is MethodDeclaration &&
+        config.parameters.excludeNames.contains(node.name.lexeme)) {
+      return;
+    }
+
     final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
     node.visitChildren(visitor);
 

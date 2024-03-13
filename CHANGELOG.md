@@ -2,6 +2,7 @@
 
 - Added `avoid_debug_print` rule
 - Fixed an issue with no_magic_number lint
+- Added `excludeNames` param for `function_lines_of_code` lint
 
 ## 0.1.4
 
