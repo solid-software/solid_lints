@@ -7,7 +7,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A number of parameters metric which checks whether we didn't exceed
 /// the maximum allowed number of parameters for a function, method or
-/// constructor.
+/// constructor. Methods or functions named 'copyWith' are excluded.
 ///
 /// ### Example:
 ///
@@ -35,6 +35,27 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   void method(a, b) {} // OK
 /// }
 /// ```
+///
+/// ### Allowed
+/// ```dart
+/// UserDto copyWith({
+///   String? email,
+///   String? firstName,
+///   String? id,
+///   String? imageUrl,
+///   String? lastName,
+///   String? phone,
+/// }) {
+///   return UserDto(
+///     email: email ?? this.email,
+///     firstName: firstName ?? this.firstName,
+///     id: id ?? this.id,
+///     imageUrl: imageUrl ?? this.imageUrl,
+///     lastName: lastName ?? this.lastName,
+///     phone: phone ?? this.phone,
+///   );
+/// }
+/// ```
 class NumberOfParametersMetric
     extends SolidLintRule<NumberOfParametersParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of
@@ -58,6 +79,10 @@ class NumberOfParametersMetric
     return NumberOfParametersMetric._(rule);
   }
 
+  bool _hasAllowedName(String name) {
+    return name == 'copyWith';
+  }
+
   @override
   void run(
     CustomLintResolver resolver,
@@ -65,6 +90,9 @@ class NumberOfParametersMetric
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
+      if (node is! MethodDeclaration && node is! FunctionDeclaration) {
+        return;
+      }
       final parameters = switch (node) {
         (final MethodDeclaration node) =>
           node.parameters?.parameters.length ?? 0,
@@ -73,7 +101,8 @@ class NumberOfParametersMetric
         _ => 0,
       };
 
-      if (parameters > config.parameters.maxParameters) {
+      if (parameters > config.parameters.maxParameters &&
+          !_hasAllowedName(node.declaredElement?.name ?? '')) {
         reporter.reportErrorForOffset(
           code,
           node.firstTokenAfterCommentAndMetadata.offset,

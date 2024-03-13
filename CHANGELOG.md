@@ -2,6 +2,7 @@
 
 - Added `avoid_using_debug_print` rule
 - Fixed an issue with no_magic_number lint
+- Excluded methods/functions named 'copyWith' from `number_of_parameters` lint
 
 ## 0.1.4
 
