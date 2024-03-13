@@ -7,7 +7,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A number of parameters metric which checks whether we didn't exceed
 /// the maximum allowed number of parameters for a function, method or
-/// constructor. Methods or functions named 'copyWith' are excluded.
+/// constructor. Methods named 'copyWith' are excluded.
 ///
 /// ### Example:
 ///
@@ -101,12 +101,21 @@ class NumberOfParametersMetric
         _ => 0,
       };
 
-      if (parameters > config.parameters.maxParameters &&
-          !_hasAllowedName(node.declaredElement?.name ?? '')) {
-        reporter.reportErrorForOffset(
+      final isMethod = node is MethodDeclaration;
+
+      final declaredElement = node.declaredElement;
+      if (declaredElement == null) {
+        return;
+      }
+      final shouldInclude = switch (isMethod) {
+        true => !_hasAllowedName(node.declaredElement?.name ?? ''),
+        false => true,
+      };
+
+      if (parameters > config.parameters.maxParameters && shouldInclude) {
+        reporter.reportErrorForElement(
           code,
-          node.firstTokenAfterCommentAndMetadata.offset,
-          node.end,
+          declaredElement,
         );
       }
     });

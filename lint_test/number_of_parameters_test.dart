@@ -3,8 +3,14 @@
 /// Check number of parameters fail
 ///
 /// `number_of_parameters: max_parameters`
-/// expect_lint: number_of_parameters
+
+// expect_lint: number_of_parameters
 String numberOfParameters(String a, String b, String c) {
+  return a + b + c;
+}
+
+// expect_lint: number_of_parameters
+String copyWith(String a, String b, String c) {
   return a + b + c;
 }
 
@@ -26,6 +32,25 @@ class UserDto {
   });
 
   UserDto copyWith({
+    String? email,
+    String? firstName,
+    String? id,
+    String? imageUrl,
+    String? lastName,
+    String? phone,
+  }) {
+    return UserDto(
+      email: email ?? this.email,
+      firstName: firstName ?? this.firstName,
+      id: id ?? this.id,
+      imageUrl: imageUrl ?? this.imageUrl,
+      lastName: lastName ?? this.lastName,
+      phone: phone ?? this.phone,
+    );
+  }
+
+// expect_lint: number_of_parameters
+  UserDto test({
     String? email,
     String? firstName,
     String? id,
