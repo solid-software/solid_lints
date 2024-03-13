@@ -11,6 +11,9 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 /// Using functions instead of Widget subclasses for decomposing Widget trees
 /// may cause unexpected behavior and performance issues.
 ///
+/// Exceptions:
+///   - overriden methods
+///
 /// More details: https://github.com/flutter/flutter/issues/19269
 ///
 /// ### Example
@@ -22,6 +25,7 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 ///
 /// class MyWidget extends StatelessWidget {
 ///   Widget get box => SizedBox(); // LINT
+///   Widget test1() => const SizedBox(); //LINT
 ///   Widget get _test3 => const SizedBox(); // LINT
 /// }
 /// ```
@@ -31,6 +35,9 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 ///
 /// ```dart
 /// class MyWidget extends MyWidget {
+///
+///   @override
+///   Widget test1() => const SizedBox();
 ///
 ///   @override
 ///   Widget get box => ColoredBox(color: Colors.pink);
