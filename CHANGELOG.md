@@ -1,11 +1,10 @@
-## 0.1.6
-
-- Improvement for avoid_returning_widget
-
 ## 0.1.5
 
 - Added `avoid_using_debug_print` rule
 - Fixed an issue with no_magic_number lint
+- Improvement for `avoid_returning_widget` lint:
+  - allows overrides
+  - no longer allows returning widgets from methods/functions named build 
 
 ## 0.1.4
 
