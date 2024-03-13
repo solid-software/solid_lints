@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
@@ -20,7 +21,7 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 /// Widget avoidReturningWidgets() => const SizedBox(); // LINT
 ///
 /// class MyWidget extends StatelessWidget {
-///   Widget _test1() => const SizedBox(); // LINT
+///   Widget get box => SizedBox(); // LINT
 ///   Widget get _test3 => const SizedBox(); // LINT
 /// }
 /// ```
@@ -29,7 +30,11 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 /// #### GOOD:
 ///
 /// ```dart
-/// class MyWidget extends StatelessWidget {
+/// class MyWidget extends MyWidget {
+///
+///   @override
+///   Widget get box => ColoredBox(color: Colors.pink);
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return const SizedBox();
@@ -51,7 +56,8 @@ class AvoidReturningWidgetsRule extends SolidLintRule {
       name: lintName,
       problemMessage: (_) =>
           'Returning a widget from a function is considered an anti-pattern. '
-          'Extract your widget to a separate class.',
+          'Unless you are overriding an existing method, '
+          'consider extracting your widget to a separate class.',
     );
 
     return AvoidReturningWidgetsRule._(rule);
@@ -64,20 +70,23 @@ class AvoidReturningWidgetsRule extends SolidLintRule {
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
-      final isWidgetReturned = switch (node) {
+      // Check if declaration is function or method,
+      // simultaneously checks if return type is [DartType]
+      final DartType? returnType = switch (node) {
         FunctionDeclaration(returnType: TypeAnnotation(:final type?)) ||
         MethodDeclaration(returnType: TypeAnnotation(:final type?)) =>
-          hasWidgetType(type),
-        _ => false,
+          type,
+        _ => null,
       };
 
-      if (node is! MethodDeclaration && node is! FunctionDeclaration) {
+      if (returnType == null) {
         return;
       }
-      print(node);
+
+      final isWidgetReturned = hasWidgetType(returnType);
+
       final isOverriden = node.declaredElement?.hasOverride ?? false;
 
-      // `build` methods return widgets by nature
       if (isWidgetReturned && !isOverriden) {
         reporter.reportErrorForNode(code, node);
       }
