@@ -2,6 +2,7 @@
 
 - Added `avoid_debug_print` rule
 - Fixed an issue with no_magic_number lint
+- Fixed unexpected avoid_unnecessary_type_assertions 
 
 ## 0.1.4
 
