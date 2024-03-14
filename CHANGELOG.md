@@ -2,6 +2,7 @@
 
 - Added `avoid_debug_print` rule
 - Fixed an issue with no_magic_number lint
+- Fixed `avoid_unused_parameters` to report positional parameters from typedef if their name are not underscores.
 - Improvement for `avoid_returning_widget` lint:
   - ignores methods that override ones that return widget (build() for example)
   - no longer allows returning widgets from methods/functions named build 
