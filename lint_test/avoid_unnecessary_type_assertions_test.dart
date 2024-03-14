@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_declarations
+// ignore_for_file: prefer_const_declarations, prefer_match_file_name, unused_element
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations
 // ignore_for_file: unnecessary_type_check
 // ignore_for_file: unused_local_variable
@@ -33,4 +33,15 @@ void fun() {
   final double? nullableD = 2.0;
   // casting `Type? is Type` is allowed
   final castedD = nullableD is double;
+}
+
+class _A {}
+
+class _B extends _A {}
+
+class _C extends _A {}
+
+void noLint() {
+  final _A a = _B();
+  if (a is! _C) return;
 }
