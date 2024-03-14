@@ -77,7 +77,7 @@ class TypeCast {
     if (!objectTypeCast.areGenericsWithSameTypeArgs) {
       return false;
     }
-    
+
     return !isReversed;
   }
 
