@@ -2,7 +2,11 @@
 
 - Added `avoid_debug_print` rule
 - Fixed an issue with no_magic_number lint
-- Fixed unexpected avoid_unnecessary_type_assertions 
+- Fixed `avoid_unused_parameters` to report positional parameters from typedef if their name are not underscores.
+- Improvement for `avoid_returning_widget` lint:
+  - ignores methods that override ones that return widget (build() for example)
+  - no longer allows returning widgets from methods/functions named build
+- Fixed unexpected avoid_unnecessary_type_assertions
 
 ## 0.1.4
 
@@ -87,12 +91,12 @@
 - Update `dart_code_metrics` dependency to 5.7.3
 - Rename deprecated `member-ordering-extended` to `member-ordering`
 - Add rule for widgets methods order configuration:
-    - initState
-    - build
-    - didChangeDependencies
-    - didUpdateWidget
-    - deactivate
-    - dispose
+  - initState
+  - build
+  - didChangeDependencies
+  - didUpdateWidget
+  - deactivate
+  - dispose
 
 ## 0.0.15
 
