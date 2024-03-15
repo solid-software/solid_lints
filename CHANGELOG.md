@@ -6,6 +6,7 @@
 - Improvement for `avoid_returning_widget` lint:
   - ignores methods that override ones that return widget (build() for example)
   - no longer allows returning widgets from methods/functions named build
+- Fixed unexpected avoid_unnecessary_type_assertions
 - Added `excludeNames` param for `function_lines_of_code` lint
 
 ## 0.1.4
