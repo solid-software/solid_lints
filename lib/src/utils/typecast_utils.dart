@@ -28,26 +28,30 @@ class TypeCast {
     this.isReversed = false,
   });
 
-  /// Returns the first type from source's supertypes
-  /// which is corresponding to target or null
-  DartType? castTypeInHierarchy() {
-    if (source.element == target.element) {
-      return source;
+  /// Checks that type checking is unnecessary
+  bool get isUnnecessaryTypeCheck {
+    final source = this.source;
+
+    if (_isNullableCompatibility) {
+      return false;
     }
 
-    final objectType = source;
-    if (objectType is InterfaceType) {
-      return objectType.allSupertypes.firstWhereOrNull(
-        (value) => value.element == target.element,
+    if (source.element == target.element) {
+      return _areGenericsWithSameTypeArgs;
+    }
+
+    if (source is InterfaceType) {
+      return source.allSupertypes.any(
+        (e) => e.element == target.element,
       );
     }
 
-    return null;
+    return false;
   }
 
   /// Checks for nullable type casts
   /// Only one case `Type? is Type` always valid assertion case.
-  bool get isNullableCompatibility {
+  bool get _isNullableCompatibility {
     final isObjectTypeNullable =
         source.nullabilitySuffix != NullabilitySuffix.none;
     final isCastedTypeNullable =
@@ -56,33 +60,8 @@ class TypeCast {
     return isObjectTypeNullable && !isCastedTypeNullable;
   }
 
-  /// Checks that type checking is unnecessary
-  /// [source] is the source expression type
-  /// [target] is the type against which the expression type is compared
-  /// and false for positive comparison, i.e. 'is', 'as' or 'whereType'
-  bool get isUnnecessaryTypeCheck {
-    if (isNullableCompatibility) {
-      return false;
-    }
-
-    final objectCastedType = castTypeInHierarchy();
-    if (objectCastedType == null) {
-      return isReversed;
-    }
-
-    final objectTypeCast = TypeCast(
-      source: objectCastedType,
-      target: target,
-    );
-    if (!objectTypeCast.areGenericsWithSameTypeArgs) {
-      return false;
-    }
-
-    return !isReversed;
-  }
-
   /// Checks for type arguments and compares them
-  bool get areGenericsWithSameTypeArgs {
+  bool get _areGenericsWithSameTypeArgs {
     if (source is DynamicType || target is DynamicType) {
       return false;
     }
