@@ -40,10 +40,10 @@ class _C {}
 
 void lint() {
   final _A a = _B();
-  // Always true
-  // expect_lint: avoid_unrelated_type_assertions
-  if (a is! _C) return;
   // Always false
   // expect_lint: avoid_unrelated_type_assertions
   if (a is _C) return;
+  // Always true
+  // expect_lint: avoid_unrelated_type_assertions
+  if (a is! _C) return;
 }
