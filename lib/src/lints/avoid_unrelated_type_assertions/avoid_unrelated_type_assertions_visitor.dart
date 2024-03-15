@@ -30,25 +30,24 @@ import 'package:collection/collection.dart';
 /// AST Visitor which finds all is expressions and checks if they are
 /// unrelated (result always false)
 class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
-  final _expressions = <IsExpression, String>{};
+  final _expressions = <IsExpression, bool>{};
 
-  /// All is expressions
-  Map<IsExpression, String> get expressions => _expressions;
+  /// Map of unrelated type checks and their results
+  Map<IsExpression, bool> get expressions => _expressions;
 
   @override
   void visitIsExpression(IsExpression node) {
     super.visitIsExpression(node);
 
     final castedType = node.type.type;
-    if (node.notOperator != null || castedType is TypeParameterType) {
+    if (castedType is TypeParameterType) {
       return;
     }
 
     final objectType = node.expression.staticType;
 
     if (_isUnrelatedTypeCheck(objectType, castedType)) {
-      _expressions[node] =
-          '${node.isOperator.keyword?.lexeme ?? ''}${node.notOperator ?? ''}';
+      _expressions[node] = node.notOperator != null;
     }
   }
 

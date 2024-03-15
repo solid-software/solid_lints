@@ -22,7 +22,7 @@ class AvoidUnrelatedTypeAssertionsRule extends SolidLintRule {
       configs: configs,
       name: lintName,
       problemMessage: (_) =>
-          'Avoid unrelated "is" assertion. The result is always "false".',
+          'Avoid unrelated "is" assertion. The result is always "{0}".',
     );
 
     return AvoidUnrelatedTypeAssertionsRule._(rule);
@@ -39,7 +39,11 @@ class AvoidUnrelatedTypeAssertionsRule extends SolidLintRule {
       visitor.visitIsExpression(node);
 
       for (final element in visitor.expressions.entries) {
-        reporter.reportErrorForNode(code, element.key);
+        reporter.reportErrorForNode(
+          code,
+          element.key,
+          [element.value.toString()],
+        );
       }
     });
   }

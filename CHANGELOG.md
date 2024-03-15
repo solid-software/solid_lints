@@ -8,6 +8,7 @@
   - no longer allows returning widgets from methods/functions named build
 - Fixed unexpected avoid_unnecessary_type_assertions
 - Added `excludeNames` param for `function_lines_of_code` lint
+- Improved `avoid_unrelated_type_assertions` to support true and false results
 
 ## 0.1.4
 
