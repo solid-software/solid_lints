@@ -9,6 +9,8 @@
 - Fixed unexpected avoid_unnecessary_type_assertions
 - Added `excludeNames` param for `function_lines_of_code` lint
 - Improved `avoid_unrelated_type_assertions` to support true and false results
+- Set default `cyclomatic_complexity` to 10 (https://github.com/solid-software/solid_lints/issues/146)
+  Credits: Arthur Miranda (https://github.com/arthurbcd)
 
 ## 0.1.4
 
