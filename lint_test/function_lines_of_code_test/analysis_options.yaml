@@ -1,0 +1,11 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - function_lines_of_code:
+      max_lines: 5
+      excludeNames:
+        - "longFunctionExcluded"
+        - "longMethodExcluded"

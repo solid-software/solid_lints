@@ -16,6 +16,8 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   rules:
 ///     - function_lines_of_code:
 ///       max_lines: 100
+///       excludeNames:
+///         - "Build"
 /// ```
 class FunctionLinesOfCodeMetric
     extends SolidLintRule<FunctionLinesOfCodeParameters> {
@@ -49,6 +51,7 @@ class FunctionLinesOfCodeMetric
     void checkNode(AstNode node) => _checkNode(resolver, reporter, node);
 
     context.registry.addMethodDeclaration(checkNode);
+    context.registry.addFunctionDeclaration(checkNode);
     context.registry.addFunctionExpression(checkNode);
   }
 
@@ -57,6 +60,12 @@ class FunctionLinesOfCodeMetric
     ErrorReporter reporter,
     AstNode node,
   ) {
+    final functionName = _getFunctionName(node);
+    if (functionName != null &&
+        config.parameters.excludeNames.contains(functionName)) {
+      return;
+    }
+
     final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
     node.visitChildren(visitor);
 
@@ -73,6 +82,18 @@ class FunctionLinesOfCodeMetric
         startOffset,
         node.length - lengthDifference,
       );
+    }
+  }
+
+  String? _getFunctionName(AstNode node) {
+    if (node is FunctionDeclaration) {
+      return node.name.lexeme;
+    } else if (node is MethodDeclaration) {
+      return node.name.lexeme;
+    } else if (node is FunctionExpression) {
+      return node.declaredElement?.name;
+    } else {
+      return null;
     }
   }
 }

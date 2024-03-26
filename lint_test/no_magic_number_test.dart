@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, avoid_returning_widgets
 // ignore_for_file: prefer_match_file_name
 // ignore_for_file: avoid_unused_parameters
 // ignore_for_file: no_empty_block
@@ -15,7 +15,7 @@ double correctCircumference(double radius) =>
     radiusToDiameterCoefficient * pi * radius;
 
 bool canDrive(int age, {bool isUSA = false}) {
-// expect_lint: no_magic_number
+  // expect_lint: no_magic_number
   return isUSA ? age >= 16 : age > 18;
 }
 
@@ -111,7 +111,39 @@ Widget build() {
   return MyWidget(
     // expect_lint: no_magic_number
     decoration: MyWidgetDecoration(size: 12),
+
     // expect_lint: no_magic_number
     value: 23,
   );
+}
+
+class TestOperation {
+  final double res;
+
+  const TestOperation({required this.res});
+}
+
+const n = 15;
+const m = 20;
+
+void checkOperationInConstructor() {
+  // expect_lint: no_magic_number
+  TestOperation(res: (5 / 5) * 20);
+
+  // expect_lint: no_magic_number
+  var variable = TestOperation(res: (n / m) * 20);
+
+  // expect_lint: no_magic_number
+  final finalVar = TestOperation(res: (10 / m + 4 + n));
+
+  // Allowed for constant expressions
+  const constVar = TestOperation(res: (10 / m + 4 + n));
+
+  var constVar2 = const TestOperation(res: 15 + (10 / n));
+
+  final l = [
+    // expect_lint: no_magic_number
+    TestOperation(res: 8),
+    const TestOperation(res: 9),
+  ];
 }

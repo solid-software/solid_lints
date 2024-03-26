@@ -5,16 +5,22 @@ class FunctionLinesOfCodeParameters {
   /// exceeding this limit triggers a warning.
   final int maxLines;
 
+  /// Function names to be excluded from the rule check
+  final List<String> excludeNames;
+
   static const _defaultMaxLines = 200;
 
   /// Constructor for [FunctionLinesOfCodeParameters] model
   const FunctionLinesOfCodeParameters({
     required this.maxLines,
+    required this.excludeNames,
   });
 
   /// Method for creating from json data
   factory FunctionLinesOfCodeParameters.fromJson(Map<String, Object?> json) =>
       FunctionLinesOfCodeParameters(
         maxLines: json['max_lines'] as int? ?? _defaultMaxLines,
+        excludeNames:
+            List<String>.from(json['excludeNames'] as Iterable? ?? []),
       );
 }
