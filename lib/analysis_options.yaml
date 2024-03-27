@@ -77,6 +77,7 @@ custom_lint:
     - newline_before_return
     - no_empty_block
     - no_equal_then_else
+    - reverse_if_to_avoid_nesting
 
     - no_magic_number:
       allowed_in_widget_params: true
