@@ -1,11 +1,11 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/reverse_if_to_avoid_nesting/visitors/reverse_if_to_avoid_nesting_visitor.dart';
+import 'package:solid_lints/src/lints/prefer_guard_clause/visitors/prefer_guard_clause_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-/// A `reverse_if_to_avoid_nesting` rule which forbids
-/// nesting of `if` statements if possible
+/// A `prefer_guard_clause` rule which promotes using guard clauses
+/// over nesting `if` statements
 ///
 /// ### Example
 ///
@@ -30,23 +30,24 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   c;
 /// }
 /// ```
-class ReverseIfToAvoidNestingRule extends SolidLintRule {
+class PreferGuardClauseRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if
   /// 'if' statements should be reversed
-  static const String lintName = 'reverse_if_to_avoid_nesting';
+  static const String lintName = 'prefer_guard_clause';
 
-  ReverseIfToAvoidNestingRule._(super.config);
+  PreferGuardClauseRule._(super.config);
 
-  /// Creates a new instance of [ReverseIfToAvoidNestingRule]
+  /// Creates a new instance of [PreferGuardClauseRule]
   /// based on the lint configuration.
-  factory ReverseIfToAvoidNestingRule.createRule(CustomLintConfigs configs) {
+  factory PreferGuardClauseRule.createRule(CustomLintConfigs configs) {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      problemMessage: (value) => "Use reverse `if` statement to avoid nesting",
+      problemMessage: (_) =>
+          "Prefer using guard clause over nesting `if` statements",
     );
 
-    return ReverseIfToAvoidNestingRule._(rule);
+    return PreferGuardClauseRule._(rule);
   }
 
   @override
@@ -56,7 +57,7 @@ class ReverseIfToAvoidNestingRule extends SolidLintRule {
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((node) {
-      final visitor = ReverseIfToAvoidNestingVisitor();
+      final visitor = PreferGuardClauseVisitor();
       node.accept(visitor);
 
       for (final element in visitor.nodes) {
