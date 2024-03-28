@@ -1,4 +1,4 @@
-// ignore_for_file: dead_code, cyclomatic_complexity, no_equal_then_else
+// ignore_for_file: dead_code, cyclomatic_complexity, no_equal_then_else, prefer_match_file_name
 
 // ignore: no_empty_block
 void _doSomething() {}
@@ -11,23 +11,21 @@ void onlyIf() {
 
 void onlyIfReturn() {
   if (true) {
-    _doSomething();
-
     return;
   }
 }
 
 void onlyIfReturnElse() {
-  // expect_lint: prefer_guard_close
+  // expect_lint: prefer_guard_clause
   if (true) {
-    _doSomething();
-  } else {
     return;
+  } else {
+    _doSomething();
   }
 }
 
 void onlyIfElseReturn() {
-  // expect_lint: prefer_guard_close
+  // expect_lint: prefer_guard_clause
   if (true) {
     _doSomething();
   } else {
@@ -62,7 +60,7 @@ void startWithElse() {
 }
 
 void startWithIfReturnElse() {
-  // expect_lint: prefer_guard_close
+  // expect_lint: prefer_guard_clause
   if (true) {
     return;
   } else {
@@ -72,7 +70,7 @@ void startWithIfReturnElse() {
 }
 
 void startWithIfElseReturn() {
-  // expect_lint: prefer_guard_close
+  // expect_lint: prefer_guard_clause
   if (true) {
     _doSomething();
   } else {
@@ -85,6 +83,22 @@ void startWithElseIf() {
   // no lint
   if (false) {
     _doSomething();
+  } else if (true) {
+    return;
+  } else {
+    return;
+  }
+  _doSomething();
+}
+
+void multipleElseIfs() {
+  // no lint
+  if (false) {
+    _doSomething();
+  } else if (true) {
+    return;
+  } else if (false) {
+    return;
   } else if (true) {
     return;
   } else {
@@ -124,7 +138,7 @@ void middleIfReturnWithReturn() {
 
 void endWithIf() {
   _doSomething();
-  // expect_lint: prefer_guard_close
+  // no lint
   if (true) {
     _doSomething();
   }
@@ -150,7 +164,7 @@ void endWithIfReturn() {
 
 void endWithIfReturnElse() {
   _doSomething();
-  // expect_lint: prefer_guard_close
+  // expect_lint: prefer_guard_clause
   if (true) {
     return;
   } else {
@@ -160,7 +174,7 @@ void endWithIfReturnElse() {
 
 void endWithIfElseReturn() {
   _doSomething();
-  // expect_lint: prefer_guard_close
+  // expect_lint: prefer_guard_clause
   if (true) {
     _doSomething();
   } else {
@@ -180,7 +194,7 @@ void endWithIfElseIf() {
 
 void endReturnWithIf() {
   _doSomething();
-  // expect_lint: prefer_guard_close
+  // no lint
   if (true) {
     _doSomething();
   }
@@ -214,26 +228,61 @@ void endReturnWithIfElse() {
 
 void endReturnWithIfReturnElse() {
   _doSomething();
-  // expect_lint: prefer_guard_close
+  // expect_lint: prefer_guard_clause
   if (true) {
     return;
   } else {
     _doSomething();
   }
-  _doSomething();
 
   return;
 }
 
 void endReturnWithIfElseReturn() {
   _doSomething();
-  // expect_lint: prefer_guard_close
+  // expect_lint: prefer_guard_clause
   if (true) {
     _doSomething();
   } else {
     return;
   }
+
+  return;
+}
+
+class A {
+  void act() {
+    // expect_lint: prefer_guard_clause
+    if (true) {
+      _doSomething();
+    } else {
+      return;
+    }
+  }
+}
+
+void nestedIfs() {
+  // expect_lint: prefer_guard_clause
+  if (true) {
+    if (true) {
+      if (true) {
+        _doSomething();
+      }
+    }
+  }
+
   _doSomething();
+}
+
+void nestedIfsReturn() {
+  // expect_lint: prefer_guard_clause
+  if (true) {
+    if (true) {
+      if (true) {
+        return;
+      }
+    }
+  }
 
   return;
 }

@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/prefer_guard_clause/visitors/prefer_guard_clause_visitor.dart';
@@ -56,7 +57,10 @@ class PreferGuardClauseRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addIfStatement((node) {
+    context.registry.addDeclaration((node) {
+      if (node is! FunctionDeclaration && node is! MethodDeclaration) {
+        return;
+      }
       final visitor = PreferGuardClauseVisitor();
       node.accept(visitor);
 
