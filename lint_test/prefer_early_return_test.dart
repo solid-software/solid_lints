@@ -20,7 +20,7 @@ void oneIfWithReturn() {
 }
 
 void nestedIf2() {
-  //expect_lint: reverse_if_to_reduce_nesting
+  //expect_lint: prefer_early_return
   if (true) {
     if (true) {
       _doSomething();
@@ -29,7 +29,7 @@ void nestedIf2() {
 }
 
 void nestedIf3() {
-  //expect_lint: reverse_if_to_reduce_nesting
+  //expect_lint: prefer_early_return
   if (true) {
     if (true) {
       if (true) {
@@ -40,7 +40,7 @@ void nestedIf3() {
 }
 
 void oneNestedIf2WithReturn() {
-  //expect_lint: reverse_if_to_reduce_nesting
+  //expect_lint: prefer_early_return
   if (true) {
     if (true) {
       if (true) {
@@ -82,7 +82,7 @@ void twoIfElse() {
 }
 
 void twoIfElseInner() {
-  //expect_lint: reverse_if_to_reduce_nesting
+  //expect_lint: prefer_early_return
   if (true) {
     if (true) {
       _doSomething();
@@ -93,7 +93,7 @@ void twoIfElseInner() {
 }
 
 void threeIf() {
-  //expect_lint: reverse_if_to_reduce_nesting
+  //expect_lint: prefer_early_return
   if (true) {
     if (true) {
       if (true) {
@@ -117,7 +117,7 @@ void threeIfElse1() {
 }
 
 void threeIfElse2() {
-  //expect_lint: reverse_if_to_reduce_nesting
+  //expect_lint: prefer_early_return
   if (true) {
     if (true) {
       if (true) {
@@ -130,7 +130,7 @@ void threeIfElse2() {
 }
 
 void threeIfElse3() {
-  //expect_lint: reverse_if_to_reduce_nesting
+  //expect_lint: prefer_early_return
   if (true) {
     if (true) {
       if (true) {

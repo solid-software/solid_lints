@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:solid_lints/src/lints/reverse_if_to_reduce_nesting/visitors/if_statement_visitor.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/visitors/if_statement_visitor.dart';
 
 /// The AST visitor that will collect all unnecessary if statements
-class ReverseIfToReduceNestingVisitor extends RecursiveAstVisitor<void> {
+class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
   final _nodes = <AstNode>[];
 
   /// All unnecessary if statements and conditional expressions.
@@ -33,7 +33,8 @@ class ReverseIfToReduceNestingVisitor extends RecursiveAstVisitor<void> {
   void _handleIfStatement(IfStatement node) {
     if (_isElseIfStatement(node)) return;
     if (_hasElseStatement(node)) return;
-    if (!_containsIfStatement(node.thenStatement)) return;
+    final containsNestedIfStatement = _containsIfStatement(node.thenStatement);
+    if (!containsNestedIfStatement) return;
 
     _nodes.add(node);
   }

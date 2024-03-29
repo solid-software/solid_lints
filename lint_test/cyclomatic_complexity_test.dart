@@ -1,4 +1,4 @@
-// ignore_for_file: literal_only_boolean_expressions, reverse_if_to_reduce_nesting
+// ignore_for_file: literal_only_boolean_expressions, prefer_early_return
 // ignore_for_file: no_empty_block, prefer_match_file_name
 
 /// Check complexity fail

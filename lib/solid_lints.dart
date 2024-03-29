@@ -26,7 +26,7 @@ import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
-import 'package:solid_lints/src/lints/reverse_if_to_reduce_nesting/reverse_if_to_reduce_nesting_rule.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_rule.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// Creates a plugin for our custom linter
@@ -62,7 +62,7 @@ class _SolidLints extends PluginBase {
       PreferMatchFileNameRule.createRule(configs),
       ProperSuperCallsRule.createRule(configs),
       AvoidDebugPrint.createRule(configs),
-      ReverseIfToReduceNestingRule.createRule(configs),
+      PreferEarlyReturnRule.createRule(configs),
     ];
 
     // Return only enabled rules
