@@ -15,10 +15,37 @@ class MathHelper {
       //expect_lint: feature_envy
       (r1.width * r1.height) + (r2.width * r2.height);
 
-  //no lint
+  //expect_lint: feature_envy
   int sumOfAreasButGood(Rectangle r1, Rectangle r2) => r1.area + r2.area;
 
   int sumOfAreasButGood2(Rectangle r1, Rectangle r2) =>
-      //no lint
+      //expect_lint: feature_envy
       r1.getArea() + r2.getArea();
+}
+
+class MathHelper2 {
+  int field;
+  MathHelper2(this.field);
+
+  int fieldTriple() => field * field * field;
+
+  //no lint
+  int sumOfAreas(Rectangle r1, Rectangle r2) => r1.area + r2.area;
+}
+
+class MathHelper3 {
+  int field;
+  MathHelper3(this.field);
+
+  int fieldDouble() => field * field;
+
+  //no lint
+  int sumOfAreas(Rectangle r1, Rectangle r2) => r1.area + r2.area;
+}
+
+class Cube {
+  List<Rectangle> sides;
+  Cube(this.sides);
+
+  int get surfaceArea => sides.map((x) => x.area).reduce((a, b) => a + b);
 }

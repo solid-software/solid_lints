@@ -32,7 +32,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// class B {
 ///   int method(A a) => a.method();
 /// }
-class FeatureEnvyRule extends SolidLintRule {
+class FeatureEnvyMetric extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents the error if
   /// 'if' statements or conditional expression is redundant
   static const String lintName = 'feature_envy';
@@ -40,18 +40,18 @@ class FeatureEnvyRule extends SolidLintRule {
 Don't access fields from class `A` in class `B`.
 Consider encapsulating logic related to class `B` in class `B`.''';
 
-  FeatureEnvyRule._(super.config);
+  FeatureEnvyMetric._(super.config);
 
-  /// Creates a new instance of [FeatureEnvyRule]
+  /// Creates a new instance of [FeatureEnvyMetric]
   /// based on the lint configuration.
-  factory FeatureEnvyRule.createRule(CustomLintConfigs configs) {
+  factory FeatureEnvyMetric.createRule(CustomLintConfigs configs) {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
       problemMessage: (value) => _problemMessage,
     );
 
-    return FeatureEnvyRule._(rule);
+    return FeatureEnvyMetric._(rule);
   }
 
   @override
@@ -60,7 +60,7 @@ Consider encapsulating logic related to class `B` in class `B`.''';
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addMethodDeclaration((node) {
+    context.registry.addClassDeclaration((node) {
       final visitor = FeatureEnvyVisitor();
       node.accept(visitor);
 
