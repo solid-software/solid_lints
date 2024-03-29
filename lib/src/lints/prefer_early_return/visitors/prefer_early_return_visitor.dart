@@ -26,9 +26,6 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
 
     if (!(nextStatementIsEmptyReturn || nextStatementIsNull)) return;
 
-    // limit to only handling cases with two ifs
-    if (ifStatements.length > 2) return;
-
     _handleIfStatement(ifStatements.last);
   }
 

@@ -210,3 +210,28 @@ void twoSeqentialIfSomething2() {
     _doSomething();
   }
 }
+
+void threeSeqentialIfReturn() {
+  //no lint
+  if (false) return;
+  if (true) return;
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
+  }
+
+  return;
+}
+
+void threeSeqentialIfReturn2() {
+  //no lint
+  if (false) return;
+  //no lint
+  if (true) {
+    _doSomething();
+  }
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
+  }
+}
