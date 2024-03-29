@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:solid_lints/src/lints/prefer_early_return/visitors/if_statement_visitor.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/visitors/return_statement_visitor.dart';
 
 /// The AST visitor that will collect all unnecessary if statements
 class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
@@ -12,32 +12,51 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitBlockFunctionBody(BlockFunctionBody node) {
     super.visitBlockFunctionBody(node);
+
     if (node.block.statements.isEmpty) return;
 
-    final first = node.block.statements.first;
+    final (ifStatements, nextStatement) = _getStartIfStatements(node);
+    if (ifStatements.isEmpty) return;
 
-    switch (node.block.statements.length) {
-      case 1:
-        if (first is IfStatement) _handleIfStatement(first);
-        return;
-      case 2:
-        final last = node.block.statements.last;
-        if (last is ReturnStatement && first is IfStatement) {
-          _handleIfStatement(first);
-        }
-      case _:
-        return;
-    }
+    // limit visitor to only work with functions
+    // that don't have a return statement or the return statementis empty
+    final nextStatementIsEmptyReturn =
+        nextStatement is ReturnStatement && nextStatement.expression == null;
+    final nextStatementIsNull = nextStatement == null;
+
+    if (!(nextStatementIsEmptyReturn || nextStatementIsNull)) return;
+
+    // limit to only handling cases with two ifs
+    if (ifStatements.length > 2) return;
+
+    _handleIfStatement(ifStatements.last);
   }
 
   void _handleIfStatement(IfStatement node) {
     if (_isElseIfStatement(node)) return;
     if (_hasElseStatement(node)) return;
-    final containsNestedIfStatement = _containsIfStatement(node.thenStatement);
-    if (!containsNestedIfStatement) return;
+    if (_hasReturnStatement(node)) return;
 
     _nodes.add(node);
   }
+}
+
+// returns a list of if statements at the start of the function
+// and the next statement after it
+// examples:
+// [if, if, if, return] -> ([if, if, if], return)
+// [if, if, if, _doSomething, return] -> ([if, if, if], _doSomething)
+// [if, if, if] -> ([if, if, if], null)
+(List<IfStatement>, Statement?) _getStartIfStatements(BlockFunctionBody body) {
+  final List<IfStatement> ifStatements = [];
+  for (final statement in body.block.statements) {
+    if (statement is IfStatement) {
+      ifStatements.add(statement);
+    } else {
+      return (ifStatements, statement);
+    }
+  }
+  return (ifStatements, null);
 }
 
 bool _hasElseStatement(IfStatement node) {
@@ -48,8 +67,8 @@ bool _isElseIfStatement(IfStatement node) {
   return node.elseStatement != null && node.elseStatement is IfStatement;
 }
 
-bool _containsIfStatement(Statement node) {
-  final visitor = IfStatementVisitor();
+bool _hasReturnStatement(Statement node) {
+  final visitor = ReturnStatementVisitor();
   node.accept(visitor);
   return visitor.nodes.isNotEmpty;
 }

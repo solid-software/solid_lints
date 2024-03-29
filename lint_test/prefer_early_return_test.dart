@@ -4,14 +4,23 @@
 void _doSomething() {}
 
 void oneIf() {
-  //no lint
+  //expect_lint: prefer_early_return
   if (true) {
     _doSomething();
   }
 }
 
-void oneIfWithReturn() {
+int oneIfWithReturnValue() {
   //no lint
+  if (true) {
+    _doSomething();
+  }
+
+  return 1;
+}
+
+void oneIfWithReturn() {
+  //expect_lint: prefer_early_return
   if (true) {
     _doSomething();
   }
@@ -26,6 +35,17 @@ void nestedIf2() {
       _doSomething();
     }
   }
+}
+
+int nestedIf2WithReturnValue() {
+  //no lint
+  if (true) {
+    if (true) {
+      _doSomething();
+    }
+  }
+
+  return 1;
 }
 
 void nestedIf3() {
@@ -139,5 +159,54 @@ void threeIfElse3() {
         _doSomething();
       }
     }
+  }
+}
+
+void twoSeqentialIf() {
+  if (false) return;
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
+  }
+}
+
+void twoSeqentialIfReturn() {
+  //no lint
+  if (false) return;
+  if (true) return;
+
+  return;
+}
+
+void twoSeqentialIfReturn2() {
+  //no lint
+  if (false) return;
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
+  }
+
+  return;
+}
+
+void twoSeqentialIfSomething() {
+  //no lint
+  if (false) return;
+  //no lint
+  if (true) {
+    _doSomething();
+  }
+
+  _doSomething();
+}
+
+void twoSeqentialIfSomething2() {
+  //no lint
+  if (true) {
+    _doSomething();
+  }
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
   }
 }
