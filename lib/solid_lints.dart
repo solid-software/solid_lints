@@ -14,6 +14,7 @@ import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_param
 import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
+import 'package:solid_lints/src/lints/feature_envy/feature_envy_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_metric.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
 import 'package:solid_lints/src/lints/newline_before_return/newline_before_return_rule.dart';
@@ -61,6 +62,7 @@ class _SolidLints extends PluginBase {
       PreferMatchFileNameRule.createRule(configs),
       ProperSuperCallsRule.createRule(configs),
       AvoidDebugPrint.createRule(configs),
+      FeatureEnvyRule.createRule(configs),
     ];
 
     // Return only enabled rules

@@ -51,6 +51,7 @@ custom_lint:
     - avoid_unrelated_type_assertions
     - avoid_unused_parameters
     - avoid_debug_print
+    - feature_envy
 
     - cyclomatic_complexity:
       max_complexity: 10
