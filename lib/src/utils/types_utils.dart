@@ -28,8 +28,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 
 extension Subtypes on DartType {
-  static final _genericsRegex = RegExp('<.*>');
-
   Iterable<DartType> get supertypes {
     final element = this.element;
     return element is InterfaceElement ? element.allSupertypes : [];
@@ -37,14 +35,91 @@ extension Subtypes on DartType {
 
   /// Formats the type string based on nullability and presence of generics.
   String getTypeString({
-    required bool withNullability,
     required bool withGenerics,
+    required bool withNullability,
   }) {
     final displayString = getDisplayString(withNullability: withNullability);
 
-    return withGenerics
-        ? displayString
-        : displayString.replaceFirst(_genericsRegex, '');
+    return withGenerics ? displayString : displayString.replaceGenericString();
+  }
+
+  /// Checks if a variable type is among the ignored types.
+  bool hasIgnoredType({required Set<String> ignoredTypes}) {
+    if (ignoredTypes.isEmpty) return false;
+
+    final checkedTypes = [this, ...supertypes];
+
+    ignoredTypes = getIntersectionTypesFor(ignoredTypes: ignoredTypes);
+    if (ignoredTypes.isEmpty) return false;
+
+    final ignoredTypeRegexes =
+        ignoredTypes.map((t) => t.getGeneralTypeRegex()).toSet();
+
+    for (final type in checkedTypes) {
+      final typeString =
+          type.getTypeString(withGenerics: true, withNullability: false);
+
+      for (final regex in ignoredTypeRegexes) {
+        if (typeString.contains(regex)) return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Returns a set of intersection types between the current types and
+  /// ignored types.
+  Set<String> getIntersectionTypesFor({required Set<String> ignoredTypes}) {
+    final checkedTypes = [this, ...supertypes];
+
+    final uniqueIgnoredTypeStrings = ignoredTypes
+        .map(
+          (s) => s.replaceGenericString(),
+        )
+        .toSet();
+
+    final uniqueCheckedTypeStrings = checkedTypes
+        .map(
+          (t) => t.getTypeString(withGenerics: false, withNullability: false),
+        )
+        .toSet();
+
+    final intersectionUniqueTypes =
+        uniqueCheckedTypeStrings.intersection(uniqueIgnoredTypeStrings);
+
+    // Filters and returns the set of ignored types that match
+    // any intersection types.
+    return ignoredTypes.where(
+      (ignoredType) {
+        return intersectionUniqueTypes.firstWhereOrNull(
+              (uniqueType) => ignoredType.contains(uniqueType),
+            ) !=
+            null;
+      },
+    ).toSet();
+  }
+}
+
+extension TypeString on String {
+  static const _baseTypeReplacement = '.*';
+  static final _genericRegex = RegExp('<.*>');
+  static final _baseTypesRegex = [
+    RegExp('dynamic'),
+    RegExp('Object'),
+    RegExp('Object?'),
+  ];
+
+  bool get hasGenericString => contains(_genericRegex);
+
+  String replaceGenericString() => replaceFirst(_genericRegex, '');
+
+  RegExp getGeneralTypeRegex() {
+    var out = this;
+    for (final regex in _baseTypesRegex) {
+      out = out.replaceAll(regex, _baseTypeReplacement);
+    }
+
+    return RegExp(out);
   }
 }
 

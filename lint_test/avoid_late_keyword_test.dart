@@ -39,9 +39,19 @@ class AvoidLateKeyword {
 
   late final na2 = NotAllowed();
 
-  late final Subscription subscription1;
+  /// expect_lint: avoid_late_keyword
+  late final Subscription<String> subscription1;
 
-  late final Subscription<List<Map<String, dynamic>>> subscription2;
+  late final Subscription<List<String>> subscription2;
+
+  late final Subscription<List<List<int>>> subscription3;
+
+  late final Subscription<Map<dynamic, String>> subscription4;
+
+  /// expect_lint: avoid_late_keyword
+  late final Subscription<Map<String, dynamic>> subscription5;
+
+  late final Subscription<Map<List<String>, String>> subscription6;
 
   void test() {
     late final ColorTween colorTween;
