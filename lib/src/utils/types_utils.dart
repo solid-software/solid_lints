@@ -28,9 +28,23 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 
 extension Subtypes on DartType {
+  static final _genericsRegex = RegExp('<.*>');
+
   Iterable<DartType> get supertypes {
     final element = this.element;
     return element is InterfaceElement ? element.allSupertypes : [];
+  }
+
+  /// Formats the type string based on nullability and presence of generics.
+  String getTypeString({
+    required bool withNullability,
+    required bool withGenerics,
+  }) {
+    final displayString = getDisplayString(withNullability: withNullability);
+
+    return withGenerics
+        ? displayString
+        : displayString.replaceFirst(_genericsRegex, '');
   }
 }
 

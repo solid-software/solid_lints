@@ -16,6 +16,7 @@ custom_lint:
       ignored_types:
         - ColorTween
         - AnimationController
+        - Subscription
     - avoid_global_state
     - avoid_returning_widgets
     - avoid_unnecessary_setstate

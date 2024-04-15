@@ -9,6 +9,8 @@ class SubAnimationController extends AnimationController {}
 
 class NotAllowed {}
 
+class Subscription<T> {}
+
 /// Check "late" keyword fail
 ///
 /// `avoid_late_keyword`
@@ -36,6 +38,10 @@ class AvoidLateKeyword {
   late final NotAllowed na1;
 
   late final na2 = NotAllowed();
+
+  late final Subscription subscription1;
+
+  late final Subscription<List<Map<String, dynamic>>> subscription2;
 
   void test() {
     late final ColorTween colorTween;
