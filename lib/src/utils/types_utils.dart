@@ -49,7 +49,7 @@ extension Subtypes on DartType {
 
     final checkedTypes = [this, ...supertypes];
 
-    ignoredTypes = getIntersectionTypesFor(ignoredTypes: ignoredTypes);
+    final intersectionIgnoredTypes = getIntersectionTypesFor(ignoredTypes: ignoredTypes);
     if (ignoredTypes.isEmpty) return false;
 
     final ignoredTypeRegexes =
