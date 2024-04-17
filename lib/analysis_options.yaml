@@ -3,21 +3,21 @@ analyzer:
     - custom_lint
   exclude:
     # General generated files
-    - "**/*.g.dart"
-    - "**/*.gr.dart"
+    - '**/*.g.dart'
+    - '**/*.gr.dart'
 
     # Flutter
-    - "lib/generated_plugin_registrant.dart"
+    - 'lib/generated_plugin_registrant.dart'
 
     # mockito
-    - "*.mocks.dart"
-    - "**/*.mocks.dart"
+    - '*.mocks.dart'
+    - '**/*.mocks.dart'
 
     # freezed
-    - "**/*.freezed.dart"
+    - '**/*.freezed.dart'
 
     # protobuf
-    - "**/*.pb.dart"
+    - '**/*.pb.dart'
 
     # test_coverage
     - test/.test_coverage.dart
@@ -51,6 +51,7 @@ custom_lint:
     - avoid_unrelated_type_assertions
     - avoid_unused_parameters
     - avoid_debug_print
+    - avoid_final_with_getter
 
     - cyclomatic_complexity:
       max_complexity: 10
