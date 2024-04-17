@@ -75,3 +75,7 @@ class MyClass {
   dispose() {}
   initState() {}
 }
+
+abstract interface class Disposable {
+  void dispose();
+}
