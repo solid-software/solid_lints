@@ -27,7 +27,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
-import 'package:solid_lints/src/utils/node_utils.dart';
+import 'package:solid_lints/src/utils/named_type_utils.dart';
 
 extension Subtypes on DartType {
   Iterable<DartType> get supertypes {
@@ -67,7 +67,7 @@ extension Subtypes on DartType {
 
     for (final ignoredTypeNode in ignoredTypeNodes) {
       for (final checkedTypeNode in checkedTypeNodes) {
-        if (ignoredTypeNode.isSubtype(node: checkedTypeNode)) {
+        if (ignoredTypeNode.isSubtypeOf(node: checkedTypeNode)) {
           return true;
         }
       }
@@ -79,8 +79,6 @@ extension Subtypes on DartType {
 
 extension TypeString on String {
   static final _genericRegex = RegExp('<.*>');
-
-  bool get hasGenericString => contains(_genericRegex);
 
   String replaceGenericString() => replaceFirst(_genericRegex, '');
 }

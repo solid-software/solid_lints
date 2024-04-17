@@ -5,11 +5,16 @@ class Subscription<T> {}
 
 class ConcreteTypeWithNoGenerics {}
 
+class NotAllowed {}
+
 /// Check "late" keyword fail
 ///
 /// `avoid_late_keyword`
 /// allow_initialized option disabled
 class AvoidLateKeyword {
+  /// expect_lint: avoid_late_keyword
+  late final NotAllowed na1;
+
   late final Subscription subscription1;
 
   late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
@@ -21,6 +26,9 @@ class AvoidLateKeyword {
   late final Subscription<Map<dynamic, String>> subscription5;
 
   void test() {
+    /// expect_lint: avoid_late_keyword
+    late final NotAllowed na1;
+
     late final Subscription subscription1;
 
     late final Subscription<ConcreteTypeWithNoGenerics> subscription2;

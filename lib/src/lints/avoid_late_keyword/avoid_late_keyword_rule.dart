@@ -96,11 +96,14 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
   }
 
   bool _hasIgnoredType(VariableDeclaration node) {
+    final ignoredTypes = config.parameters.ignoredTypes.toSet();
+    if (ignoredTypes.isEmpty) return false;
+
     final variableType = node.declaredElement?.type;
     if (variableType == null) return false;
 
     return variableType.hasIgnoredType(
-      ignoredTypes: config.parameters.ignoredTypes.toSet(),
+      ignoredTypes: ignoredTypes,
     );
   }
 }

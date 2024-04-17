@@ -13,12 +13,6 @@ custom_lint:
     - avoid_non_null_assertion
     - avoid_late_keyword:
       allow_initialized: true
-      ignored_types:
-        - ColorTween
-        - AnimationController
-        - Subscription<List<Object?>>
-        - Subscription<Map<dynamic, String>>
-        - Subscription<ConcreteTypeWithNoGenerics>
     - avoid_global_state
     - avoid_returning_widgets
     - avoid_unnecessary_setstate
