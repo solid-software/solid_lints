@@ -8,7 +8,7 @@ class ConcreteTypeWithNoGenerics {}
 /// Check "late" keyword fail
 ///
 /// `avoid_late_keyword`
-/// allow_initialized option enabled
+/// allow_initialized option disabled
 class AvoidLateKeyword {
   late final Subscription subscription1;
 

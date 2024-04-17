@@ -22,6 +22,7 @@
 // SOFTWARE.
 // ignore_for_file: public_member_api_docs
 
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -44,14 +45,14 @@ extension Subtypes on DartType {
     return withGenerics ? displayString : displayString.replaceGenericString();
   }
 
-  /// Creates the TypeAnalyzerNode based on the current type string.
-  TypeAnalyzerNode get typeAnalyzerNode {
+  /// Parses a [NamedType] instance from current type.
+  NamedType getNamedType() {
     final typeString = getTypeString(
       withGenerics: true,
       withNullability: false,
     );
 
-    return TypeAnalyzerNode.fromTypeString(typeString);
+    return parseNamedTypeFromString(typeString);
   }
 
   /// Checks if a variable type is among the ignored types.
@@ -59,14 +60,14 @@ extension Subtypes on DartType {
     if (ignoredTypes.isEmpty) return false;
 
     final checkedTypeNodes = [this, ...supertypes].map(
-      (type) => type.typeAnalyzerNode,
+      (type) => type.getNamedType(),
     );
 
-    final ignoredTypeNodes = ignoredTypes.map(TypeAnalyzerNode.fromTypeString);
+    final ignoredTypeNodes = ignoredTypes.map(parseNamedTypeFromString);
 
     for (final ignoredTypeNode in ignoredTypeNodes) {
       for (final checkedTypeNode in checkedTypeNodes) {
-        if (ignoredTypeNode.isInclude(node: checkedTypeNode)) {
+        if (ignoredTypeNode.isSubtype(node: checkedTypeNode)) {
           return true;
         }
       }

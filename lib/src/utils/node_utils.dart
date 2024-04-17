@@ -25,87 +25,65 @@ String humanReadableNodeType(AstNode? node) {
   return 'Node';
 }
 
-/// Analyzes and navigates AST nodes specific to type analysis.
-class TypeAnalyzerNode extends GeneralizingAstVisitor<void> {
-  NamedType? _currentTypeNode;
+/// Parses the provided type string to extract a [NamedType].
+NamedType parseNamedTypeFromString(String typeString) {
+  try {
+    final namedTypeFinder = _NamedTypeFinder();
 
-  /// List of child analyzer nodes.
-  final List<TypeAnalyzerNode> childNodes = [];
+    final parseResult = parseString(content: "$typeString _;");
+    parseResult.unit.visitChildren(namedTypeFinder);
 
-  /// The root node of the analyzer tree.
-  final TypeAnalyzerNode? rootNode;
-
-  /// Returns the name of the current node type.
-  String? get typeName => _currentTypeNode?.childEntities.first.toString();
-
-  /// Checks if the current type name is 'dynamic'.
-  bool get isDynamicType => typeName == "dynamic";
-
-  /// Checks if the current type name is 'Object'.
-  bool get isObjectType => typeName == "Object";
-
-  /// Checks if this node is the root node of the analyzer tree.
-  bool get isRootNode => rootNode == null;
-
-  /// Constructor to create a node with an optional root node.
-  TypeAnalyzerNode({this.rootNode});
-
-  /// Factory constructor to create a [TypeAnalyzerNode] from a [String].
-  factory TypeAnalyzerNode.fromTypeString(String typeString) {
-    final parseResult = parseString(content: "$typeString a;");
-    final analyzerNode = TypeAnalyzerNode();
-    parseResult.unit.visitChildren(analyzerNode);
-    return analyzerNode;
+    return namedTypeFinder.foundNamedType!;
+  } catch (_) {
+    throw Exception("No NamedType could be parsed from the input "
+        "typeString: '$typeString'. Ensure it's a valid Dart "
+        "type declaration.");
   }
+}
 
-  /// Factory constructor to create a [TypeAnalyzerNode] from an [AstNode].
-  factory TypeAnalyzerNode.fromAstNode(AstNode node) {
-    final analyzerNode = TypeAnalyzerNode();
-    node.visitChildren(analyzerNode);
-    return analyzerNode;
+class _NamedTypeFinder extends GeneralizingAstVisitor<void> {
+  NamedType? _foundNamedType;
+
+  NamedType? get foundNamedType => _foundNamedType;
+
+  @override
+  void visitNamedType(NamedType namedType) {
+    _foundNamedType ??= namedType;
   }
+}
 
-  /// Determines if the current node includes another analyzer node.
-  bool isInclude({required TypeAnalyzerNode node}) {
-    if (isDynamicType || isObjectType) return true;
+///
+extension ChildNamedTypes on NamedType {
+  /// Retrieves child [NamedType] instances from type arguments.
+  List<NamedType> get childNamedTypes =>
+      typeArguments?.arguments.whereType<NamedType>().toList() ?? [];
 
-    if (this != node) return false;
+  /// Gets the token name of this type instance.
+  String get tokenName => name2.toString();
 
-    if (isRootNode && childNodes.isEmpty) return true;
+  /// Checks if the current token name is 'dynamic'.
+  bool get isDynamic => tokenName == "dynamic";
 
-    if (childNodes.length != node.childNodes.length) return false;
+  /// Checks if the current token name is 'Object'.
+  bool get isObject => tokenName == "Object";
 
-    for (int i = 0; i < childNodes.length; i++) {
-      if (!childNodes[i].isInclude(node: node.childNodes[i])) {
+  /// Checks if this node is a subtype of the specified node
+  /// based on their structures.
+  bool isSubtype({required NamedType node}) {
+    if (isDynamic || isObject) return true;
+
+    if (tokenName != node.tokenName) return false;
+
+    if (childNamedTypes.isEmpty) return true;
+
+    if (childNamedTypes.length != node.childNamedTypes.length) return false;
+
+    for (int i = 0; i < childNamedTypes.length; i++) {
+      if (!childNamedTypes[i].isSubtype(node: node.childNamedTypes[i])) {
         return false;
       }
     }
 
     return true;
   }
-
-  /// Visit a named type and process it into the tree structure.
-  @override
-  void visitNamedType(NamedType node) {
-    if (_currentTypeNode == null) {
-      _currentTypeNode = node;
-      node.typeArguments?.arguments.forEach((arg) {
-        if (arg is NamedType) {
-          final newVisitor = TypeAnalyzerNode(rootNode: this);
-          arg.accept(newVisitor);
-          childNodes.add(newVisitor);
-        }
-      });
-    }
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TypeAnalyzerNode &&
-          runtimeType == other.runtimeType &&
-          typeName == other.typeName;
-
-  @override
-  int get hashCode => typeName.hashCode;
 }
