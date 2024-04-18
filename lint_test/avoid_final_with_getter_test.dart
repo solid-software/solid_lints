@@ -13,7 +13,13 @@ class Fail {
 class Skipped {
   final int _myField = 0;
 
-  int get myField => _myField + 1;
+  int get myField => _myField + 1; // it is not a getter for the field
+}
+
+class Skipped2 {
+  final int _myField = 0;
+
+  int get myFieldInt => _myField; // it is not a getter for the field too
 }
 
 class Good {
