@@ -22,16 +22,65 @@
 // SOFTWARE.
 // ignore_for_file: public_member_api_docs
 
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/utils/named_type_utils.dart';
 
 extension Subtypes on DartType {
   Iterable<DartType> get supertypes {
     final element = this.element;
     return element is InterfaceElement ? element.allSupertypes : [];
   }
+
+  /// Formats the type string based on nullability and presence of generics.
+  String getTypeString({
+    required bool withGenerics,
+    required bool withNullability,
+  }) {
+    final displayString = getDisplayString(withNullability: withNullability);
+
+    return withGenerics ? displayString : displayString.replaceGenericString();
+  }
+
+  /// Parses a [NamedType] instance from current type.
+  NamedType getNamedType() {
+    final typeString = getTypeString(
+      withGenerics: true,
+      withNullability: false,
+    );
+
+    return parseNamedTypeFromString(typeString);
+  }
+
+  /// Checks if a variable type is among the ignored types.
+  bool hasIgnoredType({required Set<String> ignoredTypes}) {
+    if (ignoredTypes.isEmpty) return false;
+
+    final checkedTypeNodes = [this, ...supertypes].map(
+      (type) => type.getNamedType(),
+    );
+
+    final ignoredTypeNodes = ignoredTypes.map(parseNamedTypeFromString);
+
+    for (final ignoredTypeNode in ignoredTypeNodes) {
+      for (final checkedTypeNode in checkedTypeNodes) {
+        if (ignoredTypeNode.isSubtypeOf(node: checkedTypeNode)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+}
+
+extension TypeString on String {
+  static final _genericRegex = RegExp('<.*>');
+
+  String replaceGenericString() => replaceFirst(_genericRegex, '');
 }
 
 bool hasWidgetType(DartType type) =>

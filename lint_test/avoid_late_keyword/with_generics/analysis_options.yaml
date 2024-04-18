@@ -1,0 +1,14 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_late_keyword:
+      allow_initialized: true
+      ignored_types:
+        - ColorTween
+        - AnimationController
+        - Subscription<List<Object?>>
+        - Subscription<Map<dynamic, String>>
+        - Subscription<ConcreteTypeWithNoGenerics>
