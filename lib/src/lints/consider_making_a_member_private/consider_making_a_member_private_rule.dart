@@ -1,3 +1,5 @@
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
@@ -26,6 +28,27 @@ class ConsiderMakingAMemberPrivateRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    // TODO: Implement the rule
+    context.registry.addMethodDeclaration((node) {
+      if (node
+          case MethodDeclaration(
+            declaredElement: ExecutableElement(isPublic: true)
+          )) {
+        // print(node);
+      }
+    });
+
+    context.registry.addVariableDeclaration((node) {
+      if (node
+          case VariableDeclaration(
+            declaredElement: VariableElement(isPublic: true)
+          )) {
+        print(node);
+      }
+    });
+    context.registry.addSimpleIdentifier((node) {
+      if (node case SimpleIdentifier(staticElement: Element(isPublic: true))) {
+        print(node);
+      }
+    });
   }
 }
