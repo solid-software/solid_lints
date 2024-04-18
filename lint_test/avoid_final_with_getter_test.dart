@@ -10,14 +10,21 @@ class Fail {
   int get myField => _myField;
 }
 
-class Fail2 {
+class FailOtherName {
   final int _myField = 0;
 
   // expect_lint: avoid_final_with_getter
   int get myFieldInt => _myField;
 }
 
-class Skipped {
+class FailStatic {
+  static final int _myField = 0;
+
+  // expect_lint: avoid_final_with_getter
+  static int get myField => _myField;
+}
+
+class Skip {
   final int _myField = 0;
 
   int get myField => _myField + 1; // it is not a getter for the field
