@@ -1,3 +1,8 @@
+## 0.2.0
+
+- Improve `avoid_late_keyword` - `ignored_types` to support ignoring subtype of the node type (https://github.com/solid-software/solid_lints/issues/157)
+
+
 ## 0.1.5
 
 - Added `avoid_debug_print` rule
