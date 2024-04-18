@@ -18,7 +18,6 @@ class AvoidFinalWithGetterVisitor extends RecursiveAstVisitor<void> {
           isGetter: true,
           declaredElement: ExecutableElement(
             isAbstract: false,
-            isStatic: false,
             isPublic: true,
           )
         )) {
