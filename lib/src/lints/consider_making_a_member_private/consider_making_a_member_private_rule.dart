@@ -9,7 +9,8 @@ class ConsiderMakingAMemberPrivateRule extends SolidLintRule {
   ConsiderMakingAMemberPrivateRule._(super.config);
 
   factory ConsiderMakingAMemberPrivateRule.createRule(
-      CustomLintConfigs configs) {
+    CustomLintConfigs configs,
+  ) {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
