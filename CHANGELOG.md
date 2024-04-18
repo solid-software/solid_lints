@@ -1,3 +1,7 @@
+## 0.2.0
+
+- Added `avoid_final_with_getter` rule
+
 ## 0.1.5
 
 - Added `avoid_debug_print` rule
