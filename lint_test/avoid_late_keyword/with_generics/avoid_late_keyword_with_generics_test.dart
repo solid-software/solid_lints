@@ -9,6 +9,10 @@ class SubAnimationController extends AnimationController {}
 
 class NotAllowed {}
 
+class Subscription<T> {}
+
+class ConcreteTypeWithNoGenerics {}
+
 /// Check "late" keyword fail
 ///
 /// `avoid_late_keyword`
@@ -37,6 +41,22 @@ class AvoidLateKeyword {
 
   late final na2 = NotAllowed();
 
+  /// expect_lint: avoid_late_keyword
+  late final Subscription<String> subscription1;
+
+  late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
+
+  late final Subscription<List<String>> subscription3;
+
+  late final Subscription<List<List<int>>> subscription4;
+
+  late final Subscription<Map<dynamic, String>> subscription5;
+
+  late final Subscription<Map<String, String>> subscription6;
+
+  /// expect_lint: avoid_late_keyword
+  late final Subscription<Map<String, dynamic>> subscription7;
+
   void test() {
     late final ColorTween colorTween;
 
@@ -60,5 +80,12 @@ class AvoidLateKeyword {
     late final NotAllowed na1;
 
     late final na2 = NotAllowed();
+
+    /// expect_lint: avoid_late_keyword
+    late final Subscription<String> subscription1;
+
+    late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
+
+    late final Subscription<List<String>> subscription3;
   }
 }

@@ -89,9 +89,11 @@ class ProperSuperCallsRule extends SolidLintRule {
     context.registry.addMethodDeclaration(
       (node) {
         final methodName = node.name.toString();
+        final body = node.body;
 
-        if (methodName == _initState || methodName == _dispose) {
-          final statements = (node.body as BlockFunctionBody).block.statements;
+        if (methodName case _initState || _dispose
+            when body is BlockFunctionBody) {
+          final statements = body.block.statements;
 
           _checkSuperCalls(
             node,
