@@ -4,22 +4,23 @@
 /// `avoid_final_with_getter`
 
 class Fail {
-  // expect_lint: avoid_final_with_getter
   final int _myField = 0;
 
+  // expect_lint: avoid_final_with_getter
   int get myField => _myField;
+}
+
+class Fail2 {
+  final int _myField = 0;
+
+  // expect_lint: avoid_final_with_getter
+  int get myFieldInt => _myField;
 }
 
 class Skipped {
   final int _myField = 0;
 
   int get myField => _myField + 1; // it is not a getter for the field
-}
-
-class Skipped2 {
-  final int _myField = 0;
-
-  int get myFieldInt => _myField; // it is not a getter for the field too
 }
 
 class Good {
