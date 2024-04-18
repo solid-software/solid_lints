@@ -8,8 +8,12 @@ class Fail {
   final int _myField = 0;
 
   int get myField => _myField;
+}
 
-  int get myField2 => _myField + 1;
+class Skipped {
+  final int _myField = 0;
+
+  int get myField => _myField + 1;
 }
 
 class Good {
