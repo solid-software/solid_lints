@@ -64,3 +64,7 @@ class MyWidget extends BaseWidget {
 Widget build() {
   return Offstage();
 }
+
+SizedBox excludeWidget() => const SizedBox();
+
+Container excludeWidget2() => Container();

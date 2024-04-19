@@ -1,7 +1,10 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_exclude.dart';
+import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
@@ -48,7 +51,8 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 ///   }
 /// }
 /// ```
-class AvoidReturningWidgetsRule extends SolidLintRule {
+class AvoidReturningWidgetsRule
+    extends SolidLintRule<AvoidReturningWidgetsParameters> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we return a widget.
   static const lintName = 'avoid_returning_widgets';
@@ -61,6 +65,7 @@ class AvoidReturningWidgetsRule extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
+      paramsParser: AvoidReturningWidgetsParameters.fromJson,
       problemMessage: (_) =>
           'Returning a widget from a function is considered an anti-pattern. '
           'Unless you are overriding an existing method, '
@@ -92,11 +97,33 @@ class AvoidReturningWidgetsRule extends SolidLintRule {
 
       final isWidgetReturned = hasWidgetType(returnType);
 
+      final isIgnored = _hasIgnored(node, returnType);
+
       final isOverriden = node.declaredElement?.hasOverride ?? false;
 
-      if (isWidgetReturned && !isOverriden) {
+      if (isWidgetReturned && !isOverriden && !isIgnored) {
         reporter.reportErrorForNode(code, node);
       }
     });
+  }
+
+  bool _hasIgnored(Declaration node, DartType returnType) {
+    final methodName = node.declaredElement?.name;
+
+    final excludedItem = config.parameters.exclude
+        .firstWhereOrNull((e) => e.methodName == methodName);
+
+    if (excludedItem
+        case AvoidReturningWidgetsExclude(
+          :final String? className,
+        )) {
+      if (className == null) {
+        return true;
+      } else {
+        return returnType.hasIgnoredType(ignoredTypes: {className});
+      }
+    }
+
+    return false;
   }
 }

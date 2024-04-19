@@ -1,0 +1,11 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_returning_widgets:
+      exclude:
+        - method_name: excludeWidget
+          class_name: SizedBox
+        - method_name: excludeWidget2
