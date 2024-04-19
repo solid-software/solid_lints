@@ -19,12 +19,12 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
     if (ifStatements.isEmpty) return;
 
     // limit visitor to only work with functions
-    // that don't have a return statement or the return statementis empty
+    // that don't have a return statement or the return statement is empty
     final nextStatementIsEmptyReturn =
         nextStatement is ReturnStatement && nextStatement.expression == null;
     final nextStatementIsNull = nextStatement == null;
 
-    if (!(nextStatementIsEmptyReturn || nextStatementIsNull)) return;
+    if (!nextStatementIsEmptyReturn && !nextStatementIsNull) return;
 
     _handleIfStatement(ifStatements.last);
   }
@@ -36,7 +36,6 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
 
     _nodes.add(node);
   }
-}
 
 // returns a list of if statements at the start of the function
 // and the next statement after it
@@ -44,28 +43,30 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
 // [if, if, if, return] -> ([if, if, if], return)
 // [if, if, if, _doSomething, return] -> ([if, if, if], _doSomething)
 // [if, if, if] -> ([if, if, if], null)
-(List<IfStatement>, Statement?) _getStartIfStatements(BlockFunctionBody body) {
-  final List<IfStatement> ifStatements = [];
-  for (final statement in body.block.statements) {
-    if (statement is IfStatement) {
-      ifStatements.add(statement);
-    } else {
-      return (ifStatements, statement);
+  (List<IfStatement>, Statement?) _getStartIfStatements(
+      BlockFunctionBody body) {
+    final List<IfStatement> ifStatements = [];
+    for (final statement in body.block.statements) {
+      if (statement is IfStatement) {
+        ifStatements.add(statement);
+      } else {
+        return (ifStatements, statement);
+      }
     }
+    return (ifStatements, null);
   }
-  return (ifStatements, null);
-}
 
-bool _hasElseStatement(IfStatement node) {
-  return node.elseStatement != null;
-}
+  bool _hasElseStatement(IfStatement node) {
+    return node.elseStatement != null;
+  }
 
-bool _isElseIfStatement(IfStatement node) {
-  return node.elseStatement != null && node.elseStatement is IfStatement;
-}
+  bool _isElseIfStatement(IfStatement node) {
+    return node.elseStatement != null && node.elseStatement is IfStatement;
+  }
 
-bool _hasReturnStatement(Statement node) {
-  final visitor = ReturnStatementVisitor();
-  node.accept(visitor);
-  return visitor.nodes.isNotEmpty;
+  bool _hasReturnStatement(Statement node) {
+    final visitor = ReturnStatementVisitor();
+    node.accept(visitor);
+    return visitor.nodes.isNotEmpty;
+  }
 }
