@@ -6,6 +6,6 @@ custom_lint:
   rules:
     - avoid_returning_widgets:
       exclude:
-        - method_name: excludeWidget
-          class_name: SizedBox
-        - method_name: excludeWidget2
+        - method_name: excludeWidgetMethod
+          class_name: ExcludeWidget
+        - method_name: excludeMethod

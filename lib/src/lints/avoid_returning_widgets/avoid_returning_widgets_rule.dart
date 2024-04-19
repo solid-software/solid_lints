@@ -3,7 +3,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_exclude.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
@@ -97,7 +96,7 @@ class AvoidReturningWidgetsRule
 
       final isWidgetReturned = hasWidgetType(returnType);
 
-      final isIgnored = _hasIgnored(node, returnType);
+      final isIgnored = _shouldIgnore(node);
 
       final isOverriden = node.declaredElement?.hasOverride ?? false;
 
@@ -107,23 +106,24 @@ class AvoidReturningWidgetsRule
     });
   }
 
-  bool _hasIgnored(Declaration node, DartType returnType) {
+  bool _shouldIgnore(Declaration node) {
     final methodName = node.declaredElement?.name;
 
     final excludedItem = config.parameters.exclude
         .firstWhereOrNull((e) => e.methodName == methodName);
 
-    if (excludedItem
-        case AvoidReturningWidgetsExclude(
-          :final String? className,
-        )) {
-      if (className == null) {
-        return true;
-      } else {
-        return returnType.hasIgnoredType(ignoredTypes: {className});
-      }
-    }
+    if (excludedItem == null) return false;
 
-    return false;
+    final className = excludedItem.className;
+
+    if (className == null || node is! MethodDeclaration) {
+      return true;
+    } else {
+      final classDeclaration = node.thisOrAncestorOfType<ClassDeclaration>();
+
+      if (classDeclaration == null) return false;
+
+      return classDeclaration.name.toString() == className;
+    }
   }
 }
