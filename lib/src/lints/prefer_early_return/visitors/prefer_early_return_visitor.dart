@@ -44,7 +44,8 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
 // [if, if, if, _doSomething, return] -> ([if, if, if], _doSomething)
 // [if, if, if] -> ([if, if, if], null)
   (List<IfStatement>, Statement?) _getStartIfStatements(
-      BlockFunctionBody body) {
+    BlockFunctionBody body,
+  ) {
     final List<IfStatement> ifStatements = [];
     for (final statement in body.block.statements) {
       if (statement is IfStatement) {
