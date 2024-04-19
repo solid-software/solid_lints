@@ -75,3 +75,8 @@ class MyClass {
   dispose() {}
   initState() {}
 }
+
+abstract interface class Disposable {
+  /// Abstract methods should be omitted by `proper_super_calls`
+  void dispose();
+}

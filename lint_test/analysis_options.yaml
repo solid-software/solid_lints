@@ -13,9 +13,6 @@ custom_lint:
     - avoid_non_null_assertion
     - avoid_late_keyword:
       allow_initialized: true
-      ignored_types:
-        - ColorTween
-        - AnimationController
     - avoid_global_state
     - avoid_returning_widgets
     - avoid_unnecessary_setstate
@@ -60,3 +57,4 @@ custom_lint:
     - prefer_last
     - prefer_match_file_name
     - proper_super_calls
+    - avoid_final_with_getter

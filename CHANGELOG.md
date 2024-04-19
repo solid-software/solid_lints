@@ -1,3 +1,10 @@
+## 0.2.0
+
+- Added `avoid_final_with_getter` rule
+- Improve `avoid_late_keyword` - `ignored_types` to support ignoring subtype of the node type (https://github.com/solid-software/solid_lints/issues/157)
+- Abstract methods should be omitted by `proper_super_calls` (https://github.com/solid-software/solid_lints/issues/159)
+
+
 ## 0.1.5
 
 - Added `avoid_debug_print` rule

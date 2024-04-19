@@ -102,10 +102,8 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
     final variableType = node.declaredElement?.type;
     if (variableType == null) return false;
 
-    final checkedTypes = [variableType, ...variableType.supertypes]
-        .map((t) => t.getDisplayString(withNullability: false))
-        .toSet();
-
-    return checkedTypes.intersection(ignoredTypes).isNotEmpty;
+    return variableType.hasIgnoredType(
+      ignoredTypes: ignoredTypes,
+    );
   }
 }
