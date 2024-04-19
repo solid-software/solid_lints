@@ -24,8 +24,10 @@ class AvoidFinalWithGetterVisitor extends RecursiveAstVisitor<void> {
       final visitor = GetterVariableVisitor(node);
       node.parent?.accept(visitor);
 
-      if (visitor.variable != null) {
-        _getters.add(FinalWithGetterInfo(node, visitor.variable!));
+      final variable = visitor.variable;
+
+      if (variable != null) {
+        _getters.add(FinalWithGetterInfo(node, variable));
       }
     }
     super.visitMethodDeclaration(node);
