@@ -64,3 +64,31 @@ class MyWidget extends BaseWidget {
 Widget build() {
   return Offstage();
 }
+
+SizedBox excludeMethod() => const SizedBox();
+
+class ExcludeWidget extends StatelessWidget {
+  const ExcludeWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+
+  Widget excludeWidgetMethod() => const SizedBox();
+
+  // expect_lint: avoid_returning_widgets
+  Widget excludeWidgetMethod2() => const SizedBox();
+}
+
+class NotExcludeWidget extends StatelessWidget {
+  const NotExcludeWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+
+  // expect_lint: avoid_returning_widgets
+  Widget excludeWidgetMethod() => const SizedBox();
+}

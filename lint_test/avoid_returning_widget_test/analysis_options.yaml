@@ -1,0 +1,11 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_returning_widgets:
+      exclude:
+        - method_name: excludeWidgetMethod
+          class_name: ExcludeWidget
+        - method_name: excludeMethod
