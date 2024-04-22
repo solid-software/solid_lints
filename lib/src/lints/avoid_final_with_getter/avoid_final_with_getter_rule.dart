@@ -1,8 +1,12 @@
+import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/visitors/avoid_final_with_getter_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
+
+part 'avoid_final_with_getter_fix.dart';
 
 /// Avoid using final private fields with getters.
 ///
@@ -59,9 +63,18 @@ class AvoidFinalWithGetterRule extends SolidLintRule {
       final visitor = AvoidFinalWithGetterVisitor();
       node.accept(visitor);
 
-      for (final getter in visitor.getters) {
-        reporter.reportErrorForNode(code, getter);
+      for (final element in visitor.getters) {
+        reporter.reportErrorForNode(
+          code,
+          element.getter,
+          null,
+          null,
+          element,
+        );
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => [_FinalWithGetterFix()];
 }
