@@ -9,6 +9,8 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// A `avoid_debug_print` rule which forbids calling or referencing
 /// debugPrint function from flutter/foundation.
 ///
+/// See more here: https://github.com/flutter/flutter/issues/147141
+///
 /// ### Example
 ///
 /// #### BAD:
@@ -23,8 +25,12 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// #### GOOD:
 ///
 /// ```dart
-/// log('');
+/// if (kDebugMode) {
+///   debugPrint('');
+/// }
 /// ```
+///
+///
 class AvoidDebugPrint extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error when debugPrint is called
@@ -96,7 +102,7 @@ class AvoidDebugPrint extends SolidLintRule {
     }
   }
 
-  /// Returns null if doesnt have right operand
+  /// Returns null if doesn't have right operand
   SyntacticEntity? _getRightOperand(List<SyntacticEntity> entities) {
     /// Example var t = 15; 15 is in 3d position
     if (entities.length < 3) {

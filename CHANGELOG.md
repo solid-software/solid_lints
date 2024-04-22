@@ -3,6 +3,9 @@
 - Added `avoid_final_with_getter` rule
 - Improve `avoid_late_keyword` - `ignored_types` to support ignoring subtype of the node type (https://github.com/solid-software/solid_lints/issues/157)
 - Abstract methods should be omitted by `proper_super_calls` (https://github.com/solid-software/solid_lints/issues/159)
+- Add a rule prefer_guard_clause for reversing nested if statements (https://github.com/solid-software/solid_lints/issues/91)
+- add exclude params support to avoid_returning_widgets rule (https://github.com/solid-software/solid_lints/issues/131)
+- add quick fix to avoid_final_with_getter (https://github.com/solid-software/solid_lints/pull/164)
 
 
 ## 0.1.5
