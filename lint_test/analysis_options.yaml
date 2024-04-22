@@ -25,6 +25,7 @@ custom_lint:
     - no_empty_block
     - no_equal_then_else
     - avoid_debug_print
+    - prefer_early_return
     - member_ordering:
       alphabetize: true
       order:

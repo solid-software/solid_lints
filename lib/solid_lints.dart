@@ -23,6 +23,7 @@ import 'package:solid_lints/src/lints/no_equal_then_else/no_equal_then_else_rule
 import 'package:solid_lints/src/lints/no_magic_number/no_magic_number_rule.dart';
 import 'package:solid_lints/src/lints/number_of_parameters/number_of_parameters_metric.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
@@ -62,6 +63,7 @@ class _SolidLints extends PluginBase {
       PreferMatchFileNameRule.createRule(configs),
       ProperSuperCallsRule.createRule(configs),
       AvoidDebugPrint.createRule(configs),
+      PreferEarlyReturnRule.createRule(configs),
       AvoidFinalWithGetterRule.createRule(configs),
     ];
 
