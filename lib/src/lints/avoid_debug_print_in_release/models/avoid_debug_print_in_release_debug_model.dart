@@ -1,7 +1,11 @@
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 
 /// A class used to parse function expression
-class AvoidDebugPrintInReleaseDebugModel {
+class AvoidDebugPrintInReleaseCheckModel {
+  /// Wheather the statement is prefixed with `!`
+  final bool negated;
+
   /// Function name
   final String name;
 
@@ -9,36 +13,38 @@ class AvoidDebugPrintInReleaseDebugModel {
   final String sourcePath;
 
   /// A class used to parse function expression
-  const AvoidDebugPrintInReleaseDebugModel({
+  const AvoidDebugPrintInReleaseCheckModel({
+    required this.negated,
     required this.name,
     required this.sourcePath,
   });
 
   /// A constructor that parses identifier into [name] and [sourcePath]
-  factory AvoidDebugPrintInReleaseDebugModel.parseExpression(
-    AstNode? identifier,
+  factory AvoidDebugPrintInReleaseCheckModel.parseExpression(
+    Expression? expression,
   ) {
-    switch (identifier) {
-      case PrefixedIdentifier():
-        final prefix = identifier.prefix.name;
-        return AvoidDebugPrintInReleaseDebugModel(
-          name: identifier.name.replaceAll('$prefix.', ''),
-          sourcePath:
-              identifier.staticElement?.librarySource?.uri.toString() ?? '',
+    switch (expression?.childEntities.toList()) {
+      case [
+          final Token token,
+          final Identifier identifier,
+        ]:
+        return AvoidDebugPrintInReleaseCheckModel._parseIdentifier(
+          identifier: identifier,
+          negated: token.type == TokenType.BANG,
         );
-      case SimpleIdentifier():
-        return AvoidDebugPrintInReleaseDebugModel(
-          name: identifier.name,
-          sourcePath:
-              identifier.staticElement?.librarySource?.uri.toString() ?? '',
+      case [final Identifier identifier]:
+        return AvoidDebugPrintInReleaseCheckModel._parseIdentifier(
+          identifier: identifier,
+          negated: false,
         );
       default:
-        return AvoidDebugPrintInReleaseDebugModel._empty();
+        return AvoidDebugPrintInReleaseCheckModel._empty();
     }
   }
 
-  factory AvoidDebugPrintInReleaseDebugModel._empty() {
-    return const AvoidDebugPrintInReleaseDebugModel(
+  factory AvoidDebugPrintInReleaseCheckModel._empty() {
+    return const AvoidDebugPrintInReleaseCheckModel(
+      negated: false,
       name: '',
       sourcePath: '',
     );
@@ -47,19 +53,44 @@ class AvoidDebugPrintInReleaseDebugModel {
   static const String _expectedPath =
       'package:flutter/src/foundation/constants.dart';
 
-  static const String _kDebugMode = 'kDebugMode';
+  static const String _kReleaseMode = 'kReleaseMode';
 
-  /// Whether the function has the same source library as kDebugMode
+  /// Whether the expression has the same source library as kDebugMode
   bool get hasTheSameSource => _expectedPath == sourcePath;
 
-  /// Whether the function has the same name as kDebugMode
-  bool get hasSameName => _kDebugMode == name;
+  /// Whether the expression has the same name as kReleaseMode
+  bool get hasSameName => _kReleaseMode == name;
 
-  /// The complete check if the statement is the `kDebugMode` identifier.
-  bool get isDebugMode => hasSameName && hasTheSameSource;
+  /// Whether the expression checks ifthe mode is not release.
+  bool get isNotRelease => negated && hasSameName && hasTheSameSource;
 
   @override
   String toString() {
     return '$name, $sourcePath';
+  }
+
+  factory AvoidDebugPrintInReleaseCheckModel._parseIdentifier({
+    required Identifier identifier,
+    required bool negated,
+  }) {
+    switch (identifier) {
+      case PrefixedIdentifier():
+        final prefix = identifier.prefix.name;
+        return AvoidDebugPrintInReleaseCheckModel(
+          negated: negated,
+          name: identifier.name.replaceAll('$prefix.', ''),
+          sourcePath:
+              identifier.staticElement?.librarySource?.uri.toString() ?? '',
+        );
+      case SimpleIdentifier():
+        return AvoidDebugPrintInReleaseCheckModel(
+          negated: negated,
+          name: identifier.name,
+          sourcePath:
+              identifier.staticElement?.librarySource?.uri.toString() ?? '',
+        );
+      default:
+        return AvoidDebugPrintInReleaseCheckModel._empty();
+    }
   }
 }

@@ -22,7 +22,7 @@ void avoidDebugPrintTest() {
 
   someOtherFunction();
 
-  if (kDebugMode) {
+  if (!kReleaseMode) {
     debugPrint('');
 
     final test = debugPrint;
@@ -36,6 +36,20 @@ void avoidDebugPrintTest() {
     final test3 = debugPrint('');
 
     someOtherFunction();
+
+    if (true) {
+      debugPrint('');
+
+      final test = debugPrint;
+
+      var test2;
+
+      test2 = debugPrint;
+
+      test.call('test');
+
+      final test3 = debugPrint('');
+    }
   }
 }
 

@@ -100,16 +100,27 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
     final funcModel =
         AvoidDebugPrintInReleaseFuncModel.parseExpression(identifier);
 
-    if (funcModel.isDebugPrint && !_checkIsDebugMode(node)) {
+    if (funcModel.isDebugPrint) {
+      if (node.thisOrAncestorMatching(
+            (node) {
+              if (node is IfStatement) {
+                final check =
+                    AvoidDebugPrintInReleaseCheckModel.parseExpression(
+                  node.expression,
+                );
+
+                return check.isNotRelease;
+              }
+
+              return false;
+            },
+          ) !=
+          null) {
+        return;
+      }
+
       reporter.reportErrorForNode(code, node);
     }
-  }
-
-  bool _checkIsDebugMode(AstNode node) {
-    final statement = node.thisOrAncestorOfType<IfStatement>()?.expression;
-    final debugModel =
-        AvoidDebugPrintInReleaseDebugModel.parseExpression(statement);
-    return debugModel.isDebugMode;
   }
 
   /// Returns null if doesn't have right operand

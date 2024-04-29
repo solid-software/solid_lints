@@ -19,7 +19,7 @@ void avoidDebugPrintTest() {
 
   debugPrint;
 
-  if (f.kDebugMode) {
+  if (!f.kReleaseMode) {
     f.debugPrint('');
 
     final test = f.debugPrint;
@@ -31,6 +31,20 @@ void avoidDebugPrintTest() {
     test.call('test');
 
     final test3 = f.debugPrint('');
+
+    if (true) {
+      f.debugPrint('');
+
+      final test = f.debugPrint;
+
+      var test2;
+
+      test2 = debugPrint;
+
+      test.call('test');
+
+      final test3 = f.debugPrint('');
+    }
   }
 }
 
