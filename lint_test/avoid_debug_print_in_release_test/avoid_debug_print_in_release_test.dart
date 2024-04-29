@@ -21,6 +21,22 @@ void avoidDebugPrintTest() {
   final test3 = debugPrint('');
 
   someOtherFunction();
+
+  if (kDebugMode) {
+    debugPrint('');
+
+    final test = debugPrint;
+
+    var test2;
+
+    test2 = debugPrint;
+
+    test.call('test');
+
+    final test3 = debugPrint('');
+
+    someOtherFunction();
+  }
 }
 
 void someOtherFunction() {

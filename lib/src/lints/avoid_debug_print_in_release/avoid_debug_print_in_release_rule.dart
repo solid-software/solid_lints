@@ -2,7 +2,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_debug_print/models/avoid_debug_print_func_model.dart';
+import 'package:solid_lints/src/lints/avoid_debug_print_in_release/models/avoid_debug_print_in_release_debug_model.dart';
+import 'package:solid_lints/src/lints/avoid_debug_print_in_release/models/avoid_debug_print_in_release_func_model.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
@@ -31,23 +32,23 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```
 ///
 ///
-class AvoidDebugPrint extends SolidLintRule {
+class AvoidDebugPrintInReleaseRule extends SolidLintRule {
   /// The [LintCode] of this lint rule that represents
   /// the error when debugPrint is called
-  static const lintName = 'avoid_debug_print';
+  static const lintName = 'avoid_debug_print_in_release';
 
-  AvoidDebugPrint._(super.config);
+  AvoidDebugPrintInReleaseRule._(super.config);
 
-  /// Creates a new instance of [AvoidDebugPrint]
+  /// Creates a new instance of [AvoidDebugPrintInReleaseRule]
   /// based on the lint configuration.
-  factory AvoidDebugPrint.createRule(CustomLintConfigs configs) {
+  factory AvoidDebugPrintInReleaseRule.createRule(CustomLintConfigs configs) {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
       problemMessage: (_) => "Avoid using 'debugPrint'",
     );
 
-    return AvoidDebugPrint._(rule);
+    return AvoidDebugPrintInReleaseRule._(rule);
   }
 
   @override
@@ -62,6 +63,7 @@ class AvoidDebugPrint extends SolidLintRule {
         if (func is! Identifier) {
           return;
         }
+
         _checkIdentifier(
           identifier: func,
           node: node,
@@ -95,11 +97,19 @@ class AvoidDebugPrint extends SolidLintRule {
     required AstNode node,
     required ErrorReporter reporter,
   }) {
-    final funcModel = AvoidDebugPrintFuncModel.parseExpression(identifier);
+    final funcModel =
+        AvoidDebugPrintInReleaseFuncModel.parseExpression(identifier);
 
-    if (funcModel.hasSameName && funcModel.hasTheSameSource) {
+    if (funcModel.isDebugPrint && !_checkIsDebugMode(node)) {
       reporter.reportErrorForNode(code, node);
     }
+  }
+
+  bool _checkIsDebugMode(AstNode node) {
+    final statement = node.thisOrAncestorOfType<IfStatement>()?.expression;
+    final debugModel =
+        AvoidDebugPrintInReleaseDebugModel.parseExpression(statement);
+    return debugModel.isDebugMode;
   }
 
   /// Returns null if doesn't have right operand

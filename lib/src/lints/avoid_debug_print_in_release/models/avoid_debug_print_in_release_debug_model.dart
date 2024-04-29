@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
 /// A class used to parse function expression
-class AvoidDebugPrintFuncModel {
+class AvoidDebugPrintInReleaseDebugModel {
   /// Function name
   final String name;
 
@@ -9,50 +9,53 @@ class AvoidDebugPrintFuncModel {
   final String sourcePath;
 
   /// A class used to parse function expression
-  const AvoidDebugPrintFuncModel({
+  const AvoidDebugPrintInReleaseDebugModel({
     required this.name,
     required this.sourcePath,
   });
 
   /// A constructor that parses identifier into [name] and [sourcePath]
-  factory AvoidDebugPrintFuncModel.parseExpression(
-    Identifier identifier,
+  factory AvoidDebugPrintInReleaseDebugModel.parseExpression(
+    AstNode? identifier,
   ) {
     switch (identifier) {
       case PrefixedIdentifier():
         final prefix = identifier.prefix.name;
-        return AvoidDebugPrintFuncModel(
+        return AvoidDebugPrintInReleaseDebugModel(
           name: identifier.name.replaceAll('$prefix.', ''),
           sourcePath:
               identifier.staticElement?.librarySource?.uri.toString() ?? '',
         );
       case SimpleIdentifier():
-        return AvoidDebugPrintFuncModel(
+        return AvoidDebugPrintInReleaseDebugModel(
           name: identifier.name,
           sourcePath:
               identifier.staticElement?.librarySource?.uri.toString() ?? '',
         );
       default:
-        return AvoidDebugPrintFuncModel._empty();
+        return AvoidDebugPrintInReleaseDebugModel._empty();
     }
   }
 
-  factory AvoidDebugPrintFuncModel._empty() {
-    return const AvoidDebugPrintFuncModel(
+  factory AvoidDebugPrintInReleaseDebugModel._empty() {
+    return const AvoidDebugPrintInReleaseDebugModel(
       name: '',
       sourcePath: '',
     );
   }
 
-  static const String _printPath = 'package:flutter/src/foundation/print.dart';
+  static const String _expectedPath =
+      'package:flutter/src/foundation/constants.dart';
 
-  static const String _debugPrint = 'debugPrint';
+  static const String _kDebugMode = 'kDebugMode';
 
-  /// Ehether the function has the same source library as debugPrint func
-  bool get hasTheSameSource => _printPath == sourcePath;
+  /// Whether the function has the same source library as kDebugMode
+  bool get hasTheSameSource => _expectedPath == sourcePath;
 
-  /// Ehether the function has the same name as debugPrint
-  bool get hasSameName => _debugPrint == name;
+  /// Whether the function has the same name as kDebugMode
+  bool get hasSameName => _kDebugMode == name;
+
+  bool get isDebugMode => hasSameName && hasTheSameSource;
 
   @override
   String toString() {

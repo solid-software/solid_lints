@@ -18,6 +18,20 @@ void avoidDebugPrintTest() {
   debugPrint();
 
   debugPrint;
+
+  if (f.kDebugMode) {
+    f.debugPrint('');
+
+    final test = f.debugPrint;
+
+    var test2;
+
+    test2 = debugPrint;
+
+    test.call('test');
+
+    final test3 = f.debugPrint('');
+  }
 }
 
 void debugPrint() {

@@ -50,7 +50,7 @@ custom_lint:
     - avoid_unnecessary_type_casts
     - avoid_unrelated_type_assertions
     - avoid_unused_parameters
-    - avoid_debug_print
+    - avoid_debug_print_in_release
     - avoid_final_with_getter
 
     - cyclomatic_complexity:
