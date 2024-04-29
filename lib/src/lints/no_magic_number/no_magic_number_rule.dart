@@ -27,7 +27,7 @@ import 'package:analyzer/error/listener.dart';
 import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/no_magic_number/models/no_magic_number_parameters.dart';
-import 'package:solid_lints/src/lints/no_magic_number/no_magic_number_visitor.dart';
+import 'package:solid_lints/src/lints/no_magic_number/visitors/no_magic_number_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 

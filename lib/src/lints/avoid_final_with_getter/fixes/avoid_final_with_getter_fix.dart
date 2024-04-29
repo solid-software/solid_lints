@@ -1,4 +1,4 @@
-part of 'avoid_final_with_getter_rule.dart';
+part of '../avoid_final_with_getter_rule.dart';
 
 class _FinalWithGetterFix extends DartFix {
   @override

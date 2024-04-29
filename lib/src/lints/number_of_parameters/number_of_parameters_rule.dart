@@ -35,17 +35,17 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   void method(a, b) {} // OK
 /// }
 /// ```
-class NumberOfParametersMetric
+class NumberOfParametersRule
     extends SolidLintRule<NumberOfParametersParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of
   /// parameters reaches the maximum value.
   static const lintName = 'number_of_parameters';
 
-  NumberOfParametersMetric._(super.rule);
+  NumberOfParametersRule._(super.rule);
 
-  /// Creates a new instance of [NumberOfParametersMetric]
+  /// Creates a new instance of [NumberOfParametersRule]
   /// based on the lint configuration.
-  factory NumberOfParametersMetric.createRule(CustomLintConfigs configs) {
+  factory NumberOfParametersRule.createRule(CustomLintConfigs configs) {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
@@ -55,7 +55,7 @@ class NumberOfParametersMetric
           'Try reducing the number of parameters.',
     );
 
-    return NumberOfParametersMetric._(rule);
+    return NumberOfParametersRule._(rule);
   }
 
   @override

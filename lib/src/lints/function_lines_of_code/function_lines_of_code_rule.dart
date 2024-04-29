@@ -2,7 +2,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
-import 'package:solid_lints/src/lints/function_lines_of_code/visitor/function_lines_of_code_visitor.dart';
+import 'package:solid_lints/src/lints/function_lines_of_code/visitors/function_lines_of_code_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
@@ -19,17 +19,17 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///       excludeNames:
 ///         - "Build"
 /// ```
-class FunctionLinesOfCodeMetric
+class FunctionLinesOfCodeRule
     extends SolidLintRule<FunctionLinesOfCodeParameters> {
   /// The [LintCode] of this lint rule that represents the error if number of
   /// parameters reaches the maximum value.
   static const lintName = 'function_lines_of_code';
 
-  FunctionLinesOfCodeMetric._(super.config);
+  FunctionLinesOfCodeRule._(super.config);
 
-  /// Creates a new instance of [FunctionLinesOfCodeMetric]
+  /// Creates a new instance of [FunctionLinesOfCodeRule]
   /// based on the lint configuration.
-  factory FunctionLinesOfCodeMetric.createRule(CustomLintConfigs configs) {
+  factory FunctionLinesOfCodeRule.createRule(CustomLintConfigs configs) {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
@@ -39,7 +39,7 @@ class FunctionLinesOfCodeMetric
           'Try splitting this function into smaller parts.',
     );
 
-    return FunctionLinesOfCodeMetric._(rule);
+    return FunctionLinesOfCodeRule._(rule);
   }
 
   @override

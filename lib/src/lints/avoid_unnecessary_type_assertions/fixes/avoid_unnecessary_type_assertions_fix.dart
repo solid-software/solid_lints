@@ -1,4 +1,4 @@
-part of 'avoid_unnecessary_type_assertions_rule.dart';
+part of '../avoid_unnecessary_type_assertions_rule.dart';
 
 /// A Quick fix for `avoid_unnecessary_type_assertions` rule
 /// Suggests to remove unnecessary assertions

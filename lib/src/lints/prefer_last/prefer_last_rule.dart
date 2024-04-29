@@ -1,7 +1,7 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/prefer_last/prefer_last_fix.dart';
-import 'package:solid_lints/src/lints/prefer_last/prefer_last_visitor.dart';
+import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
+import 'package:solid_lints/src/lints/prefer_last/visitors/prefer_last_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 

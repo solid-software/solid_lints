@@ -9,7 +9,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 import 'package:solid_lints/src/utils/typecast_utils.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
 
-part 'avoid_unnecessary_type_assertions_fix.dart';
+part 'fixes/avoid_unnecessary_type_assertions_fix.dart';
 
 /// The name of 'is' operator
 const operatorIsName = 'is';
