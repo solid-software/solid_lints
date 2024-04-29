@@ -2,22 +2,22 @@
 
 import 'package:flutter/foundation.dart';
 
-/// Test the avoid_debug_print
+/// Test the avoid_debug_print_in_release
 void avoidDebugPrintTest() {
-  // expect_lint: avoid_debug_print
+  // expect_lint: avoid_debug_print_in_release
   debugPrint('');
 
-  // expect_lint: avoid_debug_print
+  // expect_lint: avoid_debug_print_in_release
   final test = debugPrint;
 
   var test2;
 
-  // expect_lint: avoid_debug_print
+  // expect_lint: avoid_debug_print_in_release
   test2 = debugPrint;
 
   test.call('test');
 
-  // expect_lint: avoid_debug_print
+  // expect_lint: avoid_debug_print_in_release
   final test3 = debugPrint('');
 
   someOtherFunction();
