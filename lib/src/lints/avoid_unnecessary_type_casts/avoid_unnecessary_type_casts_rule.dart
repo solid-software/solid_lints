@@ -3,11 +3,11 @@ import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_unnecessary_type_casts/avoid_unnecessary_type_casts_visitor.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_type_casts/visitors/avoid_unnecessary_type_casts_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-part 'avoid_unnecessary_type_casts_fix.dart';
+part 'fixes/avoid_unnecessary_type_casts_fix.dart';
 
 /// An `avoid_unnecessary_type_casts` rule which
 /// warns about unnecessary usage of `as` operator

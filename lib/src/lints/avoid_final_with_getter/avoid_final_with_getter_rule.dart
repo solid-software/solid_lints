@@ -6,7 +6,7 @@ import 'package:solid_lints/src/lints/avoid_final_with_getter/visitors/avoid_fin
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-part 'avoid_final_with_getter_fix.dart';
+part 'fixes/avoid_final_with_getter_fix.dart';
 
 /// Avoid using final private fields with getters.
 ///

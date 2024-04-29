@@ -13,15 +13,15 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_type_casts/avoid_unneces
 import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unrelated_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
 import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart';
-import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_metric.dart';
+import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
-import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_metric.dart';
+import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
 import 'package:solid_lints/src/lints/newline_before_return/newline_before_return_rule.dart';
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:solid_lints/src/lints/no_equal_then_else/no_equal_then_else_rule.dart';
 import 'package:solid_lints/src/lints/no_magic_number/no_magic_number_rule.dart';
-import 'package:solid_lints/src/lints/number_of_parameters/number_of_parameters_metric.dart';
+import 'package:solid_lints/src/lints/number_of_parameters/number_of_parameters_rule.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
 import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
@@ -38,9 +38,9 @@ class _SolidLints extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) {
     final List<SolidLintRule> supportedRules = [
-      CyclomaticComplexityMetric.createRule(configs),
-      NumberOfParametersMetric.createRule(configs),
-      FunctionLinesOfCodeMetric.createRule(configs),
+      CyclomaticComplexityRule.createRule(configs),
+      NumberOfParametersRule.createRule(configs),
+      FunctionLinesOfCodeRule.createRule(configs),
       AvoidNonNullAssertionRule.createRule(configs),
       AvoidLateKeywordRule.createRule(configs),
       AvoidGlobalStateRule.createRule(configs),
