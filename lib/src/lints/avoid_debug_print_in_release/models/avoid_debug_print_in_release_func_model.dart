@@ -54,6 +54,7 @@ class AvoidDebugPrintInReleaseFuncModel {
   /// Ehether the function has the same name as debugPrint
   bool get hasSameName => _debugPrint == name;
 
+  /// The complete check if the expression of is the debugPrint function
   bool get isDebugPrint => hasSameName && hasTheSameSource;
 
   @override

@@ -55,6 +55,7 @@ class AvoidDebugPrintInReleaseDebugModel {
   /// Whether the function has the same name as kDebugMode
   bool get hasSameName => _kDebugMode == name;
 
+  /// The complete check if the statement is the `kDebugMode` identifier.
   bool get isDebugMode => hasSameName && hasTheSameSource;
 
   @override
