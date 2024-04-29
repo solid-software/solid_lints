@@ -1,7 +1,7 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/member_ordering/visitors/member_ordering_visitor.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_ordering_parameters.dart';
+import 'package:solid_lints/src/lints/member_ordering/visitors/member_ordering_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
