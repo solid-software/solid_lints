@@ -36,6 +36,12 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
   /// the error when debugPrint is called
   static const lintName = 'avoid_debug_print_in_release';
 
+  static const String _kReleaseModePath =
+      'package:flutter/src/foundation/constants.dart';
+  static const String _kReleaseModeName = 'kReleaseMode';
+  static const _debugPrintPath = 'package:flutter/src/foundation/print.dart';
+  static const _debugPrintName = 'debugPrint';
+
   AvoidDebugPrintInReleaseRule._(super.config);
 
   /// Creates a new instance of [AvoidDebugPrintInReleaseRule]
@@ -103,7 +109,7 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
     final debugCheck = node.thisOrAncestorMatching(
       (node) {
         if (node is IfStatement) {
-          return _isDebugCheck(node.expression);
+          return _isNotReleaseCheck(node.expression);
         }
 
         return false;
@@ -145,9 +151,6 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
   }
 
   bool _isDebugPrintNode(Identifier node) {
-    const printPath = 'package:flutter/src/foundation/print.dart';
-    const debugPrint = 'debugPrint';
-
     final String name;
     final String sourcePath;
     switch (node) {
@@ -164,10 +167,10 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
         return false;
     }
 
-    return name == debugPrint && sourcePath == printPath;
+    return name == _debugPrintName && sourcePath == _debugPrintPath;
   }
 
-  bool _isDebugCheck(Expression node) {
+  bool _isNotReleaseCheck(Expression node) {
     if (node.childEntities.toList()
         case [
           final Token token,
@@ -181,9 +184,6 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
   }
 
   bool _isReleaseModeIdentifier(Identifier node) {
-    const String expectedPath = 'package:flutter/src/foundation/constants.dart';
-    const String kReleaseModeName = 'kReleaseMode';
-
     final String name;
     final String sourcePath;
 
@@ -200,6 +200,6 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
         return false;
     }
 
-    return name == kReleaseModeName && sourcePath == expectedPath;
+    return name == _kReleaseModeName && sourcePath == _kReleaseModePath;
   }
 }

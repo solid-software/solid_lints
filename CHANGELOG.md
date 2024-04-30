@@ -6,7 +6,8 @@
 - Add a rule prefer_guard_clause for reversing nested if statements (https://github.com/solid-software/solid_lints/issues/91)
 - add exclude params support to avoid_returning_widgets rule (https://github.com/solid-software/solid_lints/issues/131)
 - add quick fix to avoid_final_with_getter (https://github.com/solid-software/solid_lints/pull/164)
-
+- Renamed `avoid_debug_print` to `avoid_debug_print_in_release`
+- Now, `avoid_debug_print_in_release` doesn't trigger if the `debugPrint` call is wrapped in a `!kReleaseMode` check.
 
 ## 0.1.5
 
