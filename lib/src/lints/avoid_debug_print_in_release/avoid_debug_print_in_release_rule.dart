@@ -1,14 +1,13 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_debug_print_in_release/models/avoid_debug_print_in_release_debug_model.dart';
-import 'package:solid_lints/src/lints/avoid_debug_print_in_release/models/avoid_debug_print_in_release_func_model.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A `avoid_debug_print` rule which forbids calling or referencing
-/// debugPrint function from flutter/foundation.
+/// debugPrint function in release mode.
 ///
 /// See more here: https://github.com/flutter/flutter/issues/147141
 ///
@@ -26,7 +25,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// #### GOOD:
 ///
 /// ```dart
-/// if (kDebugMode) {
+/// if (!kReleaseMode) {
 ///   debugPrint('');
 /// }
 /// ```
@@ -45,7 +44,7 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      problemMessage: (_) => "Avoid using 'debugPrint'",
+      problemMessage: (_) => "Avoid using 'debugPrint' in release mode",
     );
 
     return AvoidDebugPrintInReleaseRule._(rule);
@@ -97,30 +96,25 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
     required AstNode node,
     required ErrorReporter reporter,
   }) {
-    final funcModel =
-        AvoidDebugPrintInReleaseFuncModel.parseExpression(identifier);
-
-    if (funcModel.isDebugPrint) {
-      if (node.thisOrAncestorMatching(
-            (node) {
-              if (node is IfStatement) {
-                final check =
-                    AvoidDebugPrintInReleaseCheckModel.parseExpression(
-                  node.expression,
-                );
-
-                return check.isNotRelease;
-              }
-
-              return false;
-            },
-          ) !=
-          null) {
-        return;
-      }
-
-      reporter.reportErrorForNode(code, node);
+    if (!_isDebugPrintNode(identifier)) {
+      return;
     }
+
+    final debugCheck = node.thisOrAncestorMatching(
+      (node) {
+        if (node is IfStatement) {
+          return _isDebugCheck(node.expression);
+        }
+
+        return false;
+      },
+    );
+
+    if (debugCheck != null) {
+      return;
+    }
+
+    reporter.reportErrorForNode(code, node);
   }
 
   /// Returns null if doesn't have right operand
@@ -148,5 +142,64 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
       node: node,
       reporter: reporter,
     );
+  }
+
+  bool _isDebugPrintNode(Identifier node) {
+    const printPath = 'package:flutter/src/foundation/print.dart';
+    const debugPrint = 'debugPrint';
+
+    final String name;
+    final String sourcePath;
+    switch (node) {
+      case PrefixedIdentifier():
+        final prefix = node.prefix.name;
+        name = node.name.replaceAll('$prefix.', '');
+        sourcePath = node.staticElement?.librarySource?.uri.toString() ?? '';
+
+      case SimpleIdentifier():
+        name = node.name;
+        sourcePath = node.staticElement?.librarySource?.uri.toString() ?? '';
+
+      default:
+        return false;
+    }
+
+    return name == debugPrint && sourcePath == printPath;
+  }
+
+  bool _isDebugCheck(Expression node) {
+    if (node.childEntities.toList()
+        case [
+          final Token token,
+          final Identifier identifier,
+        ]) {
+      return token.type == TokenType.BANG &&
+          _isReleaseModeIdentifier(identifier);
+    }
+
+    return false;
+  }
+
+  bool _isReleaseModeIdentifier(Identifier node) {
+    const String expectedPath = 'package:flutter/src/foundation/constants.dart';
+    const String kReleaseModeName = 'kReleaseMode';
+
+    final String name;
+    final String sourcePath;
+
+    switch (node) {
+      case PrefixedIdentifier():
+        final prefix = node.prefix.name;
+
+        name = node.name.replaceAll('$prefix.', '');
+        sourcePath = node.staticElement?.librarySource?.uri.toString() ?? '';
+      case SimpleIdentifier():
+        name = node.name;
+        sourcePath = node.staticElement?.librarySource?.uri.toString() ?? '';
+      default:
+        return false;
+    }
+
+    return name == kReleaseModeName && sourcePath == expectedPath;
   }
 }
