@@ -3,6 +3,7 @@ analyzer:
     - custom_lint
 
 custom_lint:
+  debug: true,
   rules:
     - cyclomatic_complexity:
       max_complexity: 4

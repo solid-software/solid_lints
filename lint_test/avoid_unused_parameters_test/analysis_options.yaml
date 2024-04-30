@@ -1,0 +1,12 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_unused_parameters:
+      exclude:
+        - method_name: excludeMethod
+          class_name: ExcludeClass
+        - method_name: excludeFunction
+        - class_name: ExcludeEntireClass

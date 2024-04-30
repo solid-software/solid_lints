@@ -1,9 +1,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/listener.dart';
-import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
+import 'package:solid_lints/src/models/ignored_entities_model/ignored_entities_model.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
@@ -50,8 +49,7 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 ///   }
 /// }
 /// ```
-class AvoidReturningWidgetsRule
-    extends SolidLintRule<AvoidReturningWidgetsParameters> {
+class AvoidReturningWidgetsRule extends SolidLintRule<IgnoredEntitiesModel> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether we return a widget.
   static const lintName = 'avoid_returning_widgets';
@@ -64,7 +62,7 @@ class AvoidReturningWidgetsRule
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      paramsParser: AvoidReturningWidgetsParameters.fromJson,
+      paramsParser: IgnoredEntitiesModel.fromJson,
       problemMessage: (_) =>
           'Returning a widget from a function is considered an anti-pattern. '
           'Unless you are overriding an existing method, '
@@ -96,7 +94,7 @@ class AvoidReturningWidgetsRule
 
       final isWidgetReturned = hasWidgetType(returnType);
 
-      final isIgnored = _shouldIgnore(node);
+      final isIgnored = config.parameters.matchMethod(node);
 
       final isOverriden = node.declaredElement?.hasOverride ?? false;
 
@@ -104,26 +102,5 @@ class AvoidReturningWidgetsRule
         reporter.reportErrorForNode(code, node);
       }
     });
-  }
-
-  bool _shouldIgnore(Declaration node) {
-    final methodName = node.declaredElement?.name;
-
-    final excludedItem = config.parameters.exclude
-        .firstWhereOrNull((e) => e.methodName == methodName);
-
-    if (excludedItem == null) return false;
-
-    final className = excludedItem.className;
-
-    if (className == null || node is! MethodDeclaration) {
-      return true;
-    } else {
-      final classDeclaration = node.thisOrAncestorOfType<ClassDeclaration>();
-
-      if (classDeclaration == null) return false;
-
-      return classDeclaration.name.toString() == className;
-    }
   }
 }

@@ -25,12 +25,19 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/models/ignored_entities_model/ignored_entities_model.dart';
 import 'package:solid_lints/src/utils/node_utils.dart';
 import 'package:solid_lints/src/utils/parameter_utils.dart';
 
 /// AST Visitor which finds all is expressions and checks if they are
 /// unrelated (result always false)
 class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
+  /// AvoidUnusedParametersVisitor constructor
+  AvoidUnusedParametersVisitor(this.ignoredEntities);
+
+  /// Entities that should be ignored
+  final IgnoredEntitiesModel ignoredEntities;
+
   final _unusedParameters = <FormalParameter>[];
 
   /// List of unused parameters
@@ -48,6 +55,13 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
         parameters.parameters.isEmpty) {
       return;
     }
+
+    if (node.thisOrAncestorOfType<ClassDeclaration>() case final classNode?) {
+      if (ignoredEntities.matchClass(classNode)) {
+        return;
+      }
+    }
+
     final unused = _getUnusedParameters(
       node.body,
       parameters.parameters,
@@ -73,6 +87,16 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
+    if (ignoredEntities.matchMethod(node)) {
+      return;
+    }
+
+    if (node.thisOrAncestorOfType<ClassDeclaration>() case final classNode?) {
+      if (ignoredEntities.matchClass(classNode)) {
+        return;
+      }
+    }
+
     final isTearOff = _usedAsTearOff(node);
 
     if (!isOverride(node.metadata) && !isTearOff) {
@@ -91,6 +115,12 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     final params = node.parameters;
     if (params == null) {
       return;
+    }
+
+    if (node.thisOrAncestorOfType<FunctionDeclaration>() case final funcNode?) {
+      if (ignoredEntities.matchMethod(funcNode)) {
+        return;
+      }
     }
 
     _unusedParameters.addAll(
