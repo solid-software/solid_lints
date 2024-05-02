@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
@@ -39,7 +40,7 @@ class CyclomaticComplexityRule
       paramsParser: CyclomaticComplexityParameters.fromJson,
       problemMessage: (value) =>
           'The maximum allowed complexity of a function is '
-          '${value.maxComplexity}. Please decrease it.',
+          '${value.maxCyclomaticComplexity.maxComplexity}. Please decrease it.',
     );
 
     return CyclomaticComplexityRule._(rule);
@@ -52,11 +53,23 @@ class CyclomaticComplexityRule
     CustomLintContext context,
   ) {
     context.registry.addBlockFunctionBody((node) {
+      final functionNode = node.thisOrAncestorOfType<Declaration>();
+      if (functionNode != null &&
+          config.parameters.ignoredEntities.matchMethod(functionNode)) {
+        return;
+      }
+
+      final classNode = node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classNode != null &&
+          config.parameters.ignoredEntities.matchClass(classNode)) {
+        return;
+      }
+
       final visitor = CyclomaticComplexityFlowVisitor();
       node.visitChildren(visitor);
 
       if (visitor.complexityEntities.length + 1 >
-          config.parameters.maxComplexity) {
+          config.parameters.maxCyclomaticComplexity.maxComplexity) {
         reporter.reportErrorForNode(code, node);
       }
     });

@@ -15,6 +15,7 @@ class IgnoredEntity {
 
   /// Class name
   final String? className;
+
   /// Function name
   final String? functionName;
 

@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:solid_lints/src/models/ignored_entities_model/ignored_entity.dart';
 
-/// Manages a list of entities (functions/methods/classes) that should be 
+/// Manages a list of entities (functions/methods/classes) that should be
 /// excluded from a lint rule.
-/// 
+///
 /// Example config:
 /// ```yaml
 /// custom_lint:

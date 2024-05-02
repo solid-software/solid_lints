@@ -1,0 +1,13 @@
+analyzer:
+  plugins:
+    - ../custom_lint
+
+custom_lint:
+  rules:
+    - cyclomatic_complexity:
+      max_complexity: 4
+      exclude:
+        - method_name: excludeMethod
+          class_name: ExcludeClass
+        - method_name: excludeFunction
+        - class_name: ExcludeEntireClass
