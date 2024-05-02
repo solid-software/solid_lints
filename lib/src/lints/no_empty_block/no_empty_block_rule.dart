@@ -78,8 +78,6 @@ class NoEmptyBlockRule extends SolidLintRule<IgnoredEntitiesModel> {
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {
-      
-
       final visitor = NoEmptyBlockVisitor(config.parameters);
       node.accept(visitor);
 

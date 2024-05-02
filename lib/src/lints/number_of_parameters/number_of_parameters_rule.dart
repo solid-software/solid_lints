@@ -65,6 +65,11 @@ class NumberOfParametersRule
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
+      if (config.parameters.ignoredEntitiesModel.matchClass(node) ||
+          config.parameters.ignoredEntitiesModel.matchMethod(node)) {
+        return;
+      }
+
       final parameters = switch (node) {
         (final MethodDeclaration node) =>
           node.parameters?.parameters.length ?? 0,
