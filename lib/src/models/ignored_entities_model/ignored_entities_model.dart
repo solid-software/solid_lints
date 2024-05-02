@@ -19,7 +19,8 @@ import 'package:solid_lints/src/models/ignored_entities_model/ignored_entity.dar
 ///         - class_name: ExcludeEntireClass
 /// ```
 class IgnoredEntitiesModel {
-  IgnoredEntitiesModel._({required this.entities});
+  ///
+  const IgnoredEntitiesModel._({required this.entities});
 
   ///
   factory IgnoredEntitiesModel.fromJson(Map<dynamic, dynamic> json) {

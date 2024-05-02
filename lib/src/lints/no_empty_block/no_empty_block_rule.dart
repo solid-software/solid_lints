@@ -1,6 +1,7 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/no_empty_block/visitors/no_empty_block_visitor.dart';
+import 'package:solid_lints/src/models/ignored_entities_model/ignored_entities_model.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
@@ -49,7 +50,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   } catch (_) {} // ignored by this rule
 /// }
 /// ```
-class NoEmptyBlockRule extends SolidLintRule {
+class NoEmptyBlockRule extends SolidLintRule<IgnoredEntitiesModel> {
   /// The [LintCode] of this lint rule that represents
   /// the error whether left empty block.
   static const String lintName = 'no_empty_block';
@@ -62,6 +63,7 @@ class NoEmptyBlockRule extends SolidLintRule {
     final config = RuleConfig(
       configs: configs,
       name: lintName,
+      paramsParser: IgnoredEntitiesModel.fromJson,
       problemMessage: (_) =>
           'Block is empty. Empty blocks are often indicators of missing code.',
     );
@@ -76,7 +78,9 @@ class NoEmptyBlockRule extends SolidLintRule {
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {
-      final visitor = NoEmptyBlockVisitor();
+      
+
+      final visitor = NoEmptyBlockVisitor(config.parameters);
       node.accept(visitor);
 
       for (final emptyBlock in visitor.emptyBlocks) {

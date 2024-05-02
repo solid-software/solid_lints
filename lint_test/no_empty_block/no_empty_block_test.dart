@@ -49,3 +49,16 @@ class A {
     // TODO: implement toDoMethod
   }
 }
+
+void excludeFunction() {}
+
+class ExcludeEntireClass {
+  void foo() {}
+}
+
+class ExcludeClass {
+  void excludeMethod() {}
+
+  // expect_lint: no_empty_block
+  void foo() {}
+}

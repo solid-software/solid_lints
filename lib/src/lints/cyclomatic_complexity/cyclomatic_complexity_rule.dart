@@ -56,17 +56,6 @@ class CyclomaticComplexityRule
           config.parameters.ignoredEntities.matchClass(node)) {
         return;
       }
-      // final functionNode = node.thisOrAncestorOfType<Declaration>();
-      // if (functionNode != null &&
-      //     config.parameters.ignoredEntities.matchMethod(functionNode)) {
-      //   return;
-      // }
-
-      // final classNode = node.thisOrAncestorOfType<ClassDeclaration>();
-      // if (classNode != null &&
-      //     config.parameters.ignoredEntities.matchClass(classNode)) {
-      //   return;
-      // }
 
       final visitor = CyclomaticComplexityFlowVisitor();
       node.visitChildren(visitor);

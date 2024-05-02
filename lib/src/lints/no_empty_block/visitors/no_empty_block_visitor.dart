@@ -23,16 +23,23 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/models/ignored_entities_model/ignored_entities_model.dart';
 
 const _todoComment = 'TODO';
 
 /// The AST visitor that will find all empty blocks, excluding catch blocks
 /// and blocks containing [_todoComment]
 class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
+  /// Entities that this visitor should ignore.
+  final IgnoredEntitiesModel ignoredEntitiesModel;
+
   final _emptyBlocks = <Block>[];
 
   /// All empty blocks
   Iterable<Block> get emptyBlocks => _emptyBlocks;
+
+  ///
+  NoEmptyBlockVisitor(this.ignoredEntitiesModel);
 
   @override
   void visitBlock(Block node) {
@@ -41,6 +48,10 @@ class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
     if (node.statements.isNotEmpty) return;
     if (node.parent is CatchClause) return;
     if (_isPrecedingCommentToDo(node)) return;
+    if (ignoredEntitiesModel.matchClass(node) ||
+        ignoredEntitiesModel.matchMethod(node)) {
+      return;
+    }
 
     _emptyBlocks.add(node);
   }
