@@ -39,7 +39,7 @@ class CyclomaticComplexityRule
       paramsParser: CyclomaticComplexityParameters.fromJson,
       problemMessage: (value) =>
           'The maximum allowed complexity of a function is '
-          '${value.maxComplexity}. Please decrease it.',
+          '${value.maxCyclomaticComplexity.maxComplexity}. Please decrease it.',
     );
 
     return CyclomaticComplexityRule._(rule);
@@ -52,11 +52,16 @@ class CyclomaticComplexityRule
     CustomLintContext context,
   ) {
     context.registry.addBlockFunctionBody((node) {
+      if (config.parameters.ignoredEntities.isIgnoredMethod(node) ||
+          config.parameters.ignoredEntities.isIgnoredClass(node)) {
+        return;
+      }
+
       final visitor = CyclomaticComplexityFlowVisitor();
       node.visitChildren(visitor);
 
       if (visitor.complexityEntities.length + 1 >
-          config.parameters.maxComplexity) {
+          config.parameters.maxCyclomaticComplexity.maxComplexity) {
         reporter.reportErrorForNode(code, node);
       }
     });

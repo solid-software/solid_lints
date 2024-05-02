@@ -4,8 +4,7 @@ analyzer:
 
 custom_lint:
   rules:
-    - function_lines_of_code:
-      max_lines: 5
+    - avoid_unused_parameters:
       exclude:
         - method_name: excludeMethod
           class_name: ExcludeClass

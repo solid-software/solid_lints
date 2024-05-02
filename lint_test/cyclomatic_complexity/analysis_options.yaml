@@ -4,8 +4,8 @@ analyzer:
 
 custom_lint:
   rules:
-    - function_lines_of_code:
-      max_lines: 5
+    - cyclomatic_complexity:
+      max_complexity: 4
       exclude:
         - method_name: excludeMethod
           class_name: ExcludeClass

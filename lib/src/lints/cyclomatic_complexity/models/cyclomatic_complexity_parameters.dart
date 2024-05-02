@@ -1,19 +1,25 @@
-/// Cyclomatic complexity metric limits configuration.
-class CyclomaticComplexityParameters {
-  /// Threshold cyclomatic complexity level, exceeding it triggers a warning.
-  final int maxComplexity;
+import 'package:solid_lints/src/lints/cyclomatic_complexity/models/max_cyclomatic_complexity_parameters.dart';
+import 'package:solid_lints/src/models/ignored_entities_model/ignored_entities_model.dart';
 
-  /// Reference: NIST 500-235 item 2.5
-  static const _defaultMaxComplexity = 10;
+/// Config parameters for the `cyclomatic_complexity` rule
+class CyclomaticComplexityParameters {
+  /// `max_complexity` configuration
+  final MaxCyclomaticComplexityParameters maxCyclomaticComplexity;
+
+  /// `exclude` configuration
+  final IgnoredEntitiesModel ignoredEntities;
 
   /// Constructor for [CyclomaticComplexityParameters] model
   const CyclomaticComplexityParameters({
-    required this.maxComplexity,
+    required this.maxCyclomaticComplexity,
+    required this.ignoredEntities,
   });
 
-  /// Method for creating from json data
-  factory CyclomaticComplexityParameters.fromJson(Map<String, Object?> json) =>
-      CyclomaticComplexityParameters(
-        maxComplexity: json['max_complexity'] as int? ?? _defaultMaxComplexity,
-      );
+  ///
+  factory CyclomaticComplexityParameters.fromJson(Map<String, Object?> json) {
+    return CyclomaticComplexityParameters(
+      ignoredEntities: IgnoredEntitiesModel.fromJson(json),
+      maxCyclomaticComplexity: MaxCyclomaticComplexityParameters.fromJson(json),
+    );
+  }
 }

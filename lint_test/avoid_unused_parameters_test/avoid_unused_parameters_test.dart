@@ -207,3 +207,13 @@ class UsingConstructorParameterInInitializer {
     print(_value);
   }
 }
+
+class ExcludeEntireClass {
+  void foo(int a) {}
+}
+
+void excludeFunction(int a, int b) {}
+
+class ExcludeClass {
+  void excludeMethod(int a, int b) {}
+}

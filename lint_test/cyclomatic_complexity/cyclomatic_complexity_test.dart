@@ -31,3 +31,48 @@ class A {
     if (true) {}
   }
 }
+
+void excludeFunction() {
+  if (true) {
+    if (true) {
+      if (true) {
+        if (true) {}
+      }
+    }
+  }
+}
+
+class ExcludeEntireClass {
+  void foo() {
+    if (true) {
+      if (true) {
+        if (true) {
+          if (true) {}
+        }
+      }
+    }
+  }
+}
+
+class ExcludeClass {
+  /// expect_lint: cyclomatic_complexity
+  void foo() {
+    if (true) {
+      if (true) {
+        if (true) {
+          if (true) {}
+        }
+      }
+    }
+  }
+
+  void excludeMethod() {
+    if (true) {
+      if (true) {
+        if (true) {
+          if (true) {}
+        }
+      }
+    }
+  }
+}
