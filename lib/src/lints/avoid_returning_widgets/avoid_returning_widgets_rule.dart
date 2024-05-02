@@ -94,7 +94,8 @@ class AvoidReturningWidgetsRule extends SolidLintRule<IgnoredEntitiesModel> {
 
       final isWidgetReturned = hasWidgetType(returnType);
 
-      final isIgnored = config.parameters.matchMethod(node);
+      final isIgnored = config.parameters.matchMethod(node) ||
+          config.parameters.matchClass(node);
 
       final isOverriden = node.declaredElement?.hasOverride ?? false;
 

@@ -38,8 +38,13 @@ class IgnoredEntitiesModel {
 
   /// Checks if the entire class should be ignored.
   /// Doesn't match if the config specifies a specific function within the class
-  bool matchClass(ClassDeclaration node) {
-    final className = node.name.toString();
+  bool matchClass(AstNode node) {
+    final classNode = node.thisOrAncestorOfType<ClassDeclaration>();
+    if (classNode == null) {
+      return false;
+    }
+
+    final className = classNode.name.toString();
 
     return entities.any((element) {
       return element.functionName == null && element.className == className;
@@ -47,8 +52,13 @@ class IgnoredEntitiesModel {
   }
 
   /// Checks if the given method/function should be ignored.
-  bool matchMethod(Declaration node) {
-    final methodName = node.declaredElement?.name;
+  bool matchMethod(AstNode node) {
+    final methodNode = node.thisOrAncestorOfType<Declaration>();
+    if (methodNode == null) {
+      return false;
+    }
+
+    final methodName = methodNode.declaredElement?.name;
 
     return entities.any((entity) {
       if (entity.functionName != methodName) {
@@ -59,7 +69,7 @@ class IgnoredEntitiesModel {
         return true;
       }
 
-      final matchingClass = node.thisOrAncestorMatching((node) {
+      final matchingClass = methodNode.thisOrAncestorMatching((node) {
         if (node case final ClassDeclaration classNode) {
           return classNode.name.toString() == entity.className;
         }

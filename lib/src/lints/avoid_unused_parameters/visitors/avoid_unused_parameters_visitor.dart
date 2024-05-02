@@ -56,10 +56,8 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    if (node.thisOrAncestorOfType<ClassDeclaration>() case final classNode?) {
-      if (ignoredEntities.matchClass(classNode)) {
-        return;
-      }
+    if (ignoredEntities.matchClass(node)) {
+      return;
     }
 
     final unused = _getUnusedParameters(
@@ -87,14 +85,8 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    if (ignoredEntities.matchMethod(node)) {
+    if (ignoredEntities.matchMethod(node) || ignoredEntities.matchClass(node)) {
       return;
-    }
-
-    if (node.thisOrAncestorOfType<ClassDeclaration>() case final classNode?) {
-      if (ignoredEntities.matchClass(classNode)) {
-        return;
-      }
     }
 
     final isTearOff = _usedAsTearOff(node);
@@ -117,10 +109,8 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    if (node.thisOrAncestorOfType<FunctionDeclaration>() case final funcNode?) {
-      if (ignoredEntities.matchMethod(funcNode)) {
-        return;
-      }
+    if (ignoredEntities.matchMethod(node)) {
+      return;
     }
 
     _unusedParameters.addAll(

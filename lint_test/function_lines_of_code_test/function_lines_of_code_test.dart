@@ -1,4 +1,4 @@
-class ClassWithLongMethods {
+class ExcludeClass {
   int notLongMethod() {
     var i = 0;
     i++;
@@ -18,7 +18,7 @@ class ClassWithLongMethods {
   }
 
   // Excluded by excludeNames
-  int longMethodExcluded() {
+  int excludeMethod() {
     var i = 0;
     i++;
     i++;
@@ -47,11 +47,22 @@ int longFunction() {
 }
 
 // Excluded by excludeNames
-int longFunctionExcluded() {
+int excludeFunction() {
   var i = 0;
   i++;
   i++;
   i++;
   i++;
   return i;
+}
+
+class ExcludeEntireClass {
+  int longFunction() {
+    var i = 0;
+    i++;
+    i++;
+    i++;
+    i++;
+    return i;
+  }
 }

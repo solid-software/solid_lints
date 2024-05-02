@@ -16,8 +16,11 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   rules:
 ///     - function_lines_of_code:
 ///       max_lines: 100
-///       excludeNames:
-///         - "Build"
+///       exclude:
+///         - method_name: excludeMethod
+///         class_name: ExcludeClass
+///         - method_name: excludeFunction
+///         - class_name: ExcludeEntireClass
 /// ```
 class FunctionLinesOfCodeRule
     extends SolidLintRule<FunctionLinesOfCodeParameters> {
@@ -35,7 +38,7 @@ class FunctionLinesOfCodeRule
       name: lintName,
       paramsParser: FunctionLinesOfCodeParameters.fromJson,
       problemMessage: (value) =>
-          'The maximum allowed number of lines is ${value.maxLines}. '
+          'The maximum allowed number of lines is ${value.maxLinesModel}. '
           'Try splitting this function into smaller parts.',
     );
 
@@ -60,16 +63,16 @@ class FunctionLinesOfCodeRule
     ErrorReporter reporter,
     AstNode node,
   ) {
-    final functionName = _getFunctionName(node);
-    if (functionName != null &&
-        config.parameters.excludeNames.contains(functionName)) {
+    if (config.parameters.ignoredEntitiesModel.matchMethod(node) ||
+        config.parameters.ignoredEntitiesModel.matchClass(node)) {
       return;
     }
 
     final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
     node.visitChildren(visitor);
 
-    if (visitor.linesWithCode.length > config.parameters.maxLines) {
+    if (visitor.linesWithCode.length >
+        config.parameters.maxLinesModel.maxLines) {
       if (node is! AnnotatedNode) {
         return reporter.reportErrorForNode(code, node);
       }
@@ -82,18 +85,6 @@ class FunctionLinesOfCodeRule
         startOffset,
         node.length - lengthDifference,
       );
-    }
-  }
-
-  String? _getFunctionName(AstNode node) {
-    if (node is FunctionDeclaration) {
-      return node.name.lexeme;
-    } else if (node is MethodDeclaration) {
-      return node.name.lexeme;
-    } else if (node is FunctionExpression) {
-      return node.declaredElement?.name;
-    } else {
-      return null;
     }
   }
 }

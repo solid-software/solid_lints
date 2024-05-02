@@ -1,4 +1,3 @@
-import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
@@ -53,17 +52,21 @@ class CyclomaticComplexityRule
     CustomLintContext context,
   ) {
     context.registry.addBlockFunctionBody((node) {
-      final functionNode = node.thisOrAncestorOfType<Declaration>();
-      if (functionNode != null &&
-          config.parameters.ignoredEntities.matchMethod(functionNode)) {
+      if (config.parameters.ignoredEntities.matchMethod(node) ||
+          config.parameters.ignoredEntities.matchClass(node)) {
         return;
       }
+      // final functionNode = node.thisOrAncestorOfType<Declaration>();
+      // if (functionNode != null &&
+      //     config.parameters.ignoredEntities.matchMethod(functionNode)) {
+      //   return;
+      // }
 
-      final classNode = node.thisOrAncestorOfType<ClassDeclaration>();
-      if (classNode != null &&
-          config.parameters.ignoredEntities.matchClass(classNode)) {
-        return;
-      }
+      // final classNode = node.thisOrAncestorOfType<ClassDeclaration>();
+      // if (classNode != null &&
+      //     config.parameters.ignoredEntities.matchClass(classNode)) {
+      //   return;
+      // }
 
       final visitor = CyclomaticComplexityFlowVisitor();
       node.visitChildren(visitor);
