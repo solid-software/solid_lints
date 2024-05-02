@@ -52,8 +52,8 @@ class CyclomaticComplexityRule
     CustomLintContext context,
   ) {
     context.registry.addBlockFunctionBody((node) {
-      if (config.parameters.ignoredEntities.matchMethod(node) ||
-          config.parameters.ignoredEntities.matchClass(node)) {
+      if (config.parameters.ignoredEntities.isIgnoredMethod(node) ||
+          config.parameters.ignoredEntities.isIgnoredClass(node)) {
         return;
       }
 

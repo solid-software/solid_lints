@@ -63,8 +63,8 @@ class FunctionLinesOfCodeRule
     ErrorReporter reporter,
     AstNode node,
   ) {
-    if (config.parameters.ignoredEntitiesModel.matchMethod(node) ||
-        config.parameters.ignoredEntitiesModel.matchClass(node)) {
+    if (config.parameters.ignoredEntitiesModel.isIgnoredMethod(node) ||
+        config.parameters.ignoredEntitiesModel.isIgnoredClass(node)) {
       return;
     }
 

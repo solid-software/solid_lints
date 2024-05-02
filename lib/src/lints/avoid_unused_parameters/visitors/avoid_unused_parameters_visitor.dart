@@ -56,7 +56,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    if (ignoredEntities.matchClass(node)) {
+    if (ignoredEntities.isIgnoredClass(node)) {
       return;
     }
 
@@ -85,7 +85,8 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    if (ignoredEntities.matchMethod(node) || ignoredEntities.matchClass(node)) {
+    if (ignoredEntities.isIgnoredMethod(node) ||
+        ignoredEntities.isIgnoredClass(node)) {
       return;
     }
 
@@ -109,7 +110,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    if (ignoredEntities.matchMethod(node)) {
+    if (ignoredEntities.isIgnoredMethod(node)) {
       return;
     }
 

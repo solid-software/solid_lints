@@ -48,8 +48,8 @@ class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
     if (node.statements.isNotEmpty) return;
     if (node.parent is CatchClause) return;
     if (_isPrecedingCommentToDo(node)) return;
-    if (ignoredEntitiesModel.matchClass(node) ||
-        ignoredEntitiesModel.matchMethod(node)) {
+    if (ignoredEntitiesModel.isIgnoredClass(node) ||
+        ignoredEntitiesModel.isIgnoredMethod(node)) {
       return;
     }
 

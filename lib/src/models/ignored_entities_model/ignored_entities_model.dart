@@ -39,7 +39,7 @@ class IgnoredEntitiesModel {
 
   /// Checks if the entire class should be ignored.
   /// Doesn't match if the config specifies a specific function within the class
-  bool matchClass(AstNode node) {
+  bool isIgnoredClass(AstNode node) {
     final classNode = node.thisOrAncestorOfType<ClassDeclaration>();
     if (classNode == null) {
       return false;
@@ -53,7 +53,7 @@ class IgnoredEntitiesModel {
   }
 
   /// Checks if the given method/function should be ignored.
-  bool matchMethod(AstNode node) {
+  bool isIgnoredMethod(AstNode node) {
     final methodNode = node.thisOrAncestorOfType<Declaration>();
     if (methodNode == null) {
       return false;
