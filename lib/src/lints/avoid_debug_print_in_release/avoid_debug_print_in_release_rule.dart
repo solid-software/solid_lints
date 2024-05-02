@@ -6,8 +6,8 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-/// A `avoid_debug_print` rule which forbids calling or referencing
-/// debugPrint function in release mode.
+/// An `avoid_debug_print_in_release` rule which forbids calling or referencing
+/// debugPrint function from flutter/foundation in release mode.
 ///
 /// See more here: https://github.com/flutter/flutter/issues/147141
 ///
@@ -50,7 +50,9 @@ class AvoidDebugPrintInReleaseRule extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      problemMessage: (_) => "Avoid using 'debugPrint' in release mode",
+      problemMessage: (_) => """
+Avoid using 'debugPrint' in release mode. Wrap 
+your `debugPrint` call in a `!kReleaseMode` check.""",
     );
 
     return AvoidDebugPrintInReleaseRule._(rule);
