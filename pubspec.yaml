@@ -24,3 +24,6 @@ dev_dependencies:
   flutter:
     sdk: flutter
   test: ^1.24.6
+
+dependency_overrides:
+  analyzer: ^6.6.0
