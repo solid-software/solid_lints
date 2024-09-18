@@ -57,7 +57,7 @@ class PreferLastRule extends SolidLintRule {
       node.accept(visitor);
 
       for (final element in visitor.expressions) {
-        reporter.reportErrorForNode(code, element);
+        reporter.atNode(element, code);
       }
     });
   }

@@ -102,7 +102,7 @@ class NewlineBeforeReturnRule extends SolidLintRule {
       visitor.visitReturnStatement(node);
 
       for (final element in visitor.statements) {
-        reporter.reportErrorForNode(code, element);
+        reporter.atNode(element, code);
       }
     });
   }

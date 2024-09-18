@@ -101,7 +101,7 @@ class AvoidReturningWidgetsRule
       final isOverriden = node.declaredElement?.hasOverride ?? false;
 
       if (isWidgetReturned && !isOverriden && !isIgnored) {
-        reporter.reportErrorForNode(code, node);
+        reporter.atNode(node, code);
       }
     });
   }

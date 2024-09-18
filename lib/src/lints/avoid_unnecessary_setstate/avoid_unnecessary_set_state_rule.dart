@@ -84,7 +84,7 @@ class AvoidUnnecessarySetStateRule extends SolidLintRule {
       final visitor = AvoidUnnecessarySetStateVisitor();
       visitor.visitClassDeclaration(node);
       for (final element in visitor.setStateInvocations) {
-        reporter.reportErrorForNode(code, element);
+        reporter.atNode(element, code);
       }
     });
   }

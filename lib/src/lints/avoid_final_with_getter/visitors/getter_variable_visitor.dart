@@ -35,7 +35,7 @@ extension on MethodDeclaration {
           expression: SimpleIdentifier(
             staticElement: Element(
               declaration: PropertyAccessorElement(
-                variable: PropertyInducingElement(:final id)
+                variable2: PropertyInducingElement(:final id)
               )
             )
           )

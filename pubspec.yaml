@@ -8,12 +8,12 @@ documentation: https://solid-software.github.io/solid_lints/docs/intro
 topics: [lints, linter, lint, analysis, analyzer]
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
-  analyzer: ^6.2.0
+  analyzer: ^6.6.0
   collection: ^1.17.2
-  custom_lint_builder: ^0.6.0
+  custom_lint_builder: ^0.6.7
   glob: ^2.1.2
   path: ^1.8.3
   yaml: ^3.1.2

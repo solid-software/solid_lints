@@ -63,13 +63,13 @@ class AvoidGlobalStateRule extends SolidLintRule {
     context.registry.addTopLevelVariableDeclaration(
       (node) => node.variables.variables
           .where((variable) => variable.isPublicMutable)
-          .forEach((node) => reporter.reportErrorForNode(code, node)),
+          .forEach((node) => reporter.atNode(node, code)),
     );
     context.registry.addFieldDeclaration((node) {
       if (!node.isStatic) return;
       node.fields.variables
           .where((variable) => variable.isPublicMutable)
-          .forEach((node) => reporter.reportErrorForNode(code, node));
+          .forEach((node) => reporter.atNode(node, code));
     });
   }
 }

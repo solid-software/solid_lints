@@ -81,15 +81,15 @@ class DoubleLiteralFormatRule extends SolidLintRule {
       final lexeme = node.literal.lexeme;
 
       if (lexeme.hasLeadingZero) {
-        reporter.reportErrorForNode(_leadingZeroCode, node);
+        reporter.atNode(node, _leadingZeroCode);
         return;
       }
       if (lexeme.hasLeadingDecimalPoint) {
-        reporter.reportErrorForNode(_leadingDecimalCode, node);
+        reporter.atNode(node, _leadingDecimalCode);
         return;
       }
       if (lexeme.hasTrailingZero) {
-        reporter.reportErrorForNode(_trailingZeroCode, node);
+        reporter.atNode(node, _trailingZeroCode);
         return;
       }
     });

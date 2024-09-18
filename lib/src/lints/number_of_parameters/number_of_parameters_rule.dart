@@ -74,10 +74,10 @@ class NumberOfParametersRule
       };
 
       if (parameters > config.parameters.maxParameters) {
-        reporter.reportErrorForOffset(
-          code,
-          node.firstTokenAfterCommentAndMetadata.offset,
-          node.end,
+        reporter.atOffset(
+          offset: node.firstTokenAfterCommentAndMetadata.offset,
+          length: node.end,
+          errorCode: code,
         );
       }
     });

@@ -61,7 +61,7 @@ class PreferEarlyReturnRule extends SolidLintRule {
       node.accept(visitor);
 
       for (final element in visitor.nodes) {
-        reporter.reportErrorForNode(code, element);
+        reporter.atNode(element, code);
       }
     });
   }

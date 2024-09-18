@@ -86,7 +86,7 @@ class AvoidNonNullAssertionRule extends SolidLintRule {
         }
       }
 
-      reporter.reportErrorForNode(code, node);
+      reporter.atNode(node, code);
     });
   }
 }

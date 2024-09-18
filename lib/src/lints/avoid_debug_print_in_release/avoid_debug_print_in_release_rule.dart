@@ -122,7 +122,7 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
       return;
     }
 
-    reporter.reportErrorForNode(code, node);
+    reporter.atNode(node, code);
   }
 
   /// Returns null if doesn't have right operand

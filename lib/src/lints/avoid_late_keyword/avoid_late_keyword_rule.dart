@@ -76,7 +76,7 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
   ) {
     context.registry.addVariableDeclaration((node) {
       if (_shouldLint(node)) {
-        reporter.reportErrorForNode(code, node);
+        reporter.atNode(node, code);
       }
     });
   }

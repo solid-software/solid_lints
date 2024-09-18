@@ -92,12 +92,12 @@ class PreferMatchFileNameRule extends SolidLintRule {
       final nodeType =
           humanReadableNodeType(firstDeclaration.parent).toLowerCase();
 
-      reporter.reportErrorForToken(
+      reporter.atToken(
+        firstDeclaration.token,
         LintCode(
           name: lintName,
           problemMessage: 'File name does not match with first $nodeType name.',
         ),
-        firstDeclaration.token,
       );
     });
   }

@@ -64,12 +64,10 @@ class AvoidFinalWithGetterRule extends SolidLintRule {
       node.accept(visitor);
 
       for (final element in visitor.getters) {
-        reporter.reportErrorForNode(
-          code,
+        reporter.atNode(
           element.getter,
-          null,
-          null,
-          element,
+          code,
+          data: element,
         );
       }
     });

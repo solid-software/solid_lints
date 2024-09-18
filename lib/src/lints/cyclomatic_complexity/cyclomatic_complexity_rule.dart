@@ -57,7 +57,7 @@ class CyclomaticComplexityRule
 
       if (visitor.complexityEntities.length + 1 >
           config.parameters.maxComplexity) {
-        reporter.reportErrorForNode(code, node);
+        reporter.atNode(node, code);
       }
     });
   }

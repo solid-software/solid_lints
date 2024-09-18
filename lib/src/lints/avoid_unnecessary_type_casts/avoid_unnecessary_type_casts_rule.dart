@@ -41,7 +41,7 @@ class AvoidUnnecessaryTypeCastsRule extends SolidLintRule {
       visitor.visitAsExpression(node);
 
       for (final element in visitor.expressions.entries) {
-        reporter.reportErrorForNode(code, element.key);
+        reporter.atNode(element.key, code);
       }
     });
   }

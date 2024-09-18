@@ -178,7 +178,7 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
           .where(_isNotWidgetParameter);
 
       for (final magicNumber in magicNumbers) {
-        reporter.reportErrorForNode(code, magicNumber);
+        reporter.atNode(magicNumber, code);
       }
     });
   }
@@ -212,8 +212,7 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
       l.thisOrAncestorMatching(
         (a) =>
             a is InstanceCreationExpression &&
-            a.staticType?.getDisplayString(withNullability: false) ==
-                'DateTime',
+            a.staticType?.getDisplayString() == 'DateTime',
       ) ==
       null;
 
@@ -269,8 +268,7 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
     if (staticType is! InterfaceType) return false;
 
     final widgetSupertype = staticType.allSupertypes.firstWhereOrNull(
-      (supertype) =>
-          supertype.getDisplayString(withNullability: false) == 'Widget',
+      (supertype) => supertype.getDisplayString() == 'Widget',
     );
 
     return widgetSupertype != null;

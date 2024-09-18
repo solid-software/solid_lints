@@ -80,7 +80,7 @@ class NoEmptyBlockRule extends SolidLintRule {
       node.accept(visitor);
 
       for (final emptyBlock in visitor.emptyBlocks) {
-        reporter.reportErrorForNode(code, emptyBlock);
+        reporter.atNode(emptyBlock, code);
       }
     });
   }
