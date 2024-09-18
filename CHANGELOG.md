@@ -8,6 +8,7 @@
 - add quick fix to avoid_final_with_getter (https://github.com/solid-software/solid_lints/pull/164)
 - Renamed `avoid_debug_print` to `avoid_debug_print_in_release`
 - The `avoid_debug_print_in_release` no longer reports a warning if the `debugPrint` call is wrapped in a `!kReleaseMode` check.
+- Update custom_lints to work with newer Flutter
 
 ## 0.1.5
 
