@@ -11,7 +11,7 @@ environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
-  analyzer: ^6.6.0
+  analyzer: ^6.9.0
   collection: ^1.17.2
   custom_lint_builder: ^0.6.7
   glob: ^2.1.2

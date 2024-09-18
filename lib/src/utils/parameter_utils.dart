@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart';
+import 'package:analyzer/error/error.dart' hide LintCode;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Checks if parameter name consists only of underscores
