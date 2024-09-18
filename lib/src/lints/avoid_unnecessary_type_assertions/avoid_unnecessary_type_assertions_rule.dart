@@ -77,13 +77,13 @@ class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
   ) {
     context.registry.addIsExpression((node) {
       if (_isUnnecessaryIsExpression(node)) {
-        reporter.reportErrorForNode(_unnecessaryIsCode, node);
+        reporter.atNode(node, _unnecessaryIsCode);
       }
     });
 
     context.registry.addMethodInvocation((node) {
       if (_isUnnecessaryWhereType(node)) {
-        reporter.reportErrorForNode(_unnecessaryWhereTypeCode, node);
+        reporter.atNode(node, _unnecessaryWhereTypeCode);
       }
     });
   }

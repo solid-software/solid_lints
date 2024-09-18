@@ -91,12 +91,10 @@ class PreferConditionalExpressionsRule
       node.accept(visitor);
 
       for (final element in visitor.statementsInfo) {
-        reporter.reportErrorForNode(
-          code,
+        reporter.atNode(
           element.statement,
-          null,
-          null,
-          element,
+          code,
+          data: element,
         );
       }
     });

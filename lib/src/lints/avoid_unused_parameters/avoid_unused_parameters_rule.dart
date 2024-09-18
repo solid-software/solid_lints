@@ -96,7 +96,7 @@ class AvoidUnusedParametersRule extends SolidLintRule {
       node.accept(visitor);
 
       for (final element in visitor.unusedParameters) {
-        reporter.reportErrorForNode(code, element);
+        reporter.atNode(element, code);
       }
     });
   }

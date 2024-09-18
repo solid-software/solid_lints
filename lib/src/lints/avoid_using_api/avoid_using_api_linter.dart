@@ -63,7 +63,7 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      reporter.reportErrorForNode(entryCode, node);
+      reporter.atNode(node, entryCode);
     });
 
     context.registry.addNamedType((node) {
@@ -72,7 +72,7 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      reporter.reportErrorForNode(entryCode, node);
+      reporter.atNode(node, entryCode);
     });
   }
 
@@ -96,7 +96,7 @@ class AvoidUsingApiLinter {
 
       switch (node.staticElement) {
         case FunctionElement() || PropertyAccessorElement():
-          reporter.reportErrorForNode(entryCode, node);
+          reporter.atNode(node, entryCode);
       }
     });
   }
@@ -118,7 +118,7 @@ class AvoidUsingApiLinter {
       if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
-      reporter.reportErrorForNode(entryCode, node);
+      reporter.atNode(node, entryCode);
     });
 
     context.registry.addSimpleIdentifier((node) {
@@ -162,7 +162,7 @@ class AvoidUsingApiLinter {
           return;
       }
 
-      reporter.reportErrorForNode(entryCode, parent);
+      reporter.atNode(parent, entryCode);
     });
 
     context.registry.addNamedType((node) {
@@ -176,9 +176,9 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      reporter.reportErrorForNode(
-        entryCode,
+      reporter.atNode(
         node.parent?.parent ?? node.parent ?? node,
+        entryCode,
       );
     });
   }
@@ -219,23 +219,29 @@ class AvoidUsingApiLinter {
             return;
           }
 
-          reporter.reportErrorForNode(entryCode, node.parent ?? node);
+          reporter.atNode(
+            node.parent ?? node,
+            entryCode,
+          );
         case SimpleIdentifier(:final staticElement?):
           final parentElementName = staticElement.name;
           if (parentElementName != className) {
             return;
           }
 
-          reporter.reportErrorForNode(entryCode, node.parent ?? node);
+          reporter.atNode(
+            node.parent ?? node,
+            entryCode,
+          );
         case NamedType(:final element?):
           final parentTypeName = element.name;
           if (parentTypeName != className) {
             return;
           }
 
-          reporter.reportErrorForNode(
-            entryCode,
+          reporter.atNode(
             node.parent?.parent ?? node.parent ?? node,
+            entryCode,
           );
       }
     });

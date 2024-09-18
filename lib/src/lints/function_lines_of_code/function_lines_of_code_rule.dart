@@ -71,16 +71,16 @@ class FunctionLinesOfCodeRule
 
     if (visitor.linesWithCode.length > config.parameters.maxLines) {
       if (node is! AnnotatedNode) {
-        return reporter.reportErrorForNode(code, node);
+        return reporter.atNode(node, code);
       }
 
       final startOffset = node.firstTokenAfterCommentAndMetadata.offset;
       final lengthDifference = startOffset - node.offset;
 
-      reporter.reportErrorForOffset(
-        code,
-        startOffset,
-        node.length - lengthDifference,
+      reporter.atOffset(
+        offset: startOffset,
+        length: node.length - lengthDifference,
+        errorCode: code,
       );
     }
   }

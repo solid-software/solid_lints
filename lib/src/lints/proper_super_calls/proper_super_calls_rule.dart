@@ -119,15 +119,15 @@ class ProperSuperCallsRule extends SolidLintRule {
 
     if (!hasOverrideAnnotation) return;
     if (methodName == _initState && !_isSuperInitStateCalledFirst(statements)) {
-      reporter.reportErrorForNode(
-        _superInitStateCode,
+      reporter.atNode(
         node,
+        _superInitStateCode,
       );
     }
     if (methodName == _dispose && !_isSuperDisposeCalledLast(statements)) {
-      reporter.reportErrorForNode(
-        _superDisposeCode,
+      reporter.atNode(
         node,
+        _superDisposeCode,
       );
     }
   }

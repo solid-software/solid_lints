@@ -125,9 +125,9 @@ class MemberOrderingRule extends SolidLintRule<MemberOrderingParameters> {
       );
 
       for (final memberInfo in wrongOrderMembers) {
-        reporter.reportErrorForNode(
-          _createWrongOrderLintCode(memberInfo),
+        reporter.atNode(
           memberInfo.classMember,
+          _createWrongOrderLintCode(memberInfo),
         );
       }
 
@@ -137,9 +137,9 @@ class MemberOrderingRule extends SolidLintRule<MemberOrderingParameters> {
         );
 
         for (final memberInfo in alphabeticallyWrongOrderMembers) {
-          reporter.reportErrorForNode(
-            _createAlphabeticallyWrongOrderLintCode(memberInfo),
+          reporter.atNode(
             memberInfo.classMember,
+            _createAlphabeticallyWrongOrderLintCode(memberInfo),
           );
         }
       }
@@ -151,9 +151,9 @@ class MemberOrderingRule extends SolidLintRule<MemberOrderingParameters> {
         );
 
         for (final memberInfo in alphabeticallyByTypeWrongOrderMembers) {
-          reporter.reportErrorForNode(
-            _createAlphabeticallyByTypeWrongOrderLintCode(memberInfo),
+          reporter.atNode(
             memberInfo.classMember,
+            _createAlphabeticallyByTypeWrongOrderLintCode(memberInfo),
           );
         }
       }

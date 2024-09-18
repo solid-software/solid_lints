@@ -39,10 +39,10 @@ class AvoidUnrelatedTypeAssertionsRule extends SolidLintRule {
       visitor.visitIsExpression(node);
 
       for (final element in visitor.expressions.entries) {
-        reporter.reportErrorForNode(
-          code,
+        reporter.atNode(
           element.key,
-          [element.value.toString()],
+          code,
+          arguments: [element.value.toString()],
         );
       }
     });
