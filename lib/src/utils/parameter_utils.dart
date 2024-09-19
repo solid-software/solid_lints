@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart';
+import 'package:analyzer/error/error.dart' as error;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Checks if parameter name consists only of underscores
@@ -12,12 +12,12 @@ bool nameConsistsOfUnderscoresOnly(FormalParameter parameter) {
 }
 
 /// Decodes the severity parameter from the string
-ErrorSeverity? decodeErrorSeverity(String? severity) {
+error.ErrorSeverity? decodeErrorSeverity(String? severity) {
   return switch (severity?.toLowerCase()) {
-    'info' => ErrorSeverity.INFO,
-    'warning' => ErrorSeverity.WARNING,
-    'error' => ErrorSeverity.ERROR,
-    'none' => ErrorSeverity.NONE,
+    'info' => error.ErrorSeverity.INFO,
+    'warning' => error.ErrorSeverity.WARNING,
+    'error' => error.ErrorSeverity.ERROR,
+    'none' => error.ErrorSeverity.NONE,
     _ => null,
   };
 }
@@ -31,7 +31,7 @@ extension LintCodeCopyWith on LintCode {
     String? correctionMessage,
     String? uniqueName,
     String? url,
-    ErrorSeverity? errorSeverity,
+    error.ErrorSeverity? errorSeverity,
   }) =>
       LintCode(
         name: name ?? this.name,

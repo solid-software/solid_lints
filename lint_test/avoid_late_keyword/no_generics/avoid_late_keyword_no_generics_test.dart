@@ -15,28 +15,38 @@ class AvoidLateKeyword {
   /// expect_lint: avoid_late_keyword
   late final NotAllowed na1;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription subscription1;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<List<int>> subscription3;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<List<List<int>>> subscription4;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<Map<dynamic, String>> subscription5;
 
   void test() {
     /// expect_lint: avoid_late_keyword
     late final NotAllowed na1;
 
+    /// expect_lint: avoid_late_keyword
     late final Subscription subscription1;
 
+    /// expect_lint: avoid_late_keyword
     late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
 
+    /// expect_lint: avoid_late_keyword
     late final Subscription<List<int>> subscription3;
 
+    /// expect_lint: avoid_late_keyword
     late final Subscription<List<List<int>>> subscription4;
 
+    /// expect_lint: avoid_late_keyword
     late final Subscription<Map<dynamic, String>> subscription5;
   }
 }
