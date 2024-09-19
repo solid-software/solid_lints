@@ -8,8 +8,8 @@ class _UnnecessaryTypeCastsFix extends DartFix {
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
+    error.AnalysisError analysisError,
+    List<error.AnalysisError> others,
   ) {
     context.registry.addAsExpression((node) {
       if (analysisError.sourceRange.intersects(node.sourceRange)) {
