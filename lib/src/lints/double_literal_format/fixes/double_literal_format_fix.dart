@@ -8,8 +8,8 @@ class _DoubleLiteralFormatFix extends DartFix {
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
+    error.AnalysisError analysisError,
+    List<error.AnalysisError> others,
   ) {
     context.registry.addDoubleLiteral((node) {
       // checks that the literal declaration is where our warning is located
