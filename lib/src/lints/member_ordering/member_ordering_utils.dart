@@ -7,7 +7,7 @@ import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
 Annotation? parseAnnotation(AnnotatedNode node) {
   return node.metadata
       .map((metadata) => Annotation.parse(metadata.name.name))
-      .whereNotNull()
+      .nonNulls
       .firstOrNull;
 }
 

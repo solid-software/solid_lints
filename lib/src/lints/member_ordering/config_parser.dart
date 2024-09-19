@@ -71,7 +71,7 @@ class MemberOrderingConfigParser {
         ? List<String>.from(orderConfig)
         : _defaultOrderList;
 
-    return order.map(_parseGroup).whereNotNull().toList();
+    return order.map(_parseGroup).nonNulls.toList();
   }
 
   /// Parse rule config for widget class order rules
@@ -80,7 +80,7 @@ class MemberOrderingConfigParser {
         ? List<String>.from(widgetsOrderConfig)
         : _defaultWidgetsOrderList;
 
-    return widgetsOrder.map(_parseGroup).whereNotNull().toList();
+    return widgetsOrder.map(_parseGroup).nonNulls.toList();
   }
 
   static MemberGroup? _parseGroup(String group) {
