@@ -1,3 +1,11 @@
+## 0.2.2
+
+- Remove LintCode from documentation to improve scores and make it clearer
+
+## 0.2.1
+
+- Fix LintCode issue
+
 ## 0.2.0
 
 - Added `avoid_final_with_getter` rule
