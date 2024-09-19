@@ -24,7 +24,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```
 class CyclomaticComplexityRule
     extends SolidLintRule<CyclomaticComplexityParameters> {
-  /// The [LintCode] of this lint rule that represents the error if complexity
+  /// This lint rule represents the error if complexity
   /// reaches maximum value.
   static const lintName = 'cyclomatic_complexity';
 

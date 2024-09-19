@@ -41,7 +41,7 @@ const whereTypeMethodName = 'whereType';
 /// final castedD = nullableD is double;
 /// ```
 class AvoidUnnecessaryTypeAssertions extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use bad formatted double literals.
   static const lintName = 'avoid_unnecessary_type_assertions';
 

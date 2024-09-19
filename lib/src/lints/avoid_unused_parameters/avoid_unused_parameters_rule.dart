@@ -65,7 +65,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///
 /// ```
 class AvoidUnusedParametersRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use bad formatted double literals.
   static const String lintName = 'avoid_unused_parameters';
 

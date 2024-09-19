@@ -7,7 +7,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// A `avoid_unrelated_type_assertions` rule which
 /// warns about unnecessary usage of `as` operator
 class AvoidUnrelatedTypeAssertionsRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use bad formatted double literals.
   static const lintName = 'avoid_unrelated_type_assertions';
 

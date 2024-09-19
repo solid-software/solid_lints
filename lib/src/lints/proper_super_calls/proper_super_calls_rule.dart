@@ -44,7 +44,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class ProperSuperCallsRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether the initState and dispose methods
   /// are called in the incorrect order
   static const lintName = 'proper_super_calls';
@@ -52,14 +52,14 @@ class ProperSuperCallsRule extends SolidLintRule {
   static const _dispose = 'dispose';
   static const _override = 'override';
 
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether super.initState() should be called first
   static const _superInitStateCode = LintCode(
     name: lintName,
     problemMessage: "super.initState() should be first",
   );
 
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether super.dispose() should be called last
   static const _superDisposeCode = LintCode(
     name: lintName,

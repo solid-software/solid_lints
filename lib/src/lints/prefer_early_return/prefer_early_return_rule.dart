@@ -32,7 +32,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class PreferEarlyReturnRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents the error if
+  /// This lint rule represents the error if
   /// 'if' statements should be reversed
   static const String lintName = 'prefer_early_return';
 

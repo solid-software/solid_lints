@@ -57,7 +57,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```
 class PreferConditionalExpressionsRule
     extends SolidLintRule<PreferConditionalExpressionsParameters> {
-  /// The [LintCode] of this lint rule that represents the error if number of
+  /// This lint rule represents the error if number of
   /// parameters reaches the maximum value.
   static const lintName = 'prefer_conditional_expressions';
 

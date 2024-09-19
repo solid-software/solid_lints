@@ -22,7 +22,7 @@ class RuleConfig<T extends Object?> {
         parameters = paramsParser?.call(configs.rules[name]?.json ?? {}) as T,
         _problemMessageFactory = problemMessage;
 
-  /// The [LintCode] of this lint rule that represents the error.
+  /// This lint rule represents the error.
   final String name;
 
   /// A flag which indicates whether this rule was enabled by the user.

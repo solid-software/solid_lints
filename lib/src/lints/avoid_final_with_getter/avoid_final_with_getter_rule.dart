@@ -1,4 +1,4 @@
-import 'package:analyzer/error/error.dart';
+import 'package:analyzer/error/error.dart' as error;
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -35,7 +35,7 @@ part 'fixes/avoid_final_with_getter_fix.dart';
 /// ```
 ///
 class AvoidFinalWithGetterRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use final private fields with getters.
   static const lintName = 'avoid_final_with_getter';
 

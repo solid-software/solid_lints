@@ -32,7 +32,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///
 ///
 class AvoidDebugPrintInReleaseRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error when debugPrint is called
   static const lintName = 'avoid_debug_print_in_release';
 

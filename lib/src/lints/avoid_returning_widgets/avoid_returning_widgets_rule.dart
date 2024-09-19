@@ -52,7 +52,7 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 /// ```
 class AvoidReturningWidgetsRule
     extends SolidLintRule<AvoidReturningWidgetsParameters> {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we return a widget.
   static const lintName = 'avoid_returning_widgets';
 

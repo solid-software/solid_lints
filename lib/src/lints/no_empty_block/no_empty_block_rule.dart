@@ -50,7 +50,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class NoEmptyBlockRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether left empty block.
   static const String lintName = 'no_empty_block';
 
