@@ -1,3 +1,7 @@
+## 0.2.3
+
+- Replace deprecated whereNotNull()
+
 ## 0.2.2
 
 - Remove LintCode from documentation to improve scores and make it clearer
