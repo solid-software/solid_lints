@@ -8,7 +8,9 @@ void fun() {
 
   // Allowed because ignore_nested flag is enabled
   if (1 > 0) {
-    _result = 1 > 2 ? 2 : 1;
+    if (true) {
+      _result = 1 > 0 ? 0 : 1;
+    }
   } else {
     _result = 0;
   }

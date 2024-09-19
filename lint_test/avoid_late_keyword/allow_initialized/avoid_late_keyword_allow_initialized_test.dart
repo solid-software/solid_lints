@@ -14,6 +14,7 @@ class ColorTween {}
 /// `avoid_late_keyword`
 /// allow_initialized option disabled
 class AvoidLateKeyword {
+  /// expect_lint: avoid_late_keyword
   late final Animation animation1;
 
   late final animation2 = AnimationController();
@@ -23,27 +24,25 @@ class AvoidLateKeyword {
   /// expect_lint: avoid_late_keyword
   late final ColorTween colorTween1;
 
-  /// expect_lint: avoid_late_keyword
   late final colorTween2 = ColorTween();
 
-  /// expect_lint: avoid_late_keyword
   late final colorTween3 = colorTween2;
 
+  /// expect_lint: avoid_late_keyword
   late final AnimationController controller1;
 
-  /// expect_lint: avoid_late_keyword
   late final field1 = 'string';
 
   /// expect_lint: avoid_late_keyword
   late final String field2;
 
-  /// expect_lint: avoid_late_keyword
   late final String field3 = 'string';
 
   /// expect_lint: avoid_late_keyword
   late final field4;
 
   void test() {
+    /// expect_lint: avoid_late_keyword
     late final Animation animation1;
 
     late final animation2 = AnimationController();
@@ -53,21 +52,18 @@ class AvoidLateKeyword {
     /// expect_lint: avoid_late_keyword
     late final ColorTween colorTween1;
 
-    /// expect_lint: avoid_late_keyword
     late final colorTween2 = ColorTween();
 
-    /// expect_lint: avoid_late_keyword
     late final colorTween3 = colorTween2;
 
+    /// expect_lint: avoid_late_keyword
     late final AnimationController controller1;
 
-    /// expect_lint: avoid_late_keyword
     late final local1 = 'string';
 
     /// expect_lint: avoid_late_keyword
     late final String local2;
 
-    /// expect_lint: avoid_late_keyword
     late final String local4 = 'string';
 
     /// expect_lint: avoid_late_keyword

@@ -18,10 +18,13 @@ class ConcreteTypeWithNoGenerics {}
 /// `avoid_late_keyword`
 /// allow_initialized option enabled
 class AvoidLateKeyword {
+  /// expect_lint: avoid_late_keyword
   late final ColorTween colorTween;
 
+  /// expect_lint: avoid_late_keyword
   late final AnimationController controller1;
 
+  /// expect_lint: avoid_late_keyword
   late final SubAnimationController controller2;
 
   late final controller3 = AnimationController();
@@ -44,24 +47,32 @@ class AvoidLateKeyword {
   /// expect_lint: avoid_late_keyword
   late final Subscription<String> subscription1;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<List<String>> subscription3;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<List<List<int>>> subscription4;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<Map<dynamic, String>> subscription5;
 
+  /// expect_lint: avoid_late_keyword
   late final Subscription<Map<String, String>> subscription6;
 
   /// expect_lint: avoid_late_keyword
   late final Subscription<Map<String, dynamic>> subscription7;
 
   void test() {
+    /// expect_lint: avoid_late_keyword
     late final ColorTween colorTween;
 
+    /// expect_lint: avoid_late_keyword
     late final AnimationController controller1;
 
+    /// expect_lint: avoid_late_keyword
     late final SubAnimationController controller2;
 
     late final controller3 = AnimationController();
@@ -84,8 +95,10 @@ class AvoidLateKeyword {
     /// expect_lint: avoid_late_keyword
     late final Subscription<String> subscription1;
 
+    /// expect_lint: avoid_late_keyword
     late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
 
+    /// expect_lint: avoid_late_keyword
     late final Subscription<List<String>> subscription3;
   }
 }
