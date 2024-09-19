@@ -36,7 +36,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class AvoidGlobalStateRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use global state.
   static const lintName = 'avoid_global_state';
 

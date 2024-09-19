@@ -64,7 +64,7 @@ import 'package:solid_lints/src/utils/path_utils.dart';
 ///
 /// Contributed by getBoolean (https://github.com/getBoolean).
 class AvoidUsingApiRule extends SolidLintRule<AvoidUsingApiParameters> {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use bad formatted double literals.
   static const String lintName = 'avoid_using_api';
 

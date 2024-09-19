@@ -42,7 +42,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// selectedValue = condition ? valueA : valueB;
 /// ```
 class NoEqualThenElseRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents the error if
+  /// This lint rule represents the error if
   /// 'if' statements or conditional expression is redundant
   static const String lintName = 'no_equal_then_else';
 

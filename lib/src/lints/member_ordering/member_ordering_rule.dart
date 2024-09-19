@@ -83,7 +83,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class MemberOrderingRule extends SolidLintRule<MemberOrderingParameters> {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use bad formatted double literals.
   static const lintName = 'member_ordering';
 

@@ -38,7 +38,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// map['key']!;
 /// ```
 class AvoidNonNullAssertionRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use bang operator.
   static const lintName = 'avoid_non_null_assertion';
 

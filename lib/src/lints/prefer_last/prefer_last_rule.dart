@@ -27,7 +27,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// a.last; // OK
 /// ```
 class PreferLastRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents the error if iterable
+  /// This lint rule represents the error if iterable
   /// access can be simplified.
   static const lintName = 'prefer_last';
 

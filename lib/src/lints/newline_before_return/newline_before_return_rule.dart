@@ -73,7 +73,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class NewlineBeforeReturnRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents the error if
+  /// This lint rule represents the error if
   /// newline is missing before return statement
   static const String lintName = 'newline_before_return';
 

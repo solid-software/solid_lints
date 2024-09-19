@@ -48,7 +48,7 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 /// }
 /// ```
 class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use `late` keyword.
   static const lintName = 'avoid_late_keyword';
 

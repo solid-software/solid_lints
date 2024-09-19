@@ -49,7 +49,7 @@ import 'package:solid_lints/src/utils/node_utils.dart';
 /// ```
 ///
 class PreferMatchFileNameRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents the error if iterable
+  /// This lint rule represents the error if iterable
   /// access can be simplified.
   static const String lintName = 'prefer_match_file_name';
   static final _onlySymbolsRegex = RegExp('[^a-zA-Z0-9]');

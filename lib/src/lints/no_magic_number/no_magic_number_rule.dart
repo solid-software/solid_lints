@@ -134,7 +134,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error when having magic number.
   static const String lintName = 'no_magic_number';
 

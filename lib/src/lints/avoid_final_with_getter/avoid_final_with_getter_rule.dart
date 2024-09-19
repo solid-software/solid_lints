@@ -35,7 +35,7 @@ part 'fixes/avoid_final_with_getter_fix.dart';
 /// ```
 ///
 class AvoidFinalWithGetterRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use final private fields with getters.
   static const lintName = 'avoid_final_with_getter';
 

@@ -27,12 +27,12 @@ part 'double_literal_format_utils.dart';
 /// var a = 5.23, b = 0.16e+5, c = -0.25, d = -0.4e-5;
 /// ```
 class DoubleLiteralFormatRule extends SolidLintRule {
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use bad formatted double literals.
   static const lintName = 'double_literal_format';
 
   // Use different messages for different issues
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use double literals with a redundant leading 0.
   static const _leadingZeroCode = LintCode(
     name: lintName,
@@ -40,7 +40,7 @@ class DoubleLiteralFormatRule extends SolidLintRule {
     correctionMessage: "Remove redundant leading `0`.",
   );
 
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use double literals with a leading decimal point.
   static const _leadingDecimalCode = LintCode(
     name: lintName,
@@ -49,7 +49,7 @@ class DoubleLiteralFormatRule extends SolidLintRule {
     correctionMessage: "Add missing leading `0`.",
   );
 
-  /// The [LintCode] of this lint rule that represents
+  /// This lint rule represents
   /// the error whether we use double literals with a trailing 0.
   static const _trailingZeroCode = LintCode(
     name: lintName,
