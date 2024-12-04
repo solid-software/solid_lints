@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
-import 'package:solid_lints/src/models/excluded_identifier_parameter.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.dart';
 
 /// A model representing "exclude" parameters for linting, defining
 /// identifiers (classes, methods, functions) to be ignored during analysis.
