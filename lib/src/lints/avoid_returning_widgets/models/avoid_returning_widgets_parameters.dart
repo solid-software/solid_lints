@@ -1,10 +1,10 @@
-import 'package:solid_lints/src/models/exclude_params.dart';
+import 'package:solid_lints/src/models/excluded_identifiers_list_parameter.dart';
 
 /// A data model class that represents the "avoid returning widgets" input
 /// parameters.
 class AvoidReturningWidgetsParameters {
   /// A list of methods that should be excluded from the lint.
-  final ExcludeParameters exclude;
+  final ExcludedIdentifiersListParameter exclude;
 
   /// Constructor for [AvoidReturningWidgetsParameters] model
   AvoidReturningWidgetsParameters({
@@ -14,9 +14,9 @@ class AvoidReturningWidgetsParameters {
   /// Method for creating from json data
   factory AvoidReturningWidgetsParameters.fromJson(Map<String, dynamic> json) {
     return AvoidReturningWidgetsParameters(
-      exclude: ExcludeParameters.fromJson(
+      exclude: ExcludedIdentifiersListParameter.fromJson(
         excludeList:
-            json[ExcludeParameters.excludeParameterName] as Iterable? ?? [],
+            json[ExcludedIdentifiersListParameter.excludeParameterName] as Iterable? ?? [],
       ),
     );
   }
