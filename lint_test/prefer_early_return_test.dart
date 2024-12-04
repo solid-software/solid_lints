@@ -235,3 +235,12 @@ void threeSeqentialIfReturn2() {
     _doSomething();
   }
 }
+
+void throwExpression() {
+  //no lint
+  if (true) {
+    throw '';
+  }
+
+  return;
+}
