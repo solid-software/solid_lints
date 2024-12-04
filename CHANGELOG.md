@@ -1,3 +1,7 @@
+## 0.2.4
+
+- Fixed an issue with `prefer_early_retrun` for throw expression 
+
 ## 0.2.3
 
 - Replace deprecated whereNotNull()

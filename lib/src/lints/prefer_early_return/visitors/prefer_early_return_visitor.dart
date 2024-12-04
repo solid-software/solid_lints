@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/lints/prefer_early_return/visitors/return_statement_visitor.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/visitors/throw_expression_visitor.dart';
 
 /// The AST visitor that will collect all unnecessary if statements
 class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
@@ -33,6 +34,7 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
     if (_isElseIfStatement(node)) return;
     if (_hasElseStatement(node)) return;
     if (_hasReturnStatement(node)) return;
+    if (_hasThrowExpression(node)) return;
 
     _nodes.add(node);
   }
@@ -67,6 +69,12 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
 
   bool _hasReturnStatement(Statement node) {
     final visitor = ReturnStatementVisitor();
+    node.accept(visitor);
+    return visitor.nodes.isNotEmpty;
+  }
+
+  bool _hasThrowExpression(Statement node) {
+    final visitor = ThrowExpressionVisitor();
     node.accept(visitor);
     return visitor.nodes.isNotEmpty;
   }
