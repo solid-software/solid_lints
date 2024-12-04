@@ -236,11 +236,64 @@ void threeSeqentialIfReturn2() {
   }
 }
 
-void throwExpression() {
+void oneIfWithThrowWithReturn() {
   //no lint
   if (true) {
     throw '';
   }
 
   return;
+}
+
+void oneIfElseWithThrowReturn() {
+  //no lint
+  if (true) {
+    _doSomething();
+  } else {
+    throw '';
+  }
+}
+
+void twoSeqentialIfWithThrow() {
+  if (false) throw '';
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
+  }
+}
+
+void twoSeqentialIfWithThrowReturn2() {
+  //no lint
+  if (false) throw '';
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
+  }
+
+  return;
+}
+
+void threeSeqentialIfWithThrowReturn() {
+  //no lint
+  if (false) throw '';
+  if (true) throw '';
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
+  }
+
+  return;
+}
+
+void threeSeqentialIfWithThrowReturn2() {
+  //no lint
+  if (false) throw '';
+  //no lint
+  if (true) {
+    _doSomething();
+  }
+  //expect_lint: prefer_early_return
+  if (true) {
+    _doSomething();
+  }
 }
