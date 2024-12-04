@@ -65,6 +65,7 @@ class NumberOfParametersRule
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
+      final isIgnored = config.parameters.exclude.shouldIgnore(node);
       final parameters = switch (node) {
         (final MethodDeclaration node) =>
           node.parameters?.parameters.length ?? 0,
@@ -73,7 +74,7 @@ class NumberOfParametersRule
         _ => 0,
       };
 
-      if (parameters > config.parameters.maxParameters) {
+      if (!isIgnored && parameters > config.parameters.maxParameters) {
         reporter.atOffset(
           offset: node.firstTokenAfterCommentAndMetadata.offset,
           length: node.end,

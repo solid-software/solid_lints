@@ -1,5 +1,6 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/src/lints/avoid_unused_parameters/models/avoid_unused_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_unused_parameters/visitors/avoid_unused_parameters_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
@@ -64,7 +65,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// };
 ///
 /// ```
-class AvoidUnusedParametersRule extends SolidLintRule {
+class AvoidUnusedParametersRule extends SolidLintRule<AvoidUnusedParameters> {
   /// This lint rule represents
   /// the error whether we use bad formatted double literals.
   static const String lintName = 'avoid_unused_parameters';
@@ -79,6 +80,7 @@ class AvoidUnusedParametersRule extends SolidLintRule {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
+      paramsParser: AvoidUnusedParameters.fromJson,
       problemMessage: (_) => 'Parameter is unused.',
     );
 
@@ -92,12 +94,18 @@ class AvoidUnusedParametersRule extends SolidLintRule {
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {
-      final visitor = AvoidUnusedParametersVisitor();
-      node.accept(visitor);
+      context.registry.addDeclaration((declarationNode) {
+        final isIgnored =
+            config.parameters.exclude.shouldIgnore(declarationNode);
+        final visitor = AvoidUnusedParametersVisitor();
+        node.accept(visitor);
 
-      for (final element in visitor.unusedParameters) {
-        reporter.atNode(element, code);
-      }
+        if (!isIgnored) {
+          for (final element in visitor.unusedParameters) {
+            reporter.atNode(element, code);
+          }
+        }
+      });
     });
   }
 }
