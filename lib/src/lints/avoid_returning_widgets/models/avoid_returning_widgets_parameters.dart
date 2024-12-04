@@ -15,7 +15,7 @@ class AvoidReturningWidgetsParameters {
   factory AvoidReturningWidgetsParameters.fromJson(Map<String, dynamic> json) {
     return AvoidReturningWidgetsParameters(
       exclude: ExcludeParameters.fromJson(
-        excludeList: json['exclude'] as Iterable,
+        excludeList: json['exclude'] as Iterable? ?? [],
       ),
     );
   }
