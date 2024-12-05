@@ -79,13 +79,13 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
   ) {
     context.registry.addDeclaration((node) {
       final isIgnored = config.parameters.exclude.shouldIgnore(node);
-      if (!isIgnored) {
-        final visitor = NoEmptyBlockVisitor();
-        node.accept(visitor);
+      if (isIgnored) return;
+      
+      final visitor = NoEmptyBlockVisitor();
+      node.accept(visitor);
 
-        for (final emptyBlock in visitor.emptyBlocks) {
-          reporter.atNode(emptyBlock, code);
-        }
+      for (final emptyBlock in visitor.emptyBlocks) {
+        reporter.atNode(emptyBlock, code);
       }
     });
   }

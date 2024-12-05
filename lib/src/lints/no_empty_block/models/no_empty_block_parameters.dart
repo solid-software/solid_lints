@@ -1,6 +1,6 @@
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 
-/// A data model class that represents the "avoid returning widgets" input
+/// A data model class that represents the "no empty block" input
 /// parameters.
 class NoEmptyBlockParameters {
   /// A list of methods that should be excluded from the lint.

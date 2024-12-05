@@ -1,4 +1,3 @@
-
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/avoid_unused_parameters/models/avoid_unused_parameters.dart';
@@ -96,14 +95,14 @@ class AvoidUnusedParametersRule extends SolidLintRule<AvoidUnusedParameters> {
   ) {
     context.registry.addDeclaration((node) {
       final isIgnored = config.parameters.exclude.shouldIgnore(node);
-      
-      if (!isIgnored) {
-        final visitor = AvoidUnusedParametersVisitor();
-        node.accept(visitor);
 
-        for (final element in visitor.unusedParameters) {
-          reporter.atNode(element, code);
-        }
+      if (isIgnored) return;
+
+      final visitor = AvoidUnusedParametersVisitor();
+      node.accept(visitor);
+
+      for (final element in visitor.unusedParameters) {
+        reporter.atNode(element, code);
       }
     });
   }

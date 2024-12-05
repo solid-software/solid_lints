@@ -1,3 +1,7 @@
+## 0.3.4
+- Added exclude classes, methods, functions into avoid_returning_widgets,avoid_unused_parameters, cyclomatic_complexity, function_lines_of_code, no_empty_bloc, number_of_parameters 
+- Changed exclude parameter name into unction lines of code from excludeNames to exclude
+
 ## 0.2.4
 
 - Fixed an issue with `prefer_early_retrun` for throw expression 

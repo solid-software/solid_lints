@@ -53,11 +53,11 @@ class FunctionLinesOfCodeRule
     context.registry.addDeclaration((declarationNode) {
       final isIgnored = config.parameters.exclude.shouldIgnore(declarationNode);
 
-      if (!isIgnored) {
-        context.registry.addMethodDeclaration(checkNode);
-        context.registry.addFunctionDeclaration(checkNode);
-        context.registry.addFunctionExpression(checkNode);
-      }
+      if (isIgnored) return;
+
+      context.registry.addMethodDeclaration(checkNode);
+      context.registry.addFunctionDeclaration(checkNode);
+      context.registry.addFunctionExpression(checkNode);
     });
   }
 

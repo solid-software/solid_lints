@@ -6,6 +6,6 @@ custom_lint:
   rules:
     - avoid_unused_parameters:
       exclude:
-        - method_name: excludeMethod
-          class_name: Exclude
+        - class_name: Exclude
+          method_name: excludeMethod
         - method_name: excludeMethod
