@@ -15,7 +15,9 @@ custom_lint:
       exclude:
         - method_name: avoidNumberOfParameters
           class_name: Exclude
-        - method_name: avoidNumberOfParameters          
+        - method_name: avoidNumberOfParameters    
+        - method_name: copyWith
+          class_name: UserDto      
     - function_lines_of_code:
       max_lines: 50
     - avoid_non_null_assertion
