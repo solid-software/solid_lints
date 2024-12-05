@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, consider_making_a_member_private
 // ignore_for_file: cyclomatic_complexity
 // ignore_for_file: no_equal_then_else
 // ignore_for_file: dead_code

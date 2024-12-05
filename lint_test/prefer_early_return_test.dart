@@ -1,4 +1,4 @@
-// ignore_for_file: dead_code, cyclomatic_complexity, no_equal_then_else, prefer_match_file_name
+// ignore_for_file: dead_code, cyclomatic_complexity, no_equal_then_else, prefer_match_file_name, consider_making_a_member_private
 
 // ignore: no_empty_block
 void _doSomething() {}

@@ -24,30 +24,48 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
-/// The AST visitor that will find lines with code.
+/// AST Visitor for identifying unused public members, global functions,
+///  and variables.
 class ConsiderMakingAMemberPrivateVisitor extends RecursiveAstVisitor<void> {
   final CompilationUnit _node;
 
   final _unusedPublicMembers = <ClassMember>{};
+  final _unusedGlobalFunctions = <FunctionDeclaration>{};
+  final _unusedGlobalVariables = <VariableDeclaration>{};
 
-  /// Returns public members that are not used as representatives of the class.
+  /// Returns unused public members of classes.
   Iterable<ClassMember> get unusedPublicMembers => _unusedPublicMembers;
 
-  /// Creates a new instance of [ConsiderMakingAMemberPrivateVisitor].
+  /// Returns unused global functions.
+  Iterable<FunctionDeclaration> get unusedGlobalFunctions =>
+      _unusedGlobalFunctions;
+
+  /// Returns unused global variables.
+  Iterable<VariableDeclaration> get unusedGlobalVariables =>
+      _unusedGlobalVariables;
+
+  /// Constructor for [ConsiderMakingAMemberPrivateVisitor]
   ConsiderMakingAMemberPrivateVisitor(this._node);
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
+    // Check for unused public members in a class.
     final classMembers = node.members.where((member) {
       if (member is MethodDeclaration || member is FieldDeclaration) {
         final name = _getMemberName(member);
         return name != null && !_isPrivate(name);
       }
+      if (member is ConstructorDeclaration) {
+        final name = _getMemberName(member);
+        if (name == null) return true;
+
+        return !_isPrivate(name);
+      }
       return false;
     }).toList();
 
     for (final member in classMembers) {
-      final memberName = _getMemberName(member)!;
+      final memberName = _getMemberName(member);
       if (!_isUsedOutsideClass(memberName, node)) {
         _unusedPublicMembers.add(member);
       }
@@ -56,7 +74,27 @@ class ConsiderMakingAMemberPrivateVisitor extends RecursiveAstVisitor<void> {
     super.visitClassDeclaration(node);
   }
 
-  bool _isPrivate(String name) => name.startsWith('_');
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    final name = node.declaredElement?.name;
+    if (!_isPrivate(name) && !_isUsedEntity(name)) {
+      _unusedGlobalFunctions.add(node);
+    }
+    super.visitFunctionDeclaration(node);
+  }
+
+  @override
+  void visitTopLevelVariableDeclaration(TopLevelVariableDeclaration node) {
+    for (final variable in node.variables.variables) {
+      final name = variable.declaredElement?.name;
+      if (!_isPrivate(name) && !_isUsedEntity(name)) {
+        _unusedGlobalVariables.add(variable);
+      }
+    }
+    super.visitTopLevelVariableDeclaration(node);
+  }
+
+  bool _isPrivate(String? name) => name?.startsWith('_') ?? false;
 
   String? _getMemberName(ClassMember member) {
     if (member is MethodDeclaration) return member.declaredElement?.name;
@@ -64,46 +102,77 @@ class ConsiderMakingAMemberPrivateVisitor extends RecursiveAstVisitor<void> {
       final fields = member.fields.variables;
       return fields.isNotEmpty ? fields.first.declaredElement?.name : null;
     }
+    if (member is ConstructorDeclaration) {
+      return member.declaredElement?.name;
+    }
     return null;
   }
 
-  bool _isUsedOutsideClass(String memberName, ClassDeclaration classNode) {
+  bool _isUsedOutsideClass(String? memberName, ClassDeclaration classNode) {
     bool isUsedOutside = false;
 
     _node.visitChildren(
-      _PublicMemberUsageVisitor(
-        memberName: memberName,
-        classNode: classNode,
+      _GlobalEntityUsageVisitor(
+        entityName: memberName!,
         onUsageFound: () {
           isUsedOutside = true;
         },
       ),
     );
 
+    if (memberName.isEmpty) return true;
+
     return isUsedOutside;
+  }
+
+  bool _isUsedEntity(String? entityName) {
+    bool isUsed = false;
+
+    if (entityName == null) return false;
+
+    _node.visitChildren(
+      _GlobalEntityUsageVisitor(
+        entityName: entityName,
+        onUsageFound: () {
+          isUsed = true;
+        },
+      ),
+    );
+
+    return isUsed;
   }
 }
 
-class _PublicMemberUsageVisitor extends RecursiveAstVisitor<void> {
-  final String memberName;
-  final ClassDeclaration classNode;
+class _GlobalEntityUsageVisitor extends RecursiveAstVisitor<void> {
+  final String entityName;
   final Function() onUsageFound;
 
-  _PublicMemberUsageVisitor({
-    required this.memberName,
-    required this.classNode,
+  _GlobalEntityUsageVisitor({
+    required this.entityName,
     required this.onUsageFound,
   });
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier identifier) {
-    if (identifier.name == memberName) {
-      final parentClass = identifier.thisOrAncestorOfType<ClassDeclaration>();
-      if (parentClass != classNode) {
-        onUsageFound();
-      }
+    if (identifier.name == entityName) {
+      onUsageFound();
     }
-
     super.visitSimpleIdentifier(identifier);
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    if (node.constructorName.name?.name == entityName) {
+      onUsageFound();
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.target != null && node.target.toString() == entityName) {
+      onUsageFound();
+    }
+    super.visitMethodInvocation(node);
   }
 }

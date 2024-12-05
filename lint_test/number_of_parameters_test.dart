@@ -1,3 +1,4 @@
+// ignore_for_file: consider_making_a_member_private
 /// Check number of parameters fail
 ///
 /// `number_of_parameters: max_parameters`

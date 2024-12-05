@@ -69,9 +69,17 @@ class ConsiderMakingAMemberPrivateRule extends SolidLintRule {
       node.visitChildren(visitor);
 
       final unusedMembers = visitor.unusedPublicMembers;
+      final unusedGlobalVariables = visitor.unusedGlobalVariables;
+      final unusedGlobalFunctions = visitor.unusedGlobalFunctions;
 
       for (final member in unusedMembers) {
         reporter.atNode(member, code);
+      }
+      for (final variable in unusedGlobalVariables) {
+        reporter.atNode(variable, code);
+      }
+      for (final function in unusedGlobalFunctions) {
+        reporter.atNode(function, code);
       }
     });
   }

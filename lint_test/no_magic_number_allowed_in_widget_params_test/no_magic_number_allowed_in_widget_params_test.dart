@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_returning_widgets
+// ignore_for_file: avoid_returning_widgets, consider_making_a_member_private
 // ignore_for_file: prefer_match_file_name
 
 // Allowed for numbers in a Widget subtype parameters.
