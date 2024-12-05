@@ -1,9 +1,12 @@
-## 0.3.4
-- Added exclude classes, methods, functions into avoid_returning_widgets,avoid_unused_parameters, cyclomatic_complexity, function_lines_of_code, no_empty_bloc, number_of_parameters 
-- Changed exclude parameter name into unction lines of code from excludeNames to exclude
-
-## 0.2.4
-
+## 0.3.0
+- Added `exclude` parameter for the following lints:
+  - `avoid_returning_widgets`
+  - `avoid_unused_parameters`
+  - `cyclomatic_complexity`
+  - `function_lines_of_code`
+  - `no_empty_bloc`
+  - `number_of_parameters`
+- BREAKING CHANGE: Renamed `excludeNames` parameter to `exclude` for `function_lines_of_code` lint.
 - Fixed an issue with `prefer_early_retrun` for throw expression 
 
 ## 0.2.3

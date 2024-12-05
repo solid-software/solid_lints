@@ -9,7 +9,7 @@ class ExcludedIdentifierParameter {
   /// Constructor for [ExcludedIdentifierParameter] model
   const ExcludedIdentifierParameter({
     required this.methodName,
-    required this.className,
+    this.className,
   });
 
   ///

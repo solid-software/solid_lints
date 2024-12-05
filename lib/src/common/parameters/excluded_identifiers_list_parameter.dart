@@ -26,6 +26,12 @@ class ExcludedIdentifiersListParameter {
     for (final item in excludeList) {
       if (item is Map) {
         exclude.add(ExcludedIdentifierParameter.fromJson(item));
+      } else if (item is String) {
+        exclude.add(
+          ExcludedIdentifierParameter(
+            methodName: item,
+          ),
+        );
       }
     }
     return ExcludedIdentifiersListParameter(
@@ -47,6 +53,12 @@ class ExcludedIdentifiersListParameter {
     for (final item in excludeList) {
       if (item is Map) {
         exclude.add(ExcludedIdentifierParameter.fromJson(item));
+      } else if (item is String) {
+        exclude.add(
+          ExcludedIdentifierParameter(
+            methodName: item,
+          ),
+        );
       }
     }
     return ExcludedIdentifiersListParameter(
@@ -56,10 +68,10 @@ class ExcludedIdentifiersListParameter {
 
   /// Returns whether the target node should be ignored during analysis.
   bool shouldIgnore(Declaration node) {
-    final methodName = node.declaredElement?.name;
+    final declaredName = node.declaredElement?.name;
 
     final excludedItem = exclude.firstWhereOrNull(
-      (e) => e.methodName == methodName || e.className == methodName,
+      (e) => e.methodName == declaredName || e.className == declaredName,
     );
 
     if (excludedItem == null) return false;
