@@ -80,7 +80,7 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
     context.registry.addDeclaration((node) {
       final isIgnored = config.parameters.exclude.shouldIgnore(node);
       if (isIgnored) return;
-      
+
       final visitor = NoEmptyBlockVisitor();
       node.accept(visitor);
 
