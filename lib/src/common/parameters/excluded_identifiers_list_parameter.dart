@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
-import 'package:solid_lints/src/models/excluded_identifier_parameter.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.dart';
 
-/// A data model class that represents the exclude input
-/// parameters.
+/// A model representing "exclude" parameters for linting, defining
+/// identifiers (classes, methods, functions) to be ignored during analysis.
 class ExcludedIdentifiersListParameter {
   /// A list of identifiers (classes, methods, functions) that should be
   /// excluded from the lint.
@@ -33,12 +33,34 @@ class ExcludedIdentifiersListParameter {
     );
   }
 
+  /// Method for creating from json data with default params
+  factory ExcludedIdentifiersListParameter.defaultFromJson(
+    Map<String, dynamic> json,
+  ) {
+    final exclude = <ExcludedIdentifierParameter>[];
+
+    final excludeList =
+        json[ExcludedIdentifiersListParameter.excludeParameterName]
+                as Iterable? ??
+            [];
+
+    for (final item in excludeList) {
+      if (item is Map) {
+        exclude.add(ExcludedIdentifierParameter.fromJson(item));
+      }
+    }
+    return ExcludedIdentifiersListParameter(
+      exclude: exclude,
+    );
+  }
+
   /// Returns whether the target node should be ignored during analysis.
   bool shouldIgnore(Declaration node) {
     final methodName = node.declaredElement?.name;
 
-    final excludedItem =
-        exclude.firstWhereOrNull((e) => e.methodName == methodName);
+    final excludedItem = exclude.firstWhereOrNull(
+      (e) => e.methodName == methodName || e.className == methodName,
+    );
 
     if (excludedItem == null) return false;
 

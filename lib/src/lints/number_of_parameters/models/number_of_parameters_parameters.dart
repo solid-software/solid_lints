@@ -1,4 +1,4 @@
-import 'package:solid_lints/src/models/excluded_identifiers_list_parameter.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 
 /// A data model class that represents the "number of parameters" input
 /// parameters.
@@ -21,11 +21,6 @@ class NumberOfParametersParameters {
   factory NumberOfParametersParameters.fromJson(Map<String, Object?> json) =>
       NumberOfParametersParameters(
         maxParameters: json['max_parameters'] as int? ?? _defaultMaxParameters,
-        exclude: ExcludedIdentifiersListParameter.fromJson(
-          excludeList:
-              json[ExcludedIdentifiersListParameter.excludeParameterName]
-                      as Iterable? ??
-                  [],
-        ),
+        exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
       );
 }

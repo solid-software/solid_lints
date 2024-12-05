@@ -51,17 +51,18 @@ class CyclomaticComplexityRule
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addDeclaration((declarationNode) {
-      context.registry.addBlockFunctionBody((node) {
+    context.registry.addBlockFunctionBody((node) {
+      context.registry.addDeclaration((declarationNode) {
         final isIgnored =
             config.parameters.exclude.shouldIgnore(declarationNode);
-        final visitor = CyclomaticComplexityFlowVisitor();
-        node.visitChildren(visitor);
+        if (!isIgnored) {
+          final visitor = CyclomaticComplexityFlowVisitor();
+          node.visitChildren(visitor);
 
-        if (!isIgnored &&
-            visitor.complexityEntities.length + 1 >
-                config.parameters.maxComplexity) {
-          reporter.atNode(node, code);
+          if (visitor.complexityEntities.length + 1 >
+              config.parameters.maxComplexity) {
+            reporter.atNode(node, code);
+          }
         }
       });
     });

@@ -1,4 +1,4 @@
-import 'package:solid_lints/src/models/excluded_identifiers_list_parameter.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 
 /// A data model class that represents the "function lines of code" input
 /// parameters.
@@ -22,11 +22,6 @@ class FunctionLinesOfCodeParameters {
   factory FunctionLinesOfCodeParameters.fromJson(Map<String, Object?> json) =>
       FunctionLinesOfCodeParameters(
         maxLines: json['max_lines'] as int? ?? _defaultMaxLines,
-        exclude: ExcludedIdentifiersListParameter.fromJson(
-          excludeList:
-              json[ExcludedIdentifiersListParameter.excludeParameterName]
-                      as Iterable? ??
-                  [],
-        ),
+        exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
       );
 }

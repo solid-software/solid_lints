@@ -1,4 +1,4 @@
-import 'package:solid_lints/src/models/excluded_identifiers_list_parameter.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 
 /// Cyclomatic complexity metric limits configuration.
 class CyclomaticComplexityParameters {
@@ -21,11 +21,6 @@ class CyclomaticComplexityParameters {
   factory CyclomaticComplexityParameters.fromJson(Map<String, Object?> json) =>
       CyclomaticComplexityParameters(
         maxComplexity: json['max_complexity'] as int? ?? _defaultMaxComplexity,
-        exclude: ExcludedIdentifiersListParameter.fromJson(
-          excludeList:
-              json[ExcludedIdentifiersListParameter.excludeParameterName]
-                      as Iterable? ??
-                  [],
-        ),
+        exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
       );
 }

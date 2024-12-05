@@ -65,7 +65,7 @@ Widget build() {
   return Offstage();
 }
 
-// expect_lint: avoid_returning_widgets
+// no lint
 SizedBox excludeMethod() => const SizedBox();
 
 class ExcludeWidget extends StatelessWidget {
@@ -76,7 +76,7 @@ class ExcludeWidget extends StatelessWidget {
     return const Placeholder();
   }
 
-  // expect_lint: avoid_returning_widgets
+  // no lint
   Widget excludeWidgetMethod() => const SizedBox();
 
   // expect_lint: avoid_returning_widgets

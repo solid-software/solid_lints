@@ -207,3 +207,20 @@ class UsingConstructorParameterInInitializer {
     print(_value);
   }
 }
+
+// no lint
+void excludeMethod(String s) {
+  return;
+}
+
+class Exclude {
+  // no lint
+  void excludeMethod(String s) {
+    return;
+  }
+
+// expect_lint: avoid_unused_parameters
+  void excludeMethod2(String s) {
+    return;
+  }
+}

@@ -1,4 +1,4 @@
-import 'package:solid_lints/src/models/excluded_identifiers_list_parameter.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 
 /// A data model class that represents the "avoid returning widgets" input
 /// parameters.
@@ -14,11 +14,7 @@ class NoEmptyBlockParameters {
   /// Method for creating from json data
   factory NoEmptyBlockParameters.fromJson(Map<String, dynamic> json) {
     return NoEmptyBlockParameters(
-      exclude: ExcludedIdentifiersListParameter.fromJson(
-        excludeList: json[ExcludedIdentifiersListParameter.excludeParameterName]
-                as Iterable? ??
-            [],
-      ),
+      exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
     );
   }
 }
