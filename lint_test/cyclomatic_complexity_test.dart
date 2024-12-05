@@ -31,3 +31,27 @@ class A {
     if (true) {}
   }
 }
+
+// no lint
+void excludeMethod() {
+  if (true) {
+    if (true) {
+      if (true) {
+        if (true) {}
+      }
+    }
+  }
+}
+
+class Exclude {
+  // no lint
+  void excludeMethod() {
+    if (true) {
+      if (true) {
+        if (true) {
+          if (true) {}
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/listener.dart';
-import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
@@ -96,7 +95,7 @@ class AvoidReturningWidgetsRule
 
       final isWidgetReturned = hasWidgetType(returnType);
 
-      final isIgnored = _shouldIgnore(node);
+      final isIgnored = config.parameters.exclude.shouldIgnore(node);
 
       final isOverriden = node.declaredElement?.hasOverride ?? false;
 
@@ -104,26 +103,5 @@ class AvoidReturningWidgetsRule
         reporter.atNode(node, code);
       }
     });
-  }
-
-  bool _shouldIgnore(Declaration node) {
-    final methodName = node.declaredElement?.name;
-
-    final excludedItem = config.parameters.exclude
-        .firstWhereOrNull((e) => e.methodName == methodName);
-
-    if (excludedItem == null) return false;
-
-    final className = excludedItem.className;
-
-    if (className == null || node is! MethodDeclaration) {
-      return true;
-    } else {
-      final classDeclaration = node.thisOrAncestorOfType<ClassDeclaration>();
-
-      if (classDeclaration == null) return false;
-
-      return classDeclaration.name.toString() == className;
-    }
   }
 }

@@ -49,3 +49,11 @@ class A {
     // TODO: implement toDoMethod
   }
 }
+
+// no lint
+void excludeMethod() {}
+
+class Exclude {
+  // no lint
+  void excludeMethod() {}
+}
