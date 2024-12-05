@@ -39,6 +39,7 @@ custom_lint:
         - method_name: excludeMethod
         - simpleMethodName
         - SimpleClassName
+        - exclude
     - newline_before_return
     - no_empty_block:
       exclude:

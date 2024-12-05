@@ -1,15 +1,19 @@
 /// Model class for ExcludeRule parameters
 class ExcludedIdentifierParameter {
   /// The name of the method that should be excluded from the lint.
-  final String methodName;
+  final String? methodName;
 
   /// The name of the class that should be excluded from the lint.
   final String? className;
 
+  /// The name of the plain Strings that should be excluded from the lint
+  final String? declarationName;
+
   /// Constructor for [ExcludedIdentifierParameter] model
   const ExcludedIdentifierParameter({
-    required this.methodName,
+    this.methodName,
     this.className,
+    this.declarationName,
   });
 
   ///

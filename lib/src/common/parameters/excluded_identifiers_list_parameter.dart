@@ -29,7 +29,7 @@ class ExcludedIdentifiersListParameter {
       } else if (item is String) {
         exclude.add(
           ExcludedIdentifierParameter(
-            methodName: item,
+            declarationName: item,
           ),
         );
       }
@@ -56,7 +56,7 @@ class ExcludedIdentifiersListParameter {
       } else if (item is String) {
         exclude.add(
           ExcludedIdentifierParameter(
-            methodName: item,
+            declarationName: item,
           ),
         );
       }
@@ -68,10 +68,21 @@ class ExcludedIdentifiersListParameter {
 
   /// Returns whether the target node should be ignored during analysis.
   bool shouldIgnore(Declaration node) {
-    final declaredName = node.declaredElement?.name;
+    final declarationName = node.declaredElement?.name;
 
     final excludedItem = exclude.firstWhereOrNull(
-      (e) => e.methodName == declaredName || e.className == declaredName,
+      (e) {
+        if (e.declarationName == declarationName) {
+          return true;
+        } else if (node is ClassDeclaration) {
+          return e.className == declarationName;
+        } else if (node is MethodDeclaration) {
+          return e.methodName == declarationName;
+        } else if (node is FunctionDeclaration) {
+          return e.methodName == declarationName;
+        }
+        return false;
+      },
     );
 
     if (excludedItem == null) return false;
