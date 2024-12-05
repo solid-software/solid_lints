@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_declarations, prefer_match_file_name, avoid_global_state
+// ignore_for_file: prefer_const_declarations, prefer_match_file_name, avoid_global_state, consider_making_a_member_private
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations
 // ignore_for_file: unused_local_variable
 // ignore_for_file: unused_element

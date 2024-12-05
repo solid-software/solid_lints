@@ -20,6 +20,7 @@ custom_lint:
     - double_literal_format
     - avoid_unnecessary_type_assertions
     - avoid_debug_print_in_release
+    - consider_making_a_member_private
     - avoid_using_api:
       severity: info
       entries:

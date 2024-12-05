@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, prefer_match_file_name, proper_super_calls
+// ignore_for_file: unused_field, prefer_match_file_name, proper_super_calls, consider_making_a_member_private
 // ignore_for_file: unused_element
 // ignore_for_file: no_empty_block
 

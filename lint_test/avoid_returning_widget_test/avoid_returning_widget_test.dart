@@ -1,4 +1,4 @@
-// ignore_for_file: unused_element, prefer_match_file_name
+// ignore_for_file: unused_element, prefer_match_file_name, consider_making_a_member_private
 // ignore_for_file: member_ordering
 
 /// Check returning a widget fail

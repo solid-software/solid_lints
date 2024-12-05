@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// ignore_for_file: member_ordering, prefer_match_file_name
+// ignore_for_file: member_ordering, prefer_match_file_name, consider_making_a_member_private
 
 import 'package:flutter/material.dart';
 

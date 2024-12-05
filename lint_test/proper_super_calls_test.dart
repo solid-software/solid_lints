@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_match_file_name, no_empty_block
+// ignore_for_file: prefer_match_file_name, no_empty_block, consider_making_a_member_private
 
 class Widget {}
 

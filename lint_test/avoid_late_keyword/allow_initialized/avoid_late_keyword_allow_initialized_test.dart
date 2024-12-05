@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_declarations, unused_local_variable, prefer_match_file_name
+// ignore_for_file: prefer_const_declarations, unused_local_variable, prefer_match_file_name, consider_making_a_member_private
 // ignore_for_file: avoid_global_state
 
 abstract class Animation {}

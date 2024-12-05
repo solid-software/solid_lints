@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_declarations, prefer_match_file_name, prefer_early_return
+// ignore_for_file: prefer_const_declarations, prefer_match_file_name, prefer_early_return, consider_making_a_member_private
 // ignore_for_file: unused_local_variable
 // ignore_for_file: cyclomatic_complexity
 // ignore_for_file: avoid_unused_parameters
