@@ -1,19 +1,19 @@
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 
-/// A data model class that represents the "avoid returning widgets" input
+/// A data model class that represents the "no empty block" lint input
 /// parameters.
-class AvoidReturningWidgetsParameters {
+class NoEmptyBlockParameters {
   /// A list of methods that should be excluded from the lint.
   final ExcludedIdentifiersListParameter exclude;
 
-  /// Constructor for [AvoidReturningWidgetsParameters] model
-  AvoidReturningWidgetsParameters({
+  /// Constructor for [NoEmptyBlockParameters] model
+  NoEmptyBlockParameters({
     required this.exclude,
   });
 
   /// Method for creating from json data
-  factory AvoidReturningWidgetsParameters.fromJson(Map<String, dynamic> json) {
-    return AvoidReturningWidgetsParameters(
+  factory NoEmptyBlockParameters.fromJson(Map<String, dynamic> json) {
+    return NoEmptyBlockParameters(
       exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
     );
   }

@@ -52,13 +52,19 @@ class CyclomaticComplexityRule
     CustomLintContext context,
   ) {
     context.registry.addBlockFunctionBody((node) {
-      final visitor = CyclomaticComplexityFlowVisitor();
-      node.visitChildren(visitor);
+      context.registry.addDeclaration((declarationNode) {
+        final isIgnored =
+            config.parameters.exclude.shouldIgnore(declarationNode);
+        if (isIgnored) return;
 
-      if (visitor.complexityEntities.length + 1 >
-          config.parameters.maxComplexity) {
-        reporter.atNode(node, code);
-      }
+        final visitor = CyclomaticComplexityFlowVisitor();
+        node.visitChildren(visitor);
+
+        if (visitor.complexityEntities.length + 1 >
+            config.parameters.maxComplexity) {
+          reporter.atNode(node, code);
+        }
+      });
     });
   }
 }

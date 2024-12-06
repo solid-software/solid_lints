@@ -50,9 +50,15 @@ class FunctionLinesOfCodeRule
   ) {
     void checkNode(AstNode node) => _checkNode(resolver, reporter, node);
 
-    context.registry.addMethodDeclaration(checkNode);
-    context.registry.addFunctionDeclaration(checkNode);
-    context.registry.addFunctionExpression(checkNode);
+    context.registry.addDeclaration((declarationNode) {
+      final isIgnored = config.parameters.exclude.shouldIgnore(declarationNode);
+
+      if (isIgnored) return;
+
+      context.registry.addMethodDeclaration(checkNode);
+      context.registry.addFunctionDeclaration(checkNode);
+      context.registry.addFunctionExpression(checkNode);
+    });
   }
 
   void _checkNode(
@@ -60,12 +66,6 @@ class FunctionLinesOfCodeRule
     ErrorReporter reporter,
     AstNode node,
   ) {
-    final functionName = _getFunctionName(node);
-    if (functionName != null &&
-        config.parameters.excludeNames.contains(functionName)) {
-      return;
-    }
-
     final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
     node.visitChildren(visitor);
 
@@ -82,18 +82,6 @@ class FunctionLinesOfCodeRule
         length: node.length - lengthDifference,
         errorCode: code,
       );
-    }
-  }
-
-  String? _getFunctionName(AstNode node) {
-    if (node is FunctionDeclaration) {
-      return node.name.lexeme;
-    } else if (node is MethodDeclaration) {
-      return node.name.lexeme;
-    } else if (node is FunctionExpression) {
-      return node.declaredElement?.name;
-    } else {
-      return null;
     }
   }
 }

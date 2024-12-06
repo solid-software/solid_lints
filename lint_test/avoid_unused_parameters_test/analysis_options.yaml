@@ -4,8 +4,8 @@ analyzer:
 
 custom_lint:
   rules:
-    - avoid_returning_widgets:
+    - avoid_unused_parameters:
       exclude:
-        - class_name: ExcludeWidget 
-          method_name: excludeWidgetMethod
+        - class_name: Exclude
+          method_name: excludeMethod
         - method_name: excludeMethod

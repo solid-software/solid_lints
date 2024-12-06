@@ -6,23 +6,46 @@ custom_lint:
   rules:
     - cyclomatic_complexity:
       max_complexity: 4
+      exclude:
+        - class_name: Exclude
+          method_name: excludeMethod
+        - method_name: excludeMethod      
     - number_of_parameters:
       max_parameters: 2
+      exclude:
+        - class_name: Exclude
+          method_name: avoidNumberOfParameters
+        - method_name: avoidNumberOfParameters          
     - function_lines_of_code:
       max_lines: 50
     - avoid_non_null_assertion
     - avoid_late_keyword:
       allow_initialized: true
     - avoid_global_state
-    - avoid_returning_widgets
+    - avoid_returning_widgets:
+      exclude:
+        - class_name: ExcludeWidget 
+          method_name: excludeWidgetMethod
+        - method_name: excludeMethod
     - avoid_unnecessary_setstate
     - double_literal_format
     - avoid_unnecessary_type_assertions
     - avoid_unnecessary_type_casts
     - avoid_unrelated_type_assertions
-    - avoid_unused_parameters
+    - avoid_unused_parameters:
+      exclude:
+        - class_name: Exclude 
+          method_name: excludeMethod
+        - method_name: excludeMethod
+        - simpleMethodName
+        - SimpleClassName
+        - exclude
     - newline_before_return
-    - no_empty_block
+    - no_empty_block:
+      exclude:
+        - class_name: Exclude 
+          method_name: excludeMethod
+        - method_name: excludeMethod
     - no_equal_then_else
     - avoid_debug_print_in_release
     - prefer_early_return

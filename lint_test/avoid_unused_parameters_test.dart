@@ -207,3 +207,37 @@ class UsingConstructorParameterInInitializer {
     print(_value);
   }
 }
+
+// no lint
+void excludeMethod(String s) {
+  return;
+}
+
+// no lint
+void simpleMethodName(String s) {
+  return;
+}
+
+class Exclude {
+  // no lint
+  void excludeMethod(String s) {
+    return;
+  }
+
+// expect_lint: avoid_unused_parameters
+  void excludeMethod2(String s) {
+    return;
+  }
+}
+
+class SimpleClassName {
+  // no lint
+  void simpleMethodName(String s) {
+    return;
+  }
+
+// expect_lint: avoid_unused_parameters
+  void simpleMethodName2(String s) {
+    return;
+  }
+}

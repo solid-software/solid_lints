@@ -26,6 +26,12 @@ class ExcludedIdentifiersListParameter {
     for (final item in excludeList) {
       if (item is Map) {
         exclude.add(ExcludedIdentifierParameter.fromJson(item));
+      } else if (item is String) {
+        exclude.add(
+          ExcludedIdentifierParameter(
+            declarationName: item,
+          ),
+        );
       }
     }
     return ExcludedIdentifiersListParameter(
@@ -33,12 +39,38 @@ class ExcludedIdentifiersListParameter {
     );
   }
 
+  /// Method for creating from json data with default params
+  factory ExcludedIdentifiersListParameter.defaultFromJson(
+    Map<String, dynamic> json,
+  ) {
+    final excludeList =
+        json[ExcludedIdentifiersListParameter.excludeParameterName]
+                as Iterable? ??
+            [];
+
+    return ExcludedIdentifiersListParameter.fromJson(
+      excludeList: excludeList,
+    );
+  }
+
   /// Returns whether the target node should be ignored during analysis.
   bool shouldIgnore(Declaration node) {
-    final methodName = node.declaredElement?.name;
+    final declarationName = node.declaredElement?.name;
 
-    final excludedItem =
-        exclude.firstWhereOrNull((e) => e.methodName == methodName);
+    final excludedItem = exclude.firstWhereOrNull(
+      (e) {
+        if (e.declarationName == declarationName) {
+          return true;
+        } else if (node is ClassDeclaration) {
+          return e.className == declarationName;
+        } else if (node is MethodDeclaration) {
+          return e.methodName == declarationName;
+        } else if (node is FunctionDeclaration) {
+          return e.methodName == declarationName;
+        }
+        return false;
+      },
+    );
 
     if (excludedItem == null) return false;
 
