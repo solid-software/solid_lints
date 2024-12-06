@@ -1,3 +1,4 @@
+// ignore_for_file: consider_making_a_member_private
 /// Check the `prefer_first` rule
 void fun() {
   const zero = 0;

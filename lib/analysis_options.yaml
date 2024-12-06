@@ -52,6 +52,7 @@ custom_lint:
     - avoid_unused_parameters
     - avoid_debug_print_in_release
     - avoid_final_with_getter
+    - consider_making_a_member_private
 
     - cyclomatic_complexity:
       max_complexity: 10

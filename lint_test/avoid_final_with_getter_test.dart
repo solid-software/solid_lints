@@ -1,4 +1,4 @@
-// ignore_for_file: type_annotate_public_apis, prefer_match_file_name, unused_local_variable
+// ignore_for_file: type_annotate_public_apis, prefer_match_file_name, unused_local_variable, consider_making_a_member_private
 
 /// Check final private field with getter fail
 /// `avoid_final_with_getter`

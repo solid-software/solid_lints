@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field
+// ignore_for_file: unused_field, consider_making_a_member_private
 // ignore_for_file: unused_element
 // ignore_for_file: prefer_match_file_name
 

@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_match_file_name
+// ignore_for_file: prefer_match_file_name, consider_making_a_member_private
 
 class ClassWithLongMethods {
   // expect_lint: function_lines_of_code

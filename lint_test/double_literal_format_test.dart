@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_global_state
+// ignore_for_file: avoid_global_state, consider_making_a_member_private
 // ignore_for_file: type_annotate_public_apis
 // ignore_for_file: unused_local_variable
 
