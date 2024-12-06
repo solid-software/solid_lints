@@ -52,14 +52,3 @@ class X {
   // no lint
   factory X.usedFactory() => X();
 }
-
-class Y {
-  // no lint
-  void _y() {
-    final x = X();
-    X.usedFactory();
-    x.usedMethodX();
-    usedGLobalFunction();
-    usedGlobalVariables;
-  }
-}
