@@ -24,9 +24,10 @@ class MyWidgetDecoration {
 
 Widget build() {
   return MyWidget(
-    // expect_lint: no_magic_number
+    /// allowed_in_widget_params: true
     decoration: MyWidgetDecoration(size: 12),
-    // expect_lint: no_magic_number
+
+    /// allowed_in_widget_params: true
     value: 23,
   );
 }

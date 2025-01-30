@@ -7,6 +7,8 @@ class AnimationController {}
 
 class SubAnimationController extends AnimationController {}
 
+class Allowed {}
+
 class NotAllowed {}
 
 class Subscription<T> {}
@@ -18,19 +20,22 @@ class ConcreteTypeWithNoGenerics {}
 /// `avoid_late_keyword`
 /// allow_initialized option enabled
 class AvoidLateKeyword {
-  /// expect_lint: avoid_late_keyword
+  /// ignored_types: ColorTween
   late final ColorTween colorTween;
 
-  /// expect_lint: avoid_late_keyword
+  /// ignored_types: AnimationController
   late final AnimationController controller1;
 
-  /// expect_lint: avoid_late_keyword
+  /// ignored_types: AnimationController
   late final SubAnimationController controller2;
 
+  /// ignored_types: AnimationController
   late final controller3 = AnimationController();
 
+  /// ignored_types: AnimationController
   late final controller4 = SubAnimationController();
 
+  /// allow_initialized: true
   late final field1 = 'string';
 
   /// expect_lint: avoid_late_keyword
@@ -42,43 +47,47 @@ class AvoidLateKeyword {
   /// expect_lint: avoid_late_keyword
   late final NotAllowed na1;
 
-  late final na2 = NotAllowed();
+  /// allow_initialized: true
+  late final a = Allowed();
 
   /// expect_lint: avoid_late_keyword
   late final Subscription<String> subscription1;
 
-  /// expect_lint: avoid_late_keyword
+  /// ignored_types: Subscription<ConcreteTypeWithNoGenerics>
   late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
 
-  /// expect_lint: avoid_late_keyword
+  /// ignored_types: Subscription<List<Object?>>
   late final Subscription<List<String>> subscription3;
 
-  /// expect_lint: avoid_late_keyword
+  /// ignored_types: Subscription<List<Object?>>
   late final Subscription<List<List<int>>> subscription4;
 
-  /// expect_lint: avoid_late_keyword
+  /// ignored_types: Subscription<Map<dynamic, String>>
   late final Subscription<Map<dynamic, String>> subscription5;
 
-  /// expect_lint: avoid_late_keyword
+  /// ignored_types: Subscription<Map<dynamic, String>>
   late final Subscription<Map<String, String>> subscription6;
 
   /// expect_lint: avoid_late_keyword
   late final Subscription<Map<String, dynamic>> subscription7;
 
   void test() {
-    /// expect_lint: avoid_late_keyword
+    /// ignored_types: ColorTween
     late final ColorTween colorTween;
 
-    /// expect_lint: avoid_late_keyword
+    /// ignored_types: AnimationController
     late final AnimationController controller1;
 
-    /// expect_lint: avoid_late_keyword
+    /// ignored_types: AnimationController
     late final SubAnimationController controller2;
 
+    /// ignored_types: AnimationController
     late final controller3 = AnimationController();
 
+    /// ignored_types: AnimationController
     late final controller4 = SubAnimationController();
 
+    /// allow_initialized: true
     late final local1 = 'string';
 
     /// expect_lint: avoid_late_keyword
@@ -90,15 +99,16 @@ class AvoidLateKeyword {
     /// expect_lint: avoid_late_keyword
     late final NotAllowed na1;
 
-    late final na2 = NotAllowed();
+    /// allow_initialized: true
+    late final a = Allowed();
 
     /// expect_lint: avoid_late_keyword
     late final Subscription<String> subscription1;
 
-    /// expect_lint: avoid_late_keyword
+    /// ignored_types: Subscription<ConcreteTypeWithNoGenerics>
     late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
 
-    /// expect_lint: avoid_late_keyword
+    /// ignored_types: Subscription<List<String>>
     late final Subscription<List<String>> subscription3;
   }
 }

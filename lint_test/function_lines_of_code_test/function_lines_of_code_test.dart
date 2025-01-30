@@ -256,8 +256,19 @@ class ClassWithLongMethods {
     return i;
   }
 
-  // Excluded by excludeNames
+  // Excluded by method_name
   int longMethodExcluded() {
+    var i = 0;
+    i++;
+    i++;
+    i++;
+    i++;
+
+    return i;
+  }
+
+// Excluded by declaration_name
+  int longMethodExcludedByDeclarationName() {
     var i = 0;
     i++;
     i++;
@@ -481,7 +492,7 @@ int longFunction() {
   return i;
 }
 
-// Excluded by excludeNames
+// Excluded by method_name
 int longFunctionExcluded() {
   var i = 0;
   i++;
@@ -491,3 +502,34 @@ int longFunctionExcluded() {
 
   return i;
 }
+
+// Excluded by declaration_name
+int longFunctionExcludedByDeclarationName() {
+  var i = 0;
+  i++;
+  i++;
+  i++;
+  i++;
+
+  return i;
+}
+
+// expect_lint: function_lines_of_code
+final longAnonymousFunction = () {
+  var i = 0;
+  i++;
+  i++;
+  i++;
+  i++;
+
+  return i;
+};
+
+final notLongAnonymousFunction = () {
+  var i = 0;
+  i++;
+  i++;
+  i++;
+
+  return i;
+};

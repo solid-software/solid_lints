@@ -87,7 +87,9 @@ class PreferMatchFileNameRule extends SolidLintRule {
       if (_doNormalizedNamesMatch(
         resolver.source.fullName,
         firstDeclaration.token.lexeme,
-      )) return;
+      )) {
+        return;
+      }
 
       final nodeType =
           humanReadableNodeType(firstDeclaration.parent).toLowerCase();

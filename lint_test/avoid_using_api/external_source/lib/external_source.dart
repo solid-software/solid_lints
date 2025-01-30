@@ -21,5 +21,4 @@ const test2 = 'Hello World';
 
 void test() {}
 
-// expect_lint: avoid_global_state
 int banned = 5;

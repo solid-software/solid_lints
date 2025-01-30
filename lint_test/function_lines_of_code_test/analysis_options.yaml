@@ -7,5 +7,8 @@ custom_lint:
     - function_lines_of_code:
       max_lines: 5
       exclude:
-         - longFunctionExcluded
-         - longMethodExcluded
+        - class_name: ClassWithLongMethods
+          method_name: longMethodExcluded
+        - method_name: longFunctionExcluded     
+        - longFunctionExcludedByDeclarationName
+        - longMethodExcludedByDeclarationName
