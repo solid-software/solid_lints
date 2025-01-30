@@ -6,8 +6,8 @@
 /// alphabetical-by-type option enabled
 
 class CorrectAlphabeticalByTypeClass {
-  final int a = 1;
   final double e = 1;
+  final int a = 1;
 }
 
 class WrongAlphabeticalByTypeClass {
