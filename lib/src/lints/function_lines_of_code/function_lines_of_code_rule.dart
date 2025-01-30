@@ -60,6 +60,9 @@ class FunctionLinesOfCodeRule
 
     // Check for an anonymous function
     void checkFunctionExpressionNode(FunctionExpression node) {
+      // If a FunctionExpression is an immediate child of a FunctionDeclaration
+      // this means it's a named function, which are already check as part of
+      // addFunctionDeclaration call.
       if (node.parent is FunctionDeclaration) {
         return;
       }
