@@ -7,7 +7,8 @@
   - `no_empty_bloc`
   - `number_of_parameters`
 - BREAKING CHANGE: Renamed `excludeNames` parameter to `exclude` for `function_lines_of_code` lint.
-- Fixed an issue with `prefer_early_retrun` for throw expression 
+- Fixed an issue with `prefer_early_retrun` for throw expression
+- Added `copyWith` to `exclude` section for `number_of_parameters` lint 
 
 ## 0.2.3
 
