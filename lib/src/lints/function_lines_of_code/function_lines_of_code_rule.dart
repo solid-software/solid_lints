@@ -50,15 +50,25 @@ class FunctionLinesOfCodeRule
   ) {
     void checkNode(AstNode node) => _checkNode(resolver, reporter, node);
 
-    context.registry.addDeclaration((declarationNode) {
-      final isIgnored = config.parameters.exclude.shouldIgnore(declarationNode);
+    void checkDeclarationNode(Declaration node) {
+      final isIgnored = config.parameters.exclude.shouldIgnore(node);
+      if (isIgnored) {
+        return;
+      }
+      checkNode(node);
+    }
 
-      if (isIgnored) return;
+    // Check for an anonymous function
+    void checkFunctionExpressionNode(FunctionExpression node) {
+      if (node.parent is FunctionDeclaration) {
+        return;
+      }
+      checkNode(node);
+    }
 
-      context.registry.addMethodDeclaration(checkNode);
-      context.registry.addFunctionDeclaration(checkNode);
-      context.registry.addFunctionExpression(checkNode);
-    });
+    context.registry.addFunctionDeclaration(checkDeclarationNode);
+    context.registry.addMethodDeclaration(checkDeclarationNode);
+    context.registry.addFunctionExpression(checkFunctionExpressionNode);
   }
 
   void _checkNode(
