@@ -8,8 +8,9 @@
   - `number_of_parameters`
 - BREAKING CHANGE: Renamed `excludeNames` parameter to `exclude` for `function_lines_of_code` lint.
 - Fixed an issue with `prefer_early_retrun` for throw expression 
-- Update `analyzer` dependency to 7.1.0  
-- Update `custom_lint_builder` dependency to 0.7.1 
+- `number_of_parameters` lint: added `copyWith` to the default exclude list.
+- Update `analyzer` dependency to 7.1.0
+- Update `custom_lint_builder` dependency to 0.7.1
 
 ## 0.2.3
 

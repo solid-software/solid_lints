@@ -85,6 +85,8 @@ custom_lint:
 
     - number_of_parameters:
       max_parameters: 7
+      exclude:
+        - method_name: copyWith 
 
     - prefer_conditional_expressions:
       ignore_nested: true
