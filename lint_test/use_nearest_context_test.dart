@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_unused_parameters
+// ignore_for_file: avoid_unused_parameters, unused_local_variable
 import 'package:flutter/material.dart';
 
 /// Check the `use_nearest_context` rule
@@ -20,6 +20,11 @@ void showDialog(BuildContext context) {
       return SizedBox.fromSize(size: context.size);
     },
   );
+
+  final fun = ({required BuildContext context}) {
+    /// expect_lint: use_nearest_context
+    outerContext.mounted;
+  };
 
   showModalBottomSheet(
     context: context,
