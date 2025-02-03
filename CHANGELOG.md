@@ -1,4 +1,5 @@
 ## 0.3.0
+
 - Added `exclude` parameter for the following lints:
   - `avoid_returning_widgets`
   - `avoid_unused_parameters`
@@ -9,6 +10,10 @@
 - BREAKING CHANGE: Renamed `excludeNames` parameter to `exclude` for `function_lines_of_code` lint.
 - Fixed an issue with `prefer_early_retrun` for throw expression
 - `number_of_parameters` lint: added `copyWith` to the default exclude list.
+- Update dependencies:
+  - Update min Dart SDK constraint to 3.5.0
+  - Update `analyzer` dependency to 7.1.0
+  - Update `custom_lint_builder` dependency to 0.7.1
 
 ## 0.2.3
 
