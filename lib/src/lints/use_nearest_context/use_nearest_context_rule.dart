@@ -5,7 +5,6 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/use_nearest_context/models/use_nearest_context_parameters.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
@@ -57,7 +56,7 @@ part 'fixes/use_nearest_context_fix.dart';
 /// }
 /// ```
 ///
-class UseNearestContextRule extends SolidLintRule<UseNearestContextParameters> {
+class UseNearestContextRule extends SolidLintRule {
   /// This lint rule represents the error if BuildContext is used not from the
   /// nearest available scope
   static const lintName = 'use_nearest_context';
@@ -70,7 +69,6 @@ class UseNearestContextRule extends SolidLintRule<UseNearestContextParameters> {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
-      paramsParser: UseNearestContextParameters.fromJson,
       problemMessage: (value) =>
           'BuildContext is used not from the nearest available scope. '
           'Consider renaming the nearest BuildContext parameter.',
