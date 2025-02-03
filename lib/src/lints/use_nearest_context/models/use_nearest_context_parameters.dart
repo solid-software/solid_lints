@@ -1,19 +1,12 @@
-import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
+// ignore_for_file: avoid_unused_constructor_parameters
 
 /// A data model class that represents the "use nearest context" input
 /// parameters.
 class UseNearestContextParameters {
-  /// A list of methods that should be excluded from the lint.
-  final ExcludedIdentifiersListParameter exclude;
-
   /// Constructor for [UseNearestContextParameters] model
-  const UseNearestContextParameters({
-    required this.exclude,
-  });
+  const UseNearestContextParameters();
 
   /// Method for creating from json data
   factory UseNearestContextParameters.fromJson(Map<String, Object?> json) =>
-      UseNearestContextParameters(
-        exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
-      );
+      const UseNearestContextParameters();
 }
