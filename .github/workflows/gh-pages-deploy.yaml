@@ -3,6 +3,7 @@ name: Build and Deploy documentation to GitHub Pages
 on:
   push:
     branches:
+      - master
 
 permissions:
   contents: write
