@@ -81,7 +81,9 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
       final isIgnored = config.parameters.exclude.shouldIgnore(node);
       if (isIgnored) return;
 
-      final visitor = NoEmptyBlockVisitor();
+      final visitor = NoEmptyBlockVisitor(
+        allowComments: config.parameters.allowComments,
+      );
       node.accept(visitor);
 
       for (final emptyBlock in visitor.emptyBlocks) {

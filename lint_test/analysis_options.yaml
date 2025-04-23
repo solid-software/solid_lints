@@ -9,7 +9,7 @@ custom_lint:
       exclude:
         - class_name: Exclude
           method_name: excludeMethod
-        - method_name: excludeMethod      
+        - method_name: excludeMethod
     - number_of_parameters:
       max_parameters: 2
       exclude:
@@ -24,7 +24,7 @@ custom_lint:
     - avoid_global_state
     - avoid_returning_widgets:
       exclude:
-        - class_name: ExcludeWidget 
+        - class_name: ExcludeWidget
           method_name: excludeWidgetMethod
         - method_name: excludeMethod
     - avoid_unnecessary_setstate
@@ -34,7 +34,7 @@ custom_lint:
     - avoid_unrelated_type_assertions
     - avoid_unused_parameters:
       exclude:
-        - class_name: Exclude 
+        - class_name: Exclude
           method_name: excludeMethod
         - method_name: excludeMethod
         - simpleMethodName
@@ -42,8 +42,9 @@ custom_lint:
         - exclude
     - newline_before_return
     - no_empty_block:
+      allow_comments: true
       exclude:
-        - class_name: Exclude 
+        - class_name: Exclude
           method_name: excludeMethod
         - method_name: excludeMethod
     - no_equal_then_else
