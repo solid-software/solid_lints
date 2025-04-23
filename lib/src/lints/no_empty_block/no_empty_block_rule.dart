@@ -82,7 +82,7 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
       if (isIgnored) return;
 
       final visitor = NoEmptyBlockVisitor(
-        allowComments: config.parameters.allowComments,
+        allowWithComments: config.parameters.allowWithComments,
       );
       node.accept(visitor);
 

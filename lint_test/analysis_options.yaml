@@ -42,7 +42,7 @@ custom_lint:
         - exclude
     - newline_before_return
     - no_empty_block:
-      allow_comments: true
+      allow_with_comments: true
       exclude:
         - class_name: Exclude
           method_name: excludeMethod
