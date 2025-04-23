@@ -69,3 +69,14 @@ void anotherExample() {
     // explain why this block is empty
   });
 }
+
+void nestedIfElse() {
+  if (true) {
+    if (true) {
+      // no lint
+      if (true) {
+        // explain why this block is empty
+      }
+    }
+  }
+}
