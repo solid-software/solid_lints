@@ -29,7 +29,15 @@ const _todoComment = 'TODO';
 /// The AST visitor that will find all empty blocks, excluding catch blocks
 /// and blocks containing [_todoComment]
 class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
+  final bool _allowWithComments;
+
   final _emptyBlocks = <Block>[];
+
+  /// Constructor for [NoEmptyBlockVisitor]
+  /// [_allowWithComments] indicates whether to allow empty blocks that contain
+  /// any comments
+  NoEmptyBlockVisitor({required bool allowWithComments})
+      : _allowWithComments = allowWithComments;
 
   /// All empty blocks
   Iterable<Block> get emptyBlocks => _emptyBlocks;
@@ -40,6 +48,7 @@ class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
 
     if (node.statements.isNotEmpty) return;
     if (node.parent is CatchClause) return;
+    if (_allowWithComments && _isPrecedingCommentAny(node)) return;
     if (_isPrecedingCommentToDo(node)) return;
 
     _emptyBlocks.add(node);
@@ -47,4 +56,7 @@ class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
 
   static bool _isPrecedingCommentToDo(Block node) =>
       node.endToken.precedingComments?.lexeme.contains(_todoComment) ?? false;
+
+  static bool _isPrecedingCommentAny(Block node) =>
+      node.endToken.precedingComments != null;
 }

@@ -1,3 +1,7 @@
+## 0.4.0
+
+- Added `allow_with_comments` parameter for `no_empty_block` lint.
+
 ## 0.3.0
 
 - Added `exclude` parameter for the following lints:
@@ -30,11 +34,11 @@
 ## 0.2.0
 
 - Added `avoid_final_with_getter` rule
-- Improve `avoid_late_keyword` - `ignored_types` to support ignoring subtype of the node type (https://github.com/solid-software/solid_lints/issues/157)
-- Abstract methods should be omitted by `proper_super_calls` (https://github.com/solid-software/solid_lints/issues/159)
-- Add a rule prefer_guard_clause for reversing nested if statements (https://github.com/solid-software/solid_lints/issues/91)
-- add exclude params support to avoid_returning_widgets rule (https://github.com/solid-software/solid_lints/issues/131)
-- add quick fix to avoid_final_with_getter (https://github.com/solid-software/solid_lints/pull/164)
+- Improve `avoid_late_keyword` - `ignored_types` to support ignoring subtype of the node type (<https://github.com/solid-software/solid_lints/issues/157>)
+- Abstract methods should be omitted by `proper_super_calls` (<https://github.com/solid-software/solid_lints/issues/159>)
+- Add a rule prefer_guard_clause for reversing nested if statements (<https://github.com/solid-software/solid_lints/issues/91>)
+- add exclude params support to avoid_returning_widgets rule (<https://github.com/solid-software/solid_lints/issues/131>)
+- add quick fix to avoid_final_with_getter (<https://github.com/solid-software/solid_lints/pull/164>)
 - Renamed `avoid_debug_print` to `avoid_debug_print_in_release`
 - The `avoid_debug_print_in_release` no longer reports a warning if the `debugPrint` call is wrapped in a `!kReleaseMode` check.
 - Update custom_lints to work with newer Flutter
@@ -50,8 +54,8 @@
 - Fixed unexpected avoid_unnecessary_type_assertions
 - Added `excludeNames` param for `function_lines_of_code` lint
 - Improved `avoid_unrelated_type_assertions` to support true and false results
-- Set default `cyclomatic_complexity` to 10 (https://github.com/solid-software/solid_lints/issues/146)
-  Credits: Arthur Miranda (https://github.com/arthurbcd)
+- Set default `cyclomatic_complexity` to 10 (<https://github.com/solid-software/solid_lints/issues/146>)
+  Credits: Arthur Miranda (<https://github.com/arthurbcd>)
 
 ## 0.1.4
 
@@ -86,7 +90,7 @@
   - avoid_unrelated_type_assertions
   - avoid_unused_parameters
   - avoid_using_api
-    Credits: getBoolean (https://github.com/getBoolean)
+    Credits: getBoolean (<https://github.com/getBoolean>)
   - cyclomatic_complexity
   - double_literal_format
   - function_lines_of_code

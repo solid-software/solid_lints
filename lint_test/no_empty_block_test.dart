@@ -57,3 +57,26 @@ class Exclude {
   // no lint
   void excludeMethod() {}
 }
+
+// no lint
+void emptyMethodWithComments() {
+  // comment explaining why this block is empty
+}
+
+void anotherExample() {
+  // no lint
+  nestedFun(() {
+    // explain why this block is empty
+  });
+}
+
+void nestedIfElse() {
+  if (true) {
+    if (true) {
+      // no lint
+      if (true) {
+        // explain why this block is empty
+      }
+    }
+  }
+}
