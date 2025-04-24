@@ -1,10 +1,12 @@
+import 'package:collection/collection.dart';
+
 /// Represents a function parameter type
 enum ParameterType {
-  /// Super parameter type (super.parameterName)
-  super$('super'),
+  /// Inherited (super) parameter type (super.parameterName)
+  inherited('super'),
 
-  /// Required super parameter type (required super.parameterName)
-  requiredSuper('required_super'),
+  /// Required inherited (super) parameter type (required super.parameterName)
+  requiredInherited('required_super'),
 
   /// Required parameter type (required String parameterName)
   required('required'),
@@ -12,8 +14,13 @@ enum ParameterType {
   /// Nullable parameter type (String? parameterName)
   nullable('nullable'),
 
-  /// Default parameter type (String parameterName = 'defaultValue')
-  default$('default');
+  /// Default value parameter type (String parameterName = 'defaultValue')
+  defaultValue('default');
+
+  /// Returns [ParameterType] from type or null if not found
+  static ParameterType? fromType(String type) {
+    return values.firstWhereOrNull((o) => o.type == type);
+  }
 
   /// String representation of the parameter type
   final String type;

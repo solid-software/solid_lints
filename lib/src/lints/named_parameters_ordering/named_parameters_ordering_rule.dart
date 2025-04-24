@@ -1,6 +1,7 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/named_parameters_ordering_parameters.dart';
+import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_ordering_info.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/visitors/named_parameters_ordering_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
@@ -41,16 +42,6 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// #### BAD:
 ///
 /// ```dart
-/// class User {
-///   final String accountType;
-///   final String? userId;
-///
-///   User({
-///     required this.accountType,
-///     this.userId,
-///   });
-/// }
-///
 /// class UserProfile extends User {
 ///   final String? age;
 ///   final String? country;
@@ -82,16 +73,6 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// #### GOOD:
 ///
 /// ```dart
-/// class User {
-///   final String accountType;
-///   final String? userId;
-///
-///   User({
-///     required this.accountType,
-///     this.userId,
-///   });
-/// }
-///
 /// class UserProfile extends User {
 ///   final String? age;
 ///   final String? country;
@@ -121,11 +102,10 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```
 class NamedParametersOrderingRule
     extends SolidLintRule<NamedParametersOrderingParameters> {
-  /// This lint rule represents
-  /// the error whether we use bad formatted double literals.
+  /// The name of this lint rule.
   static const lintName = 'named_parameters_ordering';
 
-  static const _warningMessage = 'should be before';
+  late final _visitor = NamedParametersOrderingVisitor(config.parameters.order);
 
   NamedParametersOrderingRule._(super.config);
 
@@ -149,9 +129,7 @@ class NamedParametersOrderingRule
     CustomLintContext context,
   ) {
     context.registry.addFormalParameterList((node) {
-      final visitor = NamedParametersOrderingVisitor(config.parameters.order);
-
-      final parametersInfo = visitor.visitFormalParameterList(node);
+      final parametersInfo = _visitor.visitFormalParameterList(node);
 
       final wrongOrderParameters = parametersInfo.where(
         (info) => info.parameterOrderingInfo.isWrong,
@@ -173,7 +151,7 @@ class NamedParametersOrderingRule
     return LintCode(
       name: lintName,
       problemMessage: "${parameterOrdering.displayName} named parameters"
-          " $_warningMessage "
+          " should be before "
           "${previousParameterOrdering!.displayName} named parameters.",
     );
   }

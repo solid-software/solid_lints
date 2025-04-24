@@ -84,8 +84,8 @@ custom_lint:
     - avoid_final_with_getter
     - named_parameters_ordering:
       order:
-        - required
         - required_super
-        - default
-        - nullable
         - super
+        - required
+        - nullable
+        - default

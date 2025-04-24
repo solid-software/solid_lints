@@ -23,6 +23,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart' hide Annotation;
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_info.dart';
+import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_ordering_info.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_type.dart';
 
 /// AST Visitor which finds all methods, functions and constructor named
@@ -88,11 +90,13 @@ class NamedParametersOrderingVisitor
 
     switch (parameter) {
       case SuperFormalParameter(:final isRequired):
-        return isRequired ? ParameterType.requiredSuper : ParameterType.super$;
+        return isRequired
+            ? ParameterType.requiredInherited
+            : ParameterType.inherited;
 
       case DefaultFormalParameter():
       case _ when hasDefaultValue:
-        return ParameterType.default$;
+        return ParameterType.defaultValue;
 
       case FieldFormalParameter(:final isRequired) ||
             FunctionTypedFormalParameter(:final isRequired) ||
@@ -109,38 +113,4 @@ class NamedParametersOrderingVisitor
         _parametersOrder.indexOf(previousParameterType) >
             _parametersOrder.indexOf(currentParameterType);
   }
-}
-
-/// Data class that holds AST function parameter and it's order info
-class ParameterInfo {
-  /// AST instance of an [FormalParameter]
-  final FormalParameter formalParameter;
-
-  /// Function parameter order info
-  final ParameterOrderingInfo parameterOrderingInfo;
-
-  /// Creates instance of an [ParameterInfo]
-  const ParameterInfo({
-    required this.formalParameter,
-    required this.parameterOrderingInfo,
-  });
-}
-
-/// Data class holds information about parameter order info
-class ParameterOrderingInfo {
-  /// Indicates if order is wrong
-  final bool isWrong;
-
-  /// Info about current parameter parameter type
-  final ParameterType parameterType;
-
-  /// Info about previous parameter parameter type
-  final ParameterType? previousParameterType;
-
-  /// Creates instance of [ParameterOrderingInfo]
-  const ParameterOrderingInfo({
-    required this.isWrong,
-    required this.parameterType,
-    required this.previousParameterType,
-  });
 }
