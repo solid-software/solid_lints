@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, prefer_match_file_name, proper_super_calls, number_of_parameters
+// ignore_for_file: unused_field, prefer_match_file_name, proper_super_calls, number_of_parameters, avoid_unused_parameters, member_ordering
 // ignore_for_file: unused_element
 // ignore_for_file: no_empty_block
 
@@ -21,72 +21,88 @@ class UserProfile extends User {
   final String email;
   final bool isActive;
   final String name;
+  final String? profileId;
 
   // no lint
-  UserProfile.orderedConstructor({
+  UserProfile.orderedConstructor(
+    this.profileId, {
+    required super.accountType,
+    super.userId,
     required this.name,
     required this.email,
-    required super.accountType,
-    this.isActive = true,
     this.age,
     this.country,
-    super.userId,
+    this.isActive = true,
   });
 
-  UserProfile.partiallyOrderedConstructor({
+  UserProfile.partiallyOrderedConstructor(
+    this.profileId, {
     required super.accountType,
-    // expect_lint: named_parameters_ordering
     required this.email,
     this.age,
     // expect_lint: named_parameters_ordering
     required this.name,
     this.country,
     // expect_lint: named_parameters_ordering
-    this.isActive = true,
     super.userId,
+    this.isActive = true,
   });
 
-  UserProfile.unorderedConstructor({
+  UserProfile.unorderedConstructor(
+    String profileId, {
     this.age,
     // expect_lint: named_parameters_ordering
-    required super.accountType,
-    // expect_lint: named_parameters_ordering
-    required this.name,
     super.userId,
     // expect_lint: named_parameters_ordering
+    required super.accountType,
     this.country,
     // expect_lint: named_parameters_ordering
+    required this.name,
     this.isActive = true,
     // expect_lint: named_parameters_ordering
     required this.email,
-  });
+  }) : profileId = profileId;
 
+  // no lint
   void orderedMethod({
     required String name,
     required String email,
-    bool isActive = true,
     int? age,
+    bool isActive = true,
   }) {
     return;
   }
 
   void partiallyOrderedMethod({
     required String name,
-    required String email,
     int? age,
     // expect_lint: named_parameters_ordering
+    required String email,
     bool isActive = true,
   }) {
     return;
   }
 
   void unorderedMethod({
-    required String name,
     int? age,
     // expect_lint: named_parameters_ordering
+    required String email,
     bool isActive = true,
     // expect_lint: named_parameters_ordering
+    required String name,
+  }) {
+    return;
+  }
+
+  void mixedParameters(
+    String accountType,
+    String? userId, {
+    int? age,
+    // expect_lint: named_parameters_ordering
     required String email,
+    bool isActive = true,
+    // expect_lint: named_parameters_ordering
+    required String name,
   }) {
     return;
   }
@@ -94,11 +110,24 @@ class UserProfile extends User {
 
 void functionExample({
   required String name,
-  int? age,
-  // expect_lint: named_parameters_ordering
   bool isActive = true,
   // expect_lint: named_parameters_ordering
+  int? age,
+  // expect_lint: named_parameters_ordering
   required String email,
+}) {
+  return;
+}
+
+void mixedParameters(
+  String accountType,
+  String? userId, {
+  int? age,
+  // expect_lint: named_parameters_ordering
+  required String email,
+  bool isActive = true,
+  // expect_lint: named_parameters_ordering
+  required String name,
 }) {
   return;
 }

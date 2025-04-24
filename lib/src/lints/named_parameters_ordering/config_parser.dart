@@ -21,14 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_type.dart';
 
 /// Helper class to parse member_ordering rule config
 class NamedParametersConfigParser {
   static const _defaultOrderList = [
-    'super',
     'required_super',
+    'super',
     'required',
     'nullable',
     'default',
@@ -40,12 +39,6 @@ class NamedParametersConfigParser {
         ? List<String>.from(orderConfig)
         : _defaultOrderList;
 
-    return order
-        .map(
-          (type) =>
-              ParameterType.values.firstWhereOrNull((o) => o.type == type),
-        )
-        .nonNulls
-        .toList();
+    return order.map(ParameterType.fromType).nonNulls.toList();
   }
 }
