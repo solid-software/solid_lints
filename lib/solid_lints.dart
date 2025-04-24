@@ -17,6 +17,7 @@ import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexit
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
+import 'package:solid_lints/src/lints/named_parameters_ordering/named_parameters_ordering_rule.dart';
 import 'package:solid_lints/src/lints/newline_before_return/newline_before_return_rule.dart';
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:solid_lints/src/lints/no_equal_then_else/no_equal_then_else_rule.dart';
@@ -65,6 +66,7 @@ class _SolidLints extends PluginBase {
       AvoidDebugPrintInReleaseRule.createRule(configs),
       PreferEarlyReturnRule.createRule(configs),
       AvoidFinalWithGetterRule.createRule(configs),
+      NamedParametersOrderingRule.createRule(configs),
     ];
 
     // Return only enabled rules
