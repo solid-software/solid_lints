@@ -1,10 +1,13 @@
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:path/path.dart' as p;
+import 'package:solid_lints/src/lints/prefer_match_file_name/models/prefer_match_file_name_parameters.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/visitors/prefer_match_file_name_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 import 'package:solid_lints/src/utils/node_utils.dart';
+
+import '../number_of_parameters/models/number_of_parameters_parameters.dart';
 
 /// Warns about a mismatch between file name and first declared element inside.
 ///
@@ -48,7 +51,8 @@ import 'package:solid_lints/src/utils/node_utils.dart';
 /// class SomethingPublic {}  // OK
 /// ```
 ///
-class PreferMatchFileNameRule extends SolidLintRule {
+class PreferMatchFileNameRule
+    extends SolidLintRule<PreferMatchFileNameParameters> {
   /// This lint rule represents the error if iterable
   /// access can be simplified.
   static const String lintName = 'prefer_match_file_name';
@@ -62,6 +66,7 @@ class PreferMatchFileNameRule extends SolidLintRule {
     final config = RuleConfig(
       configs: configs,
       name: lintName,
+      paramsParser: PreferMatchFileNameParameters.fromJson,
       problemMessage: (value) =>
           'File name does not match with first declared element name.',
     );
@@ -76,7 +81,9 @@ class PreferMatchFileNameRule extends SolidLintRule {
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {
-      final visitor = PreferMatchFileNameVisitor();
+      final isIgnored = config.parameters.ignoreExtensions;
+
+      final visitor = PreferMatchFileNameVisitor(ignoreExtensions: isIgnored);
 
       node.accept(visitor);
 

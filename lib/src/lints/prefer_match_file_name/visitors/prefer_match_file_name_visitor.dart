@@ -7,6 +7,14 @@ import 'package:solid_lints/src/lints/prefer_match_file_name/models/declaration_
 class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   final _declarations = <DeclarationTokenInfo>[];
 
+  /// Variable for making sure if extensions should be ignored
+  final bool ignoreExtensions;
+
+  /// Constructor of [PreferMatchFileNameVisitor] class
+  PreferMatchFileNameVisitor({
+    required this.ignoreExtensions,
+  });
+
   /// List of all declarations
   Iterable<DeclarationTokenInfo> get declarations => _declarations
     ..sort(
@@ -27,7 +35,12 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   void visitExtensionDeclaration(ExtensionDeclaration node) {
     super.visitExtensionDeclaration(node);
 
-    return;
+    if (!ignoreExtensions) {
+      final name = node.name;
+      if (name != null) {
+        _declarations.add((token: name, parent: node));
+      }
+    }
   }
 
   @override
