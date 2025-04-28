@@ -27,10 +27,7 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   void visitExtensionDeclaration(ExtensionDeclaration node) {
     super.visitExtensionDeclaration(node);
 
-    final name = node.name;
-    if (name != null) {
-      _declarations.add((token: name, parent: node));
-    }
+    return;
   }
 
   @override
