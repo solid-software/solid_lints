@@ -82,7 +82,7 @@ class PreferMatchFileNameRule
       final excludedEntities = config.parameters.excludeEntity;
 
       final visitor = PreferMatchFileNameVisitor(
-          excludedEntities: excludedEntities,
+        excludedEntities: excludedEntities,
       );
 
       node.accept(visitor);

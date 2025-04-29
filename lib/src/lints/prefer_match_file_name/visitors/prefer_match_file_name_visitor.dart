@@ -18,18 +18,16 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   });
 
   /// List of all declarations
-  Iterable<DeclarationTokenInfo> get declarations =>
-      _declarations
-        ..sort(
-          // partition into public and private
-          // put public ones first
-          // each partition sorted by declaration order
-              (a, b) =>
-          _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
-        );
+  Iterable<DeclarationTokenInfo> get declarations => _declarations
+    ..sort(
+      // partition into public and private
+      // put public ones first
+      // each partition sorted by declaration order
+      (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
+    );
 
   bool _shouldIgnore(Declaration node) {
-    if(excludedEntities.isEmpty) return false;
+    if (excludedEntities.isEmpty) return false;
 
     if (node is ClassDeclaration && excludedEntities.contains('class')) {
       return true;
@@ -45,59 +43,61 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
     return false;
   }
 
+  @override
+  void visitClassDeclaration(ClassDeclaration node) {
+    super.visitClassDeclaration(node);
 
-@override
-void visitClassDeclaration(ClassDeclaration node) {
-  super.visitClassDeclaration(node);
+    if (_shouldIgnore(node)) return;
 
-  if(_shouldIgnore(node)) return;
+    _declarations.add((token: node.name, parent: node));
+  }
 
-  _declarations.add((token: node.name, parent: node));
-}
+  @override
+  void visitExtensionDeclaration(ExtensionDeclaration node) {
+    super.visitExtensionDeclaration(node);
 
-@override
-void visitExtensionDeclaration(ExtensionDeclaration node) {
-  super.visitExtensionDeclaration(node);
+    if (_shouldIgnore(node)) return;
 
-  if (_shouldIgnore(node)) return;
+    final name = node.name;
+    if (name != null) {
+      _declarations.add((token: name, parent: node));
+    }
+  }
 
-  final name = node.name;
-  if (name != null) {
-    _declarations.add((token: name, parent: node));
+  @override
+  void visitMixinDeclaration(MixinDeclaration node) {
+    super.visitMixinDeclaration(node);
+
+    if (_shouldIgnore(node)) return;
+
+    _declarations.add((token: node.name, parent: node));
+  }
+
+  @override
+  void visitEnumDeclaration(EnumDeclaration node) {
+    super.visitEnumDeclaration(node);
+
+    if (_shouldIgnore(node)) return;
+
+    _declarations.add((token: node.name, parent: node));
+  }
+
+  int? _publicDeclarationsFirst(
+    DeclarationTokenInfo a,
+    DeclarationTokenInfo b,
+  ) {
+    final isAPrivate = Identifier.isPrivateName(a.token.lexeme);
+    final isBPrivate = Identifier.isPrivateName(b.token.lexeme);
+    if (!isAPrivate && isBPrivate) {
+      return -1;
+    } else if (isAPrivate && !isBPrivate) {
+      return 1;
+    }
+    // no reorder needed;
+    return null;
+  }
+
+  int _byDeclarationOrder(DeclarationTokenInfo a, DeclarationTokenInfo b) {
+    return a.token.offset.compareTo(b.token.offset);
   }
 }
-
-@override
-void visitMixinDeclaration(MixinDeclaration node) {
-  super.visitMixinDeclaration(node);
-
-  if(_shouldIgnore(node)) return;
-
-  _declarations.add((token: node.name, parent: node));
-}
-
-@override
-void visitEnumDeclaration(EnumDeclaration node) {
-  super.visitEnumDeclaration(node);
-
-  if(_shouldIgnore(node)) return;
-
-  _declarations.add((token: node.name, parent: node));
-}
-
-int? _publicDeclarationsFirst(DeclarationTokenInfo a,
-    DeclarationTokenInfo b,) {
-  final isAPrivate = Identifier.isPrivateName(a.token.lexeme);
-  final isBPrivate = Identifier.isPrivateName(b.token.lexeme);
-  if (!isAPrivate && isBPrivate) {
-    return -1;
-  } else if (isAPrivate && !isBPrivate) {
-    return 1;
-  }
-  // no reorder needed;
-  return null;
-}
-
-int _byDeclarationOrder(DeclarationTokenInfo a, DeclarationTokenInfo b) {
-  return a.token.offset.compareTo(b.token.offset);
-}}
