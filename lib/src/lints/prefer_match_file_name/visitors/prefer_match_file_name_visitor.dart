@@ -8,16 +8,12 @@ import 'package:solid_lints/src/lints/prefer_match_file_name/models/declaration_
 class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   final _declarations = <DeclarationTokenInfo>[];
 
-  /// Variable for making sure if extensions should be ignored
-  final bool ignoreExtensions;
-
   /// Iterable that contains the name of entity (or entities) that should
   /// be ignored
   final Iterable<String> excludedEntities;
 
   /// Constructor of [PreferMatchFileNameVisitor] class
   PreferMatchFileNameVisitor({
-    required this.ignoreExtensions,
     required this.excludedEntities,
   });
 

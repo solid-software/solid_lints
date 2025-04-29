@@ -79,11 +79,9 @@ class PreferMatchFileNameRule
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {
-      final isIgnored = config.parameters.ignoreExtensions;
       final excludedEntities = config.parameters.excludeEntity;
 
       final visitor = PreferMatchFileNameVisitor(
-        ignoreExtensions: isIgnored,
           excludedEntities: excludedEntities,
       );
 
