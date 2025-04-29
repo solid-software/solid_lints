@@ -3,27 +3,32 @@ import 'package:analyzer/dart/ast/ast.dart';
 /// A model representing "exclude_entity" parameters for linting, defining
 /// identifiers (classes, mixins, enums, extensions) to be ignored during
 /// analysis.
-class ExcludedEntitiesListParameters {
+/// Supported entities:
+///   - class
+///   - mixin
+///   - extension
+///   - enum
+class ExcludedEntitiesListParameter {
   /// The parameter model
   final List<String> excludedEntityNames;
 
   /// A common parameter key for analysis_options.yaml
   static const String excludeEntityKey = 'exclude_entity';
 
-  /// Constructor for [ExcludedEntitiesListParameters] class
-  ExcludedEntitiesListParameters({
+  /// Constructor for [ExcludedEntitiesListParameter] class
+  ExcludedEntitiesListParameter({
     required this.excludedEntityNames,
   });
 
   /// Method for creating from json data
-  factory ExcludedEntitiesListParameters.fromJson(Map<String, dynamic> json) {
+  factory ExcludedEntitiesListParameter.fromJson(Map<String, dynamic> json) {
     final raw = json['exclude_entity'];
     if (raw is List) {
-      return ExcludedEntitiesListParameters(
+      return ExcludedEntitiesListParameter(
         excludedEntityNames: List<String>.from(raw),
       );
     }
-    return ExcludedEntitiesListParameters(
+    return ExcludedEntitiesListParameter(
       excludedEntityNames: [],
     );
   }

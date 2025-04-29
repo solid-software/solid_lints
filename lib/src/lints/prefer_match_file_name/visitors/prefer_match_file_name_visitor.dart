@@ -11,7 +11,7 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
 
   /// Iterable that contains the name of entity (or entities) that should
   /// be ignored
-  final ExcludedEntitiesListParameters excludedEntities;
+  final ExcludedEntitiesListParameter excludedEntities;
 
   /// Constructor of [PreferMatchFileNameVisitor] class
   PreferMatchFileNameVisitor({
@@ -19,36 +19,22 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   });
 
   /// List of all declarations
-  Iterable<DeclarationTokenInfo> get declarations => _declarations
-    ..sort(
-      // partition into public and private
-      // put public ones first
-      // each partition sorted by declaration order
-      (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
-    );
-
-  // bool _shouldIgnore(Declaration node) {
-  //   if (excludedEntities.isEmpty) return false;
-  //
-  //   if (node is ClassDeclaration && excludedEntities.contains('class')) {
-  //     return true;
-  //   } else if (node is MixinDeclaration && excludedEntities.contains('mixin')) {
-  //     return true;
-  //   } else if (node is EnumDeclaration && excludedEntities.contains('enum')) {
-  //     return true;
-  //   } else if (node is ExtensionDeclaration &&
-  //       excludedEntities.contains('extension')) {
-  //     return true;
-  //   }
-  //
-  //   return false;
-  // }
+  Iterable<DeclarationTokenInfo> get declarations => _declarations.where(
+        (declaration) {
+          if (declaration.parent is Declaration) {
+            return !excludedEntities
+                .shouldIgnoreEntity(declaration.parent as Declaration);
+          }
+          return true;
+        },
+      ).toList()
+        ..sort(
+          (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
+        );
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
     super.visitClassDeclaration(node);
-
-    if (excludedEntities.shouldIgnoreEntity(node)) return;
 
     _declarations.add((token: node.name, parent: node));
   }
@@ -56,8 +42,6 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitExtensionDeclaration(ExtensionDeclaration node) {
     super.visitExtensionDeclaration(node);
-
-    if (excludedEntities.shouldIgnoreEntity(node)) return;
 
     final name = node.name;
     if (name != null) {
@@ -69,16 +53,12 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   void visitMixinDeclaration(MixinDeclaration node) {
     super.visitMixinDeclaration(node);
 
-    if (excludedEntities.shouldIgnoreEntity(node)) return;
-
     _declarations.add((token: node.name, parent: node));
   }
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
     super.visitEnumDeclaration(node);
-
-    if (excludedEntities.shouldIgnoreEntity(node)) return;
 
     _declarations.add((token: node.name, parent: node));
   }

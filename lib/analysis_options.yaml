@@ -94,7 +94,6 @@ custom_lint:
     - prefer_first
     - prefer_last
     - prefer_match_file_name:
-      ignore_extensions: true
     - proper_super_calls
 
 linter:

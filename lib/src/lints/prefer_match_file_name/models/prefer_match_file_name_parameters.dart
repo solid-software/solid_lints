@@ -4,7 +4,7 @@ import 'package:solid_lints/src/common/parameters/excluded_entities_list_paramet
 /// parameters
 class PreferMatchFileNameParameters {
   /// A list of entities that should be excluded from the lint.
-  final ExcludedEntitiesListParameters excludeEntity;
+  final ExcludedEntitiesListParameter excludeEntity;
 
   /// Constructor for [PreferMatchFileNameParameters] model
   const PreferMatchFileNameParameters({
@@ -14,6 +14,6 @@ class PreferMatchFileNameParameters {
   /// Method for creating from json data
   factory PreferMatchFileNameParameters.fromJson(Map<String, Object?> json) =>
       PreferMatchFileNameParameters(
-        excludeEntity: ExcludedEntitiesListParameters.fromJson(json),
+        excludeEntity: ExcludedEntitiesListParameter.fromJson(json),
       );
 }
