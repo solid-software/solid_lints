@@ -1,10 +1,10 @@
-/// A data model class that represents the "prefer factmatch file name" input
+import 'package:solid_lints/src/common/parameters/excluded_entities_list_parameter.dart';
+
+/// A data model class that represents the "prefer match file name" input
 /// parameters
 class PreferMatchFileNameParameters {
-  /// A list of methods that should be excluded from the lint.
-  final Iterable<String> excludeEntity;
-
-  static const bool _defaultIgnoreExtensionsValue = false;
+  /// A list of entities that should be excluded from the lint.
+  final ExcludedEntitiesListParameters excludeEntity;
 
   /// Constructor for [PreferMatchFileNameParameters] model
   const PreferMatchFileNameParameters({
@@ -14,9 +14,6 @@ class PreferMatchFileNameParameters {
   /// Method for creating from json data
   factory PreferMatchFileNameParameters.fromJson(Map<String, Object?> json) =>
       PreferMatchFileNameParameters(
-        excludeEntity: (json['exclude_entity'] as Iterable?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
+        excludeEntity: ExcludedEntitiesListParameters.fromJson(json),
       );
 }

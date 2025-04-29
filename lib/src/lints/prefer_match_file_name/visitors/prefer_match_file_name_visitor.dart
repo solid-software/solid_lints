@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/common/parameters/excluded_entities_list_parameter.dart';
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/models/declaration_token_info.dart';
 
@@ -10,7 +11,7 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
 
   /// Iterable that contains the name of entity (or entities) that should
   /// be ignored
-  final Iterable<String> excludedEntities;
+  final ExcludedEntitiesListParameters excludedEntities;
 
   /// Constructor of [PreferMatchFileNameVisitor] class
   PreferMatchFileNameVisitor({
@@ -26,28 +27,28 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
       (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
     );
 
-  bool _shouldIgnore(Declaration node) {
-    if (excludedEntities.isEmpty) return false;
-
-    if (node is ClassDeclaration && excludedEntities.contains('class')) {
-      return true;
-    } else if (node is MixinDeclaration && excludedEntities.contains('mixin')) {
-      return true;
-    } else if (node is EnumDeclaration && excludedEntities.contains('enum')) {
-      return true;
-    } else if (node is ExtensionDeclaration &&
-        excludedEntities.contains('extension')) {
-      return true;
-    }
-
-    return false;
-  }
+  // bool _shouldIgnore(Declaration node) {
+  //   if (excludedEntities.isEmpty) return false;
+  //
+  //   if (node is ClassDeclaration && excludedEntities.contains('class')) {
+  //     return true;
+  //   } else if (node is MixinDeclaration && excludedEntities.contains('mixin')) {
+  //     return true;
+  //   } else if (node is EnumDeclaration && excludedEntities.contains('enum')) {
+  //     return true;
+  //   } else if (node is ExtensionDeclaration &&
+  //       excludedEntities.contains('extension')) {
+  //     return true;
+  //   }
+  //
+  //   return false;
+  // }
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
     super.visitClassDeclaration(node);
 
-    if (_shouldIgnore(node)) return;
+    if (excludedEntities.shouldIgnoreEntity(node)) return;
 
     _declarations.add((token: node.name, parent: node));
   }
@@ -56,7 +57,7 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   void visitExtensionDeclaration(ExtensionDeclaration node) {
     super.visitExtensionDeclaration(node);
 
-    if (_shouldIgnore(node)) return;
+    if (excludedEntities.shouldIgnoreEntity(node)) return;
 
     final name = node.name;
     if (name != null) {
@@ -68,7 +69,7 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   void visitMixinDeclaration(MixinDeclaration node) {
     super.visitMixinDeclaration(node);
 
-    if (_shouldIgnore(node)) return;
+    if (excludedEntities.shouldIgnoreEntity(node)) return;
 
     _declarations.add((token: node.name, parent: node));
   }
@@ -77,7 +78,7 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   void visitEnumDeclaration(EnumDeclaration node) {
     super.visitEnumDeclaration(node);
 
-    if (_shouldIgnore(node)) return;
+    if (excludedEntities.shouldIgnoreEntity(node)) return;
 
     _declarations.add((token: node.name, parent: node));
   }
