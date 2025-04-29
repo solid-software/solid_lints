@@ -7,8 +7,6 @@ import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 import 'package:solid_lints/src/utils/node_utils.dart';
 
-import '../number_of_parameters/models/number_of_parameters_parameters.dart';
-
 /// Warns about a mismatch between file name and first declared element inside.
 ///
 /// This improves navigation by matching file content and file name.
@@ -82,8 +80,12 @@ class PreferMatchFileNameRule
   ) {
     context.registry.addCompilationUnit((node) {
       final isIgnored = config.parameters.ignoreExtensions;
+      final excludedEntities = config.parameters.excludeEntity;
 
-      final visitor = PreferMatchFileNameVisitor(ignoreExtensions: isIgnored);
+      final visitor = PreferMatchFileNameVisitor(
+        ignoreExtensions: isIgnored,
+          excludedEntities: excludedEntities,
+      );
 
       node.accept(visitor);
 
