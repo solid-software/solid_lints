@@ -11,4 +11,8 @@ custom_lint:
           identifier: banned
           source: package:external_source
           reason: "Banned identifier from BannedExtension from package:external_source is not allowed"
+        - class_name: BannedExtension
+          identifier: bannedGetter
+          source: package:external_source
+          reason: "bannedGetter identifier from BannedExtension from package:external_source is not allowed"
 

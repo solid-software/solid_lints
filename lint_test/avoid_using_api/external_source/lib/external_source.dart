@@ -25,4 +25,6 @@ int banned = 5;
 
 extension BannedExtension on int {
   int banned() => this + 10;
+
+  int get bannedGetter => 10;
 }

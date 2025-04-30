@@ -5,4 +5,7 @@ void extensionIdentifierBanTesting(){
 
   // expect_lint: avoid_using_api
   a.banned();
+
+  // expect_lint: avoid_using_api
+  a.bannedGetter;
 }

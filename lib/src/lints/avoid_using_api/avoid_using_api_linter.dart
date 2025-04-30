@@ -270,5 +270,23 @@ class AvoidUsingApiLinter {
 
       reporter.atNode(node.methodName, entryCode);
     });
+
+    context.registry.addPrefixedIdentifier((node) {
+      final propertyName = node.identifier.name;
+      if (propertyName != identifier) return;
+
+      final element = node.identifier.staticElement;
+      if (element == null || element.enclosingElement3 is! ExtensionElement) {
+        return;
+      }
+
+      final extensionElement = element.enclosingElement3! as ExtensionElement;
+      if (extensionElement.name != className) return;
+
+      final sourcePath = extensionElement.librarySource.uri.toString();
+      if (!_matchesSource(sourcePath, source)) return;
+
+      reporter.atNode(node.identifier, entryCode);
+    });
   }
 }
