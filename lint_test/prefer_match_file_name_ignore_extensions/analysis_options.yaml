@@ -1,0 +1,9 @@
+analyzer:
+  plugins:
+    - ../../custom_lint
+
+custom_lint:
+  rules:
+    - prefer_match_file_name:
+      exclude_entity:
+        - extension
