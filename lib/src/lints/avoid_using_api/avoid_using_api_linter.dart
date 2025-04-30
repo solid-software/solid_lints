@@ -245,5 +245,26 @@ class AvoidUsingApiLinter {
           );
       }
     });
+
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+      if (methodName != identifier) return;
+
+      final element = node.methodName.staticElement;
+      if (element == null || element.enclosingElement3! is! ExtensionElement) {
+        return;
+      }
+
+      final extensionElement = element.enclosingElement3! as ExtensionElement;
+      if (extensionElement.name != className) return;
+
+      final sourcePath = extensionElement.librarySource.uri.toString();
+      if (!_matchesSource(sourcePath, source)) return;
+
+      reporter.atNode(
+        node.methodName,
+        entryCode,
+      );
+    });
   }
 }

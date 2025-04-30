@@ -2,6 +2,7 @@
 
 - Added `allow_with_comments` parameter for `no_empty_block` lint.
 - Added `exclude_entity` parameter for `prefer_match_feli_name` lint.
+- Fixed an issue with `avoid_using_api` for extensions
 
 ## 0.3.0
 
