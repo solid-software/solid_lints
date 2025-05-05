@@ -1,4 +1,4 @@
-## 0.4.0
+## 0.3.1
 
 - Added `allow_with_comments` parameter for `no_empty_block` lint.
 - Added extension support for `avoid_using_api`
