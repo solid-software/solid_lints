@@ -4,7 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 /// identifiers (classes, mixins, enums, extensions) to be ignored during
 /// analysis.
 /// Supported entities:
-///   - class
 ///   - mixin
 ///   - extension
 ///   - enum
@@ -28,6 +27,7 @@ class ExcludedEntitiesListParameter {
         excludedEntityNames: Set<String>.from(raw),
       );
     }
+
     return ExcludedEntitiesListParameter(
       excludedEntityNames: {},
     );
@@ -37,10 +37,7 @@ class ExcludedEntitiesListParameter {
   bool shouldIgnoreEntity(Declaration node) {
     if (excludedEntityNames.isEmpty) return false;
 
-    if (node is ClassDeclaration && excludedEntityNames.contains('class')) {
-      return true;
-    } else if (node is MixinDeclaration &&
-        excludedEntityNames.contains('mixin')) {
+    if (node is MixinDeclaration && excludedEntityNames.contains('mixin')) {
       return true;
     } else if (node is EnumDeclaration &&
         excludedEntityNames.contains('enum')) {

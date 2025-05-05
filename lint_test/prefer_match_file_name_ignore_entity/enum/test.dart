@@ -1,10 +1,11 @@
 // ignore_for_file: unused_element, unused_field
 
-/// `prefer_match_file_name` rule will be ignored by this extension because of
+/// `prefer_match_file_name` rule will be ignored by this enttiy because of
 /// exclude_entity:
-/// - extension
+/// - enum
 /// in analysis_options.yaml
-extension DefaultExtension on String {}
+enum Ignored { _ }
+enum IgnoredAgain { _ }
 
 // expect_lint: prefer_match_file_name
 abstract class WrongNamedClass {}
