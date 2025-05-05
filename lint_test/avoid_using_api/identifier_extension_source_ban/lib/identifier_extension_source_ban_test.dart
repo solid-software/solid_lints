@@ -1,6 +1,6 @@
 import 'package:external_source/external_source.dart';
 
-void extensionIdentifierBanTesting(){
+void extensionIdentifierBanTesting() {
   const int a = 10;
 
   // expect_lint: avoid_using_api
