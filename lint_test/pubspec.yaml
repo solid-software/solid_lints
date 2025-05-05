@@ -9,8 +9,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  custom_lint: ^0.7.5
-
 dev_dependencies:
   solid_lints:
     path: ../
