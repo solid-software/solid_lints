@@ -22,6 +22,7 @@
   - Update min Dart SDK constraint to 3.5.0
   - Update `analyzer` dependency to 7.1.0
   - Update `custom_lint_builder` dependency to 0.7.1
+- Added `use_nearest_context` rule
 
 ## 0.2.3
 

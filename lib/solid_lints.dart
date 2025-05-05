@@ -28,6 +28,7 @@ import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
+import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// Creates a plugin for our custom linter
@@ -65,6 +66,7 @@ class _SolidLints extends PluginBase {
       AvoidDebugPrintInReleaseRule.createRule(configs),
       PreferEarlyReturnRule.createRule(configs),
       AvoidFinalWithGetterRule.createRule(configs),
+      UseNearestContextRule.createRule(configs),
     ];
 
     // Return only enabled rules
