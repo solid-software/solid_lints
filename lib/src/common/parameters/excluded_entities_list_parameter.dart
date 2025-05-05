@@ -10,7 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 ///   - enum
 class ExcludedEntitiesListParameter {
   /// The parameter model
-  final List<String> excludedEntityNames;
+  final Set<String> excludedEntityNames;
 
   /// A common parameter key for analysis_options.yaml
   static const String excludeEntityKey = 'exclude_entity';
@@ -25,11 +25,11 @@ class ExcludedEntitiesListParameter {
     final raw = json['exclude_entity'];
     if (raw is List) {
       return ExcludedEntitiesListParameter(
-        excludedEntityNames: List<String>.from(raw),
+        excludedEntityNames: Set<String>.from(raw),
       );
     }
     return ExcludedEntitiesListParameter(
-      excludedEntityNames: [],
+      excludedEntityNames: {},
     );
   }
 
