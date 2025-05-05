@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/common/parameters/excluded_entities_list_parameter.dart';
-import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/models/declaration_token_info.dart';
 
 /// The AST visitor that will collect all Class, Enum, Extension and Mixin
