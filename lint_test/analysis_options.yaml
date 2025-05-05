@@ -4,9 +4,7 @@ analyzer:
 
 custom_lint:
   rules:
-    - prefer_match_file_name:
-      exclude_entity:
-        - extension
+    - prefer_match_file_name
     - cyclomatic_complexity:
       max_complexity: 4
       exclude:
