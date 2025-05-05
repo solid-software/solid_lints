@@ -2,6 +2,9 @@
 
 - Added `allow_with_comments` parameter for `no_empty_block` lint.
 - Added extension support for `avoid_using_api`
+- Added `exclude_entity` parameter for `prefer_match_file_name` lint.
+  It is now possible to configure this lint to ignore `enum`,
+  `extension` and `mixin` declarations via `analysis_options.yaml`.
 
 ## 0.3.0
 

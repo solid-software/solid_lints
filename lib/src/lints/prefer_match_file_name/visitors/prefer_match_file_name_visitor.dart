@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/common/parameters/excluded_entities_list_parameter.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/models/declaration_token_info.dart';
 
 /// The AST visitor that will collect all Class, Enum, Extension and Mixin
@@ -7,14 +8,28 @@ import 'package:solid_lints/src/lints/prefer_match_file_name/models/declaration_
 class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   final _declarations = <DeclarationTokenInfo>[];
 
+  /// Iterable that contains the name of entity (or entities) that should
+  /// be ignored
+  final ExcludedEntitiesListParameter excludedEntities;
+
+  /// Constructor of [PreferMatchFileNameVisitor] class
+  PreferMatchFileNameVisitor({
+    required this.excludedEntities,
+  });
+
   /// List of all declarations
-  Iterable<DeclarationTokenInfo> get declarations => _declarations
-    ..sort(
-      // partition into public and private
-      // put public ones first
-      // each partition sorted by declaration order
-      (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
-    );
+  Iterable<DeclarationTokenInfo> get declarations => _declarations.where(
+        (declaration) {
+          if (declaration.parent is Declaration) {
+            return !excludedEntities
+                .shouldIgnoreEntity(declaration.parent as Declaration);
+          }
+          return true;
+        },
+      ).toList()
+        ..sort(
+          (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
+        );
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
