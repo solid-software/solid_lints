@@ -248,22 +248,15 @@ class AvoidUsingApiLinter {
 
     context.registry.addMethodInvocation((node) {
       final methodName = node.methodName.name;
-      if (methodName != identifier) {
+      if (methodName != identifier) return;
+
+      final enclosingElement = node.methodName.staticElement?.enclosingElement3;
+      if (enclosingElement is! ExtensionElement ||
+          enclosingElement.name != className) {
         return;
       }
 
-      final element = node.methodName.staticElement;
-      if (element == null || element.enclosingElement3 is! ExtensionElement) {
-        return;
-      }
-
-      final extensionElement = element.enclosingElement3! as ExtensionElement;
-
-      if (extensionElement.name != className) {
-        return;
-      }
-
-      final sourcePath = extensionElement.librarySource.uri.toString();
+      final sourcePath = enclosingElement.librarySource.uri.toString();
       if (!_matchesSource(sourcePath, source)) {
         return;
       }
@@ -275,15 +268,13 @@ class AvoidUsingApiLinter {
       final propertyName = node.identifier.name;
       if (propertyName != identifier) return;
 
-      final element = node.identifier.staticElement;
-      if (element == null || element.enclosingElement3 is! ExtensionElement) {
+      final enclosingElement = node.identifier.staticElement?.enclosingElement3;
+      if (enclosingElement is! ExtensionElement ||
+          enclosingElement.name != className) {
         return;
       }
 
-      final extensionElement = element.enclosingElement3! as ExtensionElement;
-      if (extensionElement.name != className) return;
-
-      final sourcePath = extensionElement.librarySource.uri.toString();
+      final sourcePath = enclosingElement.librarySource.uri.toString();
       if (!_matchesSource(sourcePath, source)) return;
 
       reporter.atNode(node.identifier, entryCode);
