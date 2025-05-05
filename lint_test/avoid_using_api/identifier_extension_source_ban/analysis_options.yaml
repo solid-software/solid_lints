@@ -1,0 +1,18 @@
+analyzer:
+  plugins:
+    - ../../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_using_api:
+      severity: warning
+      entries:
+        - class_name: BannedExtension
+          identifier: banned
+          source: package:external_source
+          reason: "Banned identifier from BannedExtension from package:external_source is not allowed"
+        - class_name: BannedExtension
+          identifier: bannedGetter
+          source: package:external_source
+          reason: "bannedGetter identifier from BannedExtension from package:external_source is not allowed"
+

@@ -245,5 +245,39 @@ class AvoidUsingApiLinter {
           );
       }
     });
+
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+      if (methodName != identifier) return;
+
+      final enclosingElement = node.methodName.staticElement?.enclosingElement3;
+      if (enclosingElement is! ExtensionElement ||
+          enclosingElement.name != className) {
+        return;
+      }
+
+      final sourcePath = enclosingElement.librarySource.uri.toString();
+      if (!_matchesSource(sourcePath, source)) {
+        return;
+      }
+
+      reporter.atNode(node.methodName, entryCode);
+    });
+
+    context.registry.addPrefixedIdentifier((node) {
+      final propertyName = node.identifier.name;
+      if (propertyName != identifier) return;
+
+      final enclosingElement = node.identifier.staticElement?.enclosingElement3;
+      if (enclosingElement is! ExtensionElement ||
+          enclosingElement.name != className) {
+        return;
+      }
+
+      final sourcePath = enclosingElement.librarySource.uri.toString();
+      if (!_matchesSource(sourcePath, source)) return;
+
+      reporter.atNode(node.identifier, entryCode);
+    });
   }
 }
