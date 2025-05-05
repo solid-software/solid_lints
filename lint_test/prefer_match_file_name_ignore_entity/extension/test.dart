@@ -5,6 +5,7 @@
 /// - extension
 /// in analysis_options.yaml
 extension Ignored on String {}
+
 extension IgnoredAgain on String {}
 
 // expect_lint: prefer_match_file_name

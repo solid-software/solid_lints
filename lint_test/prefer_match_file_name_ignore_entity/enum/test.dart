@@ -5,6 +5,7 @@
 /// - enum
 /// in analysis_options.yaml
 enum Ignored { _ }
+
 enum IgnoredAgain { _ }
 
 // expect_lint: prefer_match_file_name
