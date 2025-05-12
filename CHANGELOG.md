@@ -1,3 +1,7 @@
+## 0.3.2
+
+- Added `named_parameters_ordering` rule.
+
 ## 0.3.1
 
 - Added `allow_with_comments` parameter for `no_empty_block` lint.
