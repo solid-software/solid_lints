@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/visitors/getter_variable_visitor.dart';
 
 /// A visitor that checks for final private fields with getters.
@@ -16,9 +16,11 @@ class AvoidFinalWithGetterVisitor extends RecursiveAstVisitor<void> {
     if (node
         case MethodDeclaration(
           isGetter: true,
-          declaredElement: ExecutableElement(
-            isAbstract: false,
-            isPublic: true,
+          declaredFragment: ExecutableFragment(
+            element: ExecutableElement2(
+              isAbstract: false,
+              isPublic: true,
+            )
           )
         )) {
       final visitor = GetterVariableVisitor(node);

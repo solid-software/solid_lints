@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 
 /// A visitor that checks the association of the getter with
 /// the final private variable
@@ -13,15 +13,16 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
       : _getterId = getter.getterReferenceId;
 
   /// Is there a variable associated with the getter
+
   VariableDeclaration? get variable => _variable;
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
-    if (node
-        case VariableDeclaration(
-          isFinal: true,
-          declaredElement: VariableElement(id: final id, isPrivate: true)
-        ) when id == _getterId) {
+    final element = node.declaredFragment?.element;
+    if (element != null &&
+        element.isPrivate &&
+        element.isFinal &&
+        element.id == _getterId) {
       _variable = node;
     }
 
@@ -30,17 +31,17 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
 }
 
 extension on MethodDeclaration {
-  int? get getterReferenceId => switch (body) {
-        ExpressionFunctionBody(
-          expression: SimpleIdentifier(
-            staticElement: Element(
-              declaration: PropertyAccessorElement(
-                variable2: PropertyInducingElement(:final id)
-              )
-            )
-          )
-        ) =>
-          id,
-        _ => null,
-      };
+  int? get getterReferenceId {
+    if (body is! ExpressionFunctionBody) return null;
+
+    final expression = (body as ExpressionFunctionBody).expression;
+    if (expression is SimpleIdentifier) {
+      final element = expression.element;
+      if (element is PropertyAccessorElement2) {
+        return element.variable3?.id;
+      }
+    }
+
+    return null;
+  }
 }
