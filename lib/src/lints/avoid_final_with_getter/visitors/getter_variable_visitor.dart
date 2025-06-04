@@ -13,7 +13,6 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
       : _getterId = getter.getterReferenceId;
 
   /// Is there a variable associated with the getter
-
   VariableDeclaration? get variable => _variable;
 
   @override
