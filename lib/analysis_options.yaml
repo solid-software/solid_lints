@@ -288,3 +288,6 @@ linter:
     - use_test_throws_matchers
     - valid_regexps
     - void_checks
+
+formatter:
+  trailing_commas: preserve
