@@ -1,0 +1,39 @@
+analyzer:
+  plugins:
+    - ../../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_using_api:
+      severity: warning
+      entries:
+        - identifier: ()
+          named_parameter: parameter1
+          class_name: BannedCodeUsage
+          source: package:external_source
+          reason: "Use parameter2 instead"
+        - identifier: test3
+          named_parameter: parameter1
+          class_name: BannedCodeUsage
+          source: package:external_source
+          reason: "Use parameter2 instead"
+        - identifier: test5
+          named_parameter: parameter1
+          class_name: BannedCodeUsage
+          source: package:external_source
+          reason: "Use parameter2 instead"
+        - identifier: test2
+          named_parameter: parameter1
+          class_name: BannedCodeUsage
+          source: package:external_source
+          reason: "Use parameter2 instead"
+        - identifier: test
+          named_parameter: parameter1
+          class_name: BannedCodeUsage
+          source: package:external_source
+          reason: "Use parameter2 instead"
+        - identifier: banned
+          named_parameter: parameter1
+          class_name: BannedExtension
+          source: package:external_source
+          reason: "Use parameter2 instead"

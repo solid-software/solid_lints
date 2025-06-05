@@ -310,4 +310,70 @@ class AvoidUsingApiLinter {
       reporter.atNode(node, entryCode);
     });
   }
+
+  /// Lints usages of a named parameter from a given source
+  void banUsageWithSpecificNamedParameter(
+    LintCode entryCode,
+    String identifier,
+    String namedParameter,
+    String className,
+    String source,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+      if (methodName != identifier) return;
+
+      final enclosingElement = node.methodName.element?.enclosingElement2;
+      if (enclosingElement == null || enclosingElement.name3 != className) {
+        return;
+      }
+
+      if (!_hasNamedParameter(node.argumentList, namedParameter)) {
+        return;
+      }
+
+      final sourcePath = enclosingElement.library2?.uri.toString() ?? '';
+      if (!_matchesSource(sourcePath, source)) {
+        return;
+      }
+
+      reporter.atNode(node.methodName, entryCode);
+    });
+
+    context.registry.addInstanceCreationExpression((node) {
+      final String? expectedConstructorName;
+      if (identifier == defaultConstructorIdentifier) {
+        expectedConstructorName = null;
+      } else {
+        expectedConstructorName = identifier;
+      }
+
+      final actualClassName = node.constructorName.type.name2.lexeme;
+      if (actualClassName != className) {
+        return;
+      }
+
+      if (node.constructorName.name?.name != expectedConstructorName) {
+        return;
+      }
+
+      if (!_hasNamedParameter(node.argumentList, namedParameter)) {
+        return;
+      }
+
+      final sourcePath =
+          node.constructorName.type.element2?.library2?.uri.toString();
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
+        return;
+      }
+
+      reporter.atNode(node, entryCode);
+    });
+  }
+
+  bool _hasNamedParameter(ArgumentList argumentList, String namedParameter) =>
+      argumentList.arguments.any(
+        (arg) =>
+            arg is NamedExpression && arg.name.label.name == namedParameter,
+      );
 }

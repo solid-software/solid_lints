@@ -7,6 +7,7 @@ import 'package:solid_lints/src/utils/parameter_utils.dart';
 ///
 /// Parameters:
 /// * identifier: Variable/method name
+/// * named_parameter: Named parameter of the constructor/method
 /// * class_name: Name of the class containing the variable/method
 /// * source: Package (e.g., dart:async or package:example)
 /// * severity: The default severity of the lint for each entry.
@@ -35,6 +36,9 @@ class AvoidUsingApiEntryParameters {
   /// Variable/method name
   final String? identifier;
 
+  /// Named parameter of the constrcutor/method
+  final String? namedParameter;
+
   /// Name of the class containing the variable/method
   final String? className;
 
@@ -56,6 +60,7 @@ class AvoidUsingApiEntryParameters {
   /// Constructor for [AvoidUsingApiEntryParameters] model
   const AvoidUsingApiEntryParameters({
     this.identifier,
+    this.namedParameter,
     this.className,
     this.source,
     this.severity,
@@ -70,6 +75,7 @@ class AvoidUsingApiEntryParameters {
   ) =>
       AvoidUsingApiEntryParameters(
         identifier: json['identifier'] as String?,
+        namedParameter: json['named_parameter'] as String?,
         className: json['class_name'] as String?,
         source: json['source'] as String?,
         severity: decodeErrorSeverity(json['severity'] as String?),
