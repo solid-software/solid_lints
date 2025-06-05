@@ -332,7 +332,12 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      final sourcePath = enclosingElement.library2?.uri.toString() ?? '';
+      final libSource = enclosingElement.library2;
+      if (libSource == null) {
+        return;
+      }
+
+      final sourcePath = libSource.uri.toString();
       if (!_matchesSource(sourcePath, source)) {
         return;
       }
