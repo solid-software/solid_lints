@@ -1,4 +1,4 @@
-name: identifier_class_source_ban
+name: named_parameter_ban
 description: A sample command-line application.
 version: 1.0.0
 publish_to: none
