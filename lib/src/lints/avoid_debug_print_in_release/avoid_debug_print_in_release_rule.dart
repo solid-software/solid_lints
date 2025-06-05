@@ -159,11 +159,10 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
       case PrefixedIdentifier():
         final prefix = node.prefix.name;
         name = node.name.replaceAll('$prefix.', '');
-        sourcePath = node.staticElement?.librarySource?.uri.toString() ?? '';
-
+        sourcePath = node.element?.library2?.uri.toString() ?? '';
       case SimpleIdentifier():
         name = node.name;
-        sourcePath = node.staticElement?.librarySource?.uri.toString() ?? '';
+        sourcePath = node.element?.library2?.uri.toString() ?? '';
 
       default:
         return false;
@@ -194,10 +193,10 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
         final prefix = node.prefix.name;
 
         name = node.name.replaceAll('$prefix.', '');
-        sourcePath = node.staticElement?.librarySource?.uri.toString() ?? '';
+        sourcePath = node.element?.library2?.uri.toString() ?? '';
       case SimpleIdentifier():
         name = node.name;
-        sourcePath = node.staticElement?.librarySource?.uri.toString() ?? '';
+        sourcePath = node.element?.library2?.uri.toString() ?? '';
       default:
         return false;
     }
