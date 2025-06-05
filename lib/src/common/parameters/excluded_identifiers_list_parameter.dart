@@ -55,7 +55,7 @@ class ExcludedIdentifiersListParameter {
 
   /// Returns whether the target node should be ignored during analysis.
   bool shouldIgnore(Declaration node) {
-    final declarationName = node.declaredElement?.name;
+    final declarationName = node.declaredFragment?.name2;
 
     final excludedItem = exclude.firstWhereOrNull(
       (e) {

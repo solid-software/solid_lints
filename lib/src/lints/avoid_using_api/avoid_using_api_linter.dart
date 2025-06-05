@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -94,8 +94,10 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      switch (node.staticElement) {
-        case FunctionElement() || PropertyAccessorElement():
+      switch (node.element) {
+        case LocalFunctionElement() ||
+              TopLevelFunctionElement() ||
+              PropertyAccessorElement2():
           reporter.atNode(node, entryCode);
       }
     });
@@ -108,13 +110,13 @@ class AvoidUsingApiLinter {
     String source,
   ) {
     context.registry.addVariableDeclaration((node) {
-      final typeName = node.declaredElement?.type.element?.name;
+      final typeName = node.declaredElement2?.type.element3?.name3;
       if (typeName != className) {
         return;
       }
 
       final sourcePath =
-          node.declaredElement?.type.element?.librarySource?.uri.toString();
+          node.declaredElement2?.type.element3?.library2?.uri.toString();
       if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
@@ -136,25 +138,24 @@ class AvoidUsingApiLinter {
         case InstanceCreationExpression(:final staticType?):
         case SimpleIdentifier(:final staticType?):
           final parentSourcePath =
-              staticType.element?.librarySource?.uri.toString() ??
-                  node.sourceUrl;
+              staticType.element3?.library2?.uri.toString() ?? node.sourceUrl;
           if (parentSourcePath == null ||
               !_matchesSource(parentSourcePath, source)) {
             return;
           }
 
-          final parentTypeName = staticType.element?.name;
+          final parentTypeName = staticType.element3?.name3;
           if (parentTypeName != className) {
             return;
           }
-        case SimpleIdentifier(:final staticElement?):
+        case SimpleIdentifier(:final element?):
           final parentSourcePath =
-              staticElement.librarySource?.uri.toString() ?? node.sourceUrl;
+              element.library2?.uri.toString() ?? node.sourceUrl;
           if (parentSourcePath == null ||
               !_matchesSource(parentSourcePath, source)) {
             return;
           }
-          final parentElementName = staticElement.name;
+          final parentElementName = element.name3;
           if (parentElementName != className) {
             return;
           }
@@ -214,7 +215,7 @@ class AvoidUsingApiLinter {
       switch (entityBeforeNode) {
         case InstanceCreationExpression(:final staticType?):
         case SimpleIdentifier(:final staticType?):
-          final parentTypeName = staticType.element?.name;
+          final parentTypeName = staticType.element3?.name3;
           if (parentTypeName != className) {
             return;
           }
@@ -223,8 +224,8 @@ class AvoidUsingApiLinter {
             node.parent ?? node,
             entryCode,
           );
-        case SimpleIdentifier(:final staticElement?):
-          final parentElementName = staticElement.name;
+        case SimpleIdentifier(:final element?):
+          final parentElementName = element.name3;
           if (parentElementName != className) {
             return;
           }
@@ -233,8 +234,8 @@ class AvoidUsingApiLinter {
             node.parent ?? node,
             entryCode,
           );
-        case NamedType(:final element?):
-          final parentTypeName = element.name;
+        case NamedType(:final element2?):
+          final parentTypeName = element2.name3;
           if (parentTypeName != className) {
             return;
           }
@@ -250,13 +251,13 @@ class AvoidUsingApiLinter {
       final methodName = node.methodName.name;
       if (methodName != identifier) return;
 
-      final enclosingElement = node.methodName.staticElement?.enclosingElement3;
-      if (enclosingElement is! ExtensionElement ||
-          enclosingElement.name != className) {
+      final enclosingElement = node.methodName.element?.enclosingElement2;
+      if (enclosingElement is! ExtensionElement2 ||
+          enclosingElement.name3 != className) {
         return;
       }
 
-      final sourcePath = enclosingElement.librarySource.uri.toString();
+      final sourcePath = enclosingElement.library2.uri.toString();
       if (!_matchesSource(sourcePath, source)) {
         return;
       }
@@ -268,13 +269,13 @@ class AvoidUsingApiLinter {
       final propertyName = node.identifier.name;
       if (propertyName != identifier) return;
 
-      final enclosingElement = node.identifier.staticElement?.enclosingElement3;
-      if (enclosingElement is! ExtensionElement ||
-          enclosingElement.name != className) {
+      final enclosingElement = node.identifier.element?.enclosingElement2;
+      if (enclosingElement is! ExtensionElement2 ||
+          enclosingElement.name3 != className) {
         return;
       }
 
-      final sourcePath = enclosingElement.librarySource.uri.toString();
+      final sourcePath = enclosingElement.library2.uri.toString();
       if (!_matchesSource(sourcePath, source)) return;
 
       reporter.atNode(node.identifier, entryCode);

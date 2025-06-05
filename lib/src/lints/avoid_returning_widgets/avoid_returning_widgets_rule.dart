@@ -54,6 +54,7 @@ class AvoidReturningWidgetsRule
   /// This lint rule represents
   /// the error whether we return a widget.
   static const lintName = 'avoid_returning_widgets';
+  static const _override = 'override';
 
   AvoidReturningWidgetsRule._(super.config);
 
@@ -97,7 +98,16 @@ class AvoidReturningWidgetsRule
 
       final isIgnored = config.parameters.exclude.shouldIgnore(node);
 
-      final isOverriden = node.declaredElement?.hasOverride ?? false;
+      final isOverriden = switch (node) {
+        FunctionDeclaration(:final functionExpression) =>
+          functionExpression.parent is MethodDeclaration &&
+              (functionExpression.parent! as MethodDeclaration)
+                  .metadata
+                  .any((m) => m.name.name == _override),
+        MethodDeclaration(:final metadata) =>
+          metadata.any((m) => m.name.name == _override),
+        _ => false,
+      };
 
       if (isWidgetReturned && !isOverriden && !isIgnored) {
         reporter.atNode(node, code);

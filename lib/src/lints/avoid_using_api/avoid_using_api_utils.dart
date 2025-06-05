@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 extension SimpleIdentifierParentSourceExtension on SimpleIdentifier {
   /// Returns library of the node
   String? get sourceUrl {
-    final parentSource = staticElement?.librarySource;
+    final parentSource = element?.library2;
     final parentSourceName = parentSource?.uri.toString();
     return parentSourceName;
   }
@@ -14,7 +14,7 @@ extension SimpleIdentifierParentSourceExtension on SimpleIdentifier {
 extension NamedTypeParentSourceExtension on NamedType {
   /// Returns library of the node
   String? get sourceUrl {
-    final parentSource = element?.librarySource;
+    final parentSource = element2?.library2;
     final parentSourceName = parentSource?.uri.toString();
     return parentSourceName;
   }

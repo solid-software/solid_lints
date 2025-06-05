@@ -82,7 +82,7 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
   }
 
   bool _shouldLint(VariableDeclaration node) {
-    final isLateDeclaration = node.declaredElement?.isLate ?? false;
+    final isLateDeclaration = node.isLate;
     if (!isLateDeclaration) return false;
 
     final hasIgnoredType = _hasIgnoredType(node);
@@ -99,7 +99,7 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
     final ignoredTypes = config.parameters.ignoredTypes.toSet();
     if (ignoredTypes.isEmpty) return false;
 
-    final variableType = node.declaredElement?.type;
+    final variableType = node.declaredFragment?.element.type;
     if (variableType == null) return false;
 
     return variableType.hasIgnoredType(
