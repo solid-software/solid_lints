@@ -19,6 +19,9 @@ class AvoidUsingApiLinter {
     required this.config,
   });
 
+  /// The identifier for the default constructor
+  static const String defaultConstructorIdentifier = '()';
+
   /// Access to the resolver for this lint context
   final CustomLintResolver resolver;
 
@@ -191,6 +194,11 @@ class AvoidUsingApiLinter {
     String className,
     String source,
   ) {
+    if (identifier == defaultConstructorIdentifier) {
+      _banDefaultConstructor(className, source, entryCode);
+      return;
+    }
+
     context.registry.addSimpleIdentifier((node) {
       final name = node.name;
       if (name != identifier) {
@@ -279,6 +287,27 @@ class AvoidUsingApiLinter {
       if (!_matchesSource(sourcePath, source)) return;
 
       reporter.atNode(node.identifier, entryCode);
+    });
+  }
+
+  void _banDefaultConstructor(
+    String className,
+    String source,
+    LintCode entryCode,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final constructorName = node.constructorName.type.name2.lexeme;
+      if (constructorName != className || node.constructorName.name != null) {
+        return;
+      }
+
+      final sourcePath =
+          node.constructorName.type.element2?.library2?.uri.toString();
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
+        return;
+      }
+
+      reporter.atNode(node, entryCode);
     });
   }
 }

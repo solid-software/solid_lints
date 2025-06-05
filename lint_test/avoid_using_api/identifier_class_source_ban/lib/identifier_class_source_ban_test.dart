@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'package:external_source/external_source.dart';
 
 void testingBannedCodeLint() async {
+  // expect_lint: avoid_using_api
   final bannedCodeUsage = BannedCodeUsage();
   // expect_lint: avoid_using_api
   BannedCodeUsage.test2();
