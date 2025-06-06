@@ -23,7 +23,13 @@ And then include `solid_lints` into your project top-level `analysis_options.yam
 
 ```yaml
 include: package:solid_lints/analysis_options.yaml
+
+analyzer:
+  plugins:
+    - custom_lint
 ```
+> Add `custom_lint` under `analyzer.plugins` to enable lint rules.
+
 
 Also you can use a specialized rule set designed for Dart tests.
 Add an `analysis_options.yaml` file under the `test/` directory, and include the ruleset:
