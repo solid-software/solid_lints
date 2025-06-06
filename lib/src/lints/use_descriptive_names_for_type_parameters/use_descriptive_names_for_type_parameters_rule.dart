@@ -35,29 +35,21 @@ class UseDescriptiveNamesForTypeParametersRule extends SolidLintRule {
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
-      _checkAndReport(node.typeParameters, reporter);
-    });
+    void checkTypeParameters(TypeParameterList? typeParameters) {
+      _checkAndReport(typeParameters, reporter);
+    }
 
-    context.registry.addFunctionDeclaration((node) {
-      _checkAndReport(node.functionExpression.typeParameters, reporter);
-    });
-
-    context.registry.addMethodDeclaration((node) {
-      _checkAndReport(node.typeParameters, reporter);
-    });
-
-    context.registry.addGenericTypeAlias((node) {
-      _checkAndReport(node.typeParameters, reporter);
-    });
-
-    context.registry.addExtensionDeclaration((node) {
-      _checkAndReport(node.typeParameters, reporter);
-    });
-
-    context.registry.addMixinDeclaration((node) {
-      _checkAndReport(node.typeParameters, reporter);
-    });
+    context.registry
+      ..addClassDeclaration((node) => checkTypeParameters(node.typeParameters))
+      ..addFunctionDeclaration(
+        (node) => checkTypeParameters(node.functionExpression.typeParameters),
+      )
+      ..addMethodDeclaration((node) => checkTypeParameters(node.typeParameters))
+      ..addGenericTypeAlias((node) => checkTypeParameters(node.typeParameters))
+      ..addExtensionDeclaration(
+        (node) => checkTypeParameters(node.typeParameters),
+      )
+      ..addMixinDeclaration((node) => checkTypeParameters(node.typeParameters));
   }
 
   void _checkAndReport(
