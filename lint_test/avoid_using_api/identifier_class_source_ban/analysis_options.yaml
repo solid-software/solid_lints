@@ -7,6 +7,10 @@ custom_lint:
     - avoid_using_api:
       severity: warning
       entries:
+        - identifier: ()
+          class_name: BannedCodeUsage
+          source: package:external_source
+          reason: "BannedCodeUsage() from package:external_source is not allowed"
         - identifier: test4
           class_name: BannedCodeUsage
           source: package:external_source

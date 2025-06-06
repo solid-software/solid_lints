@@ -1,0 +1,34 @@
+analyzer:
+  plugins:
+    - ../../custom_lint
+
+custom_lint:
+  rules:
+    - avoid_using_api:
+      severity: warning
+      entries:
+        - identifier: ()
+          named_parameter: badParameter
+          class_name: NamedParameterBan
+          source: package:named_parameter_ban
+          reason: "Use goodParameter instead"
+        - identifier: namedConstructor
+          named_parameter: badParameter
+          class_name: NamedParameterBan
+          source: package:named_parameter_ban
+          reason: "Use goodParameter instead"
+        - identifier: staticMethod
+          named_parameter: badParameter
+          class_name: NamedParameterBan
+          source: package:named_parameter_ban
+          reason: "Use goodParameter instead"
+        - identifier: method
+          named_parameter: badParameter
+          class_name: NamedParameterBan
+          source: package:named_parameter_ban
+          reason: "Use goodParameter instead"
+        - identifier: extensionMethod
+          named_parameter: badParameter
+          class_name: NamedParameterBanExtension
+          source: package:named_parameter_ban
+          reason: "Use goodParameter instead"

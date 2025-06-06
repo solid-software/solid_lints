@@ -19,6 +19,9 @@ class AvoidUsingApiLinter {
     required this.config,
   });
 
+  /// The identifier for the default constructor
+  static const String _defaultConstructorIdentifier = '()';
+
   /// Access to the resolver for this lint context
   final CustomLintResolver resolver;
 
@@ -191,6 +194,11 @@ class AvoidUsingApiLinter {
     String className,
     String source,
   ) {
+    if (identifier == _defaultConstructorIdentifier) {
+      _banDefaultConstructor(className, source, entryCode);
+      return;
+    }
+
     context.registry.addSimpleIdentifier((node) {
       final name = node.name;
       if (name != identifier) {
@@ -281,4 +289,98 @@ class AvoidUsingApiLinter {
       reporter.atNode(node.identifier, entryCode);
     });
   }
+
+  void _banDefaultConstructor(
+    String className,
+    String source,
+    LintCode entryCode,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final constructorName = node.constructorName.type.name2.lexeme;
+      if (constructorName != className || node.constructorName.name != null) {
+        return;
+      }
+
+      final sourcePath =
+          node.constructorName.type.element2?.library2?.uri.toString();
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
+        return;
+      }
+
+      reporter.atNode(node, entryCode);
+    });
+  }
+
+  /// Lints usages of a named parameter from a given source
+  void banUsageWithSpecificNamedParameter(
+    LintCode entryCode,
+    String identifier,
+    String namedParameter,
+    String className,
+    String source,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+      if (methodName != identifier) return;
+
+      final enclosingElement = node.methodName.element?.enclosingElement2;
+      if (enclosingElement == null || enclosingElement.name3 != className) {
+        return;
+      }
+
+      if (!_containsNamedParameter(node.argumentList, namedParameter)) {
+        return;
+      }
+
+      final libSource = enclosingElement.library2;
+      if (libSource == null) {
+        return;
+      }
+
+      final sourcePath = libSource.uri.toString();
+      if (!_matchesSource(sourcePath, source)) {
+        return;
+      }
+
+      reporter.atNode(node.methodName, entryCode);
+    });
+
+    context.registry.addInstanceCreationExpression((node) {
+      String? expectedConstructorName;
+
+      if (identifier != _defaultConstructorIdentifier) {
+        expectedConstructorName = identifier;
+      }
+
+      final actualClassName = node.constructorName.type.name2.lexeme;
+      if (actualClassName != className) {
+        return;
+      }
+
+      if (node.constructorName.name?.name != expectedConstructorName) {
+        return;
+      }
+
+      if (!_containsNamedParameter(node.argumentList, namedParameter)) {
+        return;
+      }
+
+      final sourcePath =
+          node.constructorName.type.element2?.library2?.uri.toString();
+      if (sourcePath == null || !_matchesSource(sourcePath, source)) {
+        return;
+      }
+
+      reporter.atNode(node, entryCode);
+    });
+  }
+
+  bool _containsNamedParameter(
+    ArgumentList argumentList,
+    String namedParameter,
+  ) =>
+      argumentList.arguments.any(
+        (arg) =>
+            arg is NamedExpression && arg.name.label.name == namedParameter,
+      );
 }
