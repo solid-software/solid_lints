@@ -328,7 +328,7 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      if (!_hasNamedParameter(node.argumentList, namedParameter)) {
+      if (!_containsNamedParameter(node.argumentList, namedParameter)) {
         return;
       }
 
@@ -346,10 +346,9 @@ class AvoidUsingApiLinter {
     });
 
     context.registry.addInstanceCreationExpression((node) {
-      final String? expectedConstructorName;
-      if (identifier == defaultConstructorIdentifier) {
-        expectedConstructorName = null;
-      } else {
+      String? expectedConstructorName;
+
+      if (identifier != defaultConstructorIdentifier) {
         expectedConstructorName = identifier;
       }
 
@@ -362,7 +361,7 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      if (!_hasNamedParameter(node.argumentList, namedParameter)) {
+      if (!_containsNamedParameter(node.argumentList, namedParameter)) {
         return;
       }
 
@@ -376,7 +375,10 @@ class AvoidUsingApiLinter {
     });
   }
 
-  bool _hasNamedParameter(ArgumentList argumentList, String namedParameter) =>
+  bool _containsNamedParameter(
+    ArgumentList argumentList,
+    String namedParameter,
+  ) =>
       argumentList.arguments.any(
         (arg) =>
             arg is NamedExpression && arg.name.label.name == namedParameter,
