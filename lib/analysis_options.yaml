@@ -1,6 +1,4 @@
 analyzer:
-  plugins:
-    - custom_lint
   exclude:
     # General generated files
     - '**/*.g.dart'
@@ -59,7 +57,7 @@ custom_lint:
     - double_literal_format
 
     - function_lines_of_code:
-      max_lines: 200
+      max_lines: 190
 
     - member_ordering:
       order:
