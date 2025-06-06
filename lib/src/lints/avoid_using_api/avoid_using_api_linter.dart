@@ -20,7 +20,7 @@ class AvoidUsingApiLinter {
   });
 
   /// The identifier for the default constructor
-  static const String defaultConstructorIdentifier = '()';
+  static const String _defaultConstructorIdentifier = '()';
 
   /// Access to the resolver for this lint context
   final CustomLintResolver resolver;
@@ -194,7 +194,7 @@ class AvoidUsingApiLinter {
     String className,
     String source,
   ) {
-    if (identifier == defaultConstructorIdentifier) {
+    if (identifier == _defaultConstructorIdentifier) {
       _banDefaultConstructor(className, source, entryCode);
       return;
     }
@@ -348,7 +348,7 @@ class AvoidUsingApiLinter {
     context.registry.addInstanceCreationExpression((node) {
       String? expectedConstructorName;
 
-      if (identifier != defaultConstructorIdentifier) {
+      if (identifier != _defaultConstructorIdentifier) {
         expectedConstructorName = identifier;
       }
 
