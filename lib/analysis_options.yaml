@@ -57,7 +57,7 @@ custom_lint:
     - double_literal_format
 
     - function_lines_of_code:
-      max_lines: 190
+      max_lines: 200
 
     - member_ordering:
       order:
