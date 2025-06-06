@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/use_descriptive_names_for_type_parameters/visitors/use_descriptive_names_for_type_parameters_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
@@ -37,48 +36,43 @@ class UseDescriptiveNamesForTypeParametersRule extends SolidLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((node) {
-      final visitor = UseDescriptiveNamesForTypeParametersVisitor();
-      visitor.visitClassDeclaration(node);
-      _reportViolations(reporter, visitor.singleLetterTypeParameters);
+      _checkAndReport(node.typeParameters, reporter);
     });
 
     context.registry.addFunctionDeclaration((node) {
-      final visitor = UseDescriptiveNamesForTypeParametersVisitor();
-      visitor.visitFunctionDeclaration(node);
-      _reportViolations(reporter, visitor.singleLetterTypeParameters);
+      _checkAndReport(node.functionExpression.typeParameters, reporter);
     });
 
     context.registry.addMethodDeclaration((node) {
-      final visitor = UseDescriptiveNamesForTypeParametersVisitor();
-      visitor.visitMethodDeclaration(node);
-      _reportViolations(reporter, visitor.singleLetterTypeParameters);
+      _checkAndReport(node.typeParameters, reporter);
     });
 
     context.registry.addGenericTypeAlias((node) {
-      final visitor = UseDescriptiveNamesForTypeParametersVisitor();
-      visitor.visitGenericTypeAlias(node);
-      _reportViolations(reporter, visitor.singleLetterTypeParameters);
+      _checkAndReport(node.typeParameters, reporter);
     });
 
     context.registry.addExtensionDeclaration((node) {
-      final visitor = UseDescriptiveNamesForTypeParametersVisitor();
-      visitor.visitExtensionDeclaration(node);
-      _reportViolations(reporter, visitor.singleLetterTypeParameters);
+      _checkAndReport(node.typeParameters, reporter);
     });
 
     context.registry.addMixinDeclaration((node) {
-      final visitor = UseDescriptiveNamesForTypeParametersVisitor();
-      visitor.visitMixinDeclaration(node);
-      _reportViolations(reporter, visitor.singleLetterTypeParameters);
+      _checkAndReport(node.typeParameters, reporter);
     });
   }
 
-  void _reportViolations(
+  void _checkAndReport(
+    TypeParameterList? typeParameters,
     ErrorReporter reporter,
-    List<TypeParameter> singleLetterTypeParameters,
   ) {
-    for (final param in singleLetterTypeParameters) {
-      reporter.atNode(param, code);
+    if (typeParameters == null || typeParameters.typeParameters.length < 3) {
+      return;
+    }
+
+    for (final param in typeParameters.typeParameters) {
+      final name = param.name.lexeme;
+      if (name.length == 1) {
+        reporter.atNode(param, code);
+      }
     }
   }
 }
