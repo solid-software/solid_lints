@@ -30,6 +30,10 @@ Add an `analysis_options.yaml` file under the `test/` directory, and include the
 
 ```yaml
 include: package:solid_lints/analysis_options_test.yaml
+
+analyzer:
+  plugins:
+    - custom_lint
 ```
 
 Then you can see suggestions in your IDE or you can run checks manually:
