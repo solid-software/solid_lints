@@ -88,7 +88,7 @@ class AvoidUnusedParametersRule extends SolidLintRule<AvoidUnusedParameters> {
   }
 
   @override
-  void run(
+  void runRule(
     CustomLintResolver resolver,
     ErrorReporter reporter,
     CustomLintContext context,

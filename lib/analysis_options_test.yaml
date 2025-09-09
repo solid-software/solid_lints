@@ -1,5 +1,9 @@
 include: package:solid_lints/analysis_options.yaml
 
+analyzer:
+  plugins:
+    - custom_lint
+
 custom_lint:
   rules:
 # Tests usually organized in one large main() function making this rule not applicable.

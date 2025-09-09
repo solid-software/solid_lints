@@ -72,7 +72,7 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
   }
 
   @override
-  void run(
+  void runRule(
     CustomLintResolver resolver,
     ErrorReporter reporter,
     CustomLintContext context,
