@@ -55,7 +55,7 @@ class AvoidGlobalStateRule extends SolidLintRule {
   }
 
   @override
-  void run(
+  void runRule(
     CustomLintResolver resolver,
     ErrorReporter reporter,
     CustomLintContext context,

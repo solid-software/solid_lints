@@ -46,7 +46,7 @@ class CyclomaticComplexityRule
   }
 
   @override
-  void run(
+  void runRule(
     CustomLintResolver resolver,
     ErrorReporter reporter,
     CustomLintContext context,
