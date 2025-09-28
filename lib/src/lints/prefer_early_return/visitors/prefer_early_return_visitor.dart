@@ -39,12 +39,12 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
     _nodes.add(node);
   }
 
-// returns a list of if statements at the start of the function
-// and the next statement after it
-// examples:
-// [if, if, if, return] -> ([if, if, if], return)
-// [if, if, if, _doSomething, return] -> ([if, if, if], _doSomething)
-// [if, if, if] -> ([if, if, if], null)
+  // returns a list of if statements at the start of the function
+  // and the next statement after it
+  // examples:
+  // [if, if, if, return] -> ([if, if, if], return)
+  // [if, if, if, _doSomething, return] -> ([if, if, if], _doSomething)
+  // [if, if, if] -> ([if, if, if], null)
   (List<IfStatement>, Statement?) _getStartIfStatements(
     BlockFunctionBody body,
   ) {

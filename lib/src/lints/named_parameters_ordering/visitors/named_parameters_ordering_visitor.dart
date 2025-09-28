@@ -45,8 +45,9 @@ class NamedParametersOrderingVisitor
 
     _parametersInfo.clear();
 
-    final namedParametersList =
-        node.parameters.where((p) => p.isNamed).toList();
+    final namedParametersList = node.parameters
+        .where((p) => p.isNamed)
+        .toList();
 
     if (namedParametersList.isEmpty) {
       return _parametersInfo;
@@ -99,8 +100,8 @@ class NamedParametersOrderingVisitor
         return ParameterType.defaultValue;
 
       case FieldFormalParameter(:final isRequired) ||
-            FunctionTypedFormalParameter(:final isRequired) ||
-            SimpleFormalParameter(:final isRequired):
+          FunctionTypedFormalParameter(:final isRequired) ||
+          SimpleFormalParameter(:final isRequired):
         return isRequired ? ParameterType.required : ParameterType.nullable;
     }
   }

@@ -98,8 +98,8 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
 
     final correctObjectType =
         objectType is InterfaceType && objectType.isDartAsyncFutureOr
-            ? objectType.typeArguments.first
-            : objectType;
+        ? objectType.typeArguments.first
+        : objectType;
 
     if ((correctObjectType.element == castedType.element) ||
         castedType is DynamicType ||

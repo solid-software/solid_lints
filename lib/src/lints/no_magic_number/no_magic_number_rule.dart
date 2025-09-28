@@ -147,7 +147,8 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
       configs: configs,
       name: lintName,
       paramsParser: NoMagicNumberParameters.fromJson,
-      problemMessage: (_) => 'Avoid using magic numbers.'
+      problemMessage: (_) =>
+          'Avoid using magic numbers.'
           'Extract them to named constants or variables.',
     );
 

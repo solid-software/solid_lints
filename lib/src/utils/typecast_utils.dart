@@ -66,13 +66,10 @@ class TypeCast {
       return false;
     }
 
-    if (this
-        case TypeCast(
-          source: final objectType,
-          target: final castedType,
-        )
-        when objectType is ParameterizedType &&
-            castedType is ParameterizedType) {
+    if (this case TypeCast(
+      source: final objectType,
+      target: final castedType,
+    ) when objectType is ParameterizedType && castedType is ParameterizedType) {
       if (objectType.typeArguments.length != castedType.typeArguments.length) {
         return false;
       }

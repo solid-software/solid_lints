@@ -18,18 +18,19 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
   });
 
   /// List of all declarations
-  Iterable<DeclarationTokenInfo> get declarations => _declarations.where(
+  Iterable<DeclarationTokenInfo> get declarations =>
+      _declarations.where(
         (declaration) {
           if (declaration.parent is Declaration) {
-            return !excludedEntities
-                .shouldIgnoreEntity(declaration.parent as Declaration);
+            return !excludedEntities.shouldIgnoreEntity(
+              declaration.parent as Declaration,
+            );
           }
           return true;
         },
-      ).toList()
-        ..sort(
-          (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
-        );
+      ).toList()..sort(
+        (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
+      );
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {

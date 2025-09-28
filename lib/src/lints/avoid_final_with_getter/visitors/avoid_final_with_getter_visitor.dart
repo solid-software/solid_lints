@@ -13,16 +13,15 @@ class AvoidFinalWithGetterVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
-    if (node
-        case MethodDeclaration(
-          isGetter: true,
-          declaredFragment: ExecutableFragment(
-            element: ExecutableElement(
-              isAbstract: false,
-              isPublic: true,
-            ),
-          ),
-        )) {
+    if (node case MethodDeclaration(
+      isGetter: true,
+      declaredFragment: ExecutableFragment(
+        element: ExecutableElement(
+          isAbstract: false,
+          isPublic: true,
+        ),
+      ),
+    )) {
       final visitor = GetterVariableVisitor(node);
       node.parent?.accept(visitor);
 

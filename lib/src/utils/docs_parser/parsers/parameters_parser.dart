@@ -29,7 +29,8 @@ class ParametersParser extends BaseParser {
       featureSet: FeatureSet.latestLanguageVersion(),
     );
 
-    final parameterDocs = ast.unit.declarations
+    final parameterDocs =
+        ast.unit.declarations
             .whereType<ClassDeclaration>()
             .map(_parseParametersDocs)
             .firstWhereOrNull((docs) => docs.isNotEmpty) ??

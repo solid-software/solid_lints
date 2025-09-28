@@ -10,7 +10,7 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
 
   /// Creates a new instance of [GetterVariableVisitor]
   GetterVariableVisitor(MethodDeclaration getter)
-      : _getterId = getter.getterReferenceId;
+    : _getterId = getter.getterReferenceId;
 
   /// Is there a variable associated with the getter
   VariableDeclaration? get variable => _variable;

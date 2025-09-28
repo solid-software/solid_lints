@@ -40,16 +40,15 @@ class AvoidUsingApiParameters {
   /// Method for creating from json data
   factory AvoidUsingApiParameters.fromJson(
     Map<String, Object?> json,
-  ) =>
-      AvoidUsingApiParameters(
-        entries: List<AvoidUsingApiEntryParameters>.from(
-          (json['entries'] as Iterable?)?.map(
-                (e) => AvoidUsingApiEntryParameters.fromJson(
-                  (e as YamlMap).toMap(),
-                ),
-              ) ??
-              [],
-        ),
-        severity: decodeErrorSeverity(json['severity'] as String?),
-      );
+  ) => AvoidUsingApiParameters(
+    entries: List<AvoidUsingApiEntryParameters>.from(
+      (json['entries'] as Iterable?)?.map(
+            (e) => AvoidUsingApiEntryParameters.fromJson(
+              (e as YamlMap).toMap(),
+            ),
+          ) ??
+          [],
+    ),
+    severity: decodeErrorSeverity(json['severity'] as String?),
+  );
 }

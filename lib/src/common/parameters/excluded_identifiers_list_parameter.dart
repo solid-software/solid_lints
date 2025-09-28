@@ -45,8 +45,8 @@ class ExcludedIdentifiersListParameter {
   ) {
     final excludeList =
         json[ExcludedIdentifiersListParameter.excludeParameterName]
-                as Iterable? ??
-            [];
+            as Iterable? ??
+        [];
 
     return ExcludedIdentifiersListParameter.fromJson(
       excludeList: excludeList,

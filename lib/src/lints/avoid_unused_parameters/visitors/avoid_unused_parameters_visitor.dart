@@ -109,7 +109,9 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       body,
       parameters,
     );
-    return unused.whereNot(nameConsistsOfUnderscoresOnly).where(
+    return unused
+        .whereNot(nameConsistsOfUnderscoresOnly)
+        .where(
           (param) => !param.isNamed,
         );
   }

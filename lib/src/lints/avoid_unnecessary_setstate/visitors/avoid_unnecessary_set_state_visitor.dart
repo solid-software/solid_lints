@@ -51,8 +51,9 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
     }
 
     final methods = node.members.whereType<MethodDeclaration>();
-    final classMethodsNames =
-        methods.map((declaration) => declaration.name.lexeme).toSet();
+    final classMethodsNames = methods
+        .map((declaration) => declaration.name.lexeme)
+        .toSet();
     final methodBodies = methods.map((declaration) => declaration.body).toSet();
 
     final checkedMethods = methods.where(_isMethodChecked);
@@ -105,8 +106,10 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
       return true;
     }
 
-    final visitor =
-        AvoidUnnecessarySetStateMethodVisitor(classMethodsNames, bodies);
+    final visitor = AvoidUnnecessarySetStateMethodVisitor(
+      classMethodsNames,
+      bodies,
+    );
     declaration.visitChildren(visitor);
 
     final hasSetState = visitor.setStateInvocations.isNotEmpty;

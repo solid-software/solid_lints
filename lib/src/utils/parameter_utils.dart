@@ -32,13 +32,12 @@ extension LintCodeCopyWith on LintCode {
     String? uniqueName,
     String? url,
     error.DiagnosticSeverity? errorSeverity,
-  }) =>
-      LintCode(
-        name: name ?? this.name,
-        problemMessage: problemMessage ?? this.problemMessage,
-        correctionMessage: correctionMessage ?? this.correctionMessage,
-        uniqueName: uniqueName ?? this.uniqueName,
-        url: url ?? this.url,
-        errorSeverity: errorSeverity ?? this.errorSeverity,
-      );
+  }) => LintCode(
+    name: name ?? this.name,
+    problemMessage: problemMessage ?? this.problemMessage,
+    correctionMessage: correctionMessage ?? this.correctionMessage,
+    uniqueName: uniqueName ?? this.uniqueName,
+    url: url ?? this.url,
+    errorSeverity: errorSeverity ?? this.errorSeverity,
+  );
 }

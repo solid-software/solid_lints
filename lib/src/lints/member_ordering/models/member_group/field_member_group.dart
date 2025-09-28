@@ -62,7 +62,8 @@ class FieldMemberGroup extends MemberGroup {
     final modifier = parseModifier(
       declaration.fields.variables.first.name.lexeme,
     );
-    final isNullable = declaration.fields.type?.type?.nullabilitySuffix ==
+    final isNullable =
+        declaration.fields.type?.type?.nullabilitySuffix ==
         NullabilitySuffix.question;
     final keyword = _FieldMemberGroupUtils.parseKeyWord(declaration);
 
@@ -101,7 +102,7 @@ class _FieldMemberGroupUtils {
     return declaration.fields.isConst
         ? FieldKeyword.isConst
         : declaration.fields.isFinal
-            ? FieldKeyword.isFinal
-            : FieldKeyword.unset;
+        ? FieldKeyword.isFinal
+        : FieldKeyword.unset;
   }
 }

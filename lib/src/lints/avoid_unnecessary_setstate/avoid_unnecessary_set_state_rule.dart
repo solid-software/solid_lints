@@ -68,7 +68,8 @@ class AvoidUnnecessarySetStateRule extends SolidLintRule {
     final rule = RuleConfig(
       name: lintName,
       configs: configs,
-      problemMessage: (_) => 'Avoid calling unnecessary setState. '
+      problemMessage: (_) =>
+          'Avoid calling unnecessary setState. '
           'Consider changing the state directly.',
     );
     return AvoidUnnecessarySetStateRule._(rule);

@@ -37,7 +37,7 @@ class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
   /// [_allowWithComments] indicates whether to allow empty blocks that contain
   /// any comments
   NoEmptyBlockVisitor({required bool allowWithComments})
-      : _allowWithComments = allowWithComments;
+    : _allowWithComments = allowWithComments;
 
   /// All empty blocks
   Iterable<Block> get emptyBlocks => _emptyBlocks;

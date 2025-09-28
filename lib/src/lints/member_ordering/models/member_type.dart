@@ -52,6 +52,7 @@ enum MemberType {
   const MemberType(this.type, {this.typeAlias});
 
   /// Parses a String member type and returns instance of [MemberType]
-  static MemberType? parse(String? name) => values
-      .firstWhereOrNull((type) => name == type.type || name == type.typeAlias);
+  static MemberType? parse(String? name) => values.firstWhereOrNull(
+    (type) => name == type.type || name == type.typeAlias,
+  );
 }

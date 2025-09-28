@@ -150,7 +150,8 @@ class NamedParametersOrderingRule
 
     return LintCode(
       name: lintName,
-      problemMessage: "${parameterOrdering.displayName} named parameters"
+      problemMessage:
+          "${parameterOrdering.displayName} named parameters"
           " should be before "
           "${previousParameterOrdering!.displayName} named parameters.",
     );

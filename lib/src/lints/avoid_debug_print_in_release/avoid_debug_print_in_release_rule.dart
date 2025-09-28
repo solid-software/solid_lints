@@ -172,11 +172,10 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
   }
 
   bool _isNotReleaseCheck(Expression node) {
-    if (node.childEntities.toList()
-        case [
-          final Token token,
-          final Identifier identifier,
-        ]) {
+    if (node.childEntities.toList() case [
+      final Token token,
+      final Identifier identifier,
+    ]) {
       return token.type == TokenType.BANG &&
           _isReleaseModeIdentifier(identifier);
     }

@@ -65,7 +65,8 @@ class AvoidReturningWidgetsRule
       configs: configs,
       name: lintName,
       paramsParser: AvoidReturningWidgetsParameters.fromJson,
-      problemMessage: (_) => 'Returning a widget from a function is considered '
+      problemMessage: (_) =>
+          'Returning a widget from a function is considered '
           'an anti-pattern. Unless you are overriding an existing method, '
           'consider extracting your widget to a separate class.',
     );
@@ -84,8 +85,7 @@ class AvoidReturningWidgetsRule
       // simultaneously checks if return type is [DartType]
       final DartType? returnType = switch (node) {
         FunctionDeclaration(returnType: TypeAnnotation(:final type?)) ||
-        MethodDeclaration(returnType: TypeAnnotation(:final type?)) =>
-          type,
+        MethodDeclaration(returnType: TypeAnnotation(:final type?)) => type,
         _ => null,
       };
 
@@ -101,11 +101,11 @@ class AvoidReturningWidgetsRule
         FunctionDeclaration(:final functionExpression) =>
           functionExpression.parent is MethodDeclaration &&
               (functionExpression.parent! as MethodDeclaration).metadata.any(
-                    (m) => m.name.name == _override,
-                  ),
+                (m) => m.name.name == _override,
+              ),
         MethodDeclaration(:final metadata) => metadata.any(
-            (m) => m.name.name == _override,
-          ),
+          (m) => m.name.name == _override,
+        ),
         _ => false,
       };
 

@@ -24,8 +24,8 @@ sidebar_position: 0
   DocusaurusFormatter({
     required String docusaurusDocsDirPath,
     required String readmePath,
-  })  : _outputDirectory = Directory(docusaurusDocsDirPath),
-        _readmeFile = File(readmePath);
+  }) : _outputDirectory = Directory(docusaurusDocsDirPath),
+       _readmeFile = File(readmePath);
 
   @override
   void format(List<RuleDoc> rules) {
@@ -40,9 +40,10 @@ sidebar_position: 0
     rules.forEach(_createMarkdownFileForRule);
   }
 
-  void _createMarkdownFileForRule(RuleDoc rule) => File(
-        join(_outputDirectory.path, '${rule.name}.md'),
-      )
+  void _createMarkdownFileForRule(RuleDoc rule) =>
+      File(
+          join(_outputDirectory.path, '${rule.name}.md'),
+        )
         ..createSync()
         ..writeAsString(
           _markdownFormatter.formatRuleToMarkdown(

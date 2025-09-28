@@ -39,6 +39,8 @@ enum Modifier {
   const Modifier(this.type);
 
   /// Parses a String access modifier and returns instance of [Modifier]
-  static Modifier parse(String? name) => values
-      .firstWhere((type) => type.type == name, orElse: () => Modifier.unset);
+  static Modifier parse(String? name) => values.firstWhere(
+    (type) => type.type == name,
+    orElse: () => Modifier.unset,
+  );
 }

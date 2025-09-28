@@ -99,8 +99,8 @@ class AvoidUsingApiLinter {
 
       switch (node.element) {
         case LocalFunctionElement() ||
-              TopLevelFunctionElement() ||
-              PropertyAccessorElement():
+            TopLevelFunctionElement() ||
+            PropertyAccessorElement():
           reporter.atNode(node, entryCode);
       }
     });
@@ -118,8 +118,8 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      final sourcePath =
-          node.declaredElement?.type.element?.library?.uri.toString();
+      final sourcePath = node.declaredElement?.type.element?.library?.uri
+          .toString();
       if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
@@ -301,8 +301,8 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      final sourcePath =
-          node.constructorName.type.element?.library?.uri.toString();
+      final sourcePath = node.constructorName.type.element?.library?.uri
+          .toString();
       if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
@@ -365,8 +365,8 @@ class AvoidUsingApiLinter {
         return;
       }
 
-      final sourcePath =
-          node.constructorName.type.element?.library?.uri.toString();
+      final sourcePath = node.constructorName.type.element?.library?.uri
+          .toString();
       if (sourcePath == null || !_matchesSource(sourcePath, source)) {
         return;
       }
@@ -378,9 +378,7 @@ class AvoidUsingApiLinter {
   bool _containsNamedParameter(
     ArgumentList argumentList,
     String namedParameter,
-  ) =>
-      argumentList.arguments.any(
-        (arg) =>
-            arg is NamedExpression && arg.name.label.name == namedParameter,
-      );
+  ) => argumentList.arguments.any(
+    (arg) => arg is NamedExpression && arg.name.label.name == namedParameter,
+  );
 }
