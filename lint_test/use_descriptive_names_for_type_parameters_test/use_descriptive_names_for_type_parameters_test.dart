@@ -1,5 +1,7 @@
 /// Check the `use_descriptive_names_for_type_parameters` rule
 
+// ignore_for_file: unused_element
+
 // expect_lint: use_descriptive_names_for_type_parameters
 class SomeClass<T, U, K> {}
 
@@ -14,6 +16,17 @@ class AnotherClass<A, B, C, D> {}
 void functionWithTypes<T, U, K>(T t, U u, K k) {}
 
 void validFunction<Type, Data, Context>(Type t, Data d, Context c) {}
+
+void functionWithGenericFunctionDeclarations() {
+  // expect_lint: use_descriptive_names_for_type_parameters
+  void _fail3<A, B, C>() {}
+
+  void _pass2<D, E>() {}
+
+  void _pass1<F>() {}
+
+  void _pass0() {}
+}
 
 void twoTypeParams<T, U>(T t, U u) {}
 
