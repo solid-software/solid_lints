@@ -65,7 +65,8 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
       name: lintName,
       paramsParser: NoEmptyBlockParameters.fromJson,
       problemMessage: (_) =>
-          'Block is empty. Empty blocks are often indicators of missing code.',
+          'Block is empty. Empty blocks are often indicators '
+          'of missing code.',
     );
 
     return NoEmptyBlockRule._(config);
@@ -74,7 +75,7 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {

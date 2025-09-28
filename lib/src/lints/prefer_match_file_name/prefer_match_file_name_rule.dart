@@ -75,7 +75,7 @@ class PreferMatchFileNameRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {
@@ -98,8 +98,9 @@ class PreferMatchFileNameRule
         return;
       }
 
-      final nodeType =
-          humanReadableNodeType(firstDeclaration.parent).toLowerCase();
+      final nodeType = humanReadableNodeType(
+        firstDeclaration.parent,
+      ).toLowerCase();
 
       reporter.atToken(
         firstDeclaration.token,

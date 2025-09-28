@@ -89,7 +89,7 @@ class AvoidUsingApiRule extends SolidLintRule<AvoidUsingApiParameters> {
   @override
   Future<void> run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) async {
     final rootPath = (await resolver.getResolvedUnitResult())
@@ -130,7 +130,7 @@ class AvoidUsingApiRule extends SolidLintRule<AvoidUsingApiParameters> {
             :final identifier?,
             :final namedParameter?,
             :final className?,
-            :final source?
+            :final source?,
           ):
           linter.banUsageWithSpecificNamedParameter(
             entryCode,
@@ -142,7 +142,7 @@ class AvoidUsingApiRule extends SolidLintRule<AvoidUsingApiParameters> {
         case AvoidUsingApiEntryParameters(
             :final identifier?,
             :final className?,
-            :final source?
+            :final source?,
           ):
           linter.banIdFromClassFromSource(
             entryCode,

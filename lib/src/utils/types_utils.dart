@@ -23,7 +23,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
@@ -31,8 +31,11 @@ import 'package:solid_lints/src/utils/named_type_utils.dart';
 
 extension Subtypes on DartType {
   Iterable<DartType> get supertypes {
-    final element = element3;
-    return element is InterfaceElement2 ? element.allSupertypes : [];
+    final element = this.element;
+
+    if (element is! InterfaceElement) return [];
+
+    return element.allSupertypes;
   }
 
   /// Formats the type string based on nullability and presence of generics.

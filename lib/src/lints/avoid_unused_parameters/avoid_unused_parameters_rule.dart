@@ -90,7 +90,7 @@ class AvoidUnusedParametersRule extends SolidLintRule<AvoidUnusedParameters> {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {

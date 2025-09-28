@@ -65,9 +65,8 @@ class AvoidReturningWidgetsRule
       configs: configs,
       name: lintName,
       paramsParser: AvoidReturningWidgetsParameters.fromJson,
-      problemMessage: (_) =>
-          'Returning a widget from a function is considered an anti-pattern. '
-          'Unless you are overriding an existing method, '
+      problemMessage: (_) => 'Returning a widget from a function is considered '
+          'an anti-pattern. Unless you are overriding an existing method, '
           'consider extracting your widget to a separate class.',
     );
 
@@ -77,7 +76,7 @@ class AvoidReturningWidgetsRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
@@ -101,11 +100,12 @@ class AvoidReturningWidgetsRule
       final isOverriden = switch (node) {
         FunctionDeclaration(:final functionExpression) =>
           functionExpression.parent is MethodDeclaration &&
-              (functionExpression.parent! as MethodDeclaration)
-                  .metadata
-                  .any((m) => m.name.name == _override),
-        MethodDeclaration(:final metadata) =>
-          metadata.any((m) => m.name.name == _override),
+              (functionExpression.parent! as MethodDeclaration).metadata.any(
+                    (m) => m.name.name == _override,
+                  ),
+        MethodDeclaration(:final metadata) => metadata.any(
+            (m) => m.name.name == _override,
+          ),
         _ => false,
       };
 

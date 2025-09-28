@@ -94,7 +94,7 @@ class NewlineBeforeReturnRule extends SolidLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((node) {

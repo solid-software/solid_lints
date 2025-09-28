@@ -38,6 +38,6 @@ class RuleConfig<T extends Object?> {
   LintCode get lintCode => LintCode(
         name: name,
         problemMessage: _problemMessageFactory(parameters),
-        errorSeverity: error.ErrorSeverity.WARNING,
+        errorSeverity: error.DiagnosticSeverity.WARNING,
       );
 }

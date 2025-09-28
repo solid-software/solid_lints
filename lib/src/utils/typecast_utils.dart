@@ -36,13 +36,13 @@ class TypeCast {
       return false;
     }
 
-    if (source.element3 == target.element3) {
+    if (source.element == target.element) {
       return _areGenericsWithSameTypeArgs;
     }
 
     if (source is InterfaceType) {
       return source.allSupertypes.any(
-        (e) => e.element3 == target.element3,
+        (e) => e.element == target.element,
       );
     }
 
@@ -66,7 +66,11 @@ class TypeCast {
       return false;
     }
 
-    if (this case TypeCast(source: final objectType, target: final castedType)
+    if (this
+        case TypeCast(
+          source: final objectType,
+          target: final castedType,
+        )
         when objectType is ParameterizedType &&
             castedType is ParameterizedType) {
       if (objectType.typeArguments.length != castedType.typeArguments.length) {

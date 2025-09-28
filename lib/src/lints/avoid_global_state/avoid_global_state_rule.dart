@@ -57,7 +57,7 @@ class AvoidGlobalStateRule extends SolidLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTopLevelVariableDeclaration(
@@ -77,7 +77,7 @@ class AvoidGlobalStateRule extends SolidLintRule {
 extension on VariableDeclaration {
   bool get isMutable => !isFinal && !isConst;
 
-  bool get isPrivate => declaredElement2?.isPrivate ?? false;
+  bool get isPrivate => declaredElement?.isPrivate ?? false;
 
   bool get isPublicMutable => isMutable && !isPrivate;
 }
