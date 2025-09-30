@@ -14,6 +14,7 @@ import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unre
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
 import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_rule.dart';
+import 'package:solid_lints/src/lints/dont_create_a_return_var/dont_create_a_return_var_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
@@ -67,6 +68,7 @@ class _SolidLints extends PluginBase {
       PreferEarlyReturnRule.createRule(configs),
       AvoidFinalWithGetterRule.createRule(configs),
       NamedParametersOrderingRule.createRule(configs),
+      DontCreateAReturnVarRule.createRule(configs),
     ];
 
     // Return only enabled rules
