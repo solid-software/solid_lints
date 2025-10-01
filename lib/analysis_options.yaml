@@ -56,6 +56,7 @@ custom_lint:
     - cyclomatic_complexity:
       max_complexity: 10
 
+    - dont_create_a_return_var
     - double_literal_format
 
     - function_lines_of_code:
