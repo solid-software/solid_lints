@@ -1,4 +1,7 @@
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
@@ -56,7 +59,52 @@ Rewrite the variable evaluation into return statement instead.""",
     ErrorReporter reporter,
     CustomLintContext context,
   ) {
-    // TODO: implement run
+    context.registry.addReturnStatement(
+      (statement) {
+        _checkReturnStatement(
+          statement: statement,
+          reporter: reporter,
+          context: context,
+        );
+      },
+    );
+  }
+
+  void _checkReturnStatement({
+    required ReturnStatement statement,
+    required ErrorReporter reporter,
+    required CustomLintContext context,
+  }) {
+    final expr = statement.expression;
+    if (expr is! SimpleIdentifier) return;
+    final returnVariableToken = expr.token;
+
+    //Looking for statement previous to return
+    final parent = statement.parent;
+    if (parent == null) return;
+
+    SyntacticEntity? previous;
+    for (final child in parent.childEntities) {
+      if (child == statement) break;
+      previous = child;
+    }
+    if (previous == null) return;
+
+    if (previous is! VariableDeclarationStatement) return;
+    final declarationStatement = previous;
+    
+    //Checking if return variable was declared in previous statement
+    final VariableDeclaration? variableDeclaration = 
+      declarationStatement.variables.variables
+      .firstWhereOrNull(
+        (v) => v.name.toString() == returnVariableToken.toString(),
+      );
+    if (variableDeclaration == null) return;
+
+    //Skipping mutable variables
+    if (!variableDeclaration.isFinal && !variableDeclaration.isConst) return;
+
+    reporter.atNode(expr, code);
   }
   
 }
