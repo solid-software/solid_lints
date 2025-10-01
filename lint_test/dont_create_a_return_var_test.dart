@@ -32,6 +32,19 @@ int returnVarTestCachedMutable() {
 }
 
 /// Test the dont_create_a_return_var.
+/// Caching mutable variable value, but return goes
+/// right after declaration, which makes it bad.
+int returnVarTestReturnFollowsDeclaration() {
+  var a = 1;
+  final result = a;
+
+  //Some comment here
+  
+  //expect_lint: dont_create_a_return_var
+  return result;
+}
+
+/// Test the dont_create_a_return_var.
 /// Caching another method result.
 /// Unpredictable: may be useful to cache value
 /// before operation can change it.
