@@ -1,8 +1,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/syntactic_entity.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/error/listener.dart';
-import 'package:collection/collection.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:solid_lints/src/lints/dont_create_a_return_var/visitors/dont_create_a_return_var_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
@@ -77,34 +77,82 @@ Rewrite the variable evaluation into return statement instead.""",
   }) {
     final expr = statement.expression;
     if (expr is! SimpleIdentifier) return;
-    final returnVariableToken = expr.token;
 
-    //Looking for statement previous to return
-    final parent = statement.parent;
-    if (parent == null) return;
+    final element = expr.element;
+    if(element is! LocalVariableElement2) return;
+    final returnVariableElement = element;
 
-    SyntacticEntity? previous;
-    for (final child in parent.childEntities) {
-      if (child == statement) break;
-      previous = child;
-    }
-    if (previous == null) return;
-
-    if (previous is! VariableDeclarationStatement) return;
-    final declarationStatement = previous;
+    if(!returnVariableElement.isFinal && !returnVariableElement.isConst) return;
     
-    //Checking if return variable was declared in previous statement
-    final VariableDeclaration? variableDeclaration = 
-      declarationStatement.variables.variables
-      .firstWhereOrNull(
-        (v) => v.name.toString() == returnVariableToken.toString(),
-      );
-    if (variableDeclaration == null) return;
+    final blockBody = statement.parent;
+    if (blockBody == null) return;
 
-    //Skipping mutable variables
-    if (!variableDeclaration.isFinal && !variableDeclaration.isConst) return;
+    final visitor = DontCreateAReturnVarVisitor(
+      returnVariableElement, 
+      statement,
+    );
+    blockBody.visitChildren(visitor);
 
-    reporter.atNode(expr, code);
+    if (!visitor.hasBadStatementCount()) return;
+
+    //it is 100% bad if return statement follows declaration
+    if (!visitor.foundTokensBetweenDeclarationAndReturn) {
+      reporter.atNode(statement, code);
+      return;
+    }
+
+    final declaration = visitor.variableDeclaration;
+    
+    //check if immutable
+    final initializer = declaration?.initializer;
+    if (initializer == null) return;
+
+    if (!_isExpressionImmutable(initializer)) return;
+
+    reporter.atNode(statement, code);
   }
   
+  bool _isExpressionImmutable(Expression expr) {
+    if (expr is Literal) return true;
+
+    if (expr case final PrefixedIdentifier prefixed) {
+      return
+        _isExpressionImmutable(prefixed.prefix)
+        && _isExpressionImmutable(prefixed.identifier);
+    }
+
+    if (expr case final BinaryExpression binExpr) {
+      return
+        _isExpressionImmutable(binExpr.leftOperand)
+        && _isExpressionImmutable(binExpr.rightOperand);
+    }
+
+    if (expr case final SimpleIdentifier identifier) {
+      return _isSimpleIdentifierImmutable(identifier);
+    }
+
+    return false;
+  }
+
+  bool _isSimpleIdentifierImmutable(SimpleIdentifier identifier) {
+    if (identifier.element
+      case final VariableElement2 variable
+      when variable.isFinal || variable.isConst
+      ) {
+        return true;
+    }
+
+    if (identifier.element is ClassElement2) return true;
+    
+    if (identifier.element case final GetterElement getter) {
+      if (getter.variable3
+        case final PropertyInducingElement2 property
+        when property.isFinal || property.isConst
+        ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 }
