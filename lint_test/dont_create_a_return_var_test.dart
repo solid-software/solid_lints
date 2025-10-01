@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, newline_before_return, no_empty_block
 
 /// Test the dont_create_a_return_var.
 /// Good code, trivial case.
@@ -90,7 +90,7 @@ int returnVarTestBadImmutableExpression() {
     + _TestClass.finalValue
     + testObj.finalField;
   _doNothing();
-  
+
   //expect_lint: dont_create_a_return_var
   return result;
 }
@@ -101,7 +101,6 @@ int _testValueEval() {
 
 /// This method is a placeholder for unpredictable behaviour
 /// which can potentially change any mutable variables
-//ignore: no_empty_block
 void _doNothing() { }
 
 //ignore: prefer_match_file_name
