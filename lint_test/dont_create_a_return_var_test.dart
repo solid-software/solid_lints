@@ -15,6 +15,10 @@ int returnVarTestReturnMutable() {
   return a;
 }
 
+int returnVarTestReturnParameter(int param) {
+  return param;
+}
+
 /// Test the dont_create_a_return_var.
 /// Caching mutable variable value.
 /// Unpredictable: may be useful to cache value
