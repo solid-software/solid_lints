@@ -90,3 +90,4 @@ custom_lint:
         - nullable
         - default
     - avoid_unnecessary_return_variable
+    - avoid_initstate_field_initialization

@@ -4,6 +4,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/avoid_final_with_getter_rule.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
+import 'package:solid_lints/src/lints/avoid_initstate_field_initialization/avoid_initstate_field_initialization_rule.dart';
 import 'package:solid_lints/src/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
@@ -69,6 +70,7 @@ class _SolidLints extends PluginBase {
       AvoidFinalWithGetterRule.createRule(configs),
       NamedParametersOrderingRule.createRule(configs),
       AvoidUnnecessaryReturnVariableRule.createRule(configs),
+      AvoidInitstateFieldInitializationRule.createRule(configs),
     ];
 
     // Return only enabled rules

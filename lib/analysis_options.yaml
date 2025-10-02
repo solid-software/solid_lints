@@ -43,6 +43,7 @@ custom_lint:
       ignored_types:
         - AnimationController
 
+    - avoid_initstate_field_initialization
     - avoid_non_null_assertion
     - avoid_returning_widgets
     - avoid_unnecessary_return_variable
