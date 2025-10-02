@@ -27,7 +27,7 @@ int returnVarTestCachedMutable() {
   var a = 1;
   final result = a;
   _doNothing();
-  
+
   return result;
 }
 
@@ -39,7 +39,7 @@ int returnVarTestReturnFollowsDeclaration() {
   final result = a;
 
   //Some comment here
-  
+
   //expect_lint: dont_create_a_return_var
   return result;
 }
@@ -52,7 +52,7 @@ int returnVarTestCachedAnotherMethodResult() {
   var a = 1;
   final result = _testValueEval();
   _doNothing();
-  
+
   return result;
 }
 
@@ -64,7 +64,7 @@ int returnVarTestCachedObjectField() {
   final obj = _TestClass();
   final result = obj.varField;
   _doNothing();
-  
+
   return result;
 }
 
@@ -75,7 +75,7 @@ int returnVarTestUsedVariable() {
   var a = 1;
   final result = 2;
   a += result;
-  
+
   return result;
 }
 
@@ -83,7 +83,7 @@ int returnVarTestUsedVariable() {
 /// Bad code, trivial example.
 int returnVarTestBadTrivial() {
   final result = 1;
-  
+
   //expect_lint: dont_create_a_return_var
   return result;
 }
@@ -95,13 +95,12 @@ int returnVarTestBadImmutableExpression() {
   const constLocal = 1;
   final finalLocal = 1;
   final testObj = _TestClass();
-  final result =
-    constLocal
-    + finalLocal
-    + 1 //const literal
-    + _TestClass.constValue
-    + _TestClass.finalValue
-    + testObj.finalField;
+  final result = constLocal +
+      finalLocal +
+      1 + //const literal
+      _TestClass.constValue +
+      _TestClass.finalValue +
+      testObj.finalField;
   _doNothing();
 
   //expect_lint: dont_create_a_return_var
@@ -114,7 +113,7 @@ int _testValueEval() {
 
 /// This method is a placeholder for unpredictable behaviour
 /// which can potentially change any mutable variables
-void _doNothing() { }
+void _doNothing() {}
 
 //ignore: prefer_match_file_name
 class _TestClass {

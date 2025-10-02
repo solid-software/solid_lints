@@ -17,26 +17,26 @@ class DontCreateAReturnVarVisitor extends RecursiveAstVisitor<void> {
   bool _foundTokensBetweenDeclarationAndReturn = false;
   VariableDeclaration? _variableDeclaration;
   int _variableStatementCounter = 0;
-  
+
   final ReturnStatement _returnStatement;
 
   /// After visiting holds info about whether there are any tokens
   /// between variable declaration and return statement
   bool get foundTokensBetweenDeclarationAndReturn =>
-    _foundTokensBetweenDeclarationAndReturn;
+      _foundTokensBetweenDeclarationAndReturn;
+
   /// Returns statement of local variable declaration
-  VariableDeclaration? get variableDeclaration
-    => _variableDeclaration;
+  VariableDeclaration? get variableDeclaration => _variableDeclaration;
 
   /// Creates a new instance of [DontCreateAReturnVarVisitor].
   DontCreateAReturnVarVisitor(
-    this._returnVariableElement, 
+    this._returnVariableElement,
     this._returnStatement,
   );
 
   /// Defines whether the variables is used in return statement only.
   bool hasBadStatementCount() =>
-    _variableStatementCounter == _badStatementCount;
+      _variableStatementCounter == _badStatementCount;
 
   @override
   void visitVariableDeclarationStatement(VariableDeclarationStatement node) {
@@ -48,34 +48,31 @@ class DontCreateAReturnVarVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if(node.element?.id == _returnVariableElement.id) {
+    if (node.element?.id == _returnVariableElement.id) {
       _variableStatementCounter++;
     }
 
     super.visitSimpleIdentifier(node);
   }
-  
+
   bool _collectVariableDeclaration(VariableDeclarationStatement node) {
-    final targetVariable =
-      node.variables.variables
-      .firstWhereOrNull(
-        (v)
-        => v.declaredElement2?.id == _returnVariableElement.id,
-      );
+    final targetVariable = node.variables.variables.firstWhereOrNull(
+      (v) => v.declaredElement2?.id == _returnVariableElement.id,
+    );
     if (targetVariable == null) return false;
 
     _variableDeclaration = targetVariable;
     return true;
   }
-  
+
   void _checkTokensInBetween(
-    VariableDeclarationStatement variableDeclaration, 
+    VariableDeclarationStatement variableDeclaration,
     ReturnStatement returnStatement,
   ) {
-    final tokenBeforeReturn = 
-      _returnStatement.findPrevious(_returnStatement.beginToken);
-    
-    if(tokenBeforeReturn != variableDeclaration.endToken) {
+    final tokenBeforeReturn =
+        _returnStatement.findPrevious(_returnStatement.beginToken);
+
+    if (tokenBeforeReturn != variableDeclaration.endToken) {
       _foundTokensBetweenDeclarationAndReturn = true;
     }
   }

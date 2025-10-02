@@ -14,17 +14,17 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example
 ///
 /// #### BAD:
-/// 
+///
 /// ```dart
 /// void x() {
 ///   final y = 1;
-/// 
+///
 ///   return y;
 /// }
 /// ```
-/// 
+///
 /// #### GOOD:
-/// 
+///
 /// ```dart
 /// void x() {
 ///   return 1;
@@ -35,7 +35,7 @@ class DontCreateAReturnVarRule extends SolidLintRule {
   /// This lint rule represents the error
   /// when unnecessary return variable statement is found
   static const lintName = 'dont_create_a_return_var';
-  
+
   DontCreateAReturnVarRule._(super.config);
 
   /// Creates a new instance of [DontCreateAReturnVarRule]
@@ -51,7 +51,6 @@ Rewrite the variable evaluation into return statement instead.""",
 
     return DontCreateAReturnVarRule._(rule);
   }
-
 
   @override
   void run(
@@ -79,16 +78,18 @@ Rewrite the variable evaluation into return statement instead.""",
     if (expr is! SimpleIdentifier) return;
 
     final element = expr.element;
-    if(element is! LocalVariableElement2) return;
+    if (element is! LocalVariableElement2) return;
     final returnVariableElement = element;
 
-    if(!returnVariableElement.isFinal && !returnVariableElement.isConst) return;
-    
+    if (!returnVariableElement.isFinal && !returnVariableElement.isConst) {
+      return;
+    }
+
     final blockBody = statement.parent;
     if (blockBody == null) return;
 
     final visitor = DontCreateAReturnVarVisitor(
-      returnVariableElement, 
+      returnVariableElement,
       statement,
     );
     blockBody.visitChildren(visitor);
@@ -102,7 +103,7 @@ Rewrite the variable evaluation into return statement instead.""",
     }
 
     final declaration = visitor.variableDeclaration;
-    
+
     //check if immutable
     final initializer = declaration?.initializer;
     if (initializer == null) return;
@@ -111,20 +112,18 @@ Rewrite the variable evaluation into return statement instead.""",
 
     reporter.atNode(statement, code);
   }
-  
+
   bool _isExpressionImmutable(Expression expr) {
     if (expr is Literal) return true;
 
     if (expr case final PrefixedIdentifier prefixed) {
-      return
-        _isExpressionImmutable(prefixed.prefix)
-        && _isExpressionImmutable(prefixed.identifier);
+      return _isExpressionImmutable(prefixed.prefix) &&
+          _isExpressionImmutable(prefixed.identifier);
     }
 
     if (expr case final BinaryExpression binExpr) {
-      return
-        _isExpressionImmutable(binExpr.leftOperand)
-        && _isExpressionImmutable(binExpr.rightOperand);
+      return _isExpressionImmutable(binExpr.leftOperand) &&
+          _isExpressionImmutable(binExpr.rightOperand);
     }
 
     if (expr case final SimpleIdentifier identifier) {
@@ -135,20 +134,16 @@ Rewrite the variable evaluation into return statement instead.""",
   }
 
   bool _isSimpleIdentifierImmutable(SimpleIdentifier identifier) {
-    if (identifier.element
-      case final VariableElement2 variable
-      when variable.isFinal || variable.isConst
-      ) {
-        return true;
+    if (identifier.element case final VariableElement2 variable
+        when variable.isFinal || variable.isConst) {
+      return true;
     }
 
     if (identifier.element is ClassElement2) return true;
-    
+
     if (identifier.element case final GetterElement getter) {
-      if (getter.variable3
-        case final PropertyInducingElement2 property
-        when property.isFinal || property.isConst
-        ) {
+      if (getter.variable3 case final PropertyInducingElement2 property
+          when property.isFinal || property.isConst) {
         return true;
       }
     }
