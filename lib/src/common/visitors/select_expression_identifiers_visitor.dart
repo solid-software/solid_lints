@@ -13,14 +13,4 @@ class SelectExpressionIdentifiersVisitor extends RecursiveAstVisitor<void> {
     super.visitSimpleIdentifier(node);
     _identifiers.add(node);
   }
-
-  /// Helper method to process expression, even if it is a SimpleIdentifier
-  void selectFromExpression(Expression expr) {
-    if (expr case final SimpleIdentifier identifier) {
-      _identifiers.add(identifier);
-      return;
-    }
-
-    expr.visitChildren(this);
-  }
 }

@@ -118,7 +118,7 @@ Rewrite the variable evaluation into return statement instead.""",
 
   bool _isExpressionImmutable(Expression expr) {
     final visitor = SelectExpressionIdentifiersVisitor();
-    visitor.selectFromExpression(expr);
+    expr.accept(visitor);
 
     return visitor.identifiers.every(_isSimpleIdentifierImmutable);
   }
