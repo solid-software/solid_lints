@@ -3,6 +3,7 @@ import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors/avoid_unnecessary_return_variable_visitor.dart';
+import 'package:solid_lints/src/common/visitors/select_expression_identifiers_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
@@ -116,23 +117,10 @@ Rewrite the variable evaluation into return statement instead.""",
   }
 
   bool _isExpressionImmutable(Expression expr) {
-    switch (expr) {
-      case Literal _:
-        return true;
+    final visitor = SelectExpressionIdentifiersVisitor();
+    visitor.selectFromExpression(expr);
 
-      case final PrefixedIdentifier prefixed:
-        return _isExpressionImmutable(prefixed.prefix) &&
-            _isExpressionImmutable(prefixed.identifier);
-
-      case final BinaryExpression binExpr:
-        return _isExpressionImmutable(binExpr.leftOperand) &&
-            _isExpressionImmutable(binExpr.rightOperand);
-
-      case final SimpleIdentifier identifier:
-        return _isSimpleIdentifierImmutable(identifier);
-    }
-
-    return false;
+    return visitor.identifiers.every(_isSimpleIdentifierImmutable);
   }
 
   bool _isSimpleIdentifierImmutable(SimpleIdentifier identifier) {
