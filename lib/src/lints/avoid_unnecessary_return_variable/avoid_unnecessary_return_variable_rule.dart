@@ -137,9 +137,8 @@ Rewrite the variable evaluation into return statement instead.""",
 
   bool _isSimpleIdentifierImmutable(SimpleIdentifier identifier) {
     switch (identifier.element) {
-      case final VariableElement2 variable
-          when variable.isFinal || variable.isConst:
-        return true;
+      case final VariableElement2 variable:
+        return variable.isFinal || variable.isConst;
 
       case ClassElement2 _:
         return true;
