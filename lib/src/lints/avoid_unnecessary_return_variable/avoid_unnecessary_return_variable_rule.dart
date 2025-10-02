@@ -2,8 +2,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors/avoid_unnecessary_return_variable_visitor.dart';
 import 'package:solid_lints/src/common/visitors/select_expression_identifiers_visitor.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors/avoid_unnecessary_return_variable_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
