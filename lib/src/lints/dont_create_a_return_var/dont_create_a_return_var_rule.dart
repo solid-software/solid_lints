@@ -114,38 +114,39 @@ Rewrite the variable evaluation into return statement instead.""",
   }
 
   bool _isExpressionImmutable(Expression expr) {
-    if (expr is Literal) return true;
+    switch (expr) {
+      case Literal _:
+        return true;
 
-    if (expr case final PrefixedIdentifier prefixed) {
-      return _isExpressionImmutable(prefixed.prefix) &&
-          _isExpressionImmutable(prefixed.identifier);
-    }
+      case final PrefixedIdentifier prefixed:
+        return _isExpressionImmutable(prefixed.prefix) &&
+            _isExpressionImmutable(prefixed.identifier);
 
-    if (expr case final BinaryExpression binExpr) {
-      return _isExpressionImmutable(binExpr.leftOperand) &&
-          _isExpressionImmutable(binExpr.rightOperand);
-    }
+      case final BinaryExpression binExpr:
+        return _isExpressionImmutable(binExpr.leftOperand) &&
+            _isExpressionImmutable(binExpr.rightOperand);
 
-    if (expr case final SimpleIdentifier identifier) {
-      return _isSimpleIdentifierImmutable(identifier);
+      case final SimpleIdentifier identifier:
+        return _isSimpleIdentifierImmutable(identifier);
     }
 
     return false;
   }
 
   bool _isSimpleIdentifierImmutable(SimpleIdentifier identifier) {
-    if (identifier.element case final VariableElement2 variable
-        when variable.isFinal || variable.isConst) {
-      return true;
-    }
-
-    if (identifier.element is ClassElement2) return true;
-
-    if (identifier.element case final GetterElement getter) {
-      if (getter.variable3 case final PropertyInducingElement2 property
-          when property.isFinal || property.isConst) {
+    switch (identifier.element) {
+      case final VariableElement2 variable
+          when variable.isFinal || variable.isConst:
         return true;
-      }
+
+      case ClassElement2 _:
+        return true;
+
+      case final GetterElement getter:
+        if (getter.variable3 case final PropertyInducingElement2 property
+            when property.isFinal || property.isConst) {
+          return true;
+        }
     }
 
     return false;
