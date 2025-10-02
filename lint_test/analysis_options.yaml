@@ -89,3 +89,4 @@ custom_lint:
         - required
         - nullable
         - default
+    - avoid_unnecessary_return_variable

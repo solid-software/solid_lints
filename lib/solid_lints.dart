@@ -7,6 +7,7 @@ import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule
 import 'package:solid_lints/src/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/avoid_unnecessary_return_variable_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/avoid_unnecessary_set_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_casts/avoid_unnecessary_type_casts_rule.dart';
@@ -67,6 +68,7 @@ class _SolidLints extends PluginBase {
       PreferEarlyReturnRule.createRule(configs),
       AvoidFinalWithGetterRule.createRule(configs),
       NamedParametersOrderingRule.createRule(configs),
+      AvoidUnnecessaryReturnVariableRule.createRule(configs),
     ];
 
     // Return only enabled rules

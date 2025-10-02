@@ -45,6 +45,7 @@ custom_lint:
 
     - avoid_non_null_assertion
     - avoid_returning_widgets
+    - avoid_unnecessary_return_variable
     - avoid_unnecessary_setstate
     - avoid_unnecessary_type_assertions
     - avoid_unnecessary_type_casts
