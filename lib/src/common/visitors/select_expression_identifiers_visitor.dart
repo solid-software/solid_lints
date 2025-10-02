@@ -10,7 +10,6 @@ class SelectExpressionIdentifiersVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    super.visitSimpleIdentifier(node);
     _identifiers.add(node);
   }
 }
