@@ -1,12 +1,12 @@
 // ignore_for_file: unused_local_variable, newline_before_return, no_empty_block
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Good code, trivial case.
 int returnVarTestGoodTrivial() {
   return 1;
 }
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Returning mutable variable should not trigger the lint.
 int returnVarTestReturnMutable() {
   var a = 1;
@@ -19,7 +19,7 @@ int returnVarTestReturnParameter(int param) {
   return param;
 }
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Caching mutable variable value.
 /// Unpredictable: may be useful to cache value
 /// before operation can change it.
@@ -31,7 +31,7 @@ int returnVarTestCachedMutable() {
   return result;
 }
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Caching mutable variable value, but return goes
 /// right after declaration, which makes it bad.
 int returnVarTestReturnFollowsDeclaration() {
@@ -40,11 +40,11 @@ int returnVarTestReturnFollowsDeclaration() {
 
   //Some comment here
 
-  //expect_lint: dont_create_a_return_var
+  //expect_lint: avoid_unnecessary_return_variable
   return result;
 }
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Caching another method result.
 /// Unpredictable: may be useful to cache value
 /// before operation can change it.
@@ -56,7 +56,7 @@ int returnVarTestCachedAnotherMethodResult() {
   return result;
 }
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Caching value of object's field.
 /// Unpredictable: may be useful to cache value
 /// before operation can change it.
@@ -68,7 +68,7 @@ int returnVarTestCachedObjectField() {
   return result;
 }
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Good: variable is created not only for return
 /// but is used in following expressions as well.
 int returnVarTestUsedVariable() {
@@ -79,16 +79,16 @@ int returnVarTestUsedVariable() {
   return result;
 }
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Bad code, trivial example.
 int returnVarTestBadTrivial() {
   final result = 1;
 
-  //expect_lint: dont_create_a_return_var
+  //expect_lint: avoid_unnecessary_return_variable
   return result;
 }
 
-/// Test the dont_create_a_return_var.
+/// Test the avoid_unnecessary_return_variable.
 /// Bad code: result expression is immutable,
 /// so can be written in return statement directly.
 int returnVarTestBadImmutableExpression() {
@@ -103,7 +103,7 @@ int returnVarTestBadImmutableExpression() {
       testObj.finalField;
   _doNothing();
 
-  //expect_lint: dont_create_a_return_var
+  //expect_lint: avoid_unnecessary_return_variable
   return result;
 }
 

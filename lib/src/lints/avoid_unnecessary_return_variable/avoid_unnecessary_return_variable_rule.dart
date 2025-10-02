@@ -2,12 +2,12 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/dont_create_a_return_var/visitors/dont_create_a_return_var_visitor.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors/avoid_unnecessary_return_variable_visitor.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-/// A `dont_create_a_return_var` rule which forbids returning an immutable
-/// variable if it can be rewritten in return statement itself.
+/// An `avoid_unnecessary_return_variable` rule which forbids returning
+/// an immutable variable if it can be rewritten in return statement itself.
 ///
 /// See more here: https://github.com/solid-software/solid_lints/issues/92
 ///
@@ -31,16 +31,18 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-class DontCreateAReturnVarRule extends SolidLintRule {
+class AvoidUnnecessaryReturnVariableRule extends SolidLintRule {
   /// This lint rule represents the error
   /// when unnecessary return variable statement is found
-  static const lintName = 'dont_create_a_return_var';
+  static const lintName = 'avoid_unnecessary_return_variable';
 
-  DontCreateAReturnVarRule._(super.config);
+  AvoidUnnecessaryReturnVariableRule._(super.config);
 
-  /// Creates a new instance of [DontCreateAReturnVarRule]
+  /// Creates a new instance of [AvoidUnnecessaryReturnVariableRule]
   /// based on the lint configuration.
-  factory DontCreateAReturnVarRule.createRule(CustomLintConfigs configs) {
+  factory AvoidUnnecessaryReturnVariableRule.createRule(
+    CustomLintConfigs configs,
+  ) {
     final rule = RuleConfig(
       configs: configs,
       name: lintName,
@@ -49,7 +51,7 @@ Avoid creating unnecessary variable only for return.
 Rewrite the variable evaluation into return statement instead.""",
     );
 
-    return DontCreateAReturnVarRule._(rule);
+    return AvoidUnnecessaryReturnVariableRule._(rule);
   }
 
   @override
@@ -88,7 +90,7 @@ Rewrite the variable evaluation into return statement instead.""",
     final blockBody = statement.parent;
     if (blockBody == null) return;
 
-    final visitor = DontCreateAReturnVarVisitor(
+    final visitor = AvoidUnnecessaryReturnVariableVisitor(
       returnVariableElement,
       statement,
     );

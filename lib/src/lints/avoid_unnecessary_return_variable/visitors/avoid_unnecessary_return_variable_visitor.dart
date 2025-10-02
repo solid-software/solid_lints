@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 
 /// This visitor is searches all uses of a single local variable,
 /// including variable declaration.
-class DontCreateAReturnVarVisitor extends RecursiveAstVisitor<void> {
+class AvoidUnnecessaryReturnVariableVisitor extends RecursiveAstVisitor<void> {
   /// The problem expects that exactly 1 mention of return variable.
   /// VariableDeclarationStatement doesn't count when visiting SimpleIdentifier.
   /// Any other amount of variable mentions implies that it is used somewhere
@@ -28,8 +28,8 @@ class DontCreateAReturnVarVisitor extends RecursiveAstVisitor<void> {
   /// Returns statement of local variable declaration
   VariableDeclaration? get variableDeclaration => _variableDeclaration;
 
-  /// Creates a new instance of [DontCreateAReturnVarVisitor].
-  DontCreateAReturnVarVisitor(
+  /// Creates a new instance of [AvoidUnnecessaryReturnVariableVisitor].
+  AvoidUnnecessaryReturnVariableVisitor(
     this._returnVariableElement,
     this._returnStatement,
   );

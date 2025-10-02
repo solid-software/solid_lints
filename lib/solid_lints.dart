@@ -7,6 +7,7 @@ import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule
 import 'package:solid_lints/src/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/avoid_unnecessary_return_variable_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/avoid_unnecessary_set_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_casts/avoid_unnecessary_type_casts_rule.dart';
@@ -14,7 +15,6 @@ import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unre
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
 import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_rule.dart';
-import 'package:solid_lints/src/lints/dont_create_a_return_var/dont_create_a_return_var_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
@@ -68,7 +68,7 @@ class _SolidLints extends PluginBase {
       PreferEarlyReturnRule.createRule(configs),
       AvoidFinalWithGetterRule.createRule(configs),
       NamedParametersOrderingRule.createRule(configs),
-      DontCreateAReturnVarRule.createRule(configs),
+      AvoidUnnecessaryReturnVariableRule.createRule(configs),
     ];
 
     // Return only enabled rules
