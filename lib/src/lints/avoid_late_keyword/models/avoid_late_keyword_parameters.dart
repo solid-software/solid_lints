@@ -37,7 +37,8 @@ class AvoidLateKeywordParameters {
   factory AvoidLateKeywordParameters.fromJson(Map<String, Object?> json) =>
       AvoidLateKeywordParameters(
         allowInitialized: json['allow_initialized'] as bool? ?? false,
-        ignoredTypes:
-            List<String>.from(json['ignored_types'] as Iterable? ?? []),
+        ignoredTypes: List<String>.from(
+          json['ignored_types'] as Iterable? ?? [],
+        ),
       );
 }

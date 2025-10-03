@@ -12,9 +12,11 @@ NamedType parseNamedTypeFromString(String typeString) {
 
     return namedTypeFinder.foundNamedType!;
   } catch (_) {
-    throw Exception("No NamedType could be parsed from the input "
-        "typeString: '$typeString'. Ensure it's a valid Dart "
-        "type declaration.");
+    throw Exception(
+      "No NamedType could be parsed from the input "
+      "typeString: '$typeString'. Ensure it's a valid Dart "
+      "type declaration.",
+    );
   }
 }
 
@@ -36,7 +38,7 @@ extension ChildNamedTypes on NamedType {
       typeArguments?.arguments.whereType<NamedType>().toList() ?? [];
 
   /// Gets the token name of this type instance.
-  String get tokenName => name2.toString();
+  String get tokenName => name.toString();
 
   /// Checks if the current token name is 'dynamic'.
   bool get isDynamic => tokenName == "dynamic";

@@ -187,8 +187,8 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
 
       final previousMemberGroup =
           hasSameGroup && lastMemberOrder.previousMemberGroup != null
-              ? lastMemberOrder.previousMemberGroup
-              : lastMemberOrder.memberGroup;
+          ? lastMemberOrder.previousMemberGroup
+          : lastMemberOrder.memberGroup;
 
       final memberNames = MemberNames(
         currentName: memberName,
@@ -199,16 +199,19 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
 
       return MemberOrder(
         memberNames: memberNames,
-        isAlphabeticallyWrong: hasSameGroup &&
+        isAlphabeticallyWrong:
+            hasSameGroup &&
             memberNames.currentName.compareTo(memberNames.previousName!) < 0,
-        isByTypeWrong: hasSameGroup &&
-            memberNames.currentTypeName
-                    .toLowerCase()
-                    .compareTo(memberNames.previousTypeName!.toLowerCase()) <
+        isByTypeWrong:
+            hasSameGroup &&
+            memberNames.currentTypeName.toLowerCase().compareTo(
+                  memberNames.previousTypeName!.toLowerCase(),
+                ) <
                 0,
         memberGroup: memberGroup,
         previousMemberGroup: previousMemberGroup,
-        isWrong: (hasSameGroup && lastMemberOrder.isWrong) ||
+        isWrong:
+            (hasSameGroup && lastMemberOrder.isWrong) ||
             _isCurrentGroupBefore(
               lastMemberOrder.memberGroup,
               memberGroup,
@@ -218,8 +221,10 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
     }
 
     return MemberOrder(
-      memberNames:
-          MemberNames(currentName: memberName, currentTypeName: typeName),
+      memberNames: MemberNames(
+        currentName: memberName,
+        currentTypeName: typeName,
+      ),
       isAlphabeticallyWrong: false,
       isByTypeWrong: false,
       memberGroup: memberGroup,

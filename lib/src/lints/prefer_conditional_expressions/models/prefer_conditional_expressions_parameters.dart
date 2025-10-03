@@ -23,8 +23,7 @@ class PreferConditionalExpressionsParameters {
   /// Method for creating from json data
   factory PreferConditionalExpressionsParameters.fromJson(
     Map<String, Object?> json,
-  ) =>
-      PreferConditionalExpressionsParameters(
-        ignoreNested: json[_ignoreNestedConfig] as bool? ?? false,
-      );
+  ) => PreferConditionalExpressionsParameters(
+    ignoreNested: json[_ignoreNestedConfig] as bool? ?? false,
+  );
 }

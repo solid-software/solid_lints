@@ -18,9 +18,9 @@ class RuleConfig<T extends Object?> {
     required CustomLintConfigs configs,
     required RuleProblemFactory<T> problemMessage,
     RuleParameterParser<T>? paramsParser,
-  })  : enabled = configs.rules[name]?.enabled ?? false,
-        parameters = paramsParser?.call(configs.rules[name]?.json ?? {}) as T,
-        _problemMessageFactory = problemMessage;
+  }) : enabled = configs.rules[name]?.enabled ?? false,
+       parameters = paramsParser?.call(configs.rules[name]?.json ?? {}) as T,
+       _problemMessageFactory = problemMessage;
 
   /// This lint rule represents the error.
   final String name;
@@ -36,8 +36,8 @@ class RuleConfig<T extends Object?> {
 
   /// [LintCode] which is generated based on the provided data.
   LintCode get lintCode => LintCode(
-        name: name,
-        problemMessage: _problemMessageFactory(parameters),
-        errorSeverity: error.ErrorSeverity.WARNING,
-      );
+    name: name,
+    problemMessage: _problemMessageFactory(parameters),
+    errorSeverity: error.DiagnosticSeverity.WARNING,
+  );
 }

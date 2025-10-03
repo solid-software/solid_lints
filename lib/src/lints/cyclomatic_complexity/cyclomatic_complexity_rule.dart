@@ -48,13 +48,14 @@ class CyclomaticComplexityRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlockFunctionBody((node) {
       context.registry.addDeclaration((declarationNode) {
-        final isIgnored =
-            config.parameters.exclude.shouldIgnore(declarationNode);
+        final isIgnored = config.parameters.exclude.shouldIgnore(
+          declarationNode,
+        );
         if (isIgnored) return;
 
         final visitor = CyclomaticComplexityFlowVisitor();

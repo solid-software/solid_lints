@@ -61,7 +61,8 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
       configs: configs,
       name: lintName,
       paramsParser: AvoidLateKeywordParameters.fromJson,
-      problemMessage: (_) => 'Avoid using the "late" keyword. '
+      problemMessage: (_) =>
+          'Avoid using the "late" keyword. '
           'It may result in runtime exceptions.',
     );
 
@@ -71,7 +72,7 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((node) {

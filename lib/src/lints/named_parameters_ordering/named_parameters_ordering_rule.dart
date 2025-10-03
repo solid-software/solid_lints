@@ -125,7 +125,7 @@ class NamedParametersOrderingRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFormalParameterList((node) {
@@ -150,7 +150,8 @@ class NamedParametersOrderingRule
 
     return LintCode(
       name: lintName,
-      problemMessage: "${parameterOrdering.displayName} named parameters"
+      problemMessage:
+          "${parameterOrdering.displayName} named parameters"
           " should be before "
           "${previousParameterOrdering!.displayName} named parameters.",
     );

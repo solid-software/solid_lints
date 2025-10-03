@@ -51,8 +51,8 @@ class NumberOfParametersRule
       name: lintName,
       paramsParser: NumberOfParametersParameters.fromJson,
       problemMessage: (value) =>
-          'The maximum allowed number of parameters is ${value.maxParameters}. '
-          'Try reducing the number of parameters.',
+          'The maximum allowed number of parameters is '
+          '${value.maxParameters}. Try reducing the number of parameters.',
     );
 
     return NumberOfParametersRule._(rule);
@@ -61,7 +61,7 @@ class NumberOfParametersRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
@@ -78,7 +78,7 @@ class NumberOfParametersRule
         reporter.atOffset(
           offset: node.firstTokenAfterCommentAndMetadata.offset,
           length: node.end,
-          errorCode: code,
+          diagnosticCode: code,
         );
       }
     });

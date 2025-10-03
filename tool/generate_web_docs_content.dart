@@ -25,14 +25,16 @@ void main(List<String> rawArgs) async {
     ..addOption(
       'docs-dir',
       abbr: 'o',
-      help: 'Parser output path. i.e "docusaurus/docs/Solid Lints" directory.'
+      help:
+          'Parser output path. i.e "docusaurus/docs/Solid Lints" directory.'
           'Please note that parent directory would be used to place the intro.md file',
       defaultsTo: docusaurusDefaultPath,
     )
     ..addOption(
       'readme',
       abbr: 'r',
-      help: 'Path to the README.md file that should be'
+      help:
+          'Path to the README.md file that should be'
           ' copied as docusaurus intro.md',
       defaultsTo: readmeDefaultPath,
     )

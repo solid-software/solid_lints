@@ -83,7 +83,7 @@ class ProperSuperCallsRule extends SolidLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration(
@@ -112,10 +112,11 @@ class ProperSuperCallsRule extends SolidLintRule {
     MethodDeclaration node,
     String methodName,
     List<Statement> statements,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
-    final hasOverrideAnnotation =
-        node.metadata.any((annotation) => annotation.name.name == _override);
+    final hasOverrideAnnotation = node.metadata.any(
+      (annotation) => annotation.name.name == _override,
+    );
 
     if (!hasOverrideAnnotation) return;
     if (methodName == _initState && !_isSuperInitStateCalledFirst(statements)) {
@@ -141,7 +142,8 @@ class ProperSuperCallsRule extends SolidLintRule {
     if (firstStatement is ExpressionStatement) {
       final expression = firstStatement.expression;
 
-      final isSuperInitStateCalledFirst = expression is MethodInvocation &&
+      final isSuperInitStateCalledFirst =
+          expression is MethodInvocation &&
           expression.target is SuperExpression &&
           expression.methodName.toString() == _initState;
 
@@ -160,7 +162,8 @@ class ProperSuperCallsRule extends SolidLintRule {
     if (lastStatement is ExpressionStatement) {
       final expression = lastStatement.expression;
 
-      final lastStatementIsSuperDispose = expression is MethodInvocation &&
+      final lastStatementIsSuperDispose =
+          expression is MethodInvocation &&
           expression.target is SuperExpression &&
           expression.methodName.toString() == _dispose;
 

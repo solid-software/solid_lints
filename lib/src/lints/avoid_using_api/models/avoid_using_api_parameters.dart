@@ -29,7 +29,7 @@ class AvoidUsingApiParameters {
   final List<AvoidUsingApiEntryParameters> entries;
 
   /// The default severity of the lint for each entry.
-  final ErrorSeverity? severity;
+  final DiagnosticSeverity? severity;
 
   /// Constructor for [AvoidUsingApiParameters] model
   const AvoidUsingApiParameters({
@@ -40,16 +40,15 @@ class AvoidUsingApiParameters {
   /// Method for creating from json data
   factory AvoidUsingApiParameters.fromJson(
     Map<String, Object?> json,
-  ) =>
-      AvoidUsingApiParameters(
-        entries: List<AvoidUsingApiEntryParameters>.from(
-          (json['entries'] as Iterable?)?.map(
-                (e) => AvoidUsingApiEntryParameters.fromJson(
-                  (e as YamlMap).toMap(),
-                ),
-              ) ??
-              [],
-        ),
-        severity: decodeErrorSeverity(json['severity'] as String?),
-      );
+  ) => AvoidUsingApiParameters(
+    entries: List<AvoidUsingApiEntryParameters>.from(
+      (json['entries'] as Iterable?)?.map(
+            (e) => AvoidUsingApiEntryParameters.fromJson(
+              (e as YamlMap).toMap(),
+            ),
+          ) ??
+          [],
+    ),
+    severity: decodeErrorSeverity(json['severity'] as String?),
+  );
 }

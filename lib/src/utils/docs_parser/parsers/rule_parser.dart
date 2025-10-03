@@ -24,12 +24,13 @@ class RuleParser extends BaseParser {
       path: rulePath,
       featureSet: FeatureSet.latestLanguageVersion(),
     );
-    final declaration =
-        ast.unit.declarations.whereType<ClassDeclaration>().firstWhereOrNull(
-              (declaration) =>
-                  declaration.documentationComment?.childEntities.isNotEmpty ??
-                  false,
-            );
+    final declaration = ast.unit.declarations
+        .whereType<ClassDeclaration>()
+        .firstWhereOrNull(
+          (declaration) =>
+              declaration.documentationComment?.childEntities.isNotEmpty ??
+              false,
+        );
 
     if (declaration == null) {
       throw 'Rule at the path "$rulePath" does not have documentation string';

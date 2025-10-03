@@ -61,7 +61,7 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpressionInvocation(
@@ -102,7 +102,7 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
   void _checkIdentifier({
     required Identifier identifier,
     required AstNode node,
-    required ErrorReporter reporter,
+    required DiagnosticReporter reporter,
   }) {
     if (!_isDebugPrintNode(identifier)) {
       return;
@@ -137,7 +137,7 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
   /// Handles variable assignment and declaration
   void _handleVariableAssignmentDeclaration({
     required AstNode node,
-    required ErrorReporter reporter,
+    required DiagnosticReporter reporter,
   }) {
     final rightOperand = _getRightOperand(node.childEntities.toList());
 
@@ -159,10 +159,10 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
       case PrefixedIdentifier():
         final prefix = node.prefix.name;
         name = node.name.replaceAll('$prefix.', '');
-        sourcePath = node.element?.library2?.uri.toString() ?? '';
+        sourcePath = node.element?.library?.uri.toString() ?? '';
       case SimpleIdentifier():
         name = node.name;
-        sourcePath = node.element?.library2?.uri.toString() ?? '';
+        sourcePath = node.element?.library?.uri.toString() ?? '';
 
       default:
         return false;
@@ -172,11 +172,10 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
   }
 
   bool _isNotReleaseCheck(Expression node) {
-    if (node.childEntities.toList()
-        case [
-          final Token token,
-          final Identifier identifier,
-        ]) {
+    if (node.childEntities.toList() case [
+      final Token token,
+      final Identifier identifier,
+    ]) {
       return token.type == TokenType.BANG &&
           _isReleaseModeIdentifier(identifier);
     }
@@ -193,10 +192,10 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
         final prefix = node.prefix.name;
 
         name = node.name.replaceAll('$prefix.', '');
-        sourcePath = node.element?.library2?.uri.toString() ?? '';
+        sourcePath = node.element?.library?.uri.toString() ?? '';
       case SimpleIdentifier():
         name = node.name;
-        sourcePath = node.element?.library2?.uri.toString() ?? '';
+        sourcePath = node.element?.library?.uri.toString() ?? '';
       default:
         return false;
     }

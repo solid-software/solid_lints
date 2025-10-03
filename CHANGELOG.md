@@ -1,6 +1,10 @@
 ## 0.3.2
 
 - Added `named_parameters_ordering` rule.
+- Update dependencies:
+  - Update min Dart SDK constraint to 3.8.0
+  - Update `analyzer` dependency to 8.1.1
+  - Update `custom_lint_builder` dependency to 0.8.1
 
 ## 0.3.1
 

@@ -43,9 +43,9 @@ enum Annotation {
 
   /// Parses a String name and returns instance of [Annotation]
   static Annotation parse(String? name) => values.firstWhere(
-        (annotation) =>
-            annotation.name == name ||
-            (annotation.publicName != null && annotation.publicName == name),
-        orElse: () => Annotation.unset,
-      );
+    (annotation) =>
+        annotation.name == name ||
+        (annotation.publicName != null && annotation.publicName == name),
+    orElse: () => Annotation.unset,
+  );
 }

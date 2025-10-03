@@ -43,7 +43,7 @@ enum FieldKeyword {
 
   /// Parses a String field type and returns instance of [FieldKeyword]
   static FieldKeyword parse(String? name) => values.firstWhere(
-        (type) => type.type == name,
-        orElse: () => FieldKeyword.unset,
-      );
+    (type) => type.type == name,
+    orElse: () => FieldKeyword.unset,
+  );
 }

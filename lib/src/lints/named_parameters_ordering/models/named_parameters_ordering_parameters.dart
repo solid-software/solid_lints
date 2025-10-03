@@ -39,10 +39,9 @@ class NamedParametersOrderingParameters {
   /// Method for creating from json data
   factory NamedParametersOrderingParameters.fromJson(
     Map<String, Object?> json,
-  ) =>
-      NamedParametersOrderingParameters(
-        order: NamedParametersConfigParser.parseOrder(
-          json[_orderConfig],
-        ),
-      );
+  ) => NamedParametersOrderingParameters(
+    order: NamedParametersConfigParser.parseOrder(
+      json[_orderConfig],
+    ),
+  );
 }

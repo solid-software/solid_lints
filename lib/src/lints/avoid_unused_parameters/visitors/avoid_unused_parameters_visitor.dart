@@ -23,7 +23,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/src/utils/node_utils.dart';
 import 'package:solid_lints/src/utils/parameter_utils.dart';
@@ -109,7 +109,9 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       body,
       parameters,
     );
-    return unused.whereNot(nameConsistsOfUnderscoresOnly).where(
+    return unused
+        .whereNot(nameConsistsOfUnderscoresOnly)
+        .where(
           (param) => !param.isNamed,
         );
   }
@@ -129,7 +131,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     for (final parameter in parameters) {
       final name = parameter.name;
       final isPresentInAll = allIdentifierElements.contains(
-        parameter.declaredFragment?.element.baseElement.nonSynthetic2,
+        parameter.declaredFragment?.element.baseElement.nonSynthetic,
       );
 
       /// Variables declared and initialized as 'Foo(this.param)'
@@ -172,7 +174,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
 }
 
 class _IdentifiersVisitor extends RecursiveAstVisitor<void> {
-  final elements = <Element2>{};
+  final elements = <Element>{};
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
@@ -195,7 +197,7 @@ class _InvocationsVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.name == methodName &&
-        node.element is MethodElement2 &&
+        node.element is MethodElement &&
         node.parent is ArgumentList) {
       hasTearOffInvocations = true;
     }

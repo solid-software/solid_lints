@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 /// A visitor that checks the association of the getter with
 /// the final private variable
@@ -10,7 +10,7 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
 
   /// Creates a new instance of [GetterVariableVisitor]
   GetterVariableVisitor(MethodDeclaration getter)
-      : _getterId = getter.getterReferenceId;
+    : _getterId = getter.getterReferenceId;
 
   /// Is there a variable associated with the getter
   VariableDeclaration? get variable => _variable;
@@ -36,8 +36,8 @@ extension on MethodDeclaration {
     final expression = (body as ExpressionFunctionBody).expression;
     if (expression is SimpleIdentifier) {
       final element = expression.element;
-      if (element is PropertyAccessorElement2) {
-        return element.variable3?.id;
+      if (element is PropertyAccessorElement) {
+        return element.variable.id;
       }
     }
 

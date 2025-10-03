@@ -45,8 +45,8 @@ class ExcludedIdentifiersListParameter {
   ) {
     final excludeList =
         json[ExcludedIdentifiersListParameter.excludeParameterName]
-                as Iterable? ??
-            [];
+            as Iterable? ??
+        [];
 
     return ExcludedIdentifiersListParameter.fromJson(
       excludeList: excludeList,
@@ -55,7 +55,7 @@ class ExcludedIdentifiersListParameter {
 
   /// Returns whether the target node should be ignored during analysis.
   bool shouldIgnore(Declaration node) {
-    final declarationName = node.declaredFragment?.name2;
+    final declarationName = node.declaredFragment?.name;
 
     final excludedItem = exclude.firstWhereOrNull(
       (e) {
