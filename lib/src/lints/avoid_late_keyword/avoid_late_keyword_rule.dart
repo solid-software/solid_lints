@@ -69,7 +69,7 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
   }
 
   @override
-  void run(
+  void runRule(
     CustomLintResolver resolver,
     ErrorReporter reporter,
     CustomLintContext context,
