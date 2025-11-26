@@ -1,21 +1,25 @@
 part of '../avoid_final_with_getter_rule.dart';
 
 class _FinalWithGetterFix extends DartFix {
+  final Expando<FinalWithGetterInfo> _diagnosticsInfoExpando;
+
+  _FinalWithGetterFix(this._diagnosticsInfoExpando);
+
   @override
   void run(
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    Diagnostic analysisError,
+    Diagnostic diagnostic,
     List<Diagnostic> others,
   ) {
     context.registry.addMethodDeclaration((node) {
-      if (analysisError.sourceRange.intersects(node.sourceRange)) {
-        final info = analysisError.data as FinalWithGetterInfo?;
-        if (info == null) return;
+      if (!diagnostic.sourceRange.intersects(node.sourceRange)) return;
 
-        _addReplacement(reporter, info);
-      }
+      final info = _diagnosticsInfoExpando[diagnostic];
+      if (info == null) return;
+
+      _addReplacement(reporter, info);
     });
   }
 
