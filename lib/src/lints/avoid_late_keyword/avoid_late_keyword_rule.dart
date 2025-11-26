@@ -71,7 +71,7 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((node) {

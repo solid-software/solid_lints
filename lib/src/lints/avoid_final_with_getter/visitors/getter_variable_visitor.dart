@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 /// A visitor that checks the association of the getter with
 /// the final private variable
@@ -31,14 +31,13 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
 
 extension on MethodDeclaration {
   int? get getterReferenceId {
-    if (body is! ExpressionFunctionBody) return null;
-
-    final expression = (body as ExpressionFunctionBody).expression;
-    if (expression is SimpleIdentifier) {
-      final element = expression.element;
-      if (element is PropertyAccessorElement2) {
-        return element.variable3?.id;
-      }
+    if (body
+        case ExpressionFunctionBody(
+          expression: SimpleIdentifier(
+            element: PropertyAccessorElement(:final variable)
+          )
+        )) {
+      return variable.id;
     }
 
     return null;

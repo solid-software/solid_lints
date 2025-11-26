@@ -12,12 +12,12 @@ bool nameConsistsOfUnderscoresOnly(FormalParameter parameter) {
 }
 
 /// Decodes the severity parameter from the string
-error.ErrorSeverity? decodeErrorSeverity(String? severity) {
+error.DiagnosticSeverity? decodeErrorSeverity(String? severity) {
   return switch (severity?.toLowerCase()) {
-    'info' => error.ErrorSeverity.INFO,
-    'warning' => error.ErrorSeverity.WARNING,
-    'error' => error.ErrorSeverity.ERROR,
-    'none' => error.ErrorSeverity.NONE,
+    'info' => error.DiagnosticSeverity.INFO,
+    'warning' => error.DiagnosticSeverity.WARNING,
+    'error' => error.DiagnosticSeverity.ERROR,
+    'none' => error.DiagnosticSeverity.NONE,
     _ => null,
   };
 }
@@ -31,7 +31,7 @@ extension LintCodeCopyWith on LintCode {
     String? correctionMessage,
     String? uniqueName,
     String? url,
-    error.ErrorSeverity? errorSeverity,
+    error.DiagnosticSeverity? errorSeverity,
   }) =>
       LintCode(
         name: name ?? this.name,

@@ -83,7 +83,7 @@ class ProperSuperCallsRule extends SolidLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration(
@@ -112,7 +112,7 @@ class ProperSuperCallsRule extends SolidLintRule {
     MethodDeclaration node,
     String methodName,
     List<Statement> statements,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     final hasOverrideAnnotation =
         node.metadata.any((annotation) => annotation.name.name == _override);

@@ -97,7 +97,7 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
             ? objectType.typeArguments.first
             : objectType;
 
-    if ((correctObjectType.element3 == castedType.element3) ||
+    if ((correctObjectType.element == castedType.element) ||
         castedType is DynamicType ||
         correctObjectType is DynamicType ||
         _isObjectAndEnum(correctObjectType, castedType)) {
@@ -106,7 +106,7 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
 
     if (correctObjectType is InterfaceType) {
       return correctObjectType.allSupertypes
-          .firstWhereOrNull((value) => value.element3 == castedType.element3);
+          .firstWhereOrNull((value) => value.element == castedType.element);
     }
 
     return null;
@@ -144,5 +144,5 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
 
   bool _isObjectAndEnum(DartType objectType, DartType castedType) =>
       objectType.isDartCoreObject &&
-      castedType.element3?.kind == ElementKind.ENUM;
+      castedType.element?.kind == ElementKind.ENUM;
 }

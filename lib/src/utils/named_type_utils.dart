@@ -36,7 +36,7 @@ extension ChildNamedTypes on NamedType {
       typeArguments?.arguments.whereType<NamedType>().toList() ?? [];
 
   /// Gets the token name of this type instance.
-  String get tokenName => name2.toString();
+  String get tokenName => name.toString();
 
   /// Checks if the current token name is 'dynamic'.
   bool get isDynamic => tokenName == "dynamic";

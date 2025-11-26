@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' as error;
+import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/listener.dart' as error_listener;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -33,7 +33,7 @@ class AvoidUnnecessaryTypeCastsRule extends SolidLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    error_listener.ErrorReporter reporter,
+    error_listener.DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAsExpression((node) {

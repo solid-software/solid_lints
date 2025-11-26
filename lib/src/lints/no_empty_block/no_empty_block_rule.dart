@@ -74,7 +74,7 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {

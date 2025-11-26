@@ -29,7 +29,7 @@ class AvoidUsingApiParameters {
   final List<AvoidUsingApiEntryParameters> entries;
 
   /// The default severity of the lint for each entry.
-  final ErrorSeverity? severity;
+  final DiagnosticSeverity? severity;
 
   /// Constructor for [AvoidUsingApiParameters] model
   const AvoidUsingApiParameters({

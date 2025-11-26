@@ -6,8 +6,8 @@ class _FinalWithGetterFix extends DartFix {
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    error.AnalysisError analysisError,
-    List<error.AnalysisError> others,
+    Diagnostic analysisError,
+    List<Diagnostic> others,
   ) {
     context.registry.addMethodDeclaration((node) {
       if (analysisError.sourceRange.intersects(node.sourceRange)) {
