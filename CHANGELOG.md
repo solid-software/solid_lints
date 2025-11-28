@@ -1,6 +1,7 @@
 ## 0.3.2
 
 - Added `named_parameters_ordering` rule.
+- Upgraded to analyzer: ^8.4.0 and custom_lint_builder: ^0.8.1
 
 ## 0.3.1
 
