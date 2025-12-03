@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart';
+import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/visitors/prefer_conditional_expressions_visitor.dart';
@@ -8,24 +8,30 @@ import 'package:solid_lints/src/lints/prefer_conditional_expressions/visitors/pr
 /// A Quick fix for `prefer_conditional_expressions` rule
 /// Suggests to remove unnecessary assertions
 class PreferConditionalExpressionsFix extends DartFix {
+  final Expando<StatementInfo> _diagnosticsInfoExpando;
+
+  /// A Quick fix for `prefer_conditional_expressions` rule
+  /// Suggests to remove unnecessary assertions
+  PreferConditionalExpressionsFix(this._diagnosticsInfoExpando);
+
   @override
   void run(
     CustomLintResolver resolver,
     ChangeReporter reporter,
     CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
+    Diagnostic diagnostic,
+    List<Diagnostic> others,
   ) {
     context.registry.addIfStatement((node) {
-      if (analysisError.sourceRange.intersects(node.sourceRange)) {
-        final statementInfo = analysisError.data as StatementInfo?;
-        if (statementInfo == null) return;
+      if (!diagnostic.sourceRange.intersects(node.sourceRange)) return;
 
-        final correction = _createCorrection(statementInfo);
-        if (correction == null) return;
+      final statementInfo = _diagnosticsInfoExpando[diagnostic];
+      if (statementInfo == null) return;
 
-        _addReplacement(reporter, statementInfo.statement, correction);
-      }
+      final correction = _createCorrection(statementInfo);
+      if (correction == null) return;
+
+      _addReplacement(reporter, statementInfo.statement, correction);
     });
   }
 

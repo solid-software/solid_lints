@@ -61,6 +61,8 @@ class PreferConditionalExpressionsRule
   /// parameters reaches the maximum value.
   static const lintName = 'prefer_conditional_expressions';
 
+  final _diagnosticsInfoExpando = Expando<StatementInfo>();
+
   PreferConditionalExpressionsRule._(super.config);
 
   /// Creates a new instance of [PreferConditionalExpressionsRule]
@@ -81,7 +83,7 @@ class PreferConditionalExpressionsRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {
@@ -91,15 +93,15 @@ class PreferConditionalExpressionsRule
       node.accept(visitor);
 
       for (final element in visitor.statementsInfo) {
-        reporter.atNode(
-          element.statement,
-          code,
-          data: element,
-        );
+        final diagnostic = reporter.atNode(element.statement, code);
+
+        _diagnosticsInfoExpando[diagnostic] = element;
       }
     });
   }
 
   @override
-  List<Fix> getFixes() => [PreferConditionalExpressionsFix()];
+  List<Fix> getFixes() => [
+        PreferConditionalExpressionsFix(_diagnosticsInfoExpando),
+      ];
 }

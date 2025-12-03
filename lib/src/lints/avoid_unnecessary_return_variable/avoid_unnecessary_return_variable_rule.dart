@@ -1,5 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/common/visitors/select_expression_identifiers_visitor.dart';
@@ -58,7 +58,7 @@ Rewrite the variable evaluation into return statement instead.""",
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement(
@@ -74,14 +74,14 @@ Rewrite the variable evaluation into return statement instead.""",
 
   void _checkReturnStatement({
     required ReturnStatement statement,
-    required ErrorReporter reporter,
+    required DiagnosticReporter reporter,
     required CustomLintContext context,
   }) {
     final expr = statement.expression;
     if (expr is! SimpleIdentifier) return;
 
     final element = expr.element;
-    if (element is! LocalVariableElement2) return;
+    if (element is! LocalVariableElement) return;
     final returnVariableElement = element;
 
     if (!returnVariableElement.isFinal && !returnVariableElement.isConst) {
@@ -125,17 +125,14 @@ Rewrite the variable evaluation into return statement instead.""",
 
   bool _isSimpleIdentifierImmutable(SimpleIdentifier identifier) {
     switch (identifier.element) {
-      case final VariableElement2 variable:
+      case final VariableElement variable:
         return variable.isFinal || variable.isConst;
 
-      case ClassElement2 _:
+      case ClassElement _:
         return true;
 
-      case final GetterElement getter:
-        if (getter.variable3 case final PropertyInducingElement2 property
-            when property.isFinal || property.isConst) {
-          return true;
-        }
+      case GetterElement(:final PropertyInducingElement variable):
+        return variable.isFinal || variable.isConst;
     }
 
     return false;

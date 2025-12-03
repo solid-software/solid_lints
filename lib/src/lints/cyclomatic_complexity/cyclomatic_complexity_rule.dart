@@ -48,7 +48,7 @@ class CyclomaticComplexityRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlockFunctionBody((node) {

@@ -1,13 +1,12 @@
-import 'package:analyzer/error/error.dart' as error;
+import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-part 'fixes/double_literal_format_fix.dart';
-
 part 'double_literal_format_utils.dart';
+part 'fixes/double_literal_format_fix.dart';
 
 /// A `double_literal_format` rule which
 /// checks that double literals should begin with 0. instead of just .,
@@ -74,7 +73,7 @@ class DoubleLiteralFormatRule extends SolidLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDoubleLiteral((node) {

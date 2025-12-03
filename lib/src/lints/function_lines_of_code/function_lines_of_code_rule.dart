@@ -45,7 +45,7 @@ class FunctionLinesOfCodeRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     void checkNode(AstNode node) => _checkNode(resolver, reporter, node);
@@ -76,7 +76,7 @@ class FunctionLinesOfCodeRule
 
   void _checkNode(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     AstNode node,
   ) {
     final visitor = FunctionLinesOfCodeVisitor(resolver.lineInfo);
@@ -84,7 +84,8 @@ class FunctionLinesOfCodeRule
 
     if (visitor.linesWithCode.length > config.parameters.maxLines) {
       if (node is! AnnotatedNode) {
-        return reporter.atNode(node, code);
+        reporter.atNode(node, code);
+        return;
       }
 
       final startOffset = node.firstTokenAfterCommentAndMetadata.offset;
@@ -93,7 +94,7 @@ class FunctionLinesOfCodeRule
       reporter.atOffset(
         offset: startOffset,
         length: node.length - lengthDifference,
-        errorCode: code,
+        diagnosticCode: code,
       );
     }
   }

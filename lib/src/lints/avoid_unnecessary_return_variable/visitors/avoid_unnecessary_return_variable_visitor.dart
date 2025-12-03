@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 
 /// This visitor is searches all uses of a single local variable,
@@ -9,10 +9,10 @@ class AvoidUnnecessaryReturnVariableVisitor extends RecursiveAstVisitor<void> {
   /// The problem expects that exactly 1 mention of return variable.
   /// VariableDeclarationStatement doesn't count when visiting SimpleIdentifier.
   /// Any other amount of variable mentions implies that it is used somewhere
-  /// except return, so its existance is justified.
+  /// except return, so its existence is justified.
   static const _badStatementCount = 1;
 
-  final LocalVariableElement2 _returnVariableElement;
+  final LocalVariableElement _returnVariableElement;
 
   bool _foundTokensBetweenDeclarationAndReturn = false;
   VariableDeclaration? _variableDeclaration;
@@ -57,7 +57,7 @@ class AvoidUnnecessaryReturnVariableVisitor extends RecursiveAstVisitor<void> {
 
   bool _collectVariableDeclaration(VariableDeclarationStatement node) {
     final targetVariable = node.variables.variables.firstWhereOrNull(
-      (v) => v.declaredElement2?.id == _returnVariableElement.id,
+      (v) => v.declaredFragment?.element.id == _returnVariableElement.id,
     );
     if (targetVariable == null) return false;
 

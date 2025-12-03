@@ -46,7 +46,7 @@ class AvoidUsingApiEntryParameters {
   final String? source;
 
   /// The default severity of the lint for each entry.
-  final ErrorSeverity? severity;
+  final DiagnosticSeverity? severity;
 
   /// Explain why the code is banned
   final String? reason;

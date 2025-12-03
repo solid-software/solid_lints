@@ -1,4 +1,4 @@
-import 'package:analyzer/error/error.dart' as error;
+import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -39,6 +39,8 @@ class AvoidFinalWithGetterRule extends SolidLintRule {
   /// the error whether we use final private fields with getters.
   static const lintName = 'avoid_final_with_getter';
 
+  final _diagnosticsInfoExpando = Expando<FinalWithGetterInfo>();
+
   AvoidFinalWithGetterRule._(super.config);
 
   /// Creates a new instance of [AvoidFinalWithGetterRule]
@@ -56,7 +58,7 @@ class AvoidFinalWithGetterRule extends SolidLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {
@@ -64,15 +66,13 @@ class AvoidFinalWithGetterRule extends SolidLintRule {
       node.accept(visitor);
 
       for (final element in visitor.getters) {
-        reporter.atNode(
-          element.getter,
-          code,
-          data: element,
-        );
+        final diagnostic = reporter.atNode(element.getter, code);
+
+        _diagnosticsInfoExpando[diagnostic] = element;
       }
     });
   }
 
   @override
-  List<Fix> getFixes() => [_FinalWithGetterFix()];
+  List<Fix> getFixes() => [_FinalWithGetterFix(_diagnosticsInfoExpando)];
 }

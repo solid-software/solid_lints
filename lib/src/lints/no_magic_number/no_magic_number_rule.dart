@@ -157,7 +157,7 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((node) {

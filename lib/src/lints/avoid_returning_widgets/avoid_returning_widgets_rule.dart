@@ -77,7 +77,7 @@ class AvoidReturningWidgetsRule
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDeclaration((node) {
