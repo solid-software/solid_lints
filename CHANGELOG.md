@@ -1,3 +1,7 @@
+## 0.3.3
+
+- Fix pub.dev analysis issue
+
 ## 0.3.2
 
 - Added `named_parameters_ordering` rule.
