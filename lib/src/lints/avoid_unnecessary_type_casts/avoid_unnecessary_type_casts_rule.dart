@@ -31,7 +31,7 @@ class AvoidUnnecessaryTypeCastsRule extends SolidLintRule {
   }
 
   @override
-  void run(
+  void runRule(
     CustomLintResolver resolver,
     error_listener.DiagnosticReporter reporter,
     CustomLintContext context,

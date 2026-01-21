@@ -75,7 +75,7 @@ class AvoidReturningWidgetsRule
   }
 
   @override
-  void run(
+  void runRule(
     CustomLintResolver resolver,
     DiagnosticReporter reporter,
     CustomLintContext context,

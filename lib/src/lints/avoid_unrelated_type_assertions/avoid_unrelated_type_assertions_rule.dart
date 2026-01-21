@@ -29,7 +29,7 @@ class AvoidUnrelatedTypeAssertionsRule extends SolidLintRule {
   }
 
   @override
-  void run(
+  void runRule(
     CustomLintResolver resolver,
     DiagnosticReporter reporter,
     CustomLintContext context,

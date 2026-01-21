@@ -87,7 +87,7 @@ class AvoidUsingApiRule extends SolidLintRule<AvoidUsingApiParameters> {
   }
 
   @override
-  Future<void> run(
+  Future<void> runRule(
     CustomLintResolver resolver,
     DiagnosticReporter reporter,
     CustomLintContext context,
