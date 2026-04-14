@@ -12,4 +12,6 @@ dependencies:
 dev_dependencies:
   solid_lints:
     path: ../
-  test: ^1.20.1
+  analyzer_testing: ^0.1.9
+  test_reflective_loader: ^0.3.0
+  test: ^1.25.0
