@@ -1,160 +1,122 @@
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart';
 
-/// An `avoid_debug_print_in_release` rule which forbids calling or referencing
-/// debugPrint function from flutter/foundation in release mode.
-///
-/// See more here: https://github.com/flutter/flutter/issues/147141
-///
-/// ### Example
-///
-/// #### BAD:
-///
-/// ```dart
-/// debugPrint(''); // LINT
-/// var ref = debugPrint; // LINT
-/// var ref2;
-/// ref2 = debugPrint; // LINT
-/// ```
-///
-/// #### GOOD:
-///
-/// ```dart
-/// if (!kReleaseMode) {
-///   debugPrint('');
-/// }
-/// ```
-///
-///
-class AvoidDebugPrintInReleaseRule extends SolidLintRule {
-  /// This lint rule represents
-  /// the error when debugPrint is called
-  static const lintName = 'avoid_debug_print_in_release';
+class AvoidDebugPrintInReleaseRule extends AnalysisRule {
+  /// The name of the lint
+  static const String lintName = 'avoid_debug_print_in_release';
 
+  static const LintCode code = LintCode(
+    lintName,
+    "Avoid using 'debugPrint' in release mode.",
+    correctionMessage: 'Wrap your debugPrint call in a !kReleaseMode check.',
+  );
+
+  AvoidDebugPrintInReleaseRule()
+      : super(
+          name: lintName,
+          description:
+              'Forbids calling or referencing debugPrint outside !kReleaseMode checks.',
+        );
+
+  @override
+  LintCode get diagnosticCode => code;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  ) {
+    final visitor = _Visitor(this);
+
+    registry.addFunctionExpressionInvocation(this, visitor);
+    registry.addVariableDeclaration(this, visitor);
+    registry.addAssignmentExpression(this, visitor);
+  }
+}
+
+class _Visitor extends SimpleAstVisitor<void> {
+  final AvoidDebugPrintInReleaseRule rule;
+
+  _Visitor(this.rule);
   static const String _kReleaseModePath =
       'package:flutter/src/foundation/constants.dart';
   static const String _kReleaseModeName = 'kReleaseMode';
-  static const _debugPrintPath = 'package:flutter/src/foundation/print.dart';
-  static const _debugPrintName = 'debugPrint';
+  static const String _debugPrintPath =
+      'package:flutter/src/foundation/print.dart';
+  static const String _debugPrintName = 'debugPrint';
 
-  AvoidDebugPrintInReleaseRule._(super.config);
+  @override
+  void visitFunctionExpressionInvocation(
+    FunctionExpressionInvocation node,
+  ) {
+    final func = node.function;
+    if (func is! Identifier) return;
 
-  /// Creates a new instance of [AvoidDebugPrintInReleaseRule]
-  /// based on the lint configuration.
-  factory AvoidDebugPrintInReleaseRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (_) => """
-Avoid using 'debugPrint' in release mode. Wrap 
-your `debugPrint` call in a `!kReleaseMode` check.""",
-    );
-
-    return AvoidDebugPrintInReleaseRule._(rule);
+    _checkIdentifier(identifier: func, node: node);
   }
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addFunctionExpressionInvocation(
-      (node) {
-        final func = node.function;
-        if (func is! Identifier) {
-          return;
-        }
-
-        _checkIdentifier(
-          identifier: func,
-          node: node,
-          reporter: reporter,
-        );
-      },
-    );
-
-    // addFunctionReference does not get triggered.
-    // addVariableDeclaration and addAssignmentExpression
-    // are used as a workaround for simple cases
-
-    context.registry.addVariableDeclaration((node) {
-      _handleVariableAssignmentDeclaration(
-        node: node,
-        reporter: reporter,
-      );
-    });
-
-    context.registry.addAssignmentExpression((node) {
-      _handleVariableAssignmentDeclaration(
-        node: node,
-        reporter: reporter,
-      );
-    });
+  void visitVariableDeclaration(VariableDeclaration node) {
+    _handleVariableAssignmentDeclaration(node);
   }
 
-  /// Checks whether the function identifier satisfies conditions
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    _handleVariableAssignmentDeclaration(node);
+  }
+
   void _checkIdentifier({
     required Identifier identifier,
     required AstNode node,
-    required DiagnosticReporter reporter,
   }) {
     if (!_isDebugPrintNode(identifier)) {
       return;
     }
 
-    final debugCheck = node.thisOrAncestorMatching(
-      (node) {
-        if (node is IfStatement) {
-          return _isNotReleaseCheck(node.expression);
-        }
-
-        return false;
-      },
-    );
+    final debugCheck = node.thisOrAncestorMatching((node) {
+      if (node is IfStatement) {
+        return _isNotReleaseCheck(node.expression);
+      }
+      return false;
+    });
 
     if (debugCheck != null) {
       return;
     }
 
-    reporter.atNode(node, code);
+    rule.reportAtNode(node);
   }
 
-  /// Returns null if doesn't have right operand
   SyntacticEntity? _getRightOperand(List<SyntacticEntity> entities) {
-    /// Example var t = 15; 15 is in 3d position
     if (entities.length < 3) {
       return null;
     }
     return entities[2];
   }
 
-  /// Handles variable assignment and declaration
-  void _handleVariableAssignmentDeclaration({
-    required AstNode node,
-    required DiagnosticReporter reporter,
-  }) {
+  void _handleVariableAssignmentDeclaration(AstNode node) {
     final rightOperand = _getRightOperand(node.childEntities.toList());
 
-    if (rightOperand == null || rightOperand is! Identifier) {
+    if (rightOperand is! Identifier) {
       return;
     }
 
     _checkIdentifier(
       identifier: rightOperand,
       node: node,
-      reporter: reporter,
     );
   }
 
   bool _isDebugPrintNode(Identifier node) {
     final String name;
     final String sourcePath;
+
     switch (node) {
       case PrefixedIdentifier():
         final prefix = node.prefix.name;
@@ -163,7 +125,6 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
       case SimpleIdentifier():
         name = node.name;
         sourcePath = node.element?.library?.uri.toString() ?? '';
-
       default:
         return false;
     }
@@ -173,10 +134,7 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
 
   bool _isNotReleaseCheck(Expression node) {
     if (node.childEntities.toList()
-        case [
-          final Token token,
-          final Identifier identifier,
-        ]) {
+        case [final Token token, final Identifier identifier]) {
       return token.type == TokenType.BANG &&
           _isReleaseModeIdentifier(identifier);
     }
@@ -191,7 +149,6 @@ your `debugPrint` call in a `!kReleaseMode` check.""",
     switch (node) {
       case PrefixedIdentifier():
         final prefix = node.prefix.name;
-
         name = node.name.replaceAll('$prefix.', '');
         sourcePath = node.element?.library?.uri.toString() ?? '';
       case SimpleIdentifier():

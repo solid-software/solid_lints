@@ -7,7 +7,6 @@ class AvoidGlobalStateRuleTest extends AnalysisRuleTest {
   @override
   void setUp() {
     rule = AvoidGlobalStateRule();
-
     super.setUp();
   }
 
