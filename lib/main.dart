@@ -22,8 +22,8 @@ class SolidLintsPlugin extends Plugin {
     registry.registerLintRule(
       AvoidGlobalStateRule(),
     );
-  }
-   registry.registerLintRule(
+    registry.registerLintRule(
       AvoidDebugPrintInReleaseRule(),
     );
+  }
 }
