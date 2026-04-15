@@ -1,9 +1,9 @@
 name: solid_lints_test
-description: A starting point for Dart libraries or applications.
+description: Test project for solid_lints rules
 publish_to: none
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
   flutter:
