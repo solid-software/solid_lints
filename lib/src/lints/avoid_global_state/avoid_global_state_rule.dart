@@ -50,8 +50,7 @@ class AvoidGlobalStateRule extends AnalysisRule {
   AvoidGlobalStateRule()
       : super(
           name: lintName,
-          description:
-              'Avoid top-level or static mutable variables to reduce shared mutable state.',
+          description: 'Avoid top-level or static mutable variables ',
         );
 
   @override
