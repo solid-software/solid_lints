@@ -1,8 +1,8 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/proper_super_calls/visitors/proper_super_calls_visitor.dart';
 
 /// Ensures that `super` calls are made in the correct order for the following
 /// StatefulWidget methods:
@@ -43,130 +43,50 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   super.dispose(); // OK
 /// }
 /// ```
-class ProperSuperCallsRule extends SolidLintRule {
-  /// This lint rule represents
-  /// the error whether the initState and dispose methods
-  /// are called in the incorrect order
-  static const lintName = 'proper_super_calls';
-  static const _initState = 'initState';
-  static const _dispose = 'dispose';
-  static const _override = 'override';
+class ProperSuperCallsRule extends AnalysisRule {
+  /// This lint rule name.
+  static const String lintName = 'proper_super_calls';
 
-  /// This lint rule represents
-  /// the error whether super.initState() should be called first
+  /// Error code for when super.initState() is not the first statement.
   static const _superInitStateCode = LintCode(
-    name: lintName,
-    problemMessage: "super.initState() should be first",
+    lintName,
+    "super.initState() should be first",
   );
 
-  /// This lint rule represents
-  /// the error whether super.dispose() should be called last
+  /// Error code for when super.dispose() is not the last statement.
   static const _superDisposeCode = LintCode(
-    name: lintName,
-    problemMessage: "super.dispose() should be last",
+    lintName,
+    "super.dispose() should be last",
   );
 
-  ProperSuperCallsRule._(super.config);
-
-  /// Creates a new instance of [ProperSuperCallsRule]
-  /// based on the lint configuration.
-  factory ProperSuperCallsRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      name: lintName,
-      configs: configs,
-      problemMessage: (_) => 'Proper super calls issue',
-    );
-
-    return ProperSuperCallsRule._(rule);
-  }
+  /// Creates a new instance of [ProperSuperCallsRule].
+  ProperSuperCallsRule()
+      : super(
+          name: lintName,
+          description:
+              'Ensures that `super` calls are made in the correct order ',
+        );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => _superInitStateCode;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addMethodDeclaration(
-      (node) {
-        final methodName = node.name.toString();
-        final body = node.body;
+    final visitor = ProperSuperCallsVisitor(
+      onViolation: (nameToken, {required bool isInitState}) {
+        // Access the reporter from the currentUnit
+        final reporter = context.currentUnit?.diagnosticReporter;
 
-        if (methodName case _initState || _dispose
-            when body is BlockFunctionBody) {
-          final statements = body.block.statements;
-
-          _checkSuperCalls(
-            node,
-            methodName,
-            statements,
-            reporter,
-          );
-        }
+        reporter?.atToken(
+          nameToken,
+          isInitState ? _superInitStateCode : _superDisposeCode,
+        );
       },
     );
-  }
 
-  /// This method report an error whether `super.initState()`
-  /// or `super.dispose()` are called incorrect
-  void _checkSuperCalls(
-    MethodDeclaration node,
-    String methodName,
-    List<Statement> statements,
-    DiagnosticReporter reporter,
-  ) {
-    final hasOverrideAnnotation =
-        node.metadata.any((annotation) => annotation.name.name == _override);
-
-    if (!hasOverrideAnnotation) return;
-    if (methodName == _initState && !_isSuperInitStateCalledFirst(statements)) {
-      reporter.atNode(
-        node,
-        _superInitStateCode,
-      );
-    }
-    if (methodName == _dispose && !_isSuperDisposeCalledLast(statements)) {
-      reporter.atNode(
-        node,
-        _superDisposeCode,
-      );
-    }
-  }
-
-  /// Returns `true` if `super.initState()` is called before other code in the
-  /// `initState` method, `false` otherwise.
-  bool _isSuperInitStateCalledFirst(List<Statement> statements) {
-    if (statements.isEmpty) return false;
-    final firstStatement = statements.first;
-
-    if (firstStatement is ExpressionStatement) {
-      final expression = firstStatement.expression;
-
-      final isSuperInitStateCalledFirst = expression is MethodInvocation &&
-          expression.target is SuperExpression &&
-          expression.methodName.toString() == _initState;
-
-      return isSuperInitStateCalledFirst;
-    }
-
-    return false;
-  }
-
-  /// Returns `true` if `super.dispose()` is called at the end of the `dispose`
-  /// method, `false` otherwise.
-  bool _isSuperDisposeCalledLast(List<Statement> statements) {
-    if (statements.isEmpty) return false;
-    final lastStatement = statements.last;
-
-    if (lastStatement is ExpressionStatement) {
-      final expression = lastStatement.expression;
-
-      final lastStatementIsSuperDispose = expression is MethodInvocation &&
-          expression.target is SuperExpression &&
-          expression.methodName.toString() == _dispose;
-
-      return lastStatementIsSuperDispose;
-    }
-
-    return false;
+    registry.addMethodDeclaration(this, visitor);
   }
 }
