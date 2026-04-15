@@ -12,17 +12,32 @@ void main() {
 class AvoidDebugPrintInReleaseRuleTest extends AnalysisRuleTest {
   @override
   void setUp() {
-    // We only need the parts of foundation.dart that our rule cares about.
-    newPackage('flutter')..addFile('lib/foundation.dart', r'''
-    const bool kReleaseMode = false;
-    const bool kDebugMode = true;
-    void debugPrint(String? message) {}
-  ''');
+    // Setting up a mock Flutter package structure
+    final flutter = newPackage('flutter');
+
+    // Core foundation providing the constants and the function
+    flutter.addFile('lib/foundation.dart', r'''
+      const bool kReleaseMode = false;
+      const bool kDebugMode = true;
+      void debugPrint(String? message) {}
+    ''');
+
+    // UI libraries that export foundation
+    flutter.addFile('lib/material.dart', r'''
+      export 'package:flutter/foundation.dart';
+    ''');
+
+    flutter.addFile('lib/cupertino.dart', r'''
+      export 'package:flutter/foundation.dart';
+    ''');
 
     rule = AvoidDebugPrintInReleaseRule();
 
     super.setUp();
   }
+
+  @override
+  String get analysisRule => AvoidDebugPrintInReleaseRule.lintName;
 
   void test_reports_debug_print_with_package_import() async {
     await assertDiagnostics(
@@ -59,14 +74,30 @@ void test() {
     );
   }
 
-  void test_does_not_report_guarded_call() async {
+  /// Case: if (kReleaseMode) { ... } is considered safe/safe-guarded logic.
+  void test_does_not_report_kReleaseMode_guard() async {
     await assertNoDiagnostics(
       r'''
 import 'package:flutter/foundation.dart';
 
 void test() {
-  if (!kReleaseMode) {
-    debugPrint('This is safe');
+  if (kReleaseMode) {
+    debugPrint('This is safe because it only runs in release');
+  }
+}
+''',
+    );
+  }
+
+  /// Case: if (!kDebugMode) { ... } is considered safe.
+  void test_does_not_report_not_kDebugMode_guard() async {
+    await assertNoDiagnostics(
+      r'''
+import 'package:flutter/foundation.dart';
+
+void test() {
+  if (!kDebugMode) {
+    debugPrint('Safe');
   }
 }
 ''',
@@ -83,6 +114,47 @@ void test() {
   }
 }
 ''',
+    );
+  }
+
+  /// Case: debugPrint is defined locally, not from Flutter.
+  void test_no_report_when_debugPrint_is_not_from_foundation() async {
+    await assertNoDiagnostics(
+      r'''
+void debugPrint(String message) {}
+
+void test() {
+  debugPrint('Not a flutter call');
+}
+''',
+    );
+  }
+
+  /// Case: debugPrint is imported via material.dart.
+  void test_reports_when_imported_via_material() async {
+    await assertDiagnostics(
+      r'''
+import 'package:flutter/material.dart';
+
+void test() {
+  debugPrint('Flagged via material');
+}
+''',
+      [lint(57, 10)],
+    );
+  }
+
+  /// Case: debugPrint is imported via cupertino.dart.
+  void test_reports_when_imported_via_cupertino() async {
+    await assertDiagnostics(
+      r'''
+import 'package:flutter/cupertino.dart';
+
+void test() {
+  debugPrint('Flagged via cupertino');
+}
+''',
+      [lint(58, 10)],
     );
   }
 }

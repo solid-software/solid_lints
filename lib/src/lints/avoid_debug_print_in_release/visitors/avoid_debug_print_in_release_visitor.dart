@@ -6,6 +6,10 @@ import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_p
 class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with this visitor.
   final AvoidDebugPrintInReleaseRule rule;
+  static const _foundationUri = 'package:flutter/foundation.dart';
+  static const _debugPrint = 'debugPrint';
+  static const _kReleaseMode = 'kReleaseMode';
+  static const _kDebugMode = 'kDebugMode';
 
   /// Creates an instance of [AvoidDebugPrintInReleaseVisitor].
   AvoidDebugPrintInReleaseVisitor(this.rule);
@@ -29,11 +33,12 @@ class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
     if (element == null) return;
 
 // Check the name
-    if (element.name == 'debugPrint') {
-      // Check if it's from the flutter/foundation path
+    if (element.name == _debugPrint) {
       final sourceUri = element.library?.uri.toString() ?? '';
-      final isFlutterFoundation =
-          sourceUri.contains('package:flutter/foundation.dart');
+
+      final isFlutterFoundation = sourceUri.contains(
+        _foundationUri,
+      );
 
       if (isFlutterFoundation) {
         if (!_isWrappedInReleaseCheck(node)) {
@@ -50,7 +55,7 @@ class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
         final expression = parent.expression;
         final source = expression.toString();
 
-        if (source.contains('kReleaseMode') || source.contains('kDebugMode')) {
+        if (source.contains(_kReleaseMode) || source.contains(_kDebugMode)) {
           return true;
         }
       }
