@@ -1,10 +1,8 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/avoid_non_null_assertion/visitors/avoid_non_null_assertion_visitor.dart';
 
 /// Rule which warns about usages of bang operator ("!")
 /// as it may result in unexpected runtime exceptions.
@@ -37,56 +35,32 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// final map = {'key': 'value'};
 /// map['key']!;
 /// ```
-class AvoidNonNullAssertionRule extends SolidLintRule {
-  /// This lint rule represents
-  /// the error whether we use bang operator.
-  static const lintName = 'avoid_non_null_assertion';
+class AvoidNonNullAssertionRule extends AnalysisRule {
+  /// Name of the lint
+  static const String lintName = 'avoid_non_null_assertion';
 
-  AvoidNonNullAssertionRule._(super.config);
+  /// Lint code used for suppression and reporting
+  static const LintCode code = LintCode(
+    lintName,
+    'Avoid using the bang operator. It may result in runtime exceptions.',
+  );
 
-  /// Creates a new instance of [AvoidNonNullAssertionRule]
-  /// based on the lint configuration.
-  factory AvoidNonNullAssertionRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (_) => 'Avoid using the bang operator. '
-          'It may result in runtime exceptions.',
-    );
-
-    return AvoidNonNullAssertionRule._(rule);
-  }
+  /// creates an instance of [AvoidNonNullAssertionRule]
+  AvoidNonNullAssertionRule()
+      : super(
+          name: lintName,
+          description:
+              'Warns about usages of bang operator (!) except valid Map access.',
+        );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => code;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addPostfixExpression((node) {
-      if (node.operator.type != TokenType.BANG) {
-        return;
-      }
-
-      // DCM's and Flutter's documentation treats "bang" as a valid way of
-      // accessing a Map. For compatibility it's excluded from this rule.
-      // See more:
-      // * https://dcm.dev/docs/rules/common/avoid-non-null-assertion
-      // * https://dart.dev/null-safety/understanding-null-safety#the-map-index-operator-is-nullable
-      final operand = node.operand;
-      if (operand is IndexExpression) {
-        final type = operand.target?.staticType;
-        final isInterface = type is InterfaceType;
-        final isMap = isInterface &&
-            (type.isDartCoreMap ||
-                type.allSupertypes.any((v) => v.isDartCoreMap));
-
-        if (isMap) {
-          return;
-        }
-      }
-
-      reporter.atNode(node, code);
-    });
+    registry.addPostfixExpression(this, AvoidNonNullAssertionVisitor(this));
   }
 }
