@@ -50,17 +50,30 @@ class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
 
   bool _isWrappedInReleaseCheck(AstNode node) {
     AstNode? parent = node.parent;
+
     while (parent != null) {
       if (parent is IfStatement) {
-        final expression = parent.expression;
-        final source = expression.toString();
+        final condition = parent.expression;
 
-        if (source.contains(_kReleaseMode) || source.contains(_kDebugMode)) {
+        // if (!kReleaseMode)
+        if (condition is PrefixExpression &&
+            condition.operator.lexeme == '!' &&
+            condition.operand is SimpleIdentifier) {
+          final operand = condition.operand as SimpleIdentifier;
+          if (operand.name == _kReleaseMode) {
+            return true;
+          }
+        }
+
+        // if (kDebugMode)
+        if (condition is SimpleIdentifier && condition.name == _kDebugMode) {
           return true;
         }
       }
+
       parent = parent.parent;
     }
+
     return false;
   }
 }
