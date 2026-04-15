@@ -1,5 +1,6 @@
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
+import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 
@@ -24,6 +25,9 @@ class SolidLintsPlugin extends Plugin {
     );
     registry.registerLintRule(
       AvoidNonNullAssertionRule(),
+    );
+    registry.registerLintRule(
+      AvoidDebugPrintInReleaseRule(),
     );
   }
 }
