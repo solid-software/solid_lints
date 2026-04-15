@@ -3,12 +3,12 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
 
 /// Visitor for [AvoidDebugPrintInReleaseRule].
-class AvoidDebugPrintInReleaseRuleVisitor extends SimpleAstVisitor<void> {
+class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with this visitor.
   final AvoidDebugPrintInReleaseRule rule;
 
-  /// Creates an instance of [AvoidDebugPrintInReleaseRuleVisitor].
-  AvoidDebugPrintInReleaseRuleVisitor(this.rule);
+  /// Creates an instance of [AvoidDebugPrintInReleaseVisitor].
+  AvoidDebugPrintInReleaseVisitor(this.rule);
 
   @override
   void visitMethodInvocation(MethodInvocation node) {

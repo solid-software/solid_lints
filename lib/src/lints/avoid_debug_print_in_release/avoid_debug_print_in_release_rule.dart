@@ -1,10 +1,8 @@
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
-import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule_visitor.dart';
+import 'package:solid_lints/src/lints/avoid_debug_print_in_release/visitors/avoid_debug_print_in_release_visitor.dart';
 
 /// An `avoid_debug_print_in_release` rule which forbids calling or referencing
 /// debugPrint function from flutter/foundation in release mode.
@@ -55,7 +53,7 @@ class AvoidDebugPrintInReleaseRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = AvoidDebugPrintInReleaseRuleVisitor(this);
+    final visitor = AvoidDebugPrintInReleaseVisitor(this);
     registry.addMethodInvocation(this, visitor);
     registry.addSimpleIdentifier(this, visitor);
   }

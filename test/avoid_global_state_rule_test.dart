@@ -66,7 +66,7 @@ class Test {
 ''');
   }
 
-  void test_does_not_report_local_method_variables() async {
+  void test_does_not_report_local_variables() async {
     await assertNoDiagnostics(r'''
 void m() {
   int localMutable = 0;
