@@ -8,7 +8,7 @@ import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule
 /// allowing them to run during static analysis.
 final plugin = SolidLintsPlugin();
 
-/// An analysis server plugin that provides Solid Lints rules.
+/// An analysis server plugin that provides Solid lint rules.
 ///
 /// This plugin registers custom lint rules and enables them to be executed
 /// by the Dart analyzer during code analysis.

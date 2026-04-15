@@ -3,12 +3,12 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
 
 /// Visitor for [AvoidGlobalStateRule].
-class AvoidGlobalStateRuleVisitor extends SimpleAstVisitor<void> {
+class AvoidGlobalStateVisitor extends SimpleAstVisitor<void> {
   /// The rule this visitor is associated with.
   final AvoidGlobalStateRule rule;
 
-  /// Creates an instance of [AvoidGlobalStateRuleVisitor].
-  AvoidGlobalStateRuleVisitor(this.rule);
+  /// Creates an instance of [AvoidGlobalStateVisitor].
+  AvoidGlobalStateVisitor(this.rule);
 
   @override
   void visitTopLevelVariableDeclaration(TopLevelVariableDeclaration node) {
