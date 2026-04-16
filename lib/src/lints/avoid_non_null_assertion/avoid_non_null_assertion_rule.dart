@@ -40,7 +40,7 @@ class AvoidNonNullAssertionRule extends AnalysisRule {
   static const String lintName = 'avoid_non_null_assertion';
 
   /// Lint code used for suppression and reporting
-  static const LintCode code = LintCode(
+  static const LintCode _code = LintCode(
     lintName,
     'Avoid using the bang operator. It may result in runtime exceptions.',
   );
@@ -54,7 +54,7 @@ class AvoidNonNullAssertionRule extends AnalysisRule {
         );
 
   @override
-  LintCode get diagnosticCode => code;
+  LintCode get diagnosticCode => _code;
 
   @override
   void registerNodeProcessors(
