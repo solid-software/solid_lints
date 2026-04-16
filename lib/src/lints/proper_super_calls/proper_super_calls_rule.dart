@@ -44,49 +44,43 @@ import 'package:solid_lints/src/lints/proper_super_calls/visitors/proper_super_c
 /// }
 /// ```
 class ProperSuperCallsRule extends AnalysisRule {
-  /// This lint rule name.
+  /// Lint rule name.
   static const String lintName = 'proper_super_calls';
 
-  /// Error code for when super.initState() is not the first statement.
-  static const _superInitStateCode = LintCode(
+  /// Error code for invalid `super.initState()` placement.
+  static const LintCode superInitStateCode = LintCode(
     lintName,
-    "super.initState() should be first",
+    'super.initState() should be first',
   );
 
-  /// Error code for when super.dispose() is not the last statement.
-  static const _superDisposeCode = LintCode(
+  /// Error code for invalid `super.dispose()` placement.
+  static const LintCode superDisposeCode = LintCode(
     lintName,
-    "super.dispose() should be last",
+    'super.dispose() should be last',
   );
 
-  /// Creates a new instance of [ProperSuperCallsRule].
+  /// Creates an instance of [ProperSuperCallsRule].
   ProperSuperCallsRule()
       : super(
           name: lintName,
           description:
-              'Ensures that `super` calls are made in the correct order ',
+              'Ensures proper ordering of Flutter lifecycle super calls.',
         );
 
   @override
-  LintCode get diagnosticCode => _superInitStateCode;
+  LintCode get diagnosticCode => superInitStateCode;
 
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = ProperSuperCallsVisitor(
-      onViolation: (nameToken, {required bool isInitState}) {
-        // Access the reporter from the currentUnit
-        final reporter = context.currentUnit?.diagnosticReporter;
-
-        reporter?.atToken(
-          nameToken,
-          isInitState ? _superInitStateCode : _superDisposeCode,
-        );
-      },
+    registry.addMethodDeclaration(
+      this,
+      ProperSuperCallsVisitor(
+        rule: this,
+        context: context,
+      ),
     );
-
-    registry.addMethodDeclaration(this, visitor);
   }
 }

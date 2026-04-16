@@ -1,65 +1,112 @@
+import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 
-/// Visitor for the proper [ProperSuperCallsRule].
+/// Visitor for [ProperSuperCallsRule].
 class ProperSuperCallsVisitor extends SimpleAstVisitor<void> {
-  /// Callback to report violations.
-  final void Function(Token name, {required bool isInitState}) onViolation;
+  /// The rule associated with this visitor.
+  final ProperSuperCallsRule rule;
+
+  /// The context associated with this visitor.
+  final RuleContext context;
 
   static const _initState = 'initState';
   static const _dispose = 'dispose';
-  static const _override = 'override';
+  static const _flutterStateClass = 'State';
 
   /// Creates a new instance of [ProperSuperCallsVisitor].
-  ProperSuperCallsVisitor({required this.onViolation});
+  ProperSuperCallsVisitor({
+    required this.rule,
+    required this.context,
+  });
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
     final methodName = node.name.lexeme;
     final body = node.body;
 
-    if ((methodName == _initState || methodName == _dispose) &&
-        body is BlockFunctionBody) {
-      final hasOverride = node.metadata.any(
-        (annotation) => annotation.name.name == _override,
+    if ((methodName != _initState && methodName != _dispose) ||
+        body is! BlockFunctionBody) {
+      return;
+    }
+
+    if (!_overridesFlutterStateMethod(node)) {
+      return;
+    }
+
+    final statements = body.block.statements;
+    final reporter = context.currentUnit?.diagnosticReporter;
+
+    if (reporter == null) return;
+
+    if (methodName == _initState &&
+        !_isSuperCallFirst(statements, _initState)) {
+      reporter.atToken(
+        node.name,
+        ProperSuperCallsRule.superInitStateCode,
       );
-      if (!hasOverride) return;
+    }
 
-      final statements = body.block.statements;
-
-      // Logic for initState: super.initState() must be the very first statement.
-      if (methodName == _initState &&
-          !_isSuperCallFirst(statements, _initState)) {
-        onViolation(node.name, isInitState: true);
-      }
-
-      // Logic for dispose: super.dispose() must be the very last statement.
-      if (methodName == _dispose && !_isSuperCallLast(statements, _dispose)) {
-        onViolation(node.name, isInitState: false);
-      }
+    if (methodName == _dispose && !_isSuperCallLast(statements, _dispose)) {
+      reporter.atToken(
+        node.name,
+        ProperSuperCallsRule.superDisposeCode,
+      );
     }
   }
 
-  /// Returns true if the first statement is the expected super call.
+  bool _overridesFlutterStateMethod(MethodDeclaration node) {
+    final classElement = node.declaredFragment?.element.enclosingElement;
+
+    if (classElement is! ClassElement) {
+      return false;
+    }
+
+    final methodName = node.name.lexeme;
+
+    final supertype = classElement.supertype;
+
+    if (supertype == null) {
+      return false;
+    }
+
+    final isStateSubclass = _isStateSubclass(supertype);
+
+    if (!isStateSubclass) {
+      return false;
+    }
+
+    return methodName == _initState || methodName == _dispose;
+  }
+
+  bool _isStateSubclass(InterfaceType supertype) {
+    final isStateSubclass = supertype.element.name == _flutterStateClass ||
+        supertype.allSupertypes.any(
+          (t) => t.element.name == _flutterStateClass,
+        );
+    return isStateSubclass;
+  }
+
   bool _isSuperCallFirst(List<Statement> statements, String name) {
     return statements.isNotEmpty && _isTargetSuperCall(statements.first, name);
   }
 
-  /// Returns true if the last statement is the expected super call.
   bool _isSuperCallLast(List<Statement> statements, String name) {
     return statements.isNotEmpty && _isTargetSuperCall(statements.last, name);
   }
 
-  /// Checks if a statement is a [MethodInvocation] on [SuperExpression].
   bool _isTargetSuperCall(Statement statement, String name) {
-    if (statement is ExpressionStatement) {
-      final expr = statement.expression;
-      return expr is MethodInvocation &&
-          expr.target is SuperExpression &&
-          expr.methodName.name == name;
+    if (statement is! ExpressionStatement) {
+      return false;
     }
-    return false;
+
+    final expression = statement.expression;
+
+    return expression is MethodInvocation &&
+        expression.target is SuperExpression &&
+        expression.methodName.name == name;
   }
 }
