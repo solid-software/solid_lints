@@ -31,8 +31,6 @@ class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    /// Catch cases where debugPrint is passed as a reference:
-    /// final x = debugPrint;
     if (node.parent is! MethodInvocation) {
       _check(node, node);
     }
@@ -42,7 +40,6 @@ class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
     final element = identifier.element;
     if (element == null) return;
 
-// Check the name
     if (element.name == _debugPrint) {
       final sourceUri = element.library?.uri.toString() ?? '';
 
