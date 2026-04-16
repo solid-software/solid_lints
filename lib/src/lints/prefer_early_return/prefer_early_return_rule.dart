@@ -32,23 +32,20 @@ import 'package:solid_lints/src/lints/prefer_early_return/visitors/prefer_early_
 /// }
 /// ```
 class PreferEarlyReturnRule extends AnalysisRule {
-  /// The name of the lint
+  /// Lint name
   static const String lintName = 'prefer_early_return';
-
-  /// The message shown when the lint is triggered
-  static const String lintMessage = 'Use reverse if to reduce nesting';
 
   /// Lint code
   static const LintCode _code = LintCode(
     lintName,
-    lintMessage,
+    "Use reverse if to reduce nesting",
   );
 
-  /// Creates a new instance of [PreferEarlyReturnRule]
+  /// Creates an instance of [PreferEarlyReturnRule]
   PreferEarlyReturnRule()
       : super(
           name: lintName,
-          description: lintMessage,
+          description: 'Use reverse if to reduce nesting',
         );
 
   @override
@@ -59,7 +56,12 @@ class PreferEarlyReturnRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = PreferEarlyReturnVisitor(this);
-    registry.addBlockFunctionBody(this, visitor);
+    registry.addBlockFunctionBody(
+      this,
+      PreferEarlyReturnVisitor(
+        rule: this,
+        context: context,
+      ),
+    );
   }
 }
