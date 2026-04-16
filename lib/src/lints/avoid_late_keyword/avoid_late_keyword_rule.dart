@@ -1,10 +1,10 @@
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_late_keyword/models/avoid_late_keyword_parameters.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
-import 'package:solid_lints/src/utils/types_utils.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/avoid_late_keyword/visitors/avoid_late_keyword_visitor.dart';
 
 /// Avoid `late` keyword
 ///
@@ -47,63 +47,29 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 ///   }
 /// }
 /// ```
-class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
-  /// This lint rule represents
-  /// the error whether we use `late` keyword.
-  static const lintName = 'avoid_late_keyword';
+class AvoidLateKeywordRule extends AnalysisRule {
+  static const String _lintName = 'avoid_late_keyword';
 
-  AvoidLateKeywordRule._(super.config);
+  static const LintCode _code = LintCode(
+    _lintName,
+    'Avoid using the "late" keyword. It may result in runtime exceptions.',
+  );
 
-  /// Creates a new instance of [AvoidLateKeywordRule]
-  /// based on the lint configuration.
-  factory AvoidLateKeywordRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      paramsParser: AvoidLateKeywordParameters.fromJson,
-      problemMessage: (_) => 'Avoid using the "late" keyword. '
-          'It may result in runtime exceptions.',
-    );
-
-    return AvoidLateKeywordRule._(rule);
-  }
+  /// Creates an instance of [AvoidLateKeywordRule].
+  AvoidLateKeywordRule()
+      : super(
+          name: _lintName,
+          description: 'Warns against using the late keyword.',
+        );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => _code;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addVariableDeclaration((node) {
-      if (_shouldLint(node)) {
-        reporter.atNode(node, code);
-      }
-    });
-  }
-
-  bool _shouldLint(VariableDeclaration node) {
-    final isLateDeclaration = node.isLate;
-    if (!isLateDeclaration) return false;
-
-    final hasIgnoredType = _hasIgnoredType(node);
-    if (hasIgnoredType) return false;
-
-    final allowInitialized = config.parameters.allowInitialized;
-    if (!allowInitialized) return true;
-
-    final hasInitializer = node.initializer != null;
-    return !hasInitializer;
-  }
-
-  bool _hasIgnoredType(VariableDeclaration node) {
-    final ignoredTypes = config.parameters.ignoredTypes.toSet();
-    if (ignoredTypes.isEmpty) return false;
-
-    final variableType = node.declaredFragment?.element.type;
-    if (variableType == null) return false;
-
-    return variableType.hasIgnoredType(
-      ignoredTypes: ignoredTypes,
-    );
+    registry.addVariableDeclaration(this, AvoidLateKeywordVisitor(this));
   }
 }
