@@ -35,7 +35,7 @@ class AvoidDebugPrintInReleaseRule extends AnalysisRule {
   static const String lintName = 'avoid_debug_print_in_release';
 
   /// Lint code used for suppression and reporting.
-  static const LintCode code = LintCode(
+  static const LintCode _code = LintCode(
     lintName,
     'Avoid debugPrint in release mode.',
     correctionMessage: 'Wrap in a kReleaseMode check or use a logging package.',
@@ -46,7 +46,7 @@ class AvoidDebugPrintInReleaseRule extends AnalysisRule {
       : super(name: lintName, description: 'Avoid debugPrint in release mode.');
 
   @override
-  LintCode get diagnosticCode => code;
+  LintCode get diagnosticCode => _code;
 
   @override
   void registerNodeProcessors(

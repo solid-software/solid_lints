@@ -170,4 +170,17 @@ void test() {
       [lint(58, 10)],
     );
   }
+
+  void test_reports_debug_print_call_method() async {
+    await assertDiagnostics(
+      r'''
+import 'package:flutter/foundation.dart';
+
+void test() {
+  debugPrint.call('This should be flagged');
+}
+''',
+      [lint(59, 10)],
+    );
+  }
 }
