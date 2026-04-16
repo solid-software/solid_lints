@@ -39,7 +39,7 @@ class AvoidGlobalStateRule extends AnalysisRule {
   static const String lintName = 'avoid_global_state';
 
   /// Lint code used for suppression and reporting.
-  static const LintCode code = LintCode(
+  static const LintCode _code = LintCode(
     lintName,
     'Avoid variables that can be globally mutated.',
     correctionMessage:
@@ -54,7 +54,7 @@ class AvoidGlobalStateRule extends AnalysisRule {
         );
 
   @override
-  LintCode get diagnosticCode => code;
+  LintCode get diagnosticCode => _code;
 
   @override
   void registerNodeProcessors(
