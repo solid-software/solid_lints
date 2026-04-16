@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
 
@@ -6,12 +7,11 @@ import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_p
 class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with this visitor.
   final AvoidDebugPrintInReleaseRule rule;
-
   static const _foundationUri = 'package:flutter/foundation.dart';
   static const _debugPrint = 'debugPrint';
-  static const _callMethod = 'call';
   static const _kReleaseMode = 'kReleaseMode';
   static const _kDebugMode = 'kDebugMode';
+  static const _callMethod = 'call';
 
   /// Creates an instance of [AvoidDebugPrintInReleaseVisitor].
   AvoidDebugPrintInReleaseVisitor(this.rule);
@@ -31,16 +31,9 @@ class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    final parent = node.parent;
-
-    final isDirectInvocation =
-        parent is MethodInvocation && parent.methodName == node;
-
-    final isCallTarget = parent is MethodInvocation &&
-        parent.methodName.name == _callMethod &&
-        parent.target == node;
-
-    if (!isDirectInvocation && !isCallTarget) {
+    /// Catch cases where debugPrint is passed as a reference:
+    /// final x = debugPrint;
+    if (node.parent is! MethodInvocation) {
       _check(node, node);
     }
   }
@@ -49,19 +42,23 @@ class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
     final element = identifier.element;
     if (element == null) return;
 
-    if (element.name != _debugPrint) return;
+// Check the name
+    if (element.name == _debugPrint) {
+      final sourceUri = element.library?.uri.toString() ?? '';
 
-    final sourceUri = element.library?.uri.toString() ?? '';
-    final isFlutterFoundation = sourceUri.contains(_foundationUri);
+      final isFlutterFoundation = sourceUri.contains(
+        _foundationUri,
+      );
 
-    if (!isFlutterFoundation) return;
-
-    if (!_isWrappedInSafeDebugCheck(node)) {
-      rule.reportAtNode(identifier);
+      if (isFlutterFoundation) {
+        if (!_isWrappedInReleaseCheck(node)) {
+          rule.reportAtNode(identifier);
+        }
+      }
     }
   }
 
-  bool _isWrappedInSafeDebugCheck(AstNode node) {
+  bool _isWrappedInReleaseCheck(AstNode node) {
     AstNode? parent = node.parent;
 
     while (parent != null) {
@@ -81,7 +78,7 @@ class AvoidDebugPrintInReleaseVisitor extends SimpleAstVisitor<void> {
 
   bool _isNotReleaseModeCheck(Expression condition) {
     return condition is PrefixExpression &&
-        condition.operator.lexeme == '!' &&
+        condition.operator.type == TokenType.BANG &&
         condition.operand is SimpleIdentifier &&
         (condition.operand as SimpleIdentifier).name == _kReleaseMode;
   }
