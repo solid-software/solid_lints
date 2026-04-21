@@ -56,7 +56,7 @@ class PreferEarlyReturnRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = PreferEarlyReturnVisitor(rule: this);
+    final visitor = PreferEarlyReturnVisitor(this);
     registry.addBlockFunctionBody(this, visitor);
   }
 }
