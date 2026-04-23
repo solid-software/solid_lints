@@ -50,7 +50,7 @@ class AvoidUnrelatedTypeAssertionsVisitor extends SimpleAstVisitor<void> {
     if (_isUnrelatedTypeCheck(objectType, castedType)) {
       rule.reportAtNode(
         node,
-        arguments: [node.notOperator != null ? 'false' : 'true'],
+        arguments: [if (node.notOperator != null) 'false' else 'true'],
       );
     }
   }
