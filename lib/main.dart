@@ -23,9 +23,6 @@ class SolidLintsPlugin extends Plugin {
 
   @override
   void register(PluginRegistry registry) {
-    //  final directory = Directory.current;
-    // final rules = analysisLoader.loadRules(directory.path);
-
     registry.registerLintRule(
       AvoidGlobalStateRule(),
     );

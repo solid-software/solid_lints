@@ -1,8 +1,10 @@
 import 'dart:collection';
 
+import 'dart:io' as io;
+import 'dart:io';
+import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:path/path.dart' as p;
 import 'package:solid_lints/src/common/parameter_parser/lint_options.dart';
 import 'package:yaml/yaml.dart';
 
@@ -11,14 +13,58 @@ final analysisLoader = AnalysisOptionsLoader();
 
 /// Loads and parses analysis options from a Dart project's YAML file.
 class AnalysisOptionsLoader {
-  /// Asynchronously loads analysis options from the specified [rootPath].
-  Map<String, LintOptions> loadRules(String rootPath) {
-    final file = PhysicalResourceProvider.INSTANCE.getFile(
-      p.join(rootPath, 'analysis_options.yaml'),
-    );
+  Map<String, LintOptions> _rulesCache = {};
+
+  /// Retrieves the currently loaded lint rules.
+  Map<String, LintOptions> get rules => _rulesCache;
+
+  /// Loads lint rules from the analysis options file based
+  /// on the provided [RuleContext].
+  void loadRulesFromContext(RuleContext context) {
+    if (_rulesCache.isNotEmpty) {
+      return;
+    }
+
+    final directory = context.allUnits.first.file.path;
+    _loadRules(directory);
+  }
+
+  void _loadRules(String rootPath) {
+    final yamlPath = _findNearestYamlUpwards(rootPath);
+
+    if (yamlPath == null) {
+      return;
+    }
+
+    final file = PhysicalResourceProvider.INSTANCE.getFile(yamlPath);
 
     final rules = _getRules(file);
-    return rules;
+    _rulesCache = rules;
+  }
+
+  String? _findNearestYamlUpwards(
+    String filePath, {
+    String fileName = 'analysis_options.yaml',
+  }) {
+    final startFile = io.File(filePath);
+    io.Directory dir = startFile.parent;
+
+    while (true) {
+      final candidate = PhysicalResourceProvider.INSTANCE
+          .getFile('${dir.path}${Platform.pathSeparator}$fileName');
+
+      if (candidate.exists) {
+        return candidate.path;
+      }
+
+      final parent = dir.parent;
+
+      if (parent.path == dir.path) {
+        return null;
+      }
+
+      dir = parent;
+    }
   }
 
   Map<String, LintOptions> _getRules(File? analysisOptionsFile) {
