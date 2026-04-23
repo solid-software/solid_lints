@@ -35,24 +35,4 @@ class AvoidUnrelatedTypeAssertionsRule extends AnalysisRule {
     final visitor = AvoidUnrelatedTypeAssertionsVisitor(this);
     registry.addIsExpression(this, visitor);
   }
-
-  // @override
-  // void run(
-  //   CustomLintResolver resolver,
-  //   DiagnosticReporter reporter,
-  //   CustomLintContext context,
-  // ) {
-  //   context.registry.addIsExpression((node) {
-  //     final visitor = AvoidUnrelatedTypeAssertionsVisitor();
-  //     visitor.visitIsExpression(node);
-
-  //     for (final element in visitor.expressions.entries) {
-  //       reporter.atNode(
-  //         element.key,
-  //         code,
-  //         arguments: [element.value.toString()],
-  //       );
-  //     }
-  //   });
-  // }
 }
