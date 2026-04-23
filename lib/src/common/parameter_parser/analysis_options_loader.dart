@@ -6,9 +6,6 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:solid_lints/src/common/parameter_parser/lint_options.dart';
 import 'package:yaml/yaml.dart';
 
-/// A global instance of [AnalysisOptionsLoader] for use across the plugin.
-final analysisLoader = AnalysisOptionsLoader();
-
 /// Loads and parses analysis options from a Dart project's YAML file.
 class AnalysisOptionsLoader {
   Map<String, LintOptions> _rulesCache = {};
