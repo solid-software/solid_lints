@@ -1,5 +1,3 @@
-import 'dart:io' as io;
-import 'dart:io';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
@@ -48,20 +46,20 @@ class AnalysisOptionsLoader {
     String filePath, {
     String fileName = 'analysis_options.yaml',
   }) {
-    final startFile = io.File(filePath);
-    io.Directory dir = startFile.parent;
+    final pathContext = PhysicalResourceProvider.INSTANCE.pathContext;
+    var dir = pathContext.dirname(filePath);
 
-    while (dir.path != dir.parent.path) {
-      final candidate = PhysicalResourceProvider.INSTANCE
-          .getFile('${dir.path}${Platform.pathSeparator}$fileName');
+    while (pathContext.dirname(dir) != dir) {
+      final candidatePath = pathContext.join(dir, fileName);
+      final candidate =
+          PhysicalResourceProvider.INSTANCE.getFile(candidatePath);
 
       if (candidate.exists) {
-        return candidate.path;
+        return candidatePath;
       }
 
-      final parent = dir.parent;
-
-      dir = parent;
+      final parentDir = pathContext.dirname(dir);
+      dir = parentDir;
     }
     return null;
   }
