@@ -24,7 +24,9 @@ class AnalysisOptionsLoader {
     if (_rulesCache.isNotEmpty) {
       return;
     }
-
+    if (context.allUnits.isEmpty) {
+      return;
+    }
     final directory = context.allUnits.first.file.path;
     _loadRules(directory);
   }
