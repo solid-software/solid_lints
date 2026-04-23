@@ -1,14 +1,16 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_rule.dart';
 import 'package:solid_lints/src/lints/prefer_early_return/visitors/return_statement_visitor.dart';
 import 'package:solid_lints/src/lints/prefer_early_return/visitors/throw_expression_visitor.dart';
 
-/// The AST visitor that will collect all unnecessary if statements
+/// Visitor for [PreferEarlyReturnRule].
 class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
-  final _nodes = <AstNode>[];
+  /// The rule associated with this visitor.
+  final PreferEarlyReturnRule rule;
 
-  /// All unnecessary if statements and conditional expressions.
-  Iterable<AstNode> get nodes => _nodes;
+  /// Creates an instance of [PreferEarlyReturnVisitor].
+  PreferEarlyReturnVisitor(this.rule);
 
   @override
   void visitBlockFunctionBody(BlockFunctionBody node) {
@@ -36,7 +38,7 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
     if (_hasReturnStatement(node)) return;
     if (_hasThrowExpression(node)) return;
 
-    _nodes.add(node);
+    rule.reportAtNode(node);
   }
 
 // returns a list of if statements at the start of the function

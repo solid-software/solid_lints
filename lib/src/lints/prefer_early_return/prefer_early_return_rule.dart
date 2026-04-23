@@ -1,8 +1,8 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/prefer_early_return/visitors/prefer_early_return_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A rule which highlights `if` statements that span the entire body,
 /// and suggests replacing them with a reversed boolean check
@@ -31,38 +31,35 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   c;
 /// }
 /// ```
-class PreferEarlyReturnRule extends SolidLintRule {
-  /// This lint rule represents the error if
-  /// 'if' statements should be reversed
+class PreferEarlyReturnRule extends AnalysisRule {
+  /// The name of the lint
   static const String lintName = 'prefer_early_return';
 
-  PreferEarlyReturnRule._(super.config);
+  /// The message shown when the lint is triggered
+  static const String lintMessage = 'Use reverse if to reduce nesting';
+
+  /// Lint code
+  static const LintCode _code = LintCode(
+    lintName,
+    lintMessage,
+  );
 
   /// Creates a new instance of [PreferEarlyReturnRule]
-  /// based on the lint configuration.
-  factory PreferEarlyReturnRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (_) => "Use reverse if to reduce nesting",
-    );
-
-    return PreferEarlyReturnRule._(rule);
-  }
+  PreferEarlyReturnRule()
+      : super(
+          name: lintName,
+          description: lintMessage,
+        );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addBlockFunctionBody((node) {
-      final visitor = PreferEarlyReturnVisitor();
-      node.accept(visitor);
+  LintCode get diagnosticCode => _code;
 
-      for (final element in visitor.nodes) {
-        reporter.atNode(element, code);
-      }
-    });
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  ) {
+    final visitor = PreferEarlyReturnVisitor(this);
+    registry.addBlockFunctionBody(this, visitor);
   }
 }
