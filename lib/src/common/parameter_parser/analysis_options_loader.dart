@@ -18,6 +18,9 @@ class AnalysisOptionsLoader {
   /// Retrieves the currently loaded lint rules.
   Map<String, LintOptions> get rules => _rulesCache;
 
+  /// Gets the options for a specific rule by its name.
+  LintOptions? getRuleOptions(String ruleName) => _rulesCache[ruleName];
+
   /// Loads lint rules from the analysis options file based
   /// on the provided [RuleContext].
   void loadRulesFromContext(RuleContext context) {
