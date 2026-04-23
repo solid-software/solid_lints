@@ -25,8 +25,8 @@ class AnalysisOptionsLoader {
     if (context.allUnits.isEmpty) {
       return;
     }
-    final directory = context.allUnits.first.file.path;
-    _loadRules(directory);
+    final filePath = context.allUnits.first.file.path;
+    _loadRules(filePath);
   }
 
   void _loadRules(String rootPath) {
