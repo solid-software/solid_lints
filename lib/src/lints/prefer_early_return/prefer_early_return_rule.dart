@@ -35,17 +35,20 @@ class PreferEarlyReturnRule extends AnalysisRule {
   /// The name of the lint
   static const String lintName = 'prefer_early_return';
 
+  /// The message shown when the lint is triggered
+  static const String lintMessage = 'Use reverse if to reduce nesting';
+
   /// Lint code
   static const LintCode _code = LintCode(
     lintName,
-    "Use reverse if reduce nesting",
+    lintMessage,
   );
 
   /// Creates a new instance of [PreferEarlyReturnRule]
   PreferEarlyReturnRule()
       : super(
           name: lintName,
-          description: 'Use reverse if to reduce nesting',
+          description: lintMessage,
         );
 
   @override
