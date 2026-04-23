@@ -8,20 +8,18 @@ import 'package:yaml/yaml.dart';
 
 /// Loads and parses analysis options from a Dart project's YAML file.
 class AnalysisOptionsLoader {
-  Map<String, LintOptions> _rulesCache = {};
-
-  /// Retrieves the currently loaded lint rules.
-  Map<String, LintOptions> get rules => _rulesCache;
+  final Map<String, Map<String, LintOptions>> _rulesCache = {};
 
   /// Gets the options for a specific rule by its name.
-  LintOptions? getRuleOptions(String ruleName) => _rulesCache[ruleName];
+  LintOptions? getRuleOptions(RuleContext context, String ruleName) {
+    final yamlPath = _findNearestFileUpwards(context.allUnits.first.file.path);
+    if (yamlPath == null) return null;
+    return _rulesCache[yamlPath]?[ruleName];
+  }
 
   /// Loads lint rules from the analysis options file based
   /// on the provided [RuleContext].
   void loadRulesFromContext(RuleContext context) {
-    if (_rulesCache.isNotEmpty) {
-      return;
-    }
     if (context.allUnits.isEmpty) {
       return;
     }
@@ -36,10 +34,14 @@ class AnalysisOptionsLoader {
       return;
     }
 
+    if (_rulesCache.containsKey(yamlPath)) {
+      return;
+    }
+
     final file = PhysicalResourceProvider.INSTANCE.getFile(yamlPath);
 
     final rules = _getRules(file);
-    _rulesCache = rules;
+    _rulesCache[yamlPath] = rules;
   }
 
   String? _findNearestFileUpwards(
