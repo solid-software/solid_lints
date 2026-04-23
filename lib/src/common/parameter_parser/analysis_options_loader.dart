@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'dart:io' as io;
 import 'dart:io';
 import 'package:analyzer/analysis_rule/rule_context.dart';
@@ -35,7 +33,7 @@ class AnalysisOptionsLoader {
   }
 
   void _loadRules(String rootPath) {
-    final yamlPath = _findNearestYamlUpwards(rootPath);
+    final yamlPath = _findNearestFileUpwards(rootPath);
 
     if (yamlPath == null) {
       return;
@@ -47,14 +45,14 @@ class AnalysisOptionsLoader {
     _rulesCache = rules;
   }
 
-  String? _findNearestYamlUpwards(
+  String? _findNearestFileUpwards(
     String filePath, {
     String fileName = 'analysis_options.yaml',
   }) {
     final startFile = io.File(filePath);
     io.Directory dir = startFile.parent;
 
-    while (true) {
+    while (dir.path != dir.parent.path) {
       final candidate = PhysicalResourceProvider.INSTANCE
           .getFile('${dir.path}${Platform.pathSeparator}$fileName');
 
@@ -64,12 +62,9 @@ class AnalysisOptionsLoader {
 
       final parent = dir.parent;
 
-      if (parent.path == dir.path) {
-        return null;
-      }
-
       dir = parent;
     }
+    return null;
   }
 
   Map<String, LintOptions> _getRules(File? analysisOptionsFile) {
@@ -116,6 +111,6 @@ class AnalysisOptionsLoader {
       }
     }
 
-    return UnmodifiableMapView(rules);
+    return rules;
   }
 }
