@@ -205,10 +205,6 @@ import 'package:collection/collection.dart';
 
 /// Option information for a specific [AnalysisRule].
 class LintOptions {
-  /// Creates a [LintOptions] from YAML.
-  const LintOptions.fromYaml(Map<String, Object?> yaml, {required this.enabled})
-      : json = yaml;
-
   /// Options with no [json]
   const LintOptions.empty({required this.enabled}) : json = const {};
 
@@ -217,6 +213,10 @@ class LintOptions {
 
   /// Extra configurations for a [AnalysisRule].
   final Map<String, Object?> json;
+
+  /// Creates a [LintOptions] from YAML.
+  const LintOptions.fromYaml(Map<String, Object?> yaml, {required this.enabled})
+      : json = yaml;
 
   @override
   bool operator ==(Object other) =>
