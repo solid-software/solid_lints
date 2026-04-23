@@ -1,50 +1,58 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/visitors/avoid_unrelated_type_assertions_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A `avoid_unrelated_type_assertions` rule which
 /// warns about unnecessary usage of `as` operator
-class AvoidUnrelatedTypeAssertionsRule extends SolidLintRule {
-  /// This lint rule represents
-  /// the error whether we use bad formatted double literals.
-  static const lintName = 'avoid_unrelated_type_assertions';
+class AvoidUnrelatedTypeAssertionsRule extends AnalysisRule {
+  /// Lint name used for suppression and reporting
+  static const String lintName = 'avoid_unrelated_type_assertions';
 
-  AvoidUnrelatedTypeAssertionsRule._(super.config);
+  /// Lint description used for suppression and reporting
+  static const String lintDescription =
+      'Avoid unrelated "is" assertions. The result is always "{0}".';
 
-  /// Creates a new instance of [AvoidUnrelatedTypeAssertionsRule]
-  /// based on the lint configuration.
-  factory AvoidUnrelatedTypeAssertionsRule.createRule(
-    CustomLintConfigs configs,
-  ) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (_) =>
-          'Avoid unrelated "is" assertion. The result is always "{0}".',
-    );
+  /// Lint code used for suppression and reporting
+  static const LintCode _code = LintCode(
+    lintName,
+    lintDescription,
+  );
 
-    return AvoidUnrelatedTypeAssertionsRule._(rule);
-  }
+  /// Creates an instance of [AvoidUnrelatedTypeAssertionsRule]
+  AvoidUnrelatedTypeAssertionsRule()
+      : super(name: lintName, description: lintDescription);
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addIsExpression((node) {
-      final visitor = AvoidUnrelatedTypeAssertionsVisitor();
-      visitor.visitIsExpression(node);
+  LintCode get diagnosticCode => _code;
 
-      for (final element in visitor.expressions.entries) {
-        reporter.atNode(
-          element.key,
-          code,
-          arguments: [element.value.toString()],
-        );
-      }
-    });
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  ) {
+    final visitor = AvoidUnrelatedTypeAssertionsVisitor(this);
+    registry.addIsExpression(this, visitor);
   }
+
+  // @override
+  // void run(
+  //   CustomLintResolver resolver,
+  //   DiagnosticReporter reporter,
+  //   CustomLintContext context,
+  // ) {
+  //   context.registry.addIsExpression((node) {
+  //     final visitor = AvoidUnrelatedTypeAssertionsVisitor();
+  //     visitor.visitIsExpression(node);
+
+  //     for (final element in visitor.expressions.entries) {
+  //       reporter.atNode(
+  //         element.key,
+  //         code,
+  //         arguments: [element.value.toString()],
+  //       );
+  //     }
+  //   });
+  // }
 }

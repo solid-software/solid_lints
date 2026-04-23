@@ -26,14 +26,15 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unrelated_type_assertions_rule.dart';
 
-/// AST Visitor which finds all is expressions and checks if they are
-/// unrelated (result always false)
-class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
-  final _expressions = <IsExpression, bool>{};
+/// Visitor for [AvoidUnrelatedTypeAssertionsRule].
+class AvoidUnrelatedTypeAssertionsVisitor extends SimpleAstVisitor<void> {
+  /// The rule this visitor is associated with.
+  final AvoidUnrelatedTypeAssertionsRule rule;
 
-  /// Map of unrelated type checks and their results
-  Map<IsExpression, bool> get expressions => _expressions;
+  /// Creates an instance of [AvoidUnrelatedTypeAssertionsVisitor].
+  AvoidUnrelatedTypeAssertionsVisitor(this.rule);
 
   @override
   void visitIsExpression(IsExpression node) {
@@ -47,7 +48,7 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
     final objectType = node.expression.staticType;
 
     if (_isUnrelatedTypeCheck(objectType, castedType)) {
-      _expressions[node] = node.notOperator != null;
+      rule.reportAtNode(node, arguments: [node.notOperator != null]);
     }
   }
 
