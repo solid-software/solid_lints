@@ -71,8 +71,7 @@ void nestedIf2(bool a, bool b) {
   }
 
   Future<void> test_doesn_not_report_on_nested_if2_with_return_value() async {
-    await assertNoDiagnostics(
-      r'''
+    await assertNoDiagnostics(r'''
 int nestedIf2WithReturnValue(bool a, bool b) {
   if (a) {
     if (b) {
@@ -81,8 +80,7 @@ int nestedIf2WithReturnValue(bool a, bool b) {
   }
 
   return 1;
-}''',
-    );
+}''');
   }
 
   Future<void> test_reports_on_nested_if3() async {
