@@ -10,7 +10,10 @@ class AnalysisOptionsLoader {
 
   /// Gets the options for a specific rule by its name.
   LintOptions? getRuleOptions(RuleContext context, String ruleName) {
-    final yamlPath = _findNearestFileUpwards(context.allUnits.first.file.path);
+    final packageRootPath = context.package?.root.path;
+    if (packageRootPath == null) return null;
+
+    final yamlPath = _findNearestAnalysisOptionsFilePath(packageRootPath);
     if (yamlPath == null) return null;
 
     return _rulesCache[yamlPath]?[ruleName];
@@ -19,40 +22,33 @@ class AnalysisOptionsLoader {
   /// Loads lint rules from the analysis options file based
   /// on the provided [RuleContext].
   void loadRulesFromContext(RuleContext context) {
-    if (context.allUnits.isEmpty) {
-      return;
-    }
+    final packageRootPath = context.package?.root.path;
+    if (packageRootPath == null) return;
 
-    final filePath = context.allUnits.first.file.path;
-    _loadRules(filePath);
+    _loadRules(packageRootPath);
   }
 
   void _loadRules(String rootPath) {
-    final yamlPath = _findNearestFileUpwards(rootPath);
+    final yamlPath = _findNearestAnalysisOptionsFilePath(rootPath);
 
-    if (yamlPath == null) {
+    if (yamlPath == null || _rulesCache.containsKey(yamlPath)) {
       return;
     }
 
-    if (_rulesCache.containsKey(yamlPath)) {
-      return;
-    }
+    final analysisOptionsFile =
+        PhysicalResourceProvider.INSTANCE.getFile(yamlPath);
 
-    final file = PhysicalResourceProvider.INSTANCE.getFile(yamlPath);
-
-    final rules = _getRules(file);
+    final rules = _getRules(analysisOptionsFile);
     _rulesCache[yamlPath] = rules;
   }
 
-  String? _findNearestFileUpwards(
-    String filePath, {
-    String fileName = 'analysis_options.yaml',
-  }) {
+  String? _findNearestAnalysisOptionsFilePath(String packageRootPath) {
     final pathContext = PhysicalResourceProvider.INSTANCE.pathContext;
-    String currentDirectoryPath = pathContext.dirname(filePath);
+    String currentDirectoryPath = packageRootPath;
 
     while (pathContext.dirname(currentDirectoryPath) != currentDirectoryPath) {
-      final candidatePath = pathContext.join(currentDirectoryPath, fileName);
+      final candidatePath =
+          pathContext.join(currentDirectoryPath, 'analysis_options.yaml');
       final candidateFile =
           PhysicalResourceProvider.INSTANCE.getFile(candidatePath);
 
@@ -83,31 +79,22 @@ class AnalysisOptionsLoader {
     if (yaml is! Map) return {};
 
     final rules = <String, LintOptions>{};
-    final pluginsYaml = yaml['plugins'] as Object?;
 
-    if (pluginsYaml is Map) {
-      final solidLint = pluginsYaml['solid_lints'];
-      if (solidLint is Map) {
-        final diagnostics = solidLint['diagnostics'];
+    if (yaml
+        case {'plugins': {'solid_lints': {'diagnostics': final diagnostics?}}}
+        when diagnostics is Map) {
+      for (final MapEntry(:key, :value) in diagnostics.entries) {
+        if (key is! String) continue;
 
-        if (diagnostics is Map) {
-          for (final diag in diagnostics.entries) {
-            final ruleName = diag.key as String;
-            final value = diag.value;
+        final ruleName = key;
 
-            if (value is bool) {
-              rules[ruleName] = LintOptions.empty(enabled: value);
-            } else if (value is Map) {
-              final map = Map<String, Object?>.from(value);
-
-              final enabled = map.remove('enabled') as bool? ?? true;
-
-              rules[ruleName] = LintOptions.fromYaml(
-                map,
-                enabled: enabled,
-              );
-            }
-          }
+        if (value is bool) {
+          rules[ruleName] = LintOptions.empty(enabled: value);
+        } else if (value is Map) {
+          rules[ruleName] = LintOptions.fromYaml(
+            Map<String, Object?>.from(value),
+            enabled: true,
+          );
         }
       }
     }
