@@ -1,12 +1,19 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:solid_lints/src/common/parameter_parser/cached_package_rules.dart';
 import 'package:solid_lints/src/common/parameter_parser/lint_options.dart';
 import 'package:yaml/yaml.dart';
 
 /// Loads and parses analysis options from a Dart project's YAML file.
 class AnalysisOptionsLoader {
-  final Map<String, Map<String, LintOptions>> _rulesCache = {};
+  final ResourceProvider _resourceProvider;
+  final Map<String, CachedPackageRules> _rulesCache = {};
+
+  /// Creates an instance of [AnalysisOptionsLoader]
+  AnalysisOptionsLoader({ResourceProvider? resourceProvider})
+      : _resourceProvider =
+            resourceProvider ?? PhysicalResourceProvider.INSTANCE;
 
   /// Gets the options for a specific rule by its name.
   LintOptions? getRuleOptions(RuleContext context, String ruleName) {
@@ -16,7 +23,7 @@ class AnalysisOptionsLoader {
     final yamlPath = _findNearestAnalysisOptionsFilePath(packageRootPath);
     if (yamlPath == null) return null;
 
-    return _rulesCache[yamlPath]?[ruleName];
+    return _rulesCache[yamlPath]?.rules[ruleName];
   }
 
   /// Loads lint rules from the analysis options file based
@@ -25,32 +32,36 @@ class AnalysisOptionsLoader {
     final packageRootPath = context.package?.root.path;
     if (packageRootPath == null) return;
 
-    _loadRules(packageRootPath);
+    _loadRulesIfNewer(packageRootPath);
   }
 
-  void _loadRules(String rootPath) {
+  void _loadRulesIfNewer(String rootPath) {
     final yamlPath = _findNearestAnalysisOptionsFilePath(rootPath);
+    if (yamlPath == null) return;
 
-    if (yamlPath == null || _rulesCache.containsKey(yamlPath)) {
+    final analysisOptionsFile = _resourceProvider.getFile(yamlPath);
+    final modificationStamp = analysisOptionsFile.modificationStamp;
+    final cachedRules = _rulesCache[yamlPath];
+
+    if (cachedRules?.modificationStamp == modificationStamp) {
       return;
     }
 
-    final analysisOptionsFile =
-        PhysicalResourceProvider.INSTANCE.getFile(yamlPath);
-
     final rules = _getRules(analysisOptionsFile);
-    _rulesCache[yamlPath] = rules;
+    _rulesCache[yamlPath] = CachedPackageRules(
+      modificationStamp: modificationStamp,
+      rules: rules,
+    );
   }
 
   String? _findNearestAnalysisOptionsFilePath(String packageRootPath) {
-    final pathContext = PhysicalResourceProvider.INSTANCE.pathContext;
+    final pathContext = _resourceProvider.pathContext;
     String currentDirectoryPath = packageRootPath;
 
     while (pathContext.dirname(currentDirectoryPath) != currentDirectoryPath) {
       final candidatePath =
           pathContext.join(currentDirectoryPath, 'analysis_options.yaml');
-      final candidateFile =
-          PhysicalResourceProvider.INSTANCE.getFile(candidatePath);
+      final candidateFile = _resourceProvider.getFile(candidatePath);
 
       if (candidateFile.exists) {
         return candidatePath;
