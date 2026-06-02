@@ -12,6 +12,7 @@ class AnalysisOptionsLoader {
   LintOptions? getRuleOptions(RuleContext context, String ruleName) {
     final yamlPath = _findNearestFileUpwards(context.allUnits.first.file.path);
     if (yamlPath == null) return null;
+
     return _rulesCache[yamlPath]?[ruleName];
   }
 
@@ -21,6 +22,7 @@ class AnalysisOptionsLoader {
     if (context.allUnits.isEmpty) {
       return;
     }
+
     final filePath = context.allUnits.first.file.path;
     _loadRules(filePath);
   }
@@ -47,20 +49,21 @@ class AnalysisOptionsLoader {
     String fileName = 'analysis_options.yaml',
   }) {
     final pathContext = PhysicalResourceProvider.INSTANCE.pathContext;
-    var dir = pathContext.dirname(filePath);
+    String currentDirectoryPath = pathContext.dirname(filePath);
 
-    while (pathContext.dirname(dir) != dir) {
-      final candidatePath = pathContext.join(dir, fileName);
-      final candidate =
+    while (pathContext.dirname(currentDirectoryPath) != currentDirectoryPath) {
+      final candidatePath = pathContext.join(currentDirectoryPath, fileName);
+      final candidateFile =
           PhysicalResourceProvider.INSTANCE.getFile(candidatePath);
 
-      if (candidate.exists) {
+      if (candidateFile.exists) {
         return candidatePath;
       }
 
-      final parentDir = pathContext.dirname(dir);
-      dir = parentDir;
+      final parentDir = pathContext.dirname(currentDirectoryPath);
+      currentDirectoryPath = parentDir;
     }
+
     return null;
   }
 
@@ -76,6 +79,7 @@ class AnalysisOptionsLoader {
     } catch (err) {
       return {};
     }
+
     if (yaml is! Map) return {};
 
     final rules = <String, LintOptions>{};
