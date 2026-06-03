@@ -2,7 +2,6 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:solid_lints/src/common/parameter_parser/cached_package_rules.dart';
-import 'package:solid_lints/src/common/parameter_parser/lint_options.dart';
 import 'package:yaml/yaml.dart';
 
 /// Loads and parses analysis options from a Dart project's YAML file.
@@ -16,7 +15,7 @@ class AnalysisOptionsLoader {
             resourceProvider ?? PhysicalResourceProvider.INSTANCE;
 
   /// Gets the options for a specific rule by its name.
-  LintOptions? getRuleOptions(RuleContext context, String ruleName) {
+  Map<String, Object?>? getRuleOptions(RuleContext context, String ruleName) {
     final packageRootPath = context.package?.root.path;
     if (packageRootPath == null) return null;
 
@@ -26,16 +25,16 @@ class AnalysisOptionsLoader {
     return _rulesCache[yamlPath]?.rules[ruleName];
   }
 
-  /// Loads lint rules from the analysis options file based
-  /// on the provided [RuleContext].
-  void loadRulesFromContext(RuleContext context) {
+  /// Loads lint rules from the analysis options file for all rules
+  /// using the provided [RuleContext].
+  void loadRulesOptionsFromContext(RuleContext context) {
     final packageRootPath = context.package?.root.path;
     if (packageRootPath == null) return;
 
-    _loadRulesIfNewer(packageRootPath);
+    _loadRulesOptionsIfNewer(packageRootPath);
   }
 
-  void _loadRulesIfNewer(String rootPath) {
+  void _loadRulesOptionsIfNewer(String rootPath) {
     final yamlPath = _findNearestAnalysisOptionsFilePath(rootPath);
     if (yamlPath == null) return;
 
@@ -74,7 +73,7 @@ class AnalysisOptionsLoader {
     return null;
   }
 
-  Map<String, LintOptions> _getRules(File? analysisOptionsFile) {
+  Map<String, Map<String, Object?>> _getRules(File? analysisOptionsFile) {
     if (analysisOptionsFile == null || !analysisOptionsFile.exists) {
       return {};
     }
@@ -87,29 +86,19 @@ class AnalysisOptionsLoader {
       return {};
     }
 
-    if (yaml is! Map) return {};
-
-    final rules = <String, LintOptions>{};
-
     if (yaml
         case {'plugins': {'solid_lints': {'diagnostics': final diagnostics?}}}
         when diagnostics is Map) {
-      for (final MapEntry(:key, :value) in diagnostics.entries) {
-        if (key is! String) continue;
-
-        final ruleName = key;
-
-        if (value is bool) {
-          rules[ruleName] = LintOptions.empty(enabled: value);
-        } else if (value is Map) {
-          rules[ruleName] = LintOptions.fromYaml(
-            Map<String, Object?>.from(value),
-            enabled: true,
-          );
-        }
-      }
+      return Map.fromEntries(
+        diagnostics.entries.where((e) => e.key is String && e.value is Map).map(
+              (e) => MapEntry(
+                e.key as String,
+                Map<String, Object?>.from(e.value as Map),
+              ),
+            ),
+      );
     }
 
-    return rules;
+    return {};
   }
 }

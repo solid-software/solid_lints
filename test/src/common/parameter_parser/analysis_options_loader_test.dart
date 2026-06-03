@@ -70,7 +70,7 @@ plugins:
 
     _writeMockAnalysisOptionsYamlFile();
 
-    analysisOptionsLoader.loadRulesFromContext(mockRuleContext);
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
   }
 
   void _writeMockAnalysisOptionsYamlFile() {
@@ -105,14 +105,14 @@ plugins:
       );
 
       expect(
-        currentPackageOptions?.json,
-        isNot(equals(otherPackageOptions?.json)),
+        currentPackageOptions,
+        isNot(equals(otherPackageOptions)),
       );
     }
   }
 
   void test_each_rule_gets_its_options() {
-    analysisOptionsLoader.loadRulesFromContext(mockRuleContext);
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
 
     final mockRuleThatNeedsConfigOptions = analysisOptionsLoader.getRuleOptions(
       mockRuleContext,
@@ -128,12 +128,10 @@ plugins:
     );
 
     expect(mockRuleThatNeedsConfigOptions, isNotNull);
-    expect(mockRuleThatNeedsConfigOptions?.enabled, isTrue);
-    expect(mockRuleThatNeedsConfigOptions?.json, {'abc': 'def'});
+    expect(mockRuleThatNeedsConfigOptions, {'abc': 'def'});
 
     expect(mockRule2Options, isNotNull);
-    expect(mockRule2Options?.enabled, isTrue);
-    expect(mockRule2Options?.json, {
+    expect(mockRule2Options, {
       'foo': 'bar',
       'exclude': [
         {'class_name': 'MockClass', 'method_name': 'mockMethod'},
@@ -141,8 +139,7 @@ plugins:
     });
 
     expect(cyclomaticComplexityOptions, isNotNull);
-    expect(cyclomaticComplexityOptions?.enabled, isTrue);
-    expect(cyclomaticComplexityOptions?.json, {
+    expect(cyclomaticComplexityOptions, {
       'max_complexity': 10,
       'exclude': [
         {'class_name': 'MockClass', 'method_name': 'mockMethod'},
@@ -161,20 +158,20 @@ plugins:
       testPackageRootPath,
       _mockDifferentAnalysisOptionsContent,
     );
-    analysisOptionsLoader.loadRulesFromContext(mockRuleContext);
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
 
     final updatedOptions = analysisOptionsLoader.getRuleOptions(
       mockRuleContext,
       _mockRuleThatNeedsConfigName,
     );
 
-    expect(initialOptions?.json, {'abc': 'def'});
-    expect(updatedOptions?.json, {'abc': 'ghi'});
+    expect(initialOptions, {'abc': 'def'});
+    expect(updatedOptions, {'abc': 'ghi'});
     expect(updatedOptions, isNot(same(initialOptions)));
   }
 
   void test_loads_and_parses_rule_options_from_yaml_file() {
-    analysisOptionsLoader.loadRulesFromContext(mockRuleContext);
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
 
     final options = analysisOptionsLoader.getRuleOptions(
       mockRuleContext,
@@ -182,12 +179,11 @@ plugins:
     );
 
     expect(options, isNotNull);
-    expect(options?.enabled, isTrue);
-    expect(options?.json, {'abc': 'def'});
+    expect(options, {'abc': 'def'});
   }
 
   void test_returns_cached_response_for_same_rule_name() {
-    analysisOptionsLoader.loadRulesFromContext(mockRuleContext);
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
 
     final firstOptions = analysisOptionsLoader.getRuleOptions(
       mockRuleContext,
