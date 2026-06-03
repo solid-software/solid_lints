@@ -29,7 +29,7 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/visitors/avoid_
 import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// Visitor for [AvoidUnnecessarySetStateRule].
-class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
+class AvoidUnnecessarySetStateVisitor extends SimpleAstVisitor<void> {
   static const _checkedMethods = [
     'initState',
     'didUpdateWidget',
@@ -54,7 +54,13 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    final methods = node.members.whereType<MethodDeclaration>();
+    final body = node.body;
+
+    if (body is! BlockClassBody) {
+      return;
+    }
+
+    final methods = body.members.whereType<MethodDeclaration>();
     final classMethodsNames =
         methods.map((declaration) => declaration.name.lexeme).toSet();
     final methodBodies = methods.map((declaration) => declaration.body).toSet();
