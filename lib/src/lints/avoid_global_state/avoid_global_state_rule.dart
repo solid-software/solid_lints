@@ -66,7 +66,7 @@ class AvoidGlobalStateRule extends AnalysisRule {
   ) {
     final visitor = AvoidGlobalStateVisitor(this);
 
-    _analysisLoader.loadRulesFromContext(context);
+    _analysisLoader.loadRulesOptionsFromContext(context);
     // To get the options of the rule:
     // _analysisLoader.getRuleOptions(context, lintName);
 
