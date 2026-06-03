@@ -24,10 +24,11 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/avoid_unnecessary_set_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/visitors/avoid_unnecessary_set_state_method_visitor.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
 
-/// AST visitor which checks if class is State, in case yes checks its methods
+/// Visitor for [AvoidUnnecessarySetStateRule].
 class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
   static const _checkedMethods = [
     'initState',
@@ -36,10 +37,13 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
     'build',
   ];
 
-  final _setStateInvocations = <MethodInvocation>[];
+  /// The rule associated with this visitor.
+  final AvoidUnnecessarySetStateRule rule;
 
-  /// Unnecessary setState invocations
-  Iterable<MethodInvocation> get setStateInvocations => _setStateInvocations;
+  /// Creates an instance of [AvoidUnnecessarySetStateVisitor].
+  AvoidUnnecessarySetStateVisitor(this.rule);
+
+  final _setStateInvocations = <MethodInvocation>[];
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
@@ -83,6 +87,10 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
             )
             .toList(),
       );
+
+      for (final element in visitor.setStateInvocations) {
+        rule.reportAtNode(element);
+      }
     }
   }
 
