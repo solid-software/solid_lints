@@ -1,10 +1,9 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/avoid_late_keyword/models/avoid_late_keyword_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_late_keyword/visitors/avoid_late_keyword_visitor.dart';
+import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// Avoid `late` keyword
 ///
@@ -47,7 +46,7 @@ import 'package:solid_lints/src/lints/avoid_late_keyword/visitors/avoid_late_key
 ///   }
 /// }
 /// ```
-class AvoidLateKeywordRule extends AnalysisRule {
+class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
   static const String _lintName = 'avoid_late_keyword';
 
   static const LintCode _code = LintCode(
@@ -56,10 +55,11 @@ class AvoidLateKeywordRule extends AnalysisRule {
   );
 
   /// Creates an instance of [AvoidLateKeywordRule].
-  AvoidLateKeywordRule()
-      : super(
+  AvoidLateKeywordRule({required super.analysisOptionsLoader})
+      : super.withParameters(
           name: _lintName,
           description: 'Warns against using the late keyword.',
+          parametersParser: AvoidLateKeywordParameters.fromJson,
         );
 
   @override
@@ -70,6 +70,14 @@ class AvoidLateKeywordRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    registry.addVariableDeclaration(this, AvoidLateKeywordVisitor(this));
+    final parameters =
+        getParametersForContext(context) ?? const AvoidLateKeywordParameters();
+
+    final visitor = AvoidLateKeywordVisitor(this, parameters);
+
+    registry.addVariableDeclaration(
+      this,
+      visitor,
+    );
   }
 }
