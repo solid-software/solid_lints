@@ -2,8 +2,11 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/avoid_unnecessary_return_variable_rule.dart';
 
-/// The AST visitor that will collect every Variable Declaration statement
+/// Visitor for [AvoidUnnecessaryReturnVariableRule] which checks whether the
+/// return variable is used somewhere except return statement and
+/// whether it is immutable.
 class ReturnVariableUsageVisitor extends RecursiveAstVisitor<void> {
   final ReturnStatement _returnStatement;
   final LocalVariableElement _returnVariableElement;
