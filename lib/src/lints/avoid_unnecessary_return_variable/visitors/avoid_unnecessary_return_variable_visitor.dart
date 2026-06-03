@@ -6,7 +6,7 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/avoid_un
 import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors/return_variable_usage_visitor.dart';
 
 /// Visitor for [AvoidUnnecessaryReturnVariableRule].
-class AvoidUnnecessaryReturnVariableVisitor extends RecursiveAstVisitor<void> {
+class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with this visitor.
   final AvoidUnnecessaryReturnVariableRule rule;
 
@@ -53,8 +53,6 @@ class AvoidUnnecessaryReturnVariableVisitor extends RecursiveAstVisitor<void> {
     if (!_isExpressionImmutable(initializer)) return;
 
     rule.reportAtNode(node);
-
-    super.visitReturnStatement(node);
   }
 
   bool _isExpressionImmutable(Expression expr) {
