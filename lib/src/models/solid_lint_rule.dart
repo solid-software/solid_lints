@@ -32,6 +32,8 @@ abstract class SolidLintRule<T extends Object?> extends AnalysisRule {
 
   /// Reads the rule parameters from analysis options and parses them to [T]
   T? getParametersForContext(RuleContext context) {
+    _analysisOptionsLoader?.loadRulesOptionsFromContext(context);
+
     final unparsedParameters =
         _analysisOptionsLoader?.getRuleOptions(context, name);
     if (unparsedParameters == null) return null;
