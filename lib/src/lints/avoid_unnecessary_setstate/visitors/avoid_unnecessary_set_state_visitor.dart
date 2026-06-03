@@ -88,7 +88,7 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
             .toList(),
       );
 
-      for (final element in visitor.setStateInvocations) {
+      for (final element in _setStateInvocations) {
         rule.reportAtNode(element);
       }
     }
