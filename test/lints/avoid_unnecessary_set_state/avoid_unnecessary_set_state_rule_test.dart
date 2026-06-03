@@ -64,7 +64,7 @@ class ElevatedButton extends Widget {
   final Function()? onLongPress;
   final Widget? child;
 
-  ElevatedButton({this.onPressed, this.onHover, this.onLongPress, this.child});
+  ElevatedButton({this.onPressed, this.onLongPress, this.child});
 }
 ''',
     );
