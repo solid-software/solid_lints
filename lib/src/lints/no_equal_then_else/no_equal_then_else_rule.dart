@@ -70,6 +70,7 @@ class NoEqualThenElseRule extends AnalysisRule {
     RuleContext context,
   ) {
     final visitor = NoEqualThenElseVisitor(this);
-    registry.addBlockFunctionBody(this, visitor);
+    registry.addIfStatement(this, visitor);
+    registry.addConditionalExpression(this, visitor);
   }
 }

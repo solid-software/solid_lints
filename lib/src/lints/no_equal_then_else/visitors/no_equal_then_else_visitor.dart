@@ -26,7 +26,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/lints/no_equal_then_else/no_equal_then_else_rule.dart';
 
 /// Visitor for [NoEqualThenElseRule].
-class NoEqualThenElseVisitor extends RecursiveAstVisitor<void> {
+class NoEqualThenElseVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with this visitor.
   final NoEqualThenElseRule _rule;
 
