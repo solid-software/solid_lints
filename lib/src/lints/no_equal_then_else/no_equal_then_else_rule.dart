@@ -1,8 +1,8 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/no_equal_then_else/visitors/no_equal_then_else_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 // Inspired by PVS-Studio (https://www.viva64.com/en/w/v6004/)
 
@@ -41,38 +41,35 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///
 /// selectedValue = condition ? valueA : valueB;
 /// ```
-class NoEqualThenElseRule extends SolidLintRule {
-  /// This lint rule represents the error if
-  /// 'if' statements or conditional expression is redundant
-  static const String lintName = 'no_equal_then_else';
+class NoEqualThenElseRule extends AnalysisRule {
+  /// The name of the lint rule.
+  static const String _lintName = 'no_equal_then_else';
 
-  NoEqualThenElseRule._(super.config);
+  /// The message shown when the lint is triggered.
+  static const String _lintMessage = 'Then and else branches are equal.';
 
-  /// Creates a new instance of [NoEqualThenElseRule]
-  /// based on the lint configuration.
-  factory NoEqualThenElseRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (value) => "Then and else branches are equal.",
-    );
+  /// Lint code
+  static const _code = LintCode(
+    _lintName,
+    _lintMessage,
+  );
 
-    return NoEqualThenElseRule._(rule);
-  }
+  /// Create a new instance of [NoEqualThenElseRule]
+  NoEqualThenElseRule()
+    : super(
+        name: _lintName,
+        description: _lintMessage,
+      );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addCompilationUnit((node) {
-      final visitor = NoEqualThenElseVisitor();
-      node.accept(visitor);
+  LintCode get diagnosticCode => _code;
 
-      for (final element in visitor.nodes) {
-        reporter.atNode(element, code);
-      }
-    });
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  ) {
+    final visitor = NoEqualThenElseVisitor(this);
+    registry.addBlockFunctionBody(this, visitor);
   }
 }

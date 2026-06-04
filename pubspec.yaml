@@ -8,7 +8,7 @@ documentation: https://solid-software.github.io/solid_lints/docs/intro
 topics: [lints, linter, lint, analysis, analyzer]
 
 environment:
-  sdk: ">=3.5.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
 
 dependencies:
   analyzer: ^10.0.1
