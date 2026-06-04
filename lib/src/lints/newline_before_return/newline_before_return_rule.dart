@@ -100,23 +100,7 @@ class NewlineBeforeReturnRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = NewLineBeforeReturnVisitor(this);
+    final visitor = NewLineBeforeReturnVisitor(this, context);
     registry.addReturnStatement(this, visitor);
   }
-
-  // @override
-  // void run(
-  //   CustomLintResolver resolver,
-  //   DiagnosticReporter reporter,
-  //   CustomLintContext context,
-  // ) {
-  //   context.registry.addReturnStatement((node) {
-  //     final visitor = NewLineBeforeReturnVisitor(resolver.lineInfo);
-  //     visitor.visitReturnStatement(node);
-
-  //     for (final element in visitor.statements) {
-  //       reporter.atNode(element, code);
-  //     }
-  //   });
-  // }
 }

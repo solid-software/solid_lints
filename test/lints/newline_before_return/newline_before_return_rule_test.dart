@@ -52,7 +52,7 @@ void method() {
   return;
 }
   ''',
-      [lint(47, 7)],
+      [lint(46, 7)],
     );
   }
 
@@ -64,7 +64,7 @@ void method() {
   ''');
   }
 
-  void test_does_not_report_newline_before__return() async {
+  void test_does_not_report_newline_before_return() async {
     await assertNoDiagnostics(r'''
 void method() {
   final a = 0;

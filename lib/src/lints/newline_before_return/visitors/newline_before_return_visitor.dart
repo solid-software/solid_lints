@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
@@ -30,16 +31,20 @@ import 'package:solid_lints/src/lints/newline_before_return/newline_before_retur
 class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
   final NewlineBeforeReturnRule _rule;
 
+  final RuleContext _context;
+
   /// Creates instance of [NewLineBeforeReturnVisitor] with line info
-  NewLineBeforeReturnVisitor(this._rule);
+  NewLineBeforeReturnVisitor(this._rule, this._context);
 
   @override
   void visitReturnStatement(ReturnStatement node) {
     super.visitReturnStatement(node);
 
+    final source = _context.allUnits.first.content;
+
     if (!_statementIsInBlock(node)) return;
     if (_statementIsFirstInBlock(node)) return;
-    if (_statementHasNewLineBefore(node)) return;
+    if (_statementHasNewLineBefore(node, source)) return;
 
     _rule.reportAtNode(node);
   }
@@ -51,10 +56,10 @@ class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
 
   static bool _statementHasNewLineBefore(
     ReturnStatement node,
+    String source,
   ) {
-    final source = node.root.toSource();
-
     final previousToken = node.returnKeyword.previous!;
+
     final lastNotEmptyLineToken = _optimalToken(node.returnKeyword, source);
 
     return _hasBlankLineBetween(
@@ -95,8 +100,11 @@ class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
     final aEnd = a.end;
     final bStart = b.offset;
 
-    final between = source.substring(aEnd, bStart);
+    if (aEnd > bStart) return false;
 
-    return between.contains('\n\n');
+    final between = source.substring(aEnd, bStart);
+    final hasBlankLine = between.contains(RegExp(r'\n[ \t]*\r?\n'));
+
+    return hasBlankLine;
   }
 }
