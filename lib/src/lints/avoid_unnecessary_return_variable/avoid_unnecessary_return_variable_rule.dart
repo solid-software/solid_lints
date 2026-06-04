@@ -31,25 +31,25 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors
 ///
 class AvoidUnnecessaryReturnVariableRule extends AnalysisRule {
   /// The name of the lint rule.
-  static const lintName = 'avoid_unnecessary_return_variable';
+  static const _lintName = 'avoid_unnecessary_return_variable';
 
   /// The message shown when the lint is triggered.
-  static const String lintMessage = """
+  static const String _lintMessage = """
 Avoid creating unnecessary variable only for return.
 Rewrite the variable evaluation into return statement instead.""";
 
   /// Lint code.
   static const LintCode _code = LintCode(
-    lintName,
-    lintMessage,
+    _lintName,
+    _lintMessage,
   );
 
   /// Creates a new instance of [AvoidUnnecessaryReturnVariableRule]
   AvoidUnnecessaryReturnVariableRule()
-      : super(
-          name: lintName,
-          description: lintMessage,
-        );
+    : super(
+        name: _lintName,
+        description: _lintMessage,
+      );
 
   @override
   LintCode get diagnosticCode => _code;

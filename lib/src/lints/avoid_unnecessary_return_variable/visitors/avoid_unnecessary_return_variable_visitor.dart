@@ -16,27 +16,23 @@ class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
   @override
   void visitReturnStatement(ReturnStatement node) {
     final expr = node.expression;
-    if (expr is! SimpleIdentifier) {
-      return;
-    }
+    if (expr is! SimpleIdentifier) return;
 
     final element = expr.element;
-    if (element is! LocalVariableElement) {
-      return;
-    }
+    if (element is! LocalVariableElement) return;
 
-    if (!element.isFinal && !element.isConst) {
-      return;
-    }
+    if (!element.isFinal && !element.isConst) return;
 
     final block = node.parent;
     if (block == null) return;
 
-    final returnVariableUsageVisitor =
-        ReturnVariableUsageVisitor(node, element);
+    final returnVariableUsageVisitor = ReturnVariableUsageVisitor(
+      node,
+      element,
+    );
 
     block.visitChildren(returnVariableUsageVisitor);
-    if (!returnVariableUsageVisitor.hasBadStatementCount()) return;
+    if (!returnVariableUsageVisitor.hasBadStatementCount) return;
 
     //it is 100% bad if return statement follows declaration
     if (!returnVariableUsageVisitor.foundTokensBetweenDeclarationAndReturn) {
@@ -63,17 +59,12 @@ class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
   }
 
   bool _isSimpleIdentifierImmutable(SimpleIdentifier identifier) {
-    switch (identifier.element) {
-      case final VariableElement variable:
-        return variable.isFinal || variable.isConst;
-
-      case ClassElement _:
-        return true;
-
-      case GetterElement(:final PropertyInducingElement variable):
-        return variable.isFinal || variable.isConst;
-    }
-
-    return false;
+    return switch (identifier.element) {
+      ClassElement _ => true,
+      final VariableElement variable => variable.isFinal || variable.isConst,
+      GetterElement(:final PropertyInducingElement variable) =>
+        variable.isFinal || variable.isConst,
+      _ => false,
+    };
   }
 }

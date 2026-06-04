@@ -8,6 +8,12 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/avoid_un
 /// return variable is used somewhere except return statement and
 /// whether it is immutable.
 class ReturnVariableUsageVisitor extends RecursiveAstVisitor<void> {
+  /// The problem expects that exactly 1 mention of return variable.
+  /// VariableDeclarationStatement doesn't count when visiting SimpleIdentifier.
+  /// Any other amount of variable mentions implies that it is used somewhere
+  /// except return, so its existence is justified.
+  static const _badStatementCount = 1;
+
   final ReturnStatement _returnStatement;
   final LocalVariableElement _returnVariableElement;
 
@@ -17,16 +23,10 @@ class ReturnVariableUsageVisitor extends RecursiveAstVisitor<void> {
   /// After visiting holds info about whether there are any tokens
   bool foundTokensBetweenDeclarationAndReturn = false;
 
-  /// The problem expects that exactly 1 mention of return variable.
-  /// VariableDeclarationStatement doesn't count when visiting SimpleIdentifier.
-  /// Any other amount of variable mentions implies that it is used somewhere
-  /// except return, so its existence is justified.
-  static const _badStatementCount = 1;
-
   int _variableStatementCounter = 0;
 
   /// Defines whether the variables is used in return statement only.
-  bool hasBadStatementCount() =>
+  bool get hasBadStatementCount =>
       _variableStatementCounter == _badStatementCount;
 
   /// Creates a new instance of [ReturnVariableUsageVisitor].
@@ -66,8 +66,9 @@ class ReturnVariableUsageVisitor extends RecursiveAstVisitor<void> {
     VariableDeclarationStatement variableDeclaration,
     ReturnStatement returnStatement,
   ) {
-    final tokenBeforeReturn =
-        _returnStatement.findPrevious(_returnStatement.beginToken);
+    final tokenBeforeReturn = _returnStatement.findPrevious(
+      _returnStatement.beginToken,
+    );
 
     if (tokenBeforeReturn != variableDeclaration.endToken) {
       foundTokensBetweenDeclarationAndReturn = true;

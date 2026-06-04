@@ -17,44 +17,37 @@ class AvoidUnnecessaryReturnVariableTest extends AnalysisRuleTest {
   }
 
   @override
-  String get analysisRule => AvoidUnnecessaryReturnVariableRule.lintName;
+  String get analysisRule => rule.name;
 
   void test_does_not_report_if_return_good_trivial() async {
-    await assertNoDiagnostics(
-      r'''
+    await assertNoDiagnostics(r'''
 int returnVarTestTrivial() {
   return 1;
 }
-  ''',
-    );
+  ''');
   }
 
   void test_does_not_report_if_return_is_mutable() async {
-    await assertNoDiagnostics(
-      r'''
+    await assertNoDiagnostics(r'''
 int returnVarTestMutable() {
   var a = 1;
   a++;
 
   return a;
 }
-  ''',
-    );
+  ''');
   }
 
   void test_does_not_report_if_returns_parameter() async {
-    await assertNoDiagnostics(
-      r'''
+    await assertNoDiagnostics(r'''
 int returnVarTestReturnParameter(int param) {
   return param;
 }
-  ''',
-    );
+  ''');
   }
 
   void test_does_not_report_if_return_is_cached_mutable() async {
-    await assertNoDiagnostics(
-      r'''
+    await assertNoDiagnostics(r'''
 int returnVarTestCachedMutable() {
   var a = 1;
   final result = a;
@@ -64,12 +57,12 @@ int returnVarTestCachedMutable() {
 }
 
 void _doNothing() {}
-  ''',
-    );
+  ''');
   }
 
   void test_reports_if_return_follows_declaration() async {
-    await assertDiagnostics(r'''
+    await assertDiagnostics(
+      r'''
 int returnVarTestReturnFollowsDeclaration() {
   var a = 1;
   final result = a;
@@ -78,12 +71,13 @@ int returnVarTestReturnFollowsDeclaration() {
 
   return result;
 }
-  ''', [lint(105, 14)]);
+  ''',
+      [lint(105, 14)],
+    );
   }
 
   void test_does_not_report_if_return_is_cached_another_method_result() async {
-    await assertNoDiagnostics(
-      r'''
+    await assertNoDiagnostics(r'''
 int returnVarTestCachedAnotherMethodResult() {
   var a = 1;
   final result = _testValueEval();
@@ -97,13 +91,11 @@ int _testValueEval() {
 }
 
 void _doNothing() {}
-''',
-    );
+''');
   }
 
   void test_does_not_report_if_return_is_cached_object_field() async {
-    await assertNoDiagnostics(
-      r'''
+    await assertNoDiagnostics(r'''
 int returnVarTestCachedObjectField() {
   final obj = _TestClass();
   final result = obj.varField;
@@ -121,13 +113,11 @@ class _TestClass {
 }
 
 void _doNothing() {}
-''',
-    );
+''');
   }
 
   void test_does_not_report_if_return_used_variable() async {
-    await assertNoDiagnostics(
-      r'''
+    await assertNoDiagnostics(r'''
 int returnVarTestUsedVariable() {
   var a = 1;
   final result = 2;
@@ -135,22 +125,25 @@ int returnVarTestUsedVariable() {
 
   return result;
 }
-''',
-    );
+''');
   }
 
   void test_reports_if_return_is_bad_trivial() async {
-    await assertDiagnostics(r'''
+    await assertDiagnostics(
+      r'''
 int returnVarTestBadTrivial() {
   final result = 1;
 
   return result;
 }
-''', [lint(55, 14)]);
+''',
+      [lint(55, 14)],
+    );
   }
 
   void test_reports_if_return_is_bad_immutable_expression() async {
-    await assertDiagnostics(r'''
+    await assertDiagnostics(
+      r'''
 int returnVarTestBadImmutableExpression() {
   const constLocal = 1;
   final finalLocal = 1;
@@ -175,6 +168,8 @@ class _TestClass {
 }
 
 void _doNothing() {}
-''', [lint(304, 14)]);
+''',
+      [lint(304, 14)],
+    );
   }
 }
