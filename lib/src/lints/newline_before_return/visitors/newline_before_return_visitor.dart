@@ -28,7 +28,7 @@ import 'package:analyzer/source/line_info.dart';
 import 'package:solid_lints/src/lints/newline_before_return/newline_before_return_rule.dart';
 
 /// Visitor for [NewlineBeforeReturnRule].
-class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
+class NewLineBeforeReturnVisitor extends SimpleAstVisitor<void> {
   final NewlineBeforeReturnRule _rule;
 
   /// Creates instance of [NewLineBeforeReturnVisitor] with line info
