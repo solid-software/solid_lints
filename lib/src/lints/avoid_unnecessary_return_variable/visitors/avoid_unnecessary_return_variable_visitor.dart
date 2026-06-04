@@ -8,10 +8,10 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors
 /// Visitor for [AvoidUnnecessaryReturnVariableRule].
 class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with this visitor.
-  final AvoidUnnecessaryReturnVariableRule rule;
+  final AvoidUnnecessaryReturnVariableRule _rule;
 
   /// Creates a new instance of [AvoidUnnecessaryReturnVariableVisitor].
-  AvoidUnnecessaryReturnVariableVisitor(this.rule);
+  AvoidUnnecessaryReturnVariableVisitor(this._rule);
 
   @override
   void visitReturnStatement(ReturnStatement node) {
@@ -36,7 +36,7 @@ class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
 
     //it is 100% bad if return statement follows declaration
     if (!returnVariableUsageVisitor.foundTokensBetweenDeclarationAndReturn) {
-      rule.reportAtNode(node);
+      _rule.reportAtNode(node);
       return;
     }
 
@@ -48,7 +48,7 @@ class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
 
     if (!_isExpressionImmutable(initializer)) return;
 
-    rule.reportAtNode(node);
+    _rule.reportAtNode(node);
   }
 
   bool _isExpressionImmutable(Expression expr) {
