@@ -64,7 +64,7 @@ class AvoidUnnecessarySetStateRule extends AnalysisRule {
       'Consider changing the state directly.';
 
   /// The lint code for this rule.
-  static const LintCode _code = LintCode(
+  static const _code = LintCode(
     lintName,
     lintMessage,
   );
