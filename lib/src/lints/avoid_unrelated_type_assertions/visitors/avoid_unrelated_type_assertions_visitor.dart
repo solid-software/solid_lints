@@ -29,7 +29,7 @@ import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unrelated_type_assertions_rule.dart';
 
 /// Visitor for [AvoidUnrelatedTypeAssertionsRule].
-class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
+class AvoidUnrelatedTypeAssertionsVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with this visitor.
   final AvoidUnrelatedTypeAssertionsRule _rule;
 
