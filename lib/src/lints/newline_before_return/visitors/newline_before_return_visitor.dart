@@ -57,9 +57,12 @@ class NewLineBeforeReturnVisitor extends SimpleAstVisitor<void> {
     if (root is! CompilationUnit) return true;
 
     final lineInfo = root.lineInfo;
+    final previousToken = node.returnKeyword.previous;
+
+    if (previousToken == null) return true;
 
     final previousTokenLineNumber = lineInfo
-        .getLocation(node.returnKeyword.previous!.end)
+        .getLocation(previousToken.end)
         .lineNumber;
     final lastNotEmptyLineToken = _optimalToken(node.returnKeyword, lineInfo);
     final tokenLineNumber = lineInfo
