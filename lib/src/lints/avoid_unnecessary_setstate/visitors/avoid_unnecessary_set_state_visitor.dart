@@ -24,11 +24,12 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/avoid_unnecessary_set_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/visitors/avoid_unnecessary_set_state_method_visitor.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
 
-/// AST visitor which checks if class is State, in case yes checks its methods
-class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
+/// Visitor for [AvoidUnnecessarySetStateRule].
+class AvoidUnnecessarySetStateVisitor extends SimpleAstVisitor<void> {
   static const _checkedMethods = [
     'initState',
     'didUpdateWidget',
@@ -36,10 +37,13 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
     'build',
   ];
 
+  /// The rule associated with this visitor.
+  final AvoidUnnecessarySetStateRule _rule;
+
   final _setStateInvocations = <MethodInvocation>[];
 
-  /// Unnecessary setState invocations
-  Iterable<MethodInvocation> get setStateInvocations => _setStateInvocations;
+  /// Creates an instance of [AvoidUnnecessarySetStateVisitor].
+  AvoidUnnecessarySetStateVisitor(this._rule);
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
@@ -50,9 +54,16 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    final methods = node.members.whereType<MethodDeclaration>();
-    final classMethodsNames =
-        methods.map((declaration) => declaration.name.lexeme).toSet();
+    final body = node.body;
+
+    if (body is! BlockClassBody) {
+      return;
+    }
+
+    final methods = body.members.whereType<MethodDeclaration>();
+    final classMethodsNames = methods
+        .map((declaration) => declaration.name.lexeme)
+        .toSet();
     final methodBodies = methods.map((declaration) => declaration.body).toSet();
 
     final checkedMethods = methods.where(_isMethodChecked);
@@ -83,6 +94,10 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
             )
             .toList(),
       );
+
+      for (final element in _setStateInvocations) {
+        _rule.reportAtNode(element);
+      }
     }
   }
 
@@ -105,8 +120,10 @@ class AvoidUnnecessarySetStateVisitor extends RecursiveAstVisitor<void> {
       return true;
     }
 
-    final visitor =
-        AvoidUnnecessarySetStateMethodVisitor(classMethodsNames, bodies);
+    final visitor = AvoidUnnecessarySetStateMethodVisitor(
+      classMethodsNames,
+      bodies,
+    );
     declaration.visitChildren(visitor);
 
     final hasSetState = visitor.setStateInvocations.isNotEmpty;

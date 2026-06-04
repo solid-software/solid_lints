@@ -57,12 +57,14 @@ class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
     ReturnStatement node,
     LineInfo lineInfo,
   ) {
-    final previousTokenLineNumber =
-        lineInfo.getLocation(node.returnKeyword.previous!.end).lineNumber;
+    final previousTokenLineNumber = lineInfo
+        .getLocation(node.returnKeyword.previous!.end)
+        .lineNumber;
 
     final lastNotEmptyLineToken = _optimalToken(node.returnKeyword, lineInfo);
-    final tokenLineNumber =
-        lineInfo.getLocation(lastNotEmptyLineToken.offset).lineNumber;
+    final tokenLineNumber = lineInfo
+        .getLocation(lastNotEmptyLineToken.offset)
+        .lineNumber;
 
     return tokenLineNumber > previousTokenLineNumber + 1;
   }
