@@ -100,7 +100,7 @@ class NewlineBeforeReturnRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    final visitor = NewLineBeforeReturnVisitor(this, context);
+    final visitor = NewLineBeforeReturnVisitor(this);
     registry.addReturnStatement(this, visitor);
   }
 }
