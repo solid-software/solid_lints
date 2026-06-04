@@ -50,7 +50,7 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
     if (_isUnrelatedTypeCheck(objectType, castedType)) {
       rule.reportAtNode(
         node,
-        arguments: [if (node.notOperator != null) 'false' else 'true'],
+        arguments: [if (node.notOperator != null) 'true' else 'false'],
       );
     }
   }
