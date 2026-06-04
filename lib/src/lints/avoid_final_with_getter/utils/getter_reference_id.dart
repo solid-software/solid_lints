@@ -5,15 +5,33 @@ import 'package:analyzer/dart/element/element.dart';
 extension GetterReferenceId on MethodDeclaration {
   /// Get the reference id of the getter.
   int? get getterReferenceId {
-    if (body
-        case ExpressionFunctionBody(
-          expression: SimpleIdentifier(
-            element: PropertyAccessorElement(:final variable)
-          )
-        )) {
-      return variable.id;
-    }
+    final returnExpression = switch (body) {
+      ExpressionFunctionBody(expression: final expr) ||
+      BlockFunctionBody(
+        block: Block(
+          statements: [
+            ReturnStatement(expression: final expr?),
+          ],
+        )
+      ) =>
+        expr,
+      _ => null,
+    };
 
-    return null;
+    final identifier = switch (returnExpression) {
+      SimpleIdentifier() => returnExpression,
+      PropertyAccess(
+        target: ThisExpression(),
+        :final propertyName,
+      ) =>
+        propertyName,
+      _ => null,
+    };
+
+    return switch (identifier) {
+      SimpleIdentifier(element: PropertyAccessorElement(:final variable)) =>
+        variable.id,
+      _ => null,
+    };
   }
 }

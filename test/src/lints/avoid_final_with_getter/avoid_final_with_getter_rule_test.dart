@@ -55,38 +55,77 @@ class Test {
     );
   }
 
-  Future<void> test_does_not_report_on_getter_that_contains_logic() async {
-    await assertNoDiagnostics(
+  Future<void> test_reports_on_getter_with_this_property_access() async {
+    await assertDiagnostics(
       r'''
 class Test {
   final int _myField = 0;
   
-  int get myField => _myField + 1;
+  int get myField => this._myField;
 }
 ''',
-    );
-  }
-
-  Future<void> test_does_not_report_on_public_final_field() async {
-    await assertNoDiagnostics(
-      r'''
-class Test {
-  final int myField = 0;
-}
-''',
+      [lint(44, 33)],
     );
   }
 
   Future<void>
-      test_does_not_report_on_getter_returning_mutable_private_field() async {
-    await assertNoDiagnostics(
+  test_reports_on_block_body_getter_returning_private_field() async {
+    await assertDiagnostics(
       r'''
 class Test {
-  int _myField = 0;
-
-  int get myField => _myField;
+  final int _myField = 0;
+  
+  int get myField {
+    return _myField;
+  }
 }
 ''',
+      [lint(44, 42)],
     );
+  }
+
+  Future<void> test_does_not_report_on_getter_that_contains_logic() async {
+    await assertNoDiagnostics(r'''
+class Test {
+  final int _myField = 0;
+  final int _myField2 = 1;
+  final int _myField3 = 2;
+  
+  int get myField => _myField + 1;
+
+  int get myField2 => this._myField2 + 1;
+
+  int get myField3 {
+    return this._myField3 + 1;
+  }
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_public_final_field() async {
+    await assertNoDiagnostics(r'''
+class Test {
+  final int myField = 0;
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_on_getter_returning_mutable_private_field() async {
+    await assertNoDiagnostics(r'''
+class Test {
+  int _myField = 0;
+  int _myField2 = 1;
+  int _myField3 = 2;
+  
+  int get myField => _myField;
+
+  int get myField2 => this._myField2;
+
+  int get myField3 {
+    return _myField3;
+  }
+}
+''');
   }
 }
