@@ -24,18 +24,14 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/source/line_info.dart';
+import 'package:solid_lints/src/lints/newline_before_return/newline_before_return_rule.dart';
 
-/// The AST visitor that will all return statements.
+/// Visitor for [NewlineBeforeReturnRule].
 class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
-  final LineInfo _lineInfo;
-  final _statements = <ReturnStatement>[];
+  final NewlineBeforeReturnRule _rule;
 
   /// Creates instance of [NewLineBeforeReturnVisitor] with line info
-  NewLineBeforeReturnVisitor(this._lineInfo);
-
-  /// List of all return statements
-  Iterable<ReturnStatement> get statements => _statements;
+  NewLineBeforeReturnVisitor(this._rule);
 
   @override
   void visitReturnStatement(ReturnStatement node) {
@@ -43,9 +39,9 @@ class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
 
     if (!_statementIsInBlock(node)) return;
     if (_statementIsFirstInBlock(node)) return;
-    if (_statementHasNewLineBefore(node, _lineInfo)) return;
+    if (_statementHasNewLineBefore(node)) return;
 
-    _statements.add(node);
+    _rule.reportAtNode(node);
   }
 
   static bool _statementIsInBlock(ReturnStatement node) => node.parent is Block;
@@ -55,26 +51,27 @@ class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
 
   static bool _statementHasNewLineBefore(
     ReturnStatement node,
-    LineInfo lineInfo,
   ) {
-    final previousTokenLineNumber =
-        lineInfo.getLocation(node.returnKeyword.previous!.end).lineNumber;
+    final source = node.root.toSource();
 
-    final lastNotEmptyLineToken = _optimalToken(node.returnKeyword, lineInfo);
-    final tokenLineNumber =
-        lineInfo.getLocation(lastNotEmptyLineToken.offset).lineNumber;
+    final previousToken = node.returnKeyword.previous!;
+    final lastNotEmptyLineToken = _optimalToken(node.returnKeyword, source);
 
-    return tokenLineNumber > previousTokenLineNumber + 1;
+    return _hasBlankLineBetween(
+      previousToken,
+      lastNotEmptyLineToken,
+      source,
+    );
   }
 
   /// If return statement has comment above ignores all the comment lines
-  static Token _optimalToken(Token token, LineInfo lineInfo) {
+  static Token _optimalToken(Token token, String source) {
     var optimalToken = token;
 
     var commentToken = _latestCommentToken(token);
+
     while (commentToken != null &&
-        lineInfo.getLocation(commentToken.end).lineNumber + 1 >=
-            lineInfo.getLocation(optimalToken.offset).lineNumber) {
+        !_hasBlankLineBetween(commentToken, optimalToken, source)) {
       optimalToken = commentToken;
       commentToken = commentToken.previous;
     }
@@ -84,10 +81,22 @@ class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
 
   static Token? _latestCommentToken(Token token) {
     Token? latestCommentToken = token.precedingComments;
-    while (latestCommentToken?.next != null) {
-      latestCommentToken = latestCommentToken?.next;
+
+    if (latestCommentToken == null) return null;
+
+    while (latestCommentToken!.next != null) {
+      latestCommentToken = latestCommentToken.next;
     }
 
     return latestCommentToken;
+  }
+
+  static bool _hasBlankLineBetween(Token a, Token b, String source) {
+    final aEnd = a.end;
+    final bStart = b.offset;
+
+    final between = source.substring(aEnd, bStart);
+
+    return between.contains('\n\n');
   }
 }
