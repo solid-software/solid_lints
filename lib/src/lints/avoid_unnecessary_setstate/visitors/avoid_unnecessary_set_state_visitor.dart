@@ -40,10 +40,10 @@ class AvoidUnnecessarySetStateVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with this visitor.
   final AvoidUnnecessarySetStateRule rule;
 
+  final _setStateInvocations = <MethodInvocation>[];
+
   /// Creates an instance of [AvoidUnnecessarySetStateVisitor].
   AvoidUnnecessarySetStateVisitor(this.rule);
-
-  final _setStateInvocations = <MethodInvocation>[];
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {

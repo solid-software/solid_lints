@@ -74,7 +74,7 @@ class ElevatedButton extends Widget {
   }
 
   @override
-  String get analysisRule => AvoidUnnecessarySetStateRule.lintName;
+  String get analysisRule => rule.name;
 
   void test_reports_set_state_in_init_state() async {
     await assertDiagnostics(
