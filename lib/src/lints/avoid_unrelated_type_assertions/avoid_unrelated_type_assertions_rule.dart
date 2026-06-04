@@ -8,24 +8,24 @@ import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/visitors/a
 /// warns about unnecessary usage of `as` operator
 class AvoidUnrelatedTypeAssertionsRule extends AnalysisRule {
   /// The name of the lint rule.
-  static const lintName = 'avoid_unrelated_type_assertions';
+  static const _lintName = 'avoid_unrelated_type_assertions';
 
   /// The message shown when the lint rule is triggered.
-  static const lintMessage =
+  static const _lintMessage =
       'Avoid unrelated "is" assertion. The result is always "{0}".';
 
   /// Lint code for this rule.
   static const LintCode _code = LintCode(
-    lintName,
-    lintMessage,
+    _lintName,
+    _lintMessage,
   );
 
   /// Creates a new instance of [AvoidUnrelatedTypeAssertionsRule].
   AvoidUnrelatedTypeAssertionsRule()
-      : super(
-          name: lintName,
-          description: lintMessage,
-        );
+    : super(
+        name: _lintName,
+        description: _lintMessage,
+      );
 
   @override
   LintCode get diagnosticCode => _code;

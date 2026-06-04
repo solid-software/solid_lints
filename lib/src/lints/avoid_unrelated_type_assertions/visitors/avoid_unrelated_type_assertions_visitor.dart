@@ -31,10 +31,10 @@ import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unre
 /// Visitor for [AvoidUnrelatedTypeAssertionsRule].
 class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
   /// The rule associated with this visitor.
-  final AvoidUnrelatedTypeAssertionsRule rule;
+  final AvoidUnrelatedTypeAssertionsRule _rule;
 
   /// Creates an instance of [AvoidUnrelatedTypeAssertionsVisitor].
-  AvoidUnrelatedTypeAssertionsVisitor(this.rule);
+  AvoidUnrelatedTypeAssertionsVisitor(this._rule);
 
   @override
   void visitIsExpression(IsExpression node) {
@@ -48,7 +48,7 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
     final objectType = node.expression.staticType;
 
     if (_isUnrelatedTypeCheck(objectType, castedType)) {
-      rule.reportAtNode(
+      _rule.reportAtNode(
         node,
         arguments: [if (node.notOperator != null) 'true' else 'false'],
       );
@@ -68,10 +68,14 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
       return false;
     }
 
-    final objectCastedType =
-        _foundCastedTypeInObjectTypeHierarchy(objectType, castedType);
-    final castedObjectType =
-        _foundCastedTypeInObjectTypeHierarchy(castedType, objectType);
+    final objectCastedType = _foundCastedTypeInObjectTypeHierarchy(
+      objectType,
+      castedType,
+    );
+    final castedObjectType = _foundCastedTypeInObjectTypeHierarchy(
+      castedType,
+      objectType,
+    );
     if (objectCastedType == null && castedObjectType == null) {
       return true;
     }
@@ -98,8 +102,8 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
 
     final correctObjectType =
         objectType is InterfaceType && objectType.isDartAsyncFutureOr
-            ? objectType.typeArguments.first
-            : objectType;
+        ? objectType.typeArguments.first
+        : objectType;
 
     if ((correctObjectType.element == castedType.element) ||
         castedType is DynamicType ||
@@ -109,8 +113,9 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (correctObjectType is InterfaceType) {
-      return correctObjectType.allSupertypes
-          .firstWhereOrNull((value) => value.element == castedType.element);
+      return correctObjectType.allSupertypes.firstWhereOrNull(
+        (value) => value.element == castedType.element,
+      );
     }
 
     return null;

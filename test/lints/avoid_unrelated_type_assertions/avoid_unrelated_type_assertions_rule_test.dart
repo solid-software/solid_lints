@@ -17,7 +17,7 @@ class AvoidUnrelatedTypeAssertionsRuleTest extends AnalysisRuleTest {
   }
 
   @override
-  String get analysisRule => AvoidUnrelatedTypeAssertionsRule.lintName;
+  String get analysisRule => rule.name;
 
   void test_reports_unrelated_string_is_int() async {
     await assertDiagnostics(
