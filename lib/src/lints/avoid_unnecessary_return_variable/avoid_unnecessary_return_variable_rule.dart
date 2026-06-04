@@ -1,11 +1,8 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/common/visitors/select_expression_identifiers_visitor.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors/avoid_unnecessary_return_variable_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// An `avoid_unnecessary_return_variable` rule which forbids returning
 /// an immutable variable if it can be rewritten in return statement itself.
@@ -32,109 +29,37 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-class AvoidUnnecessaryReturnVariableRule extends SolidLintRule {
-  /// This lint rule represents the error
-  /// when unnecessary return variable statement is found
-  static const lintName = 'avoid_unnecessary_return_variable';
+class AvoidUnnecessaryReturnVariableRule extends AnalysisRule {
+  /// The name of the lint rule.
+  static const _lintName = 'avoid_unnecessary_return_variable';
 
-  AvoidUnnecessaryReturnVariableRule._(super.config);
+  /// The message shown when the lint is triggered.
+  static const String _lintMessage = """
+Avoid creating unnecessary variable only for return.
+Rewrite the variable evaluation into return statement instead.""";
+
+  /// Lint code.
+  static const LintCode _code = LintCode(
+    _lintName,
+    _lintMessage,
+  );
 
   /// Creates a new instance of [AvoidUnnecessaryReturnVariableRule]
-  /// based on the lint configuration.
-  factory AvoidUnnecessaryReturnVariableRule.createRule(
-    CustomLintConfigs configs,
-  ) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (_) => """
-Avoid creating unnecessary variable only for return.
-Rewrite the variable evaluation into return statement instead.""",
-    );
-
-    return AvoidUnnecessaryReturnVariableRule._(rule);
-  }
+  AvoidUnnecessaryReturnVariableRule()
+    : super(
+        name: _lintName,
+        description: _lintMessage,
+      );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => _code;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addReturnStatement(
-      (statement) {
-        _checkReturnStatement(
-          statement: statement,
-          reporter: reporter,
-          context: context,
-        );
-      },
-    );
-  }
-
-  void _checkReturnStatement({
-    required ReturnStatement statement,
-    required DiagnosticReporter reporter,
-    required CustomLintContext context,
-  }) {
-    final expr = statement.expression;
-    if (expr is! SimpleIdentifier) return;
-
-    final element = expr.element;
-    if (element is! LocalVariableElement) return;
-    final returnVariableElement = element;
-
-    if (!returnVariableElement.isFinal && !returnVariableElement.isConst) {
-      return;
-    }
-
-    final blockBody = statement.parent;
-    if (blockBody == null) return;
-
-    final visitor = AvoidUnnecessaryReturnVariableVisitor(
-      returnVariableElement,
-      statement,
-    );
-    blockBody.visitChildren(visitor);
-
-    if (!visitor.hasBadStatementCount()) return;
-
-    //it is 100% bad if return statement follows declaration
-    if (!visitor.foundTokensBetweenDeclarationAndReturn) {
-      reporter.atNode(statement, code);
-      return;
-    }
-
-    final declaration = visitor.variableDeclaration;
-
-    //check if immutable
-    final initializer = declaration?.initializer;
-    if (initializer == null) return;
-
-    if (!_isExpressionImmutable(initializer)) return;
-
-    reporter.atNode(statement, code);
-  }
-
-  bool _isExpressionImmutable(Expression expr) {
-    final visitor = SelectExpressionIdentifiersVisitor();
-    expr.accept(visitor);
-
-    return visitor.identifiers.every(_isSimpleIdentifierImmutable);
-  }
-
-  bool _isSimpleIdentifierImmutable(SimpleIdentifier identifier) {
-    switch (identifier.element) {
-      case final VariableElement variable:
-        return variable.isFinal || variable.isConst;
-
-      case ClassElement _:
-        return true;
-
-      case GetterElement(:final PropertyInducingElement variable):
-        return variable.isFinal || variable.isConst;
-    }
-
-    return false;
+    final visitor = AvoidUnnecessaryReturnVariableVisitor(this);
+    registry.addReturnStatement(this, visitor);
   }
 }
