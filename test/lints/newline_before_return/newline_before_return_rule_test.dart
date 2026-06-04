@@ -56,6 +56,31 @@ void method() {
     );
   }
 
+  void test_reports_no_newline_before_return_with_multiple_comments() async {
+    await assertDiagnostics(
+      r'''
+void method() {
+  final a = 0;
+  // Comment 1
+  // Comment 2
+  return;
+}
+  ''',
+      [lint(63, 7)],
+    );
+  }
+
+  void test_does_not_report_newline_before_return_with_comment() async {
+    await assertNoDiagnostics(r'''
+void method() {
+  final a = 0;
+ 
+  // Comment
+  return;
+}
+  ''');
+  }
+
   void test_does_not_report_no_newline_before_single_statement_return() async {
     await assertNoDiagnostics(r'''
 void method() {
