@@ -25,14 +25,17 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/line_info.dart';
-import 'package:solid_lints/src/lints/newline_before_return/newline_before_return_rule.dart';
 
-/// Visitor for [NewlineBeforeReturnRule].
-class NewLineBeforeReturnVisitor extends SimpleAstVisitor<void> {
-  final NewlineBeforeReturnRule _rule;
+/// The AST visitor that will all return statements.
+class NewLineBeforeReturnVisitor extends RecursiveAstVisitor<void> {
+  final LineInfo _lineInfo;
+  final _statements = <ReturnStatement>[];
 
   /// Creates instance of [NewLineBeforeReturnVisitor] with line info
-  NewLineBeforeReturnVisitor(this._rule);
+  NewLineBeforeReturnVisitor(this._lineInfo);
+
+  /// List of all return statements
+  Iterable<ReturnStatement> get statements => _statements;
 
   @override
   void visitReturnStatement(ReturnStatement node) {
@@ -40,9 +43,9 @@ class NewLineBeforeReturnVisitor extends SimpleAstVisitor<void> {
 
     if (!_statementIsInBlock(node)) return;
     if (_statementIsFirstInBlock(node)) return;
-    if (_statementHasNewLineBefore(node)) return;
+    if (_statementHasNewLineBefore(node, _lineInfo)) return;
 
-    _rule.reportAtNode(node);
+    _statements.add(node);
   }
 
   static bool _statementIsInBlock(ReturnStatement node) => node.parent is Block;
@@ -52,15 +55,12 @@ class NewLineBeforeReturnVisitor extends SimpleAstVisitor<void> {
 
   static bool _statementHasNewLineBefore(
     ReturnStatement node,
+    LineInfo lineInfo,
   ) {
-    final root = node.root;
-    if (root is! CompilationUnit) return true;
-
-    final lineInfo = root.lineInfo;
-
     final previousTokenLineNumber = lineInfo
         .getLocation(node.returnKeyword.previous!.end)
         .lineNumber;
+
     final lastNotEmptyLineToken = _optimalToken(node.returnKeyword, lineInfo);
     final tokenLineNumber = lineInfo
         .getLocation(lastNotEmptyLineToken.offset)
