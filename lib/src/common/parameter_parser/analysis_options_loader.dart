@@ -15,29 +15,34 @@ class AnalysisOptionsLoader {
             resourceProvider ?? PhysicalResourceProvider.INSTANCE;
 
   /// Gets the options for a specific rule by its name.
-  Map<String, Object?>? getRuleOptions(RuleContext context, String ruleName) {
+  Map<String, Object?>? getRuleOptions(RuleContext context, String ruleName) =>
+      _withNearestAnalysisOptionsFilePathForContext<Map<String, Object?>?>(
+        context,
+        (path) => _rulesCache[path]?.rules[ruleName],
+      );
+
+  /// Loads lint rules from the analysis options file for all rules
+  /// using the provided [RuleContext].
+  void loadRulesOptionsFromContext(RuleContext context) =>
+      _withNearestAnalysisOptionsFilePathForContext(
+        context,
+        _loadRulesOptionsIfNewer,
+      );
+
+  T? _withNearestAnalysisOptionsFilePathForContext<T>(
+    RuleContext context,
+    T Function(String) f,
+  ) {
     final packageRootPath = context.package?.root.path;
     if (packageRootPath == null) return null;
 
     final yamlPath = _findNearestAnalysisOptionsFilePath(packageRootPath);
     if (yamlPath == null) return null;
 
-    return _rulesCache[yamlPath]?.rules[ruleName];
+    return f(yamlPath);
   }
 
-  /// Loads lint rules from the analysis options file for all rules
-  /// using the provided [RuleContext].
-  void loadRulesOptionsFromContext(RuleContext context) {
-    final packageRootPath = context.package?.root.path;
-    if (packageRootPath == null) return;
-
-    _loadRulesOptionsIfNewer(packageRootPath);
-  }
-
-  void _loadRulesOptionsIfNewer(String rootPath) {
-    final yamlPath = _findNearestAnalysisOptionsFilePath(rootPath);
-    if (yamlPath == null) return;
-
+  void _loadRulesOptionsIfNewer(String yamlPath) {
     final analysisOptionsFile = _resourceProvider.getFile(yamlPath);
     final modificationStamp = analysisOptionsFile.modificationStamp;
     final cachedRules = _rulesCache[yamlPath];
