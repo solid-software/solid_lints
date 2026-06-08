@@ -25,21 +25,23 @@ class SolidLintsPlugin extends Plugin {
   @override
   void register(PluginRegistry registry) {
     final analysisLoader = AnalysisOptionsLoader();
-    registry.registerLintRule(
-      AvoidGlobalStateRule(analysisLoader),
-    );
-    registry.registerLintRule(
-      AvoidNonNullAssertionRule(),
-    );
-    registry.registerLintRule(
-      AvoidDebugPrintInReleaseRule(),
-    );
-    registry.registerLintRule(
-      ProperSuperCallsRule(),
-    );
 
     final doubleLiteralFormatRule = DoubleLiteralFormatRule();
-    registry.registerLintRule(doubleLiteralFormatRule);
+    final lintRules = [
+      AvoidGlobalStateRule(),
+      AvoidNonNullAssertionRule(),
+      AvoidDebugPrintInReleaseRule(),
+      doubleLiteralFormatRule,
+      ProperSuperCallsRule(),
+      // TODO: Add more lint rules and use analysisLoader
+      // for rules that need parameters
+      // For example: `CyclomaticComplexityRule(analysisLoader)`
+    ];
+
+    for (final lintRule in lintRules) {
+      registry.registerLintRule(lintRule);
+    }
+
     for (final code in doubleLiteralFormatRule.diagnosticCodes) {
       registry.registerFixForRule(code, DoubleLiteralFormatFix.new);
     }

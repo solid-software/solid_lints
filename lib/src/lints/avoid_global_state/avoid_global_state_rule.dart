@@ -2,7 +2,6 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
-import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/visitors/avoid_global_state_visitor.dart';
 
 /// Avoid top-level and static mutable variables.
@@ -47,10 +46,8 @@ class AvoidGlobalStateRule extends AnalysisRule {
         'Prefer using final/const or a state management solution.',
   );
 
-  final AnalysisOptionsLoader _analysisLoader;
-
   /// Creates an instance of [AvoidGlobalStateRule].
-  AvoidGlobalStateRule(this._analysisLoader)
+  AvoidGlobalStateRule()
       : super(
           name: lintName,
           description: 'Avoid top-level or static mutable variables ',
@@ -65,10 +62,6 @@ class AvoidGlobalStateRule extends AnalysisRule {
     RuleContext context,
   ) {
     final visitor = AvoidGlobalStateVisitor(this);
-
-    _analysisLoader.loadRulesOptionsFromContext(context);
-    // To get the options of the rule:
-    // _analysisLoader.getRuleOptions(context, lintName);
 
     registry.addTopLevelVariableDeclaration(this, visitor);
     registry.addFieldDeclaration(this, visitor);
