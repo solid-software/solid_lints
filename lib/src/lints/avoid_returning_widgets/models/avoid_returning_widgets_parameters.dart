@@ -11,6 +11,13 @@ class AvoidReturningWidgetsParameters {
     required this.exclude,
   });
 
+  /// Empty [AvoidReturningWidgetsParameters] model, excludes nothing.
+  factory AvoidReturningWidgetsParameters.empty() {
+    return AvoidReturningWidgetsParameters(
+      exclude: ExcludedIdentifiersListParameter(exclude: []),
+    );
+  }
+
   /// Method for creating from json data
   factory AvoidReturningWidgetsParameters.fromJson(Map<String, dynamic> json) {
     return AvoidReturningWidgetsParameters(

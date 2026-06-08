@@ -82,7 +82,7 @@ class ExcludedIdentifiersListParameter {
       final classDeclaration = node.thisOrAncestorOfType<ClassDeclaration>();
 
       return classDeclaration != null &&
-          classDeclaration.name.toString() == className;
+          classDeclaration.namePart.typeName.lexeme == className;
     }
   }
 }

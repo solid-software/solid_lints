@@ -4,6 +4,8 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
+import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
+import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
@@ -33,9 +35,10 @@ class SolidLintsPlugin extends Plugin {
       AvoidDebugPrintInReleaseRule(),
       doubleLiteralFormatRule,
       ProperSuperCallsRule(),
-      // TODO: Add more lint rules and use analysisLoader
-      // for rules that need parameters
-      // For example: `CyclomaticComplexityRule(analysisLoader)`
+      AvoidReturningWidgetsRule(
+        analysisOptionsLoader: analysisLoader,
+        parametersParser: AvoidReturningWidgetsParameters.fromJson,
+      ),
     ];
 
     for (final lintRule in lintRules) {
