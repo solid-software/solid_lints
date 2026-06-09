@@ -11,6 +11,9 @@ environment:
   sdk: ">=3.9.0 <4.0.0"
 
 dependencies:
+  # Needed until required types for fixes are exported by analyzer_server_plugin
+  # More details: https://github.com/dart-lang/sdk/issues/61821
+  analyzer_plugin: ^0.14.2
   analyzer: ^10.0.1
   collection: ^1.19.0
   analysis_server_plugin: ^0.3.3
@@ -23,4 +26,3 @@ dev_dependencies:
   args: ^2.6.0
   analyzer_testing: ^0.1.9
   test_reflective_loader: ^0.3.0
-

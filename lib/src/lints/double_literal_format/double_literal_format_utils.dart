@@ -1,7 +1,8 @@
-part of 'double_literal_format_rule.dart';
+import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 
-/// Useful extensions for double literals representation
-extension _StringDoubleEx on String {
+/// Extension to quickly check double literal formatting according to
+/// [DoubleLiteralFormatRule].
+extension DoubleLiteralFormatUtils on String {
   /// Returns true if a double literal starts with 00
   bool get hasLeadingZero => startsWith('0') && this[1] != '.';
 

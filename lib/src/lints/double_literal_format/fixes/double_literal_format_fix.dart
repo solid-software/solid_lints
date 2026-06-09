@@ -1,44 +1,62 @@
-part of '../double_literal_format_rule.dart';
+import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
+import 'package:analysis_server_plugin/edit/dart/dart_fix_kind_priority.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
+import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
+import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
+import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_utils.dart';
 
-/// A Quick fix for `double_literal_format` rule
+/// A Quick fix for [DoubleLiteralFormatRule] rule
 /// Suggests the correct value for an issue
-class _DoubleLiteralFormatFix extends DartFix {
+class DoubleLiteralFormatFix extends ParsedCorrectionProducer {
+  static const _doubleLiteralFormatKind = FixKind(
+    'solid_lints.fix.${DoubleLiteralFormatRule.lintName}',
+    DartFixKindPriority.standard,
+    "Fix double literal format",
+  );
+
+  /// Creates a new instance of [DoubleLiteralFormatFix].
+  DoubleLiteralFormatFix({required super.context});
+
   @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    Diagnostic analysisError,
-    List<Diagnostic> others,
-  ) {
-    context.registry.addDoubleLiteral((node) {
-      // checks that the literal declaration is where our warning is located
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+  FixKind get fixKind => _doubleLiteralFormatKind;
 
-      final lexeme = node.literal.lexeme;
-      String? correctLexeme;
+  @override
+  FixKind get multiFixKind => const FixKind(
+    'solid_lints.fix.multi.${DoubleLiteralFormatRule.lintName}',
+    DartFixKindPriority.standard,
+    "Fix double literal format across files",
+  );
 
-      if (lexeme.hasLeadingZero) {
-        correctLexeme = _correctLeadingZeroLexeme(lexeme);
-      } else if (lexeme.hasLeadingDecimalPoint) {
-        correctLexeme = _correctLeadingDecimalPointLexeme(lexeme);
-      } else if (lexeme.hasTrailingZero) {
-        correctLexeme = _correctTrailingZeroLexeme(lexeme);
-      }
+  @override
+  CorrectionApplicability get applicability =>
+      CorrectionApplicability.automatically;
 
-      if (correctLexeme != null) {
-        final changeBuilder = reporter.createChangeBuilder(
-          message: 'Replace by $correctLexeme',
-          priority: 1,
-        );
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final doubleLiteralNode = node;
+    if (doubleLiteralNode is! DoubleLiteral) return;
 
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleReplacement(
-            SourceRange(node.offset, node.length),
-            correctLexeme!,
-          );
-        });
-      }
+    final lexeme = doubleLiteralNode.literal.lexeme;
+    if (!lexeme.hasLeadingZero &&
+        !lexeme.hasLeadingDecimalPoint &&
+        !lexeme.hasTrailingZero) {
+      return;
+    }
+
+    final correctLexeme = _correctTrailingZeroLexeme(
+      _correctLeadingZeroLexeme(
+        _correctLeadingDecimalPointLexeme(
+          lexeme,
+        ),
+      ),
+    );
+
+    await builder.addDartFileEdit(file, (builder) {
+      builder.addSimpleReplacement(
+        doubleLiteralNode.sourceRange,
+        correctLexeme,
+      );
     });
   }
 
@@ -46,19 +64,21 @@ class _DoubleLiteralFormatFix extends DartFix {
       ? lexeme
       : _correctLeadingZeroLexeme(lexeme.substring(1));
 
-  String _correctLeadingDecimalPointLexeme(String lexeme) => '0$lexeme';
+  String _correctLeadingDecimalPointLexeme(String lexeme) =>
+      lexeme.hasLeadingDecimalPoint ? '0$lexeme' : lexeme;
 
   String _correctTrailingZeroLexeme(String lexeme) {
     if (!lexeme.hasTrailingZero) {
       return lexeme;
-    } else {
-      final mantissa = lexeme.split('e').first;
-      return _correctTrailingZeroLexeme(
-        lexeme.replaceFirst(
-          mantissa,
-          mantissa.substring(0, mantissa.length - 1),
-        ),
-      );
     }
+
+    final mantissa = lexeme.split('e').first;
+
+    return _correctTrailingZeroLexeme(
+      lexeme.replaceFirst(
+        mantissa,
+        mantissa.substring(0, mantissa.length - 1),
+      ),
+    );
   }
 }
