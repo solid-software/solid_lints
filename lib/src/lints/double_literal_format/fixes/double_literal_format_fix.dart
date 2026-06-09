@@ -72,7 +72,7 @@ class DoubleLiteralFormatFix extends ParsedCorrectionProducer {
       return lexeme;
     }
 
-    final mantissa = lexeme.split('e').first;
+    final mantissa = lexeme.toLowerCase().split('e').first;
 
     return _correctTrailingZeroLexeme(
       lexeme.replaceFirst(

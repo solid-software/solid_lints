@@ -11,7 +11,7 @@ extension DoubleLiteralFormatUtils on String {
 
   /// Returns true if a mantissa of a double literal ends with 0
   bool get hasTrailingZero {
-    final mantissa = split('e').first;
+    final mantissa = toLowerCase().split('e').first;
 
     return mantissa.contains('.') &&
         mantissa.endsWith('0') &&

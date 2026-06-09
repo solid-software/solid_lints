@@ -53,12 +53,14 @@ class Test {
   final badB = -1.20;
   double get badC => -1.200;
   double badExpr = 5.23 + 5.230;
-  
+  var badD = -0.400e-5;
+
   void someMethod() {
     var badA = 5.230;
     double badB = -1.20;
     double badC = -1.200;
     double badExpr = 5.23 + 5.230;
+    var badD = -0.400E-5;
   }
 }
 ''',
@@ -67,11 +69,13 @@ class Test {
         lint(49, 4),
         lint(77, 5),
         lint(110, 5),
+        lint(131, 8),
 
-        lint(157, 5),
-        lint(183, 4),
-        lint(208, 5),
-        lint(243, 5),
+        lint(179, 5),
+        lint(205, 4),
+        lint(230, 5),
+        lint(265, 5),
+        lint(288, 8),
       ],
     );
   }
@@ -82,21 +86,25 @@ class Test {
 var badA = .23;
 double badB = -.2;
 double badExpr = 5.23 + .23;
+var badD = .4e-5;
 
 class Test {
   var badA = .23;
   double badB = -.2;
   double get badExpr => 5.23 + .23;
+  double get badD => -.4E-5;
 }
 ''',
       [
         lint(11, 3),
         lint(31, 2),
         lint(59, 3),
+        lint(75, 5),
 
-        lint(91, 3),
-        lint(113, 2),
-        lint(148, 3),
+        lint(109, 3),
+        lint(131, 2),
+        lint(166, 3),
+        lint(193, 5),
       ],
     );
   }
@@ -118,6 +126,9 @@ double goodB = -1.2;
 double goodExpr = 5.23 + 5.23;
 class DoubleLiteralFormatTest {
   var goodA = 0.16e+5;
+  var goodB = 0.16E+5;
+  double goodC = -0.4E-5;
+  double goodE = 5.23 + 0.4e-5;
   
   void someMethod() {
     const goodA = -0.25;
