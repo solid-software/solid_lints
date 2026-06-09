@@ -8,6 +8,7 @@ import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
@@ -35,6 +36,7 @@ class SolidLintsPlugin extends Plugin {
       AvoidFinalWithGetterRule(),
       AvoidGlobalStateRule(),
       AvoidNonNullAssertionRule(),
+      AvoidUnnecessaryTypeAssertionsRule(),
       AvoidDebugPrintInReleaseRule(),
       doubleLiteralFormatRule,
       ProperSuperCallsRule(),
