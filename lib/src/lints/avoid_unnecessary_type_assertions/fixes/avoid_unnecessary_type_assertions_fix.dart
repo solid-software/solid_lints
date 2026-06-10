@@ -12,13 +12,18 @@ class AvoidUnnecessaryTypeAssertionsFix extends ResolvedCorrectionProducer {
   static const _avoidUnnecessaryTypeAssertionsFixKind = FixKind(
     'solid_lints.fix.${AvoidUnnecessaryTypeAssertionsRule.lintName}',
     DartFixKindPriority.standard,
-    'Remove the unnecessary "{0}"',
+    'Remove the unnecessary {0}',
   );
 
-  String _itemToDelete = 'type assertion';
+  SourceRange? _partToRemove;
 
   @override
-  List<String>? get fixArguments => [_itemToDelete];
+  List<String>? get fixArguments => [
+    if (_partToRemove case final partToRemove?)
+      '"${utils.getRangeText(partToRemove).trim()}"'
+    else
+      'type assertion',
+  ];
 
   @override
   FixKind get fixKind => _avoidUnnecessaryTypeAssertionsFixKind;
@@ -34,41 +39,30 @@ class AvoidUnnecessaryTypeAssertionsFix extends ResolvedCorrectionProducer {
   Future<void> compute(ChangeBuilder builder) async {
     final isExpressionNode = node.thisOrAncestorOfType<IsExpression>();
     if (isExpressionNode != null) {
-      _itemToDelete = AvoidUnnecessaryTypeAssertionsRule.operatorIsName;
-
-      await _addDeletion(
-        builder,
-        isExpressionNode,
-        isExpressionNode.isOperator.offset - 1,
-      );
-
-      return;
+      final operatorOffset = isExpressionNode.isOperator.offset - 1;
+      _partToRemove = _removedPartRange(isExpressionNode, operatorOffset);
     }
 
     final whereTypeNode = node.thisOrAncestorOfType<MethodInvocation>();
-    if (whereTypeNode != null) {
-      _itemToDelete = AvoidUnnecessaryTypeAssertionsRule.whereTypeMethodName;
-
-      await _addDeletion(
-        builder,
-        whereTypeNode,
-        whereTypeNode.operator?.offset ?? whereTypeNode.offset,
-      );
-
-      return;
+    if (whereTypeNode != null && _partToRemove == null) {
+      final operatorOffset =
+          whereTypeNode.operator?.offset ?? whereTypeNode.offset;
+      _partToRemove = _removedPartRange(whereTypeNode, operatorOffset);
     }
+
+    final partToRemove = _partToRemove;
+    if (partToRemove == null) return;
+
+    await builder.addDartFileEdit(
+      file,
+      (builder) => builder.addDeletion(partToRemove),
+    );
   }
 
-  Future<void> _addDeletion(
-    ChangeBuilder builder,
-    Expression node,
-    int operatorOffset,
-  ) async {
+  SourceRange _removedPartRange(Expression node, int operatorOffset) {
     final targetNameLength = operatorOffset - node.offset;
     final removedPartLength = node.length - targetNameLength;
 
-    await builder.addDartFileEdit(file, (builder) {
-      builder.addDeletion(SourceRange(operatorOffset, removedPartLength));
-    });
+    return SourceRange(operatorOffset, removedPartLength);
   }
 }
