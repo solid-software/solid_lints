@@ -32,16 +32,30 @@ class AvoidUnnecessaryTypeAssertionsFix extends ResolvedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    if (node case final IsExpression node) {
+    final isExpressionNode = node.thisOrAncestorOfType<IsExpression>();
+    if (isExpressionNode != null) {
       _itemToDelete = AvoidUnnecessaryTypeAssertionsRule.operatorIsName;
-      await _addDeletion(builder, node, node.isOperator.offset);
-    } else if (node case final MethodInvocation node) {
-      _itemToDelete = AvoidUnnecessaryTypeAssertionsRule.whereTypeMethodName;
+
       await _addDeletion(
         builder,
-        node,
-        node.operator?.offset ?? node.offset,
+        isExpressionNode,
+        isExpressionNode.isOperator.offset - 1,
       );
+
+      return;
+    }
+
+    final whereTypeNode = node.thisOrAncestorOfType<MethodInvocation>();
+    if (whereTypeNode != null) {
+      _itemToDelete = AvoidUnnecessaryTypeAssertionsRule.whereTypeMethodName;
+
+      await _addDeletion(
+        builder,
+        whereTypeNode,
+        whereTypeNode.operator?.offset ?? whereTypeNode.offset,
+      );
+
+      return;
     }
   }
 
