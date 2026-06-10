@@ -26,14 +26,15 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unrelated_type_assertions_rule.dart';
 
-/// AST Visitor which finds all is expressions and checks if they are
-/// unrelated (result always false)
-class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
-  final _expressions = <IsExpression, bool>{};
+/// Visitor for [AvoidUnrelatedTypeAssertionsRule].
+class AvoidUnrelatedTypeAssertionsVisitor extends SimpleAstVisitor<void> {
+  /// The rule associated with this visitor.
+  final AvoidUnrelatedTypeAssertionsRule _rule;
 
-  /// Map of unrelated type checks and their results
-  Map<IsExpression, bool> get expressions => _expressions;
+  /// Creates an instance of [AvoidUnrelatedTypeAssertionsVisitor].
+  AvoidUnrelatedTypeAssertionsVisitor(this._rule);
 
   @override
   void visitIsExpression(IsExpression node) {
@@ -47,7 +48,10 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
     final objectType = node.expression.staticType;
 
     if (_isUnrelatedTypeCheck(objectType, castedType)) {
-      _expressions[node] = node.notOperator != null;
+      _rule.reportAtNode(
+        node,
+        arguments: [if (node.notOperator != null) 'true' else 'false'],
+      );
     }
   }
 
@@ -64,10 +68,14 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
       return false;
     }
 
-    final objectCastedType =
-        _foundCastedTypeInObjectTypeHierarchy(objectType, castedType);
-    final castedObjectType =
-        _foundCastedTypeInObjectTypeHierarchy(castedType, objectType);
+    final objectCastedType = _foundCastedTypeInObjectTypeHierarchy(
+      objectType,
+      castedType,
+    );
+    final castedObjectType = _foundCastedTypeInObjectTypeHierarchy(
+      castedType,
+      objectType,
+    );
     if (objectCastedType == null && castedObjectType == null) {
       return true;
     }
@@ -94,8 +102,8 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
 
     final correctObjectType =
         objectType is InterfaceType && objectType.isDartAsyncFutureOr
-            ? objectType.typeArguments.first
-            : objectType;
+        ? objectType.typeArguments.first
+        : objectType;
 
     if ((correctObjectType.element == castedType.element) ||
         castedType is DynamicType ||
@@ -105,8 +113,9 @@ class AvoidUnrelatedTypeAssertionsVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (correctObjectType is InterfaceType) {
-      return correctObjectType.allSupertypes
-          .firstWhereOrNull((value) => value.element == castedType.element);
+      return correctObjectType.allSupertypes.firstWhereOrNull(
+        (value) => value.element == castedType.element,
+      );
     }
 
     return null;
