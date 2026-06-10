@@ -109,7 +109,8 @@ class DoubleLiteralFormatRule extends MultiAnalysisRule {
         name: lintName,
         description:
             'Double literals should begin with `0.` instead of just `.`, '
-            'and should not end with a trailing 0',
+            'should not end with a trailing 0 and '
+            'should not start with a leading 0',
       );
 
   @override
