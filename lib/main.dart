@@ -1,5 +1,6 @@
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
+import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
@@ -23,21 +24,24 @@ class SolidLintsPlugin extends Plugin {
 
   @override
   void register(PluginRegistry registry) {
-    registry.registerLintRule(
-      AvoidGlobalStateRule(),
-    );
-    registry.registerLintRule(
-      AvoidNonNullAssertionRule(),
-    );
-    registry.registerLintRule(
-      AvoidDebugPrintInReleaseRule(),
-    );
-    registry.registerLintRule(
-      ProperSuperCallsRule(),
-    );
+    final analysisLoader = AnalysisOptionsLoader();
 
     final doubleLiteralFormatRule = DoubleLiteralFormatRule();
-    registry.registerLintRule(doubleLiteralFormatRule);
+    final lintRules = [
+      AvoidGlobalStateRule(),
+      AvoidNonNullAssertionRule(),
+      AvoidDebugPrintInReleaseRule(),
+      doubleLiteralFormatRule,
+      ProperSuperCallsRule(),
+      // TODO: Add more lint rules and use analysisLoader
+      // for rules that need parameters
+      // For example: `CyclomaticComplexityRule(analysisLoader)`
+    ];
+
+    for (final lintRule in lintRules) {
+      registry.registerLintRule(lintRule);
+    }
+
     for (final code in doubleLiteralFormatRule.diagnosticCodes) {
       registry.registerFixForRule(code, DoubleLiteralFormatFix.new);
     }
