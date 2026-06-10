@@ -23,14 +23,15 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/no_equal_then_else/no_equal_then_else_rule.dart';
 
-/// The AST visitor that will collect all unnecessary if statements and
-/// conditional expressions.
-class NoEqualThenElseVisitor extends RecursiveAstVisitor<void> {
-  final _nodes = <AstNode>[];
+/// Visitor for [NoEqualThenElseRule].
+class NoEqualThenElseVisitor extends SimpleAstVisitor<void> {
+  /// The rule associated with this visitor.
+  final NoEqualThenElseRule _rule;
 
-  /// All unnecessary if statements and conditional expressions.
-  Iterable<AstNode> get nodes => _nodes;
+  /// Creates an instance of [NoEqualThenElseVisitor]
+  NoEqualThenElseVisitor(this._rule);
 
   @override
   void visitIfStatement(IfStatement node) {
@@ -39,7 +40,7 @@ class NoEqualThenElseVisitor extends RecursiveAstVisitor<void> {
     if (node.elseStatement != null &&
         node.elseStatement is! IfStatement &&
         node.thenStatement.toString() == node.elseStatement.toString()) {
-      _nodes.add(node);
+      _rule.reportAtNode(node);
     }
   }
 
@@ -48,7 +49,7 @@ class NoEqualThenElseVisitor extends RecursiveAstVisitor<void> {
     super.visitConditionalExpression(node);
 
     if (node.thenExpression.toString() == node.elseExpression.toString()) {
-      _nodes.add(node);
+      _rule.reportAtNode(node);
     }
   }
 }
