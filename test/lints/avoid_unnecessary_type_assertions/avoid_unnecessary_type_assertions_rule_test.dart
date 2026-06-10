@@ -183,4 +183,17 @@ void test(MyIterable iterable) {
 }
 ''');
   }
+
+  Future<void> test_does_not_report_custom_types_when_using_subtype() async {
+    await assertNoDiagnostics(r'''
+abstract class _A {}
+abstract class _B extends _A {}
+
+abstract class AIterable implements Iterable<_A> {}
+
+void test(AIterable iterable) {
+  iterable.whereType<_B>();
+}
+''');
+  }
 }
