@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/src/utils/typecast_utils.dart';
-import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// Visitor for [AvoidUnnecessaryTypeAssertionsRule].
 /// Reports on unnecessary usage of 'whereType' method.
@@ -47,14 +47,20 @@ class UnnecessaryWhereTypeVisitor extends SimpleAstVisitor<void> {
       methodName: Identifier(
         name: AvoidUnnecessaryTypeAssertionsRule.whereTypeMethodName,
       ),
-      target: Expression(staticType: final ParameterizedType targetType),
-      realTarget: Expression(staticType: final realTargetType),
-      typeArguments: TypeArgumentList(arguments: final arguments),
-    ) when isIterable(realTargetType) && arguments.isNotEmpty) {
-      final objectType = targetType.typeArguments.first;
+      target: Expression(staticType: final InterfaceType targetType),
+      typeArguments: TypeArgumentList(:final arguments),
+    ) when arguments.isNotEmpty) {
+      final targetIterableType = switch (targetType) {
+        InterfaceType(isDartCoreIterable: true) => targetType,
+        InterfaceType(:final allSupertypes) => allSupertypes.firstWhereOrNull(
+          (e) => e.isDartCoreIterable,
+        ),
+      };
+
+      final objectType = targetIterableType?.typeArguments.firstOrNull;
       final castedType = arguments.first.type;
 
-      if (castedType == null) {
+      if (castedType == null || objectType == null) {
         return false;
       }
 

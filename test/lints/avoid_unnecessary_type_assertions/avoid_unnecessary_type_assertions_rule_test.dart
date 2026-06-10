@@ -171,4 +171,16 @@ void fun() {
 }
 ''');
   }
+
+  Future<void> test_reports_on_custom_types_with_default_generics() async {
+    await assertAutoDiagnostics('''
+// ignore_for_file: unnecessary_type_check
+
+abstract class MyIterable implements Iterable<int> {}
+
+void test(MyIterable iterable) {
+  ${l('iterable.whereType<num>()')};
+}
+''');
+  }
 }
