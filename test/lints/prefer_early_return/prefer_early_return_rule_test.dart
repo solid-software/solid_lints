@@ -197,6 +197,22 @@ void test(bool a, bool b) {
     );
   }
 
+  void test_reports_on_three_if() async {
+    await assertDiagnostics(
+      r'''
+void threeIf(bool a, bool b, bool c) {
+  if (a) {
+    if (b) {
+      if (c) {
+        print('hello');
+      }
+    }
+  }
+}''',
+      [lint(41, 74)],
+    );
+  }
+
   void test_does_not_report_nested_3_with_else_1() async {
     await assertNoDiagnostics(
       r'''
