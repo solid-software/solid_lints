@@ -44,13 +44,13 @@ class PreferFirstFix extends ParsedCorrectionProducer {
 
   String _createCorrection(Expression expression) {
     switch (expression) {
-      case MethodInvocation(isCascaded: true):
-      case IndexExpression(isCascaded: true):
-        return '..first';
+      case MethodInvocation(isCascaded: true, :final isNullAware):
+      case IndexExpression(isCascaded: true, :final isNullAware):
+        return isNullAware ? '?.first' : '..first';
 
-      case MethodInvocation(:final target?):
-      case IndexExpression(:final target?):
-        return '$target.first';
+      case MethodInvocation(:final target?, :final isNullAware):
+      case IndexExpression(:final target?, :final isNullAware):
+        return isNullAware ? '$target?.first' : '$target.first';
 
       default:
         return '.first';
