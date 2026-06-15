@@ -80,3 +80,31 @@ abstract interface class Disposable {
   /// Abstract methods should be omitted by `proper_super_calls`
   void dispose();
 }
+
+class ProperSuperCallsTest3 extends StatefulWidget {
+  @override
+  State<ProperSuperCallsTest3> createState() => _ProperSuperCallsTest3State();
+
+  ProperSuperCallsTest3();
+}
+
+class _ProperSuperCallsTest3State extends State<ProperSuperCallsTest3> {
+  @override
+  Widget build() {
+    return Widget();
+  }
+
+  @override
+  Future<void> initState() async {
+    await super.initState();
+    print('');
+  }
+
+  @override
+  Future<void> dispose() async {
+    print('');
+    await super.dispose();
+  }
+}
+
+
