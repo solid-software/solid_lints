@@ -1,3 +1,7 @@
+## 0.3.4
+
+- Added `use_nearest_context` rule.
+
 ## 0.3.3
 
 - Fix pub.dev analysis issue
