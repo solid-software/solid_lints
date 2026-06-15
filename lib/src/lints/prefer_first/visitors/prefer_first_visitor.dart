@@ -19,8 +19,7 @@ class PreferFirstVisitor extends RecursiveAstVisitor<void> {
 
     if (!isIterable || !isElementAt) return;
 
-    final arg = node.argumentList.arguments.first;
-
+    final arg = node.argumentList.arguments.firstOrNull;
     if (arg case IntegerLiteral(value: 0)) {
       _rule.reportAtNode(node);
     }
