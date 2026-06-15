@@ -44,13 +44,13 @@ class PreferLastFix extends ParsedCorrectionProducer {
 
   String _createCorrection(Expression expression) {
     switch (expression) {
-      case MethodInvocation(isCascaded: true):
-      case IndexExpression(isCascaded: true):
-        return '..last';
+      case MethodInvocation(isCascaded: true, :final isNullAware):
+      case IndexExpression(isCascaded: true, :final isNullAware):
+        return isNullAware ? '?.last' : '..last';
 
-      case MethodInvocation(:final target?):
-      case IndexExpression(:final target?):
-        return '$target.last';
+      case MethodInvocation(:final target?, :final isNullAware):
+      case IndexExpression(:final target?, :final isNullAware):
+        return isNullAware ? '$target?.last' : '$target.last';
 
       default:
         return '.last';
