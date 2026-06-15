@@ -22,7 +22,7 @@ class PreferLastVisitor extends RecursiveAstVisitor<void> {
 
     if (!isIterable || !isElementAt) return;
 
-    final arg = node.argumentList.arguments.first;
+    final arg = node.argumentList.arguments.firstOrNull;
 
     if (arg is BinaryExpression &&
         _isLastElementAccess(arg, target.toString())) {
