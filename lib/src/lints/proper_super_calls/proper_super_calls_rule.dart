@@ -139,9 +139,9 @@ class ProperSuperCallsRule extends SolidLintRule {
     final firstStatement = statements.first;
 
     if (firstStatement is ExpressionStatement) {
-      var expression = firstStatement.expression;
+      var expression = firstStatement.expression.unParenthesized;
       if (expression is AwaitExpression) {
-        expression = expression.expression;
+        expression = expression.expression.unParenthesized;
       }
 
       final isSuperInitStateCalledFirst = expression is MethodInvocation &&
@@ -161,9 +161,9 @@ class ProperSuperCallsRule extends SolidLintRule {
     final lastStatement = statements.last;
 
     if (lastStatement is ExpressionStatement) {
-      var expression = lastStatement.expression;
+      var expression = lastStatement.expression.unParenthesized;
       if (expression is AwaitExpression) {
-        expression = expression.expression;
+        expression = expression.expression.unParenthesized;
       }
 
       final lastStatementIsSuperDispose = expression is MethodInvocation &&

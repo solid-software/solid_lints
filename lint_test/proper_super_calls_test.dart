@@ -107,4 +107,30 @@ class _ProperSuperCallsTest3State extends State<ProperSuperCallsTest3> {
   }
 }
 
+class ProperSuperCallsTest4 extends StatefulWidget {
+  @override
+  State<ProperSuperCallsTest4> createState() => _ProperSuperCallsTest4State();
+
+  ProperSuperCallsTest4();
+}
+
+class _ProperSuperCallsTest4State extends State<ProperSuperCallsTest4> {
+  @override
+  Widget build() {
+    return Widget();
+  }
+
+  @override
+  Future<void> initState() async {
+    await (super.initState());
+    print('');
+  }
+
+  @override
+  Future<void> dispose() async {
+    print('');
+    (await super.dispose());
+  }
+}
+
 
