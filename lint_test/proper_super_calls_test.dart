@@ -132,5 +132,3 @@ class _ProperSuperCallsTest4State extends State<ProperSuperCallsTest4> {
     (await super.dispose());
   }
 }
-
-
