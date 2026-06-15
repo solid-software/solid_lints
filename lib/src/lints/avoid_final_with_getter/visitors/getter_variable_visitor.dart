@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:solid_lints/src/lints/avoid_final_with_getter/utils/getter_reference_id.dart';
 
-/// A visitor that checks the association of the getter with
-/// the final private variable
+/// A visitor that gets the final private variable associated with the getter.
 class GetterVariableVisitor extends RecursiveAstVisitor<void> {
   final int? _getterId;
   VariableDeclaration? _variable;
@@ -17,29 +17,19 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
-    final element = node.declaredFragment?.element;
-    if (element != null &&
-        element.isPrivate &&
-        element.isFinal &&
-        element.id == _getterId) {
+    if (node
+        case VariableDeclaration(
+          declaredFragment: VariableFragment(
+            element: VariableElement(
+              isPrivate: true,
+              isFinal: true,
+              :final id,
+            )
+          )
+        ) when id == _getterId) {
       _variable = node;
     }
 
     super.visitVariableDeclaration(node);
-  }
-}
-
-extension on MethodDeclaration {
-  int? get getterReferenceId {
-    if (body
-        case ExpressionFunctionBody(
-          expression: SimpleIdentifier(
-            element: PropertyAccessorElement(:final variable)
-          )
-        )) {
-      return variable.id;
-    }
-
-    return null;
   }
 }
