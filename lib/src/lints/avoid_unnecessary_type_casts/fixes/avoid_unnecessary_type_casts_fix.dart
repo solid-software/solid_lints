@@ -6,13 +6,29 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_casts/avoid_unnecessary_type_casts_rule.dart';
 
-/// A Quick fix for `avoid_unnecessary_type_casts` rule
-/// Suggests to remove unnecessary assertions
+/// A quick fix for [AvoidUnnecessaryTypeCastsRule].
+///
+/// Removes the `as Type` suffix from an unnecessary cast expression while
+/// keeping the original expression unchanged.
+///
+/// ### Example
+///
+/// Given:
+///
+/// ```dart
+/// final result = testList as List<double>;
+/// ```
+///
+/// The fix produces:
+///
+/// ```dart
+/// final result = testList;
+/// ```
 class AvoidUnnecessaryTypeCastsFix extends ParsedCorrectionProducer {
   static const _avoidUnnecessaryTypeCastsKind = FixKind(
     'solid_lints.fix.${AvoidUnnecessaryTypeCastsRule.lintName}',
     DartFixKindPriority.standard,
-    "Remove unnecessary type cast",
+    'Remove unnecessary type cast',
   );
 
   @override
@@ -22,10 +38,10 @@ class AvoidUnnecessaryTypeCastsFix extends ParsedCorrectionProducer {
   FixKind get multiFixKind => const FixKind(
     'solid_lints.fix.multi.${AvoidUnnecessaryTypeCastsRule.lintName}',
     DartFixKindPriority.standard,
-    "Remove unnecessary type cast across files",
+    'Remove unnecessary type cast across files',
   );
 
-  /// Creates a new instance of [AvoidUnnecessaryTypeCastsFix]
+  /// Creates a new instance of [AvoidUnnecessaryTypeCastsFix].
   AvoidUnnecessaryTypeCastsFix({required super.context});
 
   @override
