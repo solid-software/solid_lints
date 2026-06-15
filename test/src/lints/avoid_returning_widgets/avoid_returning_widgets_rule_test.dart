@@ -1,0 +1,296 @@
+import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
+import 'package:analyzer_testing/utilities/utilities.dart';
+import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
+import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
+import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
+import 'package:test_reflective_loader/test_reflective_loader.dart';
+
+void main() {
+  defineReflectiveSuite(() {
+    defineReflectiveTests(AvoidReturningWidgetsRuleTest);
+  });
+}
+
+@reflectiveTest
+class AvoidReturningWidgetsRuleTest extends AnalysisRuleTest {
+  static const _importFlutterWidgets = "import 'package:flutter/widgets.dart';";
+  static const _mockFlutterWidgetsContent = '''
+abstract class Widget {
+  final String key;
+
+  const Widget({required this.key});
+}
+
+class StatelessWidget implements Widget {
+  const StatelessWidget({super.key});
+
+  @override
+  Widget build(BuildContext context);
+}
+
+class StatefulWidget implements Widget {
+  const StatefulWidget({super.key});
+  
+  @override
+  Widget build(BuildContext context);
+}
+
+abstract interface class BuildContext {}
+
+class Placeholder extends StatelessWidget {
+  const Placeholder({super.key});
+
+  @override
+  Widget build(BuildContext context) => throw 'unimplemented';
+}
+
+class SizedBox extends Widget {
+  final Widget? child;
+
+  const SizedBox({this.child});
+
+  @override
+  Widget build(BuildContext context) => child ?? const SizedBox();
+}
+
+class BoxDecoration extends Widget {
+  const BoxDecoration();
+
+  @override
+  Widget build(BuildContext context) => throw 'unimplemented';
+}
+
+class DecoratedBox extends Widget {
+  const DecoratedBox({required this.decoration});
+
+  final BoxDecoration decoration;
+
+  @override
+  Widget build(BuildContext context) => throw 'unimplemented';
+}
+''';
+  static const _mockAnalysisOptionsContent = '''
+plugins:
+  solid_lints:
+    diagnostics:
+      avoid_returning_widgets:
+        exclude:
+          - class_name: ExcludeWidget 
+            method_name: excludeWidgetMethod
+          - method_name: excludeMethod
+  ''';
+
+  void _addBaseWidgetFile() {
+    newFile('$testPackageLibPath/base_widget.dart', '''
+$_importFlutterWidgets
+class BaseWidget extends StatelessWidget {
+  const BaseWidget({super.key});
+
+  Widget get box => SizedBox();
+
+  Widget decoratedBox() => DecoratedBox(decoration: BoxDecoration());
+
+  set box(Widget value) {
+    throw 'unimplemented';
+  }
+}
+''');
+  }
+
+  @override
+  void setUp() {
+    rule = AvoidReturningWidgetsRule(
+      analysisOptionsLoader: AnalysisOptionsLoader(
+        resourceProvider: resourceProvider,
+      ),
+      parametersParser: AvoidReturningWidgetsParameters.fromJson,
+    );
+    newPackage('flutter')
+      ..addFile('lib/widgets.dart', _mockFlutterWidgetsContent);
+    super.setUp();
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''${analysisOptionsContent(rules: [rule.name])}
+$_mockAnalysisOptionsContent''',
+    );
+  }
+
+  Future<void> test_reports_on_static_function() async {
+    await assertDiagnostics(
+      '''
+$_importFlutterWidgets
+
+Widget avoidReturningWidgets() => const SizedBox();
+
+Widget build() {
+  return SizedBox();
+}
+''',
+      [lint(40, 51), lint(93, 39)],
+    );
+  }
+
+  Future<void> test_reports_on_methods() async {
+    await assertDiagnostics(
+      '''
+$_importFlutterWidgets
+
+class BaseWidget extends StatelessWidget {
+  const BaseWidget({super.key});
+
+  Widget decoratedBox() {
+    return DecoratedBox(decoration: BoxDecoration());
+  }
+}
+''',
+      [lint(119, 81)],
+    );
+  }
+
+  Future<void> test_reports_on_getters_but_not_setters() async {
+    await assertDiagnostics(
+      '''
+$_importFlutterWidgets
+
+class BaseWidget extends StatelessWidget {
+  const BaseWidget({super.key});
+
+  Widget get box => SizedBox();
+
+  set box(Widget value) {
+    throw 'unimplemented';
+  }
+}
+''',
+      [lint(119, 29)],
+    );
+  }
+
+  Future<void> test_reports_on_private_members() async {
+    _addBaseWidgetFile();
+
+    await assertDiagnostics(
+      '''
+$_importFlutterWidgets
+import 'base_widget.dart';
+
+class MyWidget extends BaseWidget {
+  const MyWidget({super.key});
+
+  Widget _test1() => const SizedBox();
+
+  Widget _test2() {
+    return const SizedBox(
+      child: SizedBox(),
+    );
+  }
+
+  Widget get _test3 => const SizedBox();
+
+  @override
+  Widget decoratedBox() {
+    return super.decoratedBox();
+  }
+
+  @override
+  Widget get box => SizedBox();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox();
+  }
+}
+''',
+      [
+        lint(137, 36),
+        lint(177, 80),
+        lint(261, 38),
+      ],
+    );
+  }
+
+  Future<void> test_does_not_report_on_overridden_members() async {
+    _addBaseWidgetFile();
+
+    // Shouldn't report even if not annotated with @override
+    await assertNoDiagnostics(
+      '''
+$_importFlutterWidgets
+import 'base_widget.dart';
+
+class MyWidget extends BaseWidget {
+  const MyWidget({super.key});
+
+  Widget decoratedBox() {
+    return super.decoratedBox();
+  }
+
+  Widget get box => SizedBox();
+  
+  Widget build(BuildContext context) {
+    return const SizedBox();
+  }
+}
+''',
+    );
+  }
+
+  Future<void> test_does_not_report_on_excluded() async {
+    await assertNoDiagnostics(
+      '''
+$_importFlutterWidgets
+
+SizedBox excludeMethod() => const SizedBox();
+
+class ExcludeWidget extends StatelessWidget {
+  const ExcludeWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+
+  Widget excludeWidgetMethod() => const SizedBox();
+}
+
+''',
+    );
+  }
+
+  Future<void> test_reports_on_non_matching_excluded() async {
+    await assertDiagnostics(
+      '''
+$_importFlutterWidgets
+
+SizedBox excludeMethod() => const SizedBox();
+
+class ExcludeWidget extends StatelessWidget {
+  const ExcludeWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+
+  Widget notExcludeWidgetMethod() => const Placeholder();
+}
+
+class NotExcludeWidget extends StatelessWidget {
+  const NotExcludeWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+
+  Widget excludeWidgetMethod() => const SizedBox();
+}
+''',
+      [
+        lint(260, 55),
+        lint(498, 49),
+      ],
+    );
+  }
+}
