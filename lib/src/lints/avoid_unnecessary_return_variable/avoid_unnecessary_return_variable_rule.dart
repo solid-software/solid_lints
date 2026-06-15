@@ -88,14 +88,14 @@ Rewrite the variable evaluation into return statement instead.""",
       return;
     }
 
-    final blockBody = statement.parent;
-    if (blockBody == null) return;
+    final functionBody = statement.thisOrAncestorOfType<FunctionBody>();
+    if (functionBody == null) return;
 
     final visitor = AvoidUnnecessaryReturnVariableVisitor(
       returnVariableElement,
       statement,
     );
-    blockBody.visitChildren(visitor);
+    functionBody.visitChildren(visitor);
 
     if (!visitor.hasBadStatementCount()) return;
 

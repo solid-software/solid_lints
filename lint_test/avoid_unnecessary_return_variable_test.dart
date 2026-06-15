@@ -123,3 +123,15 @@ class _TestClass {
   final finalField = 1;
   var varField = 1;
 }
+
+/// Test the avoid_unnecessary_return_variable.
+/// Good: returning cached variable where return variable is
+/// declared at the outer block, and returned inside an inner block.
+Future<String?> testAvoidUnnecessaryReturnVariableNestedBlock() async {
+  final cached = 'cached';
+  if (cached.isNotEmpty) {
+    // Should NOT trigger the avoid_unnecessary_return_variable lint
+    return cached;
+  }
+  return null;
+}
