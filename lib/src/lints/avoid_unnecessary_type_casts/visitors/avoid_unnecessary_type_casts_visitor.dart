@@ -23,15 +23,16 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_type_casts/avoid_unnecessary_type_casts_rule.dart';
 import 'package:solid_lints/src/utils/typecast_utils.dart';
 
 /// AST Visitor which finds all as expressions and checks if they are
 /// necessary
 class AvoidUnnecessaryTypeCastsVisitor extends RecursiveAstVisitor<void> {
-  final _expressions = <Expression, String>{};
+  final AvoidUnnecessaryTypeCastsRule _rule;
 
-  /// All as expressions
-  Map<Expression, String> get expressions => _expressions;
+  /// Creates a new instance of [AvoidUnnecessaryTypeCastsVisitor]
+  AvoidUnnecessaryTypeCastsVisitor(this._rule);
 
   @override
   void visitAsExpression(AsExpression node) {
@@ -49,8 +50,8 @@ class AvoidUnnecessaryTypeCastsVisitor extends RecursiveAstVisitor<void> {
       target: castedType,
     );
 
-    if (typeCast.isUnnecessaryTypeCheck) {
-      _expressions[node] = 'as';
-    }
+    if (!typeCast.isUnnecessaryTypeCheck) return;
+
+    _rule.reportAtNode(node);
   }
 }
