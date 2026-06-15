@@ -39,8 +39,8 @@ class AvoidUnnecessaryTypeCastsFix extends ParsedCorrectionProducer {
 
     await builder.addDartFileEdit(file, (builder) {
       final operatorOffset = asExpressionNode.asOperator.offset;
-      final targetNameLength = operatorOffset - node.offset;
-      final removedPartLength = node.length - targetNameLength;
+      final targetNameLength = operatorOffset - asExpressionNode.offset;
+      final removedPartLength = asExpressionNode.length - targetNameLength;
 
       builder.addDeletion(SourceRange(operatorOffset, removedPartLength));
     });
