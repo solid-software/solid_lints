@@ -18,22 +18,12 @@ class _UseNearestContextFix extends DartFix {
     Diagnostic diagnostic,
     List<Diagnostic> others,
   ) {
-    void tryApplyFix(AstNode node) {
-      final statementInfo = _diagnosticsInfoExpando[diagnostic];
-      if (statementInfo == null) return;
-      final parameterName = statementInfo.parameter.name;
-      if (parameterName == null) return;
-      if (node.sourceRange.intersects(parameterName.sourceRange)) {
-        _addReplacement(
-          reporter,
-          parameterName,
-          statementInfo.name,
-        );
-      }
-    }
+    final statementInfo = _diagnosticsInfoExpando[diagnostic];
+    if (statementInfo == null) return;
+    final parameterName = statementInfo.parameter.name;
+    if (parameterName == null) return;
 
-    context.registry.addFunctionDeclaration(tryApplyFix);
-    context.registry.addMethodDeclaration(tryApplyFix);
+    _addReplacement(reporter, parameterName, statementInfo.name);
   }
 
   void _addReplacement(

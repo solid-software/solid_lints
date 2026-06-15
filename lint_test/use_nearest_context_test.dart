@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_unused_parameters, unused_local_variable, function_lines_of_code, newline_before_return
+// ignore_for_file: avoid_unused_parameters, unused_local_variable, function_lines_of_code, newline_before_return, member_ordering, avoid_non_null_assertion
 import 'package:flutter/material.dart';
 
 /// Check the `use_nearest_context` rule
@@ -120,5 +120,68 @@ class _UseNearestContextTestState extends State<UseNearestContextTest> {
 
     /// Allowed: using method's own BuildContext directly
     return SizedBox.fromSize(size: context.size);
+  }
+}
+
+/// Check the `use_nearest_context` rule within a constructor body.
+class QuickFixBrokenTest {
+  QuickFixBrokenTest(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext _) {
+        /// expect_lint: use_nearest_context
+        return SizedBox.fromSize(size: context.size);
+      },
+    );
+  }
+}
+
+/// False positive checks: none of these should trigger the lint.
+class FalsePositiveTest extends StatefulWidget {
+  const FalsePositiveTest({super.key});
+
+  @override
+  State<FalsePositiveTest> createState() => _FalsePositiveTestState();
+}
+
+class _FalsePositiveTestState extends State<FalsePositiveTest> {
+  @override
+  Widget build(BuildContext context) {
+    /// Case 1: Local variable assigned from nearest context —
+    /// should NOT trigger, but currently does (false positive).
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext innerContext) {
+        final BuildContext localContext = innerContext;
+
+        /// Allowed: localContext is assigned from innerContext
+        return SizedBox.fromSize(size: localContext.size);
+      },
+    );
+
+    /// Case 2: Property of another object — state.context
+    /// should NOT trigger, but currently does (false positive).
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext innerContext) {
+        final state =
+            (innerContext as Element).findAncestorStateOfType<State>()!;
+
+        /// Allowed: state.context is a property access, not a direct use
+        return SizedBox.fromSize(size: state.context.size);
+      },
+    );
+
+    /// Case 3: this.context inside a builder — SHOULD trigger,
+    /// because this.context is the outer scope's BuildContext.
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext innerContext) {
+        /// expect_lint: use_nearest_context
+        return SizedBox.fromSize(size: this.context.size);
+      },
+    );
+
+    return const SizedBox.shrink();
   }
 }

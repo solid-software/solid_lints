@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -72,8 +73,7 @@ class UseNearestContextRule extends SolidLintRule {
       configs: configs,
       name: lintName,
       problemMessage: (value) =>
-          'BuildContext is used not from the nearest available scope. '
-          'Consider renaming the nearest BuildContext parameter.',
+          'Use the nearest BuildContext parameter instead of the outer one.',
     );
 
     return UseNearestContextRule._(rule);
@@ -87,10 +87,13 @@ class UseNearestContextRule extends SolidLintRule {
   ) {
     context.registry.addSimpleIdentifier((node) {
       if (!isBuildContext(node.staticType)) return;
+      if (_isPropertyOfOtherObject(node)) return;
 
       final closestBuildContext = _findClosestBuildContext(node);
       if (closestBuildContext == null) return;
       if (closestBuildContext.name?.lexeme != node.name) {
+        if (_isDeclaredInNearestScope(node, closestBuildContext)) return;
+
         final diagnostic = reporter.atNode(node, code);
         _diagnosticsInfoExpando[diagnostic] = StatementInfo(
           name: node.name,
@@ -98,6 +101,38 @@ class UseNearestContextRule extends SolidLintRule {
         );
       }
     });
+  }
+
+  /// Returns `true` if [node] is a property accessed on another object
+  /// (e.g. `state.context`), but not on `this` (e.g. `this.context`).
+  bool _isPropertyOfOtherObject(SimpleIdentifier node) {
+    final parent = node.parent;
+    if (parent is PrefixedIdentifier && node == parent.identifier) {
+      return true;
+    }
+    if (parent is PropertyAccess && node == parent.propertyName) {
+      return parent.target is! ThisExpression;
+    }
+    return false;
+  }
+
+  /// Returns `true` if [node] refers to a variable declared inside the body
+  /// of the function that owns [closestParam] (i.e. a local variable
+  /// in the same scope, like `final localCtx = innerContext;`).
+  bool _isDeclaredInNearestScope(
+    SimpleIdentifier node,
+    SimpleFormalParameter closestParam,
+  ) {
+    final element = node.element;
+    if (element is! LocalVariableElement) return false;
+
+    final nearestFunction = closestParam.parent?.parent;
+    if (nearestFunction is! FunctionExpression) return false;
+
+    final body = nearestFunction.body;
+    final declOffset = element.firstFragment.nameOffset;
+    if (declOffset == null) return false;
+    return declOffset >= body.offset && declOffset < body.end;
   }
 
   SimpleFormalParameter? _findClosestBuildContext(SimpleIdentifier node) {
