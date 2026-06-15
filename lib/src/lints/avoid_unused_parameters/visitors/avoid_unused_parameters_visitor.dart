@@ -94,7 +94,10 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
   void visitFunctionExpression(FunctionExpression node) {
     super.visitFunctionExpression(node);
 
-    final declaration = node.thisOrAncestorOfType<FunctionDeclaration>();
+    final declaration =
+        node.thisOrAncestorOfType<FunctionDeclaration>() ??
+        node.thisOrAncestorOfType<MethodDeclaration>() ??
+        node.thisOrAncestorOfType<ConstructorDeclaration>();
     if (declaration != null && _isExcluded(declaration)) return;
 
     final params = node.parameters;
