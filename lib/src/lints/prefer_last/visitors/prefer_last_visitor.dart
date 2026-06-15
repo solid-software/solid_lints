@@ -1,30 +1,32 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// The AST visitor that will collect all Iterable access expressions
 /// which can be replaced with .last
 class PreferLastVisitor extends RecursiveAstVisitor<void> {
-  final _expressions = <Expression>[];
+  final PreferLastRule _rule;
 
-  /// List of all Iterable access expressions
-  Iterable<Expression> get expressions => _expressions;
+  /// Creates a new instance of [PreferLastVisitor]
+  PreferLastVisitor(this._rule);
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     super.visitMethodInvocation(node);
 
     final target = node.realTarget;
+    final isIterable = isIterableOrSubclass(target?.staticType);
+    final isElementAt = node.methodName.name == 'elementAt';
 
-    if (isIterableOrSubclass(target?.staticType) &&
-        node.methodName.name == 'elementAt') {
-      final arg = node.argumentList.arguments.first;
+    if (!isIterable || !isElementAt) return;
 
-      if (arg is BinaryExpression &&
-          _isLastElementAccess(arg, target.toString())) {
-        _expressions.add(node);
-      }
+    final arg = node.argumentList.arguments.first;
+
+    if (arg is BinaryExpression &&
+        _isLastElementAccess(arg, target.toString())) {
+      _rule.reportAtNode(node);
     }
   }
 
@@ -34,24 +36,25 @@ class PreferLastVisitor extends RecursiveAstVisitor<void> {
 
     final target = node.realTarget;
 
-    if (isListOrSubclass(target.staticType)) {
-      final index = node.index;
+    if (!isListOrSubclass(target.staticType)) return;
 
-      if (index is BinaryExpression &&
-          _isLastElementAccess(index, target.toString())) {
-        _expressions.add(node);
-      }
+    final index = node.index;
+
+    if (index is BinaryExpression &&
+        _isLastElementAccess(index, target.toString())) {
+      _rule.reportAtNode(node);
     }
   }
 
   bool _isLastElementAccess(BinaryExpression expression, String targetName) {
-    final left = expression.leftOperand;
     final right = expression.rightOperand;
-    final leftName = _getLeftOperandName(left);
+    if (right is! IntegerLiteral || right.value != 1) return false;
 
-    if (right is! IntegerLiteral) return false;
-    if (right.value != 1) return false;
-    if (expression.operator.type != TokenType.MINUS) return false;
+    final isMinusExpression = expression.operator.type == TokenType.MINUS;
+    if (!isMinusExpression) return false;
+
+    final left = expression.leftOperand;
+    final leftName = _getLeftOperandName(left);
 
     return leftName == '$targetName.length';
   }
