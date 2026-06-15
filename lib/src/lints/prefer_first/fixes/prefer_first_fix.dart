@@ -33,19 +33,13 @@ class PreferFirstFix extends ParsedCorrectionProducer {
 
   @override
   Future<void> compute(ChangeBuilder builder) async {
-    final elementAtNode = node.thisOrAncestorOfType<MethodInvocation>();
-    if (elementAtNode != null) {
-      final correction = _createCorrection(elementAtNode);
+    final targetNode = node.thisOrAncestorMatching(
+      (n) => n is MethodInvocation || n is IndexExpression,
+    );
+    if (targetNode is! Expression) return;
 
-      await _addReplacement(builder, elementAtNode, correction);
-    }
-
-    final indexNode = node.thisOrAncestorOfType<IndexExpression>();
-    if (indexNode != null) {
-      final correction = _createCorrection(indexNode);
-
-      await _addReplacement(builder, indexNode, correction);
-    }
+    final correction = _createCorrection(targetNode);
+    await _addReplacement(builder, targetNode, correction);
   }
 
   String _createCorrection(Expression expression) {
