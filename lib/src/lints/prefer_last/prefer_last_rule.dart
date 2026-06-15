@@ -49,7 +49,4 @@ class PreferLastRule extends SolidLintRule {
     final visitor = PreferLastVisitor(this);
     registry.addCompilationUnit(this, visitor);
   }
-
-  // @override
-  // List<Fix> getFixes() => [PreferLastFix()];
 }
