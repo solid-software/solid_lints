@@ -93,7 +93,7 @@ void fun() {
 
 void fun() {
   final testList = [1.0, 2.0, 3.0];
-  final result = ${l('testList is List<double>')};
+  final result = ${expectLint('testList is List<double>')};
 }
 ''');
   }
@@ -105,7 +105,7 @@ void fun() {
 
 void fun() {
   final testList = [1.0, 2.0, 3.0];
-  final result = ${l('testList is! List<double>')};
+  final result = ${expectLint('testList is! List<double>')};
 }
 ''');
   }
@@ -116,7 +116,7 @@ void fun() {
 
 void fun() {
   final double d = 2.0;
-  final casted = ${l('d is double')};
+  final casted = ${expectLint('d is double')};
 }
 ''');
   }
@@ -128,7 +128,7 @@ void fun() {
 
 void fun() {
   final double d = 2.0;
-  final negativeCasted = ${l('d is! double')};
+  final negativeCasted = ${expectLint('d is! double')};
 }
 ''');
   }
@@ -139,7 +139,7 @@ void fun() {
 
 void fun() {
   final double d = 2.0;
-  final casted = ${l('d is double?')};
+  final casted = ${expectLint('d is double?')};
 }
 ''');
   }
@@ -150,7 +150,7 @@ void fun() {
 
 void fun() {
   final ints = <int>[1, 2, 3];
-  final result = ${l('ints is Iterable<int>')};
+  final result = ${expectLint('ints is Iterable<int>')};
 }
 ''');
   }
@@ -159,7 +159,7 @@ void fun() {
     await assertAutoDiagnostics('''
 void fun() {
   final testList = [1.0, 2.0, 3.0];
-  ${l('testList.whereType<double>()')}.length;
+  ${expectLint('testList.whereType<double>()')}.length;
 }
 ''');
   }
@@ -167,7 +167,7 @@ void fun() {
   Future<void> test_reports_if_where_type_filters_nullable_type() async {
     await assertAutoDiagnostics('''
 void fun() {
-  ${l('[1.0, 2.0].whereType<double?>()')};
+  ${expectLint('[1.0, 2.0].whereType<double?>()')};
 }
 ''');
   }
@@ -179,7 +179,7 @@ void fun() {
 abstract class MyIterable implements Iterable<int> {}
 
 void test(MyIterable iterable) {
-  ${l('iterable.whereType<num>()')};
+  ${expectLint('iterable.whereType<num>()')};
 }
 ''');
   }

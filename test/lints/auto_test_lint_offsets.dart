@@ -16,7 +16,7 @@ mixin AutoTestLintOffsets on AnalysisRuleTest {
     }
   }
 
-  String l(String code) {
+  String expectLint(String code) {
     _expectedCodeFragments.add(code);
     return code;
   }
