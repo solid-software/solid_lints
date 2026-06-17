@@ -167,4 +167,52 @@ class MyWidgetState extends State<StatefulWidget> {
 ''',
     );
   }
+
+  void test_no_report_for_async_correct_usage() async {
+    await assertNoDiagnostics(
+      r'''
+import 'package:flutter/src/widgets/framework.dart';
+
+class MyWidgetState extends State<StatefulWidget> {
+  @override
+  Future<void> initState() async {
+    // ignore: use_of_void_result
+    await super.initState();
+    print('');
+  }
+
+  @override
+  Future<void> dispose() async {
+    print('');
+    // ignore: use_of_void_result
+    await super.dispose();
+  }
+}
+''',
+    );
+  }
+
+  void test_no_report_for_parenthesized_and_async_correct_usage() async {
+    await assertNoDiagnostics(
+      r'''
+import 'package:flutter/src/widgets/framework.dart';
+
+class MyWidgetState extends State<StatefulWidget> {
+  @override
+  Future<void> initState() async {
+    // ignore: use_of_void_result
+    await (super.initState());
+    print('');
+  }
+
+  @override
+  Future<void> dispose() async {
+    print('');
+    // ignore: use_of_void_result
+    (await super.dispose());
+  }
+}
+''',
+    );
+  }
 }

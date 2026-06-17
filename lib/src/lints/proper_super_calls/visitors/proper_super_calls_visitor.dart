@@ -103,7 +103,10 @@ class ProperSuperCallsVisitor extends SimpleAstVisitor<void> {
       return false;
     }
 
-    final expression = statement.expression;
+    var expression = statement.expression.unParenthesized;
+    if (expression is AwaitExpression) {
+      expression = expression.expression.unParenthesized;
+    }
 
     return expression is MethodInvocation &&
         expression.target is SuperExpression &&
