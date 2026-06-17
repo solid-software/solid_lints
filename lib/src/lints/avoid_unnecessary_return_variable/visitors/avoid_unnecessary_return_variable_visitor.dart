@@ -24,9 +24,8 @@ class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
     if (!element.isFinal && !element.isConst) return;
 
     //get enclosing block function body
-    final functionBody = node.thisOrAncestorOfType<BlockFunctionBody>();
-    if (functionBody == null) return;
-    final block = functionBody.block;
+    final block = node.thisOrAncestorOfType<BlockFunctionBody>()?.block;
+    if (block == null) return;
 
     final returnVariableUsageVisitor = ReturnVariableUsageVisitor(
       node,
