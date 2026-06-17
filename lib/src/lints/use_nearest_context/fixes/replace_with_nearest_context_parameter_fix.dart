@@ -48,14 +48,20 @@ class ReplaceWithNearestContextParameterFix extends ResolvedCorrectionProducer {
 
     if (errorNode is SimpleIdentifier) {
       final parent = errorNode.parent;
-      if (parent is PropertyAccess && parent.target is ThisExpression) {
-        await builder.addDartFileEdit(file, (builder) {
-          builder.addSimpleReplacement(
-            parent.sourceRange,
-            parameterName,
-          );
-        });
-        return;
+      if (parent is PropertyAccess) {
+        var target = parent.target;
+        while (target is ParenthesizedExpression) {
+          target = target.expression;
+        }
+        if (target is ThisExpression || target is SuperExpression) {
+          await builder.addDartFileEdit(file, (builder) {
+            builder.addSimpleReplacement(
+              parent.sourceRange,
+              parameterName,
+            );
+          });
+          return;
+        }
       }
     }
   }

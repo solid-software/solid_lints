@@ -31,9 +31,16 @@ class RenameNearestContextParameterFix extends ResolvedCorrectionProducer {
     final identifierNode = node;
     if (identifierNode is! SimpleIdentifier) return;
 
-    // Do not offer renaming the parameter if this is an access on `this`.
+    // Do not offer renaming the parameter if this is an access on `this`
+    // or `super`.
     final parent = identifierNode.parent;
-    if (parent is PropertyAccess && parent.target is ThisExpression) return;
+    if (parent is PropertyAccess) {
+      var target = parent.target;
+      while (target is ParenthesizedExpression) {
+        target = target.expression;
+      }
+      if (target is ThisExpression || target is SuperExpression) return;
+    }
 
     final closestBuildContext = findClosestBuildContext(identifierNode);
     if (closestBuildContext == null) return;
