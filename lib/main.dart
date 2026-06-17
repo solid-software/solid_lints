@@ -11,6 +11,9 @@ import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_retur
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
+import 'package:solid_lints/src/lints/use_nearest_context/fixes/rename_nearest_context_parameter_fix.dart';
+import 'package:solid_lints/src/lints/use_nearest_context/fixes/replace_with_nearest_context_parameter_fix.dart';
+import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
 
 /// The entry point for the Solid Lints analyser server plugin.
 ///
@@ -42,6 +45,7 @@ class SolidLintsPlugin extends Plugin {
         analysisOptionsLoader: analysisLoader,
         parametersParser: AvoidReturningWidgetsParameters.fromJson,
       ),
+      UseNearestContextRule(),
     ];
 
     for (final lintRule in lintRules) {
@@ -55,6 +59,16 @@ class SolidLintsPlugin extends Plugin {
     registry.registerFixForRule(
       AvoidFinalWithGetterRule.code,
       AvoidFinalWithGetterFix.new,
+    );
+
+    registry.registerFixForRule(
+      UseNearestContextRule.code,
+      RenameNearestContextParameterFix.new,
+    );
+
+    registry.registerFixForRule(
+      UseNearestContextRule.code,
+      ReplaceWithNearestContextParameterFix.new,
     );
   }
 }
