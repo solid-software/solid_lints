@@ -12,6 +12,8 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_un
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/fixes/avoid_unnecessary_type_assertions_fix.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
+import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
+import 'package:solid_lints/src/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 
 /// The entry point for the Solid Lints analyser server plugin.
@@ -46,6 +48,10 @@ class SolidLintsPlugin extends Plugin {
       AvoidReturningWidgetsRule(
         analysisOptionsLoader: analysisLoader,
         parametersParser: AvoidReturningWidgetsParameters.fromJson,
+      ),
+      FunctionLinesOfCodeRule(
+        analysisOptionsLoader: analysisLoader,
+        parametersParser: FunctionLinesOfCodeParameters.fromJson,
       ),
     ];
 
