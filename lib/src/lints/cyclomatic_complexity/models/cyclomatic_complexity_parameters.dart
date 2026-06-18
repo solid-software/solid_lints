@@ -17,6 +17,13 @@ class CyclomaticComplexityParameters {
     required this.exclude,
   });
 
+  /// Empty [CyclomaticComplexityParameters] model.
+  factory CyclomaticComplexityParameters.empty() =>
+      CyclomaticComplexityParameters(
+        maxComplexity: _defaultMaxComplexity,
+        exclude: ExcludedIdentifiersListParameter(exclude: []),
+      );
+
   /// Method for creating from json data
   factory CyclomaticComplexityParameters.fromJson(Map<String, Object?> json) =>
       CyclomaticComplexityParameters(
