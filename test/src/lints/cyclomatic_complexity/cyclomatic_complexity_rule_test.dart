@@ -195,4 +195,33 @@ void test(bool a, bool b, bool c, bool d) {
       ],
     );
   }
+
+  Future<void> test_does_not_count_complexity_in_closures() async {
+    await assertNoDiagnostics(
+      r'''
+void main() {
+  Calculator? calc;
+  group('a', () {
+    group('b', () {
+      group('c', () {
+        test('adds one to input values', () {
+          calc = Calculator();
+          expect(calc?.addOne(2), 3);
+          expect(calc?.addOne(-7), -6);
+          expect(calc?.addOne(0), 1);
+        });
+      });
+    });
+  });
 }
+void group(String name, void Function() body) {}
+void test(String name, void Function() body) {}
+void expect(Object? actual, Object? matcher) {}
+class Calculator {
+  int addOne(int value) => value + 1;
+}
+''',
+    );
+  }
+}
+
