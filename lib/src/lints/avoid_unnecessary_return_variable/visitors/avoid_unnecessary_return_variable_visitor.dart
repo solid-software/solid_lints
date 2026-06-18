@@ -15,7 +15,7 @@ class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitReturnStatement(ReturnStatement node) {
-    final expr = node.expression;
+    final expr = node.expression?.unParenthesized;
     if (expr is! SimpleIdentifier) return;
 
     final element = expr.element;
@@ -23,7 +23,8 @@ class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
 
     if (!element.isFinal && !element.isConst) return;
 
-    final block = node.parent;
+    //get enclosing block function body
+    final block = node.thisOrAncestorOfType<BlockFunctionBody>()?.block;
     if (block == null) return;
 
     final returnVariableUsageVisitor = ReturnVariableUsageVisitor(
@@ -34,16 +35,18 @@ class AvoidUnnecessaryReturnVariableVisitor extends SimpleAstVisitor<void> {
     block.visitChildren(returnVariableUsageVisitor);
     if (!returnVariableUsageVisitor.hasBadStatementCount) return;
 
+    //check if declaration statement is found
+    final declaration = returnVariableUsageVisitor.variableDeclaration;
+    if (declaration == null) return;
+
     //it is 100% bad if return statement follows declaration
     if (!returnVariableUsageVisitor.foundTokensBetweenDeclarationAndReturn) {
       _rule.reportAtNode(node);
       return;
     }
 
-    final declaration = returnVariableUsageVisitor.variableDeclaration;
-
     //check if immutable
-    final initializer = declaration?.initializer;
+    final initializer = declaration.initializer;
     if (initializer == null) return;
 
     if (!_isExpressionImmutable(initializer)) return;
