@@ -172,4 +172,57 @@ void _doNothing() {}
       [lint(304, 14)],
     );
   }
+
+  void test_does_not_report_if_return_is_cached_nested_block() async {
+    await assertNoDiagnostics(r'''
+Future<String?> testAvoidUnnecessaryReturnVariableNestedBlock() async {
+  final cached = 'cached';
+  if (cached.isNotEmpty) {
+    // Should NOT trigger the avoid_unnecessary_return_variable lint
+    return cached;
+  }
+  return null;
 }
+''');
+  }
+
+  void test_reports_if_return_is_cached_and_only_returned_nested_block() async {
+    await assertDiagnostics(
+      r'''
+int test(bool b) {
+  final a = 3;
+  if (b) {
+    return a;
+  }
+  return 0;
+}
+''',
+      [lint(49, 9)],
+    );
+  }
+
+  void test_reports_if_return_in_parentheses() async {
+    await assertDiagnostics(
+      r'''
+int test() {
+  final a = 3;
+  return (a);
+}
+''',
+      [lint(30, 11)],
+    );
+  }
+
+  void test_does_not_report_if_return_is_cached_and_used_after_return_nested_block() async {
+    await assertNoDiagnostics(r'''
+int test(bool b) {
+  final a = 3;
+  if (b) {
+    return a;
+  }
+  return a + 1;
+}
+''');
+  }
+}
+
