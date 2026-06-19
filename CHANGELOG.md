@@ -1,3 +1,8 @@
+## 1.0.0
+
+- feat!: migrate to analyzer_server_plugin
+- BREAKING CHANGE: removed `avoid_unnecessary_type_casts` rule, use dart linter's `unnecessary_cast` instead
+
 ## 0.3.3
 
 - Fix pub.dev analysis issue
