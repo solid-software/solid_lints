@@ -5,6 +5,8 @@ import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_c
 import 'package:solid_lints/src/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../../../lints/auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(FunctionLinesOfCodeRuleTest);
@@ -12,7 +14,8 @@ void main() {
 }
 
 @reflectiveTest
-class FunctionLinesOfCodeRuleTest extends AnalysisRuleTest {
+class FunctionLinesOfCodeRuleTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   static const _mockAnalysisOptionsContent = '''
 plugins:
   solid_lints:
@@ -46,19 +49,16 @@ $_mockAnalysisOptionsContent''',
   }
 
   Future<void> test_reports_when_lines_exceed_threshold() async {
-    await assertDiagnostics(
-      r'''
-int longFunction() {
+    await assertAutoDiagnostics('''
+${expectLint(r'''int longFunction() {
   var i = 0;
   i++;
   i++;
   i++;
 
   return i;
-}
-''',
-      [lint(0, 69)],
-    );
+}''')}
+''');
   }
 
   Future<void> test_does_not_report_when_lines_within_threshold() async {
@@ -102,19 +102,16 @@ int longFunctionExcluded() {
   }
 
   Future<void> test_reports_on_anonymous_functions() async {
-    await assertDiagnostics(
-      r'''
-final longAnonymousFunction = () {
+    await assertAutoDiagnostics('''
+final longAnonymousFunction = ${expectLint(r'''() {
   var i = 0;
   i++;
   i++;
   i++;
 
   return i;
-};
-''',
-      [lint(30, 53)],
-    );
+}''')};
+''');
   }
 
   Future<void> test_does_not_report_on_method_excluded_by_string() async {
