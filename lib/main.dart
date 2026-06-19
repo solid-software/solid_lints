@@ -35,6 +35,7 @@ class SolidLintsPlugin extends Plugin {
     final avoidUnnecessaryTypeAssertionsRule =
         AvoidUnnecessaryTypeAssertionsRule();
     final doubleLiteralFormatRule = DoubleLiteralFormatRule();
+
     final lintRules = [
       AvoidFinalWithGetterRule(),
       AvoidGlobalStateRule(),

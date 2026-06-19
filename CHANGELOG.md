@@ -1,3 +1,8 @@
+## 1.0.0
+
+- feat!: migrate to analyzer_server_plugin
+- refactor: replace `avoid_unnecessary_type_casts` rule with dart analyzer's `unnecessary_cast`
+
 ## 0.3.3
 
 - Fix pub.dev analysis issue
