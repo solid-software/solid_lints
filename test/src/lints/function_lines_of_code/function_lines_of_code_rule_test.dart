@@ -128,4 +128,22 @@ class SomeClass {
 }
 ''');
   }
+
+  Future<void>
+  test_does_not_report_on_function_with_comments_and_blank_lines() async {
+    await assertNoDiagnostics(r'''
+int shortFunctionWithComments() {
+  // This is a single-line comment.
+  var i = 0;
+  i++;
+  i++;
+
+  /*
+   * This is a multi-line comment.
+   */
+  
+  return i;
+}
+''');
+  }
 }

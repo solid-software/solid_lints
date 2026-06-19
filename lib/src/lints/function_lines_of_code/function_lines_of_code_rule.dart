@@ -39,7 +39,9 @@ class FunctionLinesOfCodeRule
     required super.parametersParser,
   }) : super.withParameters(
          name: lintName,
-         description: _code.problemMessage,
+         description:
+             'An approximate metric of meaningful lines of source code '
+             'inside a function, excluding blank lines and comments.',
        );
 
   @override
