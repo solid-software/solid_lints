@@ -269,6 +269,22 @@ void test(List<int> l1, List<int> l2, List<int> l3, List<int> l4) ${expectLint(r
   }
 
   Future<void>
+  test_reports_when_complexity_exceeds_threshold_due_to_for_in_loops() async {
+    await assertAutoDiagnostics('''
+void test(List<int> l1, List<int> l2, List<int> l3, List<int> l4) ${expectLint(r'''{
+  for (var x in l1) {
+    for (var y in l2) {
+      for (var z in l3) {
+        for (var w in l4) {}
+      }
+    }
+  }
+}''')}
+''');
+  }
+
+
+  Future<void>
   test_reports_when_complexity_exceeds_threshold_due_to_logical_and_pattern() async {
     await assertAutoDiagnostics('''
 void test(Object val) ${expectLint(r'''{
