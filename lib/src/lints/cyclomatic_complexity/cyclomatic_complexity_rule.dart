@@ -41,11 +41,11 @@ class CyclomaticComplexityRule
     required super.analysisOptionsLoader,
     required super.parametersParser,
   }) : super.withParameters(
-          name: lintName,
-          description:
-              'Limit for the number of linearly independent paths '
-              "through a program's source code.",
-        );
+         name: lintName,
+         description:
+             'Limit for the number of linearly independent paths '
+             "through a program's source code.",
+       );
 
   @override
   void registerNodeProcessors(
@@ -54,11 +54,14 @@ class CyclomaticComplexityRule
   ) {
     super.registerNodeProcessors(registry, context);
 
-    final parameters = getParametersForContext(context) ??
+    final parameters =
+        getParametersForContext(context) ??
         CyclomaticComplexityParameters.empty();
 
     final visitor = CyclomaticComplexityVisitor(this, parameters);
 
-    registry.addCompilationUnit(this, visitor);
+    registry.addFunctionDeclaration(this, visitor);
+    registry.addConstructorDeclaration(this, visitor);
+    registry.addMethodDeclaration(this, visitor);
   }
 }
