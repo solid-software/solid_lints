@@ -41,15 +41,15 @@ class FunctionLinesOfCodeRuleVisitor extends RecursiveAstVisitor<void> {
   }
 
   void _checkNode(AstNode node) {
-    final lineInfo = _context.currentUnit?.unit.lineInfo;
-    if (lineInfo == null) return;
+    final currentUnit = _context.currentUnit;
+    if (currentUnit == null) return;
 
+    final lineInfo = currentUnit.unit.lineInfo;
     final visitor = FunctionLinesOfCodeVisitor(lineInfo);
     node.visitChildren(visitor);
 
     if (visitor.linesWithCode.length > _parameters.maxLines) {
-      final reporter = _context.currentUnit?.diagnosticReporter;
-      if (reporter == null) return;
+      final reporter = currentUnit.diagnosticReporter;
 
       if (node is! AnnotatedNode) {
         reporter.atNode(
