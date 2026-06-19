@@ -102,4 +102,47 @@ void main () {
       [lint(104, 39), lint(234, 29), lint(267, 39), lint(310, 43)],
     );
   }
+
+  void test_reports_on_cascade_element_at_access_with_length_minus_one() async {
+    await assertDiagnostics(
+      r'''
+void main () {
+  final list2 = [1, 0, 2, 3];
+  list2..elementAt(list2.length - 1);
+}
+''',
+      [lint(52, 29)],
+    );
+  }
+
+  void test_reports_on_null_aware_index_access_with_length_minus_one() async {
+    await assertDiagnostics(
+      r'''
+List<int>? list1 = [0, 1, 2, 3];
+var a = list1?[list1!.length - 1];
+
+void test(List<int>? list2) {
+  list1?[list1!.length - 1];
+  list2?[list2.length - 1];
+}
+''',
+      [lint(41, 25), lint(101, 25), lint(130, 24)],
+    );
+  }
+
+  void
+  test_reports_on_null_aware_element_at_access_with_length_minus_one() async {
+    await assertDiagnostics(
+      r'''
+List<int>? list1 = [0, 1, 2, 3];
+var a = list1?.elementAt(list1!.length - 1);
+
+void test(List<int>? list2) {
+  list1?.elementAt(list1!.length - 1);
+  list2?.elementAt(list2.length - 1);
+}
+''',
+      [lint(41, 35), lint(111, 35), lint(150, 34)],
+    );
+  }
 }
