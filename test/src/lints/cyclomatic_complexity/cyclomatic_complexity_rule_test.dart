@@ -62,7 +62,8 @@ void cyclomaticComplexity() ${expectLint(r'''{
 ''');
   }
 
-  Future<void> test_does_not_report_when_complexity_is_within_threshold() async {
+  Future<void>
+  test_does_not_report_when_complexity_is_within_threshold() async {
     await assertNoDiagnostics(r'''
 void simple() {
   if (true) {}
@@ -116,7 +117,8 @@ void parentFunction() {
 ''');
   }
 
-  Future<void> test_reports_when_complexity_exceeds_threshold_with_switch_expression() async {
+  Future<void>
+  test_reports_when_complexity_exceeds_threshold_with_switch_expression() async {
     await assertAutoDiagnostics('''
 String test(int val) ${expectLint(r'''{
   return switch (val) {
@@ -129,7 +131,8 @@ String test(int val) ${expectLint(r'''{
 ''');
   }
 
-  Future<void> test_reports_when_complexity_exceeds_threshold_due_to_guard_clause() async {
+  Future<void>
+  test_reports_when_complexity_exceeds_threshold_due_to_guard_clause() async {
     await assertAutoDiagnostics('''
 String test(int val) ${expectLint(r'''{
   return switch (val) {
@@ -141,7 +144,8 @@ String test(int val) ${expectLint(r'''{
 ''');
   }
 
-  Future<void> test_reports_when_complexity_exceeds_threshold_with_switch_statement_and_patterns() async {
+  Future<void>
+  test_reports_when_complexity_exceeds_threshold_with_switch_statement_and_patterns() async {
     await assertAutoDiagnostics('''
 void test(Object val) ${expectLint(r'''{
   switch (val) {
@@ -158,7 +162,8 @@ void test(Object val) ${expectLint(r'''{
 ''');
   }
 
-  Future<void> test_reports_when_complexity_exceeds_threshold_due_to_logical_operators() async {
+  Future<void>
+  test_reports_when_complexity_exceeds_threshold_due_to_logical_operators() async {
     await assertAutoDiagnostics('''
 void test(bool a, bool b, bool c, bool d) ${expectLint(r'''{
   if (a && b && c && d) {}
@@ -192,7 +197,8 @@ class Calculator {
 ''');
   }
 
-  Future<void> test_reports_when_constructor_complexity_exceeds_threshold() async {
+  Future<void>
+  test_reports_when_constructor_complexity_exceeds_threshold() async {
     await assertAutoDiagnostics('''
 class Complex {
   Complex(int val) ${expectLint(r'''{
@@ -218,7 +224,8 @@ class Simple {
 ''');
   }
 
-  Future<void> test_reports_when_complexity_exceeds_threshold_with_do_statement() async {
+  Future<void>
+  test_reports_when_complexity_exceeds_threshold_with_do_statement() async {
     await assertAutoDiagnostics('''
 void testDoWhile() ${expectLint(r'''{
   int x = 0;
@@ -234,7 +241,7 @@ void testDoWhile() ${expectLint(r'''{
   }
 
   Future<void>
-      test_reports_when_complexity_exceeds_threshold_due_to_collection_if() async {
+  test_reports_when_complexity_exceeds_threshold_due_to_collection_if() async {
     await assertAutoDiagnostics('''
 void test(bool a, bool b, bool c, bool d) ${expectLint(r'''{
   var result = [
@@ -248,7 +255,7 @@ void test(bool a, bool b, bool c, bool d) ${expectLint(r'''{
   }
 
   Future<void>
-      test_reports_when_complexity_exceeds_threshold_due_to_collection_for() async {
+  test_reports_when_complexity_exceeds_threshold_due_to_collection_for() async {
     await assertAutoDiagnostics('''
 void test(List<int> l1, List<int> l2, List<int> l3, List<int> l4) ${expectLint(r'''{
   var result = [
@@ -262,7 +269,7 @@ void test(List<int> l1, List<int> l2, List<int> l3, List<int> l4) ${expectLint(r
   }
 
   Future<void>
-      test_reports_when_complexity_exceeds_threshold_due_to_logical_and_pattern() async {
+  test_reports_when_complexity_exceeds_threshold_due_to_logical_and_pattern() async {
     await assertAutoDiagnostics('''
 void test(Object val) ${expectLint(r'''{
   if (val case int x && > 0 && < 10 && != 5 && != 6) {}
@@ -271,7 +278,7 @@ void test(Object val) ${expectLint(r'''{
   }
 
   Future<void>
-      test_reports_when_complexity_exceeds_threshold_due_to_logical_or_pattern() async {
+  test_reports_when_complexity_exceeds_threshold_due_to_logical_or_pattern() async {
     await assertAutoDiagnostics('''
 void test(Object val) ${expectLint(r'''{
   if (val case int x || int x || int x || int x || int x) {}
@@ -280,7 +287,7 @@ void test(Object val) ${expectLint(r'''{
   }
 
   Future<void>
-      test_reports_when_complexity_exceeds_threshold_due_to_null_aware_cascade() async {
+  test_reports_when_complexity_exceeds_threshold_due_to_null_aware_cascade() async {
     await assertAutoDiagnostics('''
 void test(dynamic a, dynamic b, dynamic c, dynamic d) ${expectLint(r'''{
   a?..f();
@@ -292,7 +299,7 @@ void test(dynamic a, dynamic b, dynamic c, dynamic d) ${expectLint(r'''{
   }
 
   Future<void>
-      test_reports_when_complexity_exceeds_threshold_due_to_null_aware_spread() async {
+  test_reports_when_complexity_exceeds_threshold_due_to_null_aware_spread() async {
     await assertAutoDiagnostics('''
 void test(List? a, List? b, List? c, List? d) ${expectLint(r'''{
   var r = [
@@ -315,7 +322,7 @@ void test(dynamic x, List<int> y) {
   }
 
   Future<void>
-      test_does_not_report_when_collection_elements_within_threshold() async {
+  test_does_not_report_when_collection_elements_within_threshold() async {
     await assertNoDiagnostics(r'''
 void test(bool a, List<int> list) {
   var result = [
@@ -343,7 +350,7 @@ void test(Object val) {
   }
 
   Future<void>
-      test_does_not_report_on_pattern_matching_or_within_threshold() async {
+  test_does_not_report_on_pattern_matching_or_within_threshold() async {
     await assertNoDiagnostics(r'''
 void test(Object val) {
   if (val case int x || int x) {}
@@ -367,7 +374,7 @@ void parent() {
   }
 
   Future<void>
-      test_does_not_count_null_aware_cascades_and_spreads_in_closures() async {
+  test_does_not_count_null_aware_cascades_and_spreads_in_closures() async {
     await assertNoDiagnostics(r'''
 void parent() {
   final closure = (dynamic x, List? y) {
@@ -379,7 +386,19 @@ void parent() {
   }
 
   Future<void>
-      test_reports_when_complexity_exceeds_threshold_due_to_null_check_patterns() async {
+  test_reports_when_complexity_exceeds_threshold_due_to_null_aware_function_calls() async {
+    await assertAutoDiagnostics('''
+void test(Function? a, Function? b, Function? c, Function? d) ${expectLint(r'''{
+  a?.call();
+  b?.call();
+  c?.call();
+  d?.call();
+}''')}
+''');
+  }
+
+  Future<void>
+  test_reports_when_complexity_exceeds_threshold_due_to_null_check_patterns() async {
     await assertAutoDiagnostics('''
 void test(Object val) ${expectLint(r'''{
   if (val case [int? a?, int? b?, int? c?]) {}
@@ -388,7 +407,7 @@ void test(Object val) ${expectLint(r'''{
   }
 
   Future<void>
-      test_reports_when_complexity_exceeds_threshold_due_to_null_assert_patterns() async {
+  test_reports_when_complexity_exceeds_threshold_due_to_null_assert_patterns() async {
     await assertAutoDiagnostics('''
 void test(Object val) ${expectLint(r'''{
   if (val case [int? a!, int? b!, int? c!]) {}
@@ -397,7 +416,7 @@ void test(Object val) ${expectLint(r'''{
   }
 
   Future<void>
-      test_does_not_report_on_null_check_and_assert_patterns_within_threshold() async {
+  test_does_not_report_on_null_check_and_assert_patterns_within_threshold() async {
     await assertNoDiagnostics(r'''
 void test(Object val) {
   if (val case [int? a?, int? b!]) {}
