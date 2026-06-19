@@ -3,6 +3,8 @@ import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../../../lints/auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(UseNearestContextRuleTest);
@@ -10,12 +12,12 @@ void main() {
 }
 
 @reflectiveTest
-class UseNearestContextRuleTest extends AnalysisRuleTest {
+class UseNearestContextRuleTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   @override
   void setUp() {
     rule = UseNearestContextRule();
-    newPackage('flutter')
-      ..addFile('lib/material.dart', r'''
+    newPackage('flutter')..addFile('lib/material.dart', r'''
 class BuildContext {
   BuildContext get context => this;
   Object? get size => null;
@@ -49,8 +51,8 @@ class Future {
   }
 
   Future<void> test_reports_on_outer_context_usage() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   final outerContext = context;
@@ -58,19 +60,17 @@ void showDialog(BuildContext context) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext _) {
-      final s = outerContext.size;
+      final s = ${expectLint('outerContext')}.size;
       return Widget();
     },
   );
 }
-''',
-      [lint(208, 12)],
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_nearest_context_usage() async {
-    await assertNoDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertNoDiagnostics(r'''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   showModalBottomSheet(
@@ -81,13 +81,12 @@ void showDialog(BuildContext context) {
     },
   );
 }
-''',
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_property_of_other_object() async {
-    await assertNoDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertNoDiagnostics(r'''
+import 'package:flutter/material.dart';
 
 class FalsePositiveTest {
   void build(BuildContext context) {
@@ -101,13 +100,12 @@ class FalsePositiveTest {
     );
   }
 }
-''',
-    );
+''');
   }
 
   Future<void> test_reports_on_this_context_inside_builder() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 class FalsePositiveTest {
   BuildContext get context => throw '';
@@ -116,20 +114,19 @@ class FalsePositiveTest {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext innerContext) {
-        final s = this.context.size;
+        final s = this.${expectLint('context')}.size;
         return Widget();
       },
     );
   }
 }
-''',
-      [lint(263, 7)],
-    );
+''');
   }
 
-  Future<void> test_does_not_report_on_local_variable_assigned_from_nearest_context() async {
-    await assertNoDiagnostics(
-      r'''import 'package:flutter/material.dart';
+  Future<void>
+  test_does_not_report_on_local_variable_assigned_from_nearest_context() async {
+    await assertNoDiagnostics(r'''
+import 'package:flutter/material.dart';
 
 class FalsePositiveTest {
   void build(BuildContext context) {
@@ -143,13 +140,13 @@ class FalsePositiveTest {
     );
   }
 }
-''',
-    );
+''');
   }
 
-  Future<void> test_reports_on_outer_builder_context_usage_in_nested_builder() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+  Future<void>
+  test_reports_on_outer_builder_context_usage_in_nested_builder() async {
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   showModalBottomSheet(
@@ -157,59 +154,54 @@ void showDialog(BuildContext context) {
     builder: (BuildContext outerBuilderCtx) {
       return Builder(
         builder: (BuildContext innerBuilderCtx) {
-          final s = outerBuilderCtx.size;
+          final s = ${expectLint('outerBuilderCtx')}.size;
           return Widget();
         },
       );
     },
   );
 }
-''',
-      [lint(265, 15)],
-    );
+''');
   }
 
   Future<void> test_reports_on_untyped_builder_parameter_usage() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   showModalBottomSheet(
     context: context,
     builder: (_) {
-      final s = context.size;
+      final s = ${expectLint('context')}.size;
       return Widget();
     },
   );
 }
-''',
-      [lint(162, 7)],
-    );
+''');
   }
 
   Future<void> test_reports_on_outer_context_usage_in_async_callback() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext innerContext) {
       Future.microtask(() {
-        final s = context.size;
+        final s = ${expectLint('context')}.size;
       });
       return Widget();
     },
   );
 }
-''',
-      [lint(216, 7)],
-    );
+''');
   }
 
-  Future<void> test_does_not_report_on_nearest_context_usage_in_async_callback() async {
-    await assertNoDiagnostics(
-      r'''import 'package:flutter/material.dart';
+  Future<void>
+  test_does_not_report_on_nearest_context_usage_in_async_callback() async {
+    await assertNoDiagnostics(r'''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   showModalBottomSheet(
@@ -222,33 +214,30 @@ void showDialog(BuildContext context) {
     },
   );
 }
-''',
-    );
+''');
   }
 
   Future<void> test_reports_on_constructor_parameter_usage_in_builder() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 class QuickFixBrokenTest {
   QuickFixBrokenTest(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext _) {
-        final s = context.size;
+        final s = ${expectLint('context')}.size;
         return Widget();
       },
     );
   }
 }
-''',
-      [lint(215, 7)],
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_shadowed_parameter_name_usage() async {
-    await assertNoDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertNoDiagnostics(r'''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   showModalBottomSheet(
@@ -259,64 +248,58 @@ void showDialog(BuildContext context) {
     },
   );
 }
-''',
-    );
+''');
   }
 
   Future<void> test_reports_on_nullable_outer_context_usage() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext? context) {
   showModalBottomSheet(
     context: context!,
     builder: (BuildContext _) {
-      final s = context;
+      final s = ${expectLint('context')};
       return Widget();
     },
   );
 }
-''',
-      [lint(177, 7)],
-    );
+''');
   }
 
   Future<void> test_reports_on_this_context_inside_extension_method() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 extension BuildContextX on BuildContext {
   void someMethod() {
     showModalBottomSheet(
       context: this,
       builder: (BuildContext innerContext) {
-        final s = this.size;
+        final s = ${expectLint('this')}.size;
         return Widget();
       },
     );
   }
 }
-''',
-      [lint(215, 4)],
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_this_context_outside_builder() async {
-    await assertNoDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertNoDiagnostics(r'''
+import 'package:flutter/material.dart';
 
 extension BuildContextX on BuildContext {
   void someMethod() {
     final s = this.size;
   }
 }
-''',
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_nullable_nearest_context_usage() async {
-    await assertNoDiagnostics(
-      r'''import 'package:flutter/material.dart';
+    await assertNoDiagnostics(r'''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   showModalBottomSheet(
@@ -327,26 +310,23 @@ void showDialog(BuildContext context) {
     },
   );
 }
-''',
-    );
+''');
   }
 
-  Future<void> test_reports_on_outer_context_usage_with_nullable_nearest_context() async {
-    await assertDiagnostics(
-      r'''import 'package:flutter/material.dart';
+  Future<void>
+  test_reports_on_outer_context_usage_with_nullable_nearest_context() async {
+    await assertAutoDiagnostics('''
+import 'package:flutter/material.dart';
 
 void showDialog(BuildContext context) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext? innerContext) {
-      final s = context.size;
+      final s = ${expectLint('context')}.size;
       return Widget();
     },
   );
 }
-''',
-      [lint(187, 7)],
-    );
+''');
   }
 }
-
