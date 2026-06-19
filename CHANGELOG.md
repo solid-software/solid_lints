@@ -1,7 +1,7 @@
 ## 1.0.0
 
 - feat!: migrate to analyzer_server_plugin
-- BREAKING CHANGE: removed `avoid_unnecessary_type_casts` rule, use dart linter's `unnecessary_cast` instead
+- refactor: replace `avoid_unnecessary_type_casts` rule with dart analyzer's `unnecessary_cast`
 
 ## 0.3.3
 

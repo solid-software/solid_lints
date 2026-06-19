@@ -33,6 +33,7 @@ analyzer:
     missing_required_param: error
     missing_return: error
     parameter_assignments: error
+    unnecessary_cast: warning
 
 custom_lint:
   rules:
