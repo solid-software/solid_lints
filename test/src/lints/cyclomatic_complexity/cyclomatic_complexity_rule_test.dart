@@ -377,4 +377,31 @@ void parent() {
 }
 ''');
   }
+
+  Future<void>
+      test_reports_when_complexity_exceeds_threshold_due_to_null_check_patterns() async {
+    await assertAutoDiagnostics('''
+void test(Object val) ${expectLint(r'''{
+  if (val case [int? a?, int? b?, int? c?]) {}
+}''')}
+''');
+  }
+
+  Future<void>
+      test_reports_when_complexity_exceeds_threshold_due_to_null_assert_patterns() async {
+    await assertAutoDiagnostics('''
+void test(Object val) ${expectLint(r'''{
+  if (val case [int? a!, int? b!, int? c!]) {}
+}''')}
+''');
+  }
+
+  Future<void>
+      test_does_not_report_on_null_check_and_assert_patterns_within_threshold() async {
+    await assertNoDiagnostics(r'''
+void test(Object val) {
+  if (val case [int? a?, int? b!]) {}
+}
+''');
+  }
 }

@@ -181,6 +181,18 @@ class CyclomaticComplexityFlowVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitNullCheckPattern(NullCheckPattern node) {
+    _increaseComplexity(node);
+    super.visitNullCheckPattern(node);
+  }
+
+  @override
+  void visitNullAssertPattern(NullAssertPattern node) {
+    _increaseComplexity(node);
+    super.visitNullAssertPattern(node);
+  }
+
+  @override
   void visitCascadeExpression(CascadeExpression node) {
     if (node.isNullAware) {
       _increaseComplexity(node);
