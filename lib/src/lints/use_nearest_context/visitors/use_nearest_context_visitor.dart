@@ -19,11 +19,10 @@ class UseNearestContextVisitor extends SimpleAstVisitor<void> {
 
     final closestBuildContext = findClosestBuildContext(node);
     if (closestBuildContext == null) return;
-    if (closestBuildContext.name?.lexeme != node.name) {
-      if (_isDeclaredInNearestScope(node, closestBuildContext)) return;
+    if (closestBuildContext.name?.lexeme == node.name) return;
+    if (_isDeclaredInNearestScope(node, closestBuildContext)) return;
 
-      _rule.reportAtNode(node);
-    }
+    _rule.reportAtNode(node);
   }
 
   @override
