@@ -34,12 +34,10 @@ class FunctionLinesOfCodeRuleVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitFunctionExpression(FunctionExpression node) {
-    super.visitFunctionExpression(node);
-
-    if (node.parent is FunctionDeclaration) {
-      return;
+    if (node.parent is! FunctionDeclaration) {
+      _checkNode(node);
     }
-    _checkNode(node);
+    super.visitFunctionExpression(node);
   }
 
   void _checkNode(AstNode node) {
