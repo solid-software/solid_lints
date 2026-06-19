@@ -101,6 +101,13 @@ class CyclomaticComplexityFlowVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitDoStatement(DoStatement node) {
+    _increaseComplexity(node);
+
+    super.visitDoStatement(node);
+  }
+
+  @override
   void visitForStatement(ForStatement node) {
     _increaseComplexity(node);
 

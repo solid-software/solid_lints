@@ -41,7 +41,7 @@ class CyclomaticComplexityRule
     required super.analysisOptionsLoader,
     required super.parametersParser,
   }) : super.withParameters(
-          name: _code.lowerCaseName,
+          name: lintName,
           description:
               'Limit for the number of linearly independent paths '
               "through a program's source code.",

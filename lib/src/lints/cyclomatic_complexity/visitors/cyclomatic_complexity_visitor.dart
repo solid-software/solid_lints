@@ -20,6 +20,12 @@ class CyclomaticComplexityVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitConstructorDeclaration(ConstructorDeclaration node) {
+    super.visitConstructorDeclaration(node);
+    _checkFunctionBody(node, node.body);
+  }
+
+  @override
   void visitMethodDeclaration(MethodDeclaration node) {
     super.visitMethodDeclaration(node);
     _checkFunctionBody(node, node.body);
