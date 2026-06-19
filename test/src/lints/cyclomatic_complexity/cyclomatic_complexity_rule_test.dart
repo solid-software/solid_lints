@@ -232,4 +232,149 @@ void testDoWhile() ${expectLint(r'''{
 }''')}
 ''');
   }
+
+  Future<void>
+      test_reports_when_complexity_exceeds_threshold_due_to_collection_if() async {
+    await assertAutoDiagnostics('''
+void test(bool a, bool b, bool c, bool d) ${expectLint(r'''{
+  var result = [
+    if (a) 1,
+    if (b) 2,
+    if (c) 3,
+    if (d) 4,
+  ];
+}''')}
+''');
+  }
+
+  Future<void>
+      test_reports_when_complexity_exceeds_threshold_due_to_collection_for() async {
+    await assertAutoDiagnostics('''
+void test(List<int> l1, List<int> l2, List<int> l3, List<int> l4) ${expectLint(r'''{
+  var result = [
+    for (var x in l1) x,
+    for (var x in l2) x,
+    for (var x in l3) x,
+    for (var x in l4) x,
+  ];
+}''')}
+''');
+  }
+
+  Future<void>
+      test_reports_when_complexity_exceeds_threshold_due_to_logical_and_pattern() async {
+    await assertAutoDiagnostics('''
+void test(Object val) ${expectLint(r'''{
+  if (val case int x && > 0 && < 10 && != 5 && != 6) {}
+}''')}
+''');
+  }
+
+  Future<void>
+      test_reports_when_complexity_exceeds_threshold_due_to_logical_or_pattern() async {
+    await assertAutoDiagnostics('''
+void test(Object val) ${expectLint(r'''{
+  if (val case int x || int x || int x || int x || int x) {}
+}''')}
+''');
+  }
+
+  Future<void>
+      test_reports_when_complexity_exceeds_threshold_due_to_null_aware_cascade() async {
+    await assertAutoDiagnostics('''
+void test(dynamic a, dynamic b, dynamic c, dynamic d) ${expectLint(r'''{
+  a?..f();
+  b?..f();
+  c?..f();
+  d?..f();
+}''')}
+''');
+  }
+
+  Future<void>
+      test_reports_when_complexity_exceeds_threshold_due_to_null_aware_spread() async {
+    await assertAutoDiagnostics('''
+void test(List? a, List? b, List? c, List? d) ${expectLint(r'''{
+  var r = [
+    ...?a,
+    ...?b,
+    ...?c,
+    ...?d,
+  ];
+}''')}
+''');
+  }
+
+  Future<void> test_does_not_report_on_normal_cascades_and_spreads() async {
+    await assertNoDiagnostics(r'''
+void test(dynamic x, List<int> y) {
+  x..a()..b();
+  [...y];
+}
+''');
+  }
+
+  Future<void>
+      test_does_not_report_when_collection_elements_within_threshold() async {
+    await assertNoDiagnostics(r'''
+void test(bool a, List<int> list) {
+  var result = [
+    if (a) 1,
+    for (var x in list) x,
+  ];
+}
+''');
+  }
+
+  Future<void> test_does_not_double_count_cascade_sections() async {
+    await assertNoDiagnostics(r'''
+void test(dynamic x) {
+  x?..a()..b()..c()..d()..e();
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_simple_pattern_matching() async {
+    await assertNoDiagnostics(r'''
+void test(Object val) {
+  if (val case int x && > 0) {}
+}
+''');
+  }
+
+  Future<void>
+      test_does_not_report_on_pattern_matching_or_within_threshold() async {
+    await assertNoDiagnostics(r'''
+void test(Object val) {
+  if (val case int x || int x) {}
+}
+''');
+  }
+
+  Future<void> test_does_not_count_collection_elements_in_closures() async {
+    await assertNoDiagnostics(r'''
+void parent() {
+  final closure = () {
+    final list = [
+      if (true) 1,
+      if (true) 2,
+      if (true) 3,
+      if (true) 4,
+    ];
+  };
+}
+''');
+  }
+
+  Future<void>
+      test_does_not_count_null_aware_cascades_and_spreads_in_closures() async {
+    await assertNoDiagnostics(r'''
+void parent() {
+  final closure = (dynamic x, List? y) {
+    x?..a()..b()..c()..d();
+    [...?y];
+  };
+}
+''');
+  }
 }

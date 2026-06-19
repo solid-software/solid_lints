@@ -157,6 +157,46 @@ class CyclomaticComplexityFlowVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitIfElement(IfElement node) {
+    _increaseComplexity(node);
+    super.visitIfElement(node);
+  }
+
+  @override
+  void visitForElement(ForElement node) {
+    _increaseComplexity(node);
+    super.visitForElement(node);
+  }
+
+  @override
+  void visitLogicalAndPattern(LogicalAndPattern node) {
+    _increaseComplexity(node);
+    super.visitLogicalAndPattern(node);
+  }
+
+  @override
+  void visitLogicalOrPattern(LogicalOrPattern node) {
+    _increaseComplexity(node);
+    super.visitLogicalOrPattern(node);
+  }
+
+  @override
+  void visitCascadeExpression(CascadeExpression node) {
+    if (node.isNullAware) {
+      _increaseComplexity(node);
+    }
+    super.visitCascadeExpression(node);
+  }
+
+  @override
+  void visitSpreadElement(SpreadElement node) {
+    if (node.isNullAware) {
+      _increaseComplexity(node);
+    }
+    super.visitSpreadElement(node);
+  }
+
+  @override
   void visitWhileStatement(WhileStatement node) {
     _increaseComplexity(node);
 
