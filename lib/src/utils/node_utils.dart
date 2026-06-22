@@ -1,5 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/element/element.dart';
+
 
 /// Check node is override method from its metadata
 bool isOverride(List<Annotation> metadata) => metadata.any(
@@ -21,4 +23,41 @@ String humanReadableNodeType(AstNode? node) {
   }
 
   return 'Node';
+}
+
+/// Extension on [SimpleIdentifier] to provide scope and property utility
+/// checks.
+extension SimpleIdentifierExtension on SimpleIdentifier {
+  /// Returns `true` if this identifier is a property accessed on another
+  /// object (e.g. `state.context`), but not on `this` (e.g. `this.context`).
+  bool get isPropertyOfOtherObject {
+    final parent = this.parent;
+    if (parent is PrefixedIdentifier && this == parent.identifier) {
+      return true;
+    }
+    if (parent is PropertyAccess && this == parent.propertyName) {
+      var target = parent.target;
+      while (target is ParenthesizedExpression) {
+        target = target.expression;
+      }
+      return target is! ThisExpression && target is! SuperExpression;
+    }
+    return false;
+  }
+
+  /// Returns `true` if this identifier refers to a variable declared inside
+  /// the body of the function that owns [as] (i.e. a local variable in the
+  /// same scope).
+  bool isDeclaredInSameFunction({required SimpleFormalParameter as}) {
+    final element = this.element;
+    if (element is! LocalVariableElement) return false;
+
+    final nearestFunction = as.parent?.parent;
+    if (nearestFunction is! FunctionExpression) return false;
+
+    final body = nearestFunction.body;
+    final declOffset = element.firstFragment.nameOffset;
+    if (declOffset == null) return false;
+    return declOffset >= body.offset && declOffset < body.end;
+  }
 }
