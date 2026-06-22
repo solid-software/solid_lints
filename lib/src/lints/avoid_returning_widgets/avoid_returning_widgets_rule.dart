@@ -66,11 +66,11 @@ class AvoidReturningWidgetsRule
   /// Creates a new instance of [AvoidReturningWidgetsRule]
   AvoidReturningWidgetsRule({
     required super.analysisOptionsLoader,
-    required super.parametersParser,
   }) : super.withParameters(
-          name: _code.lowerCaseName,
-          description: _code.problemMessage,
-        );
+         name: _code.lowerCaseName,
+         description: _code.problemMessage,
+         parametersParser: AvoidReturningWidgetsParameters.fromJson,
+       );
 
   @override
   void registerNodeProcessors(
@@ -79,7 +79,8 @@ class AvoidReturningWidgetsRule
   ) {
     super.registerNodeProcessors(registry, context);
 
-    final parameters = getParametersForContext(context) ??
+    final parameters =
+        getParametersForContext(context) ??
         AvoidReturningWidgetsParameters.empty();
 
     final visitor = AvoidReturningWidgetsVisitor(this, parameters);
