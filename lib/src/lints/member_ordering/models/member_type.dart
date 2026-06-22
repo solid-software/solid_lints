@@ -32,7 +32,7 @@ enum MemberType {
   method('methods', typeAlias: 'method'),
 
   /// Indicates constructor affiliation
-  constructor('constructors'),
+  constructor('constructors', typeAlias: 'constructor'),
 
   /// Indicates getters affiliation
   getter('getters'),

@@ -24,6 +24,7 @@
 import 'package:analyzer/dart/ast/ast.dart' hide Annotation;
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/annotation.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/field_keyword.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/constructor_member_group.dart';
@@ -31,25 +32,27 @@ import 'package:solid_lints/src/lints/member_ordering/models/member_group/field_
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/get_set_member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/method_member_group.dart';
+import 'package:solid_lints/src/lints/member_ordering/models/member_info.dart';
+import 'package:solid_lints/src/lints/member_ordering/models/member_names.dart';
+import 'package:solid_lints/src/lints/member_ordering/models/member_order.dart';
+import 'package:solid_lints/src/lints/member_ordering/models/member_ordering_parameters.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// AST Visitor which finds all class members and checks if they are
 /// in order provided from rule config or default config
-class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
-  final List<MemberGroup> _groupsOrder;
-  final List<MemberGroup> _widgetsGroupsOrder;
+class MemberOrderingVisitor extends SimpleAstVisitor<void> {
+  final MemberOrderingRule _rule;
+  final MemberOrderingParameters _parameters;
 
   final _membersInfo = <MemberInfo>[];
 
   /// Creates instance of [MemberOrderingVisitor]
-  /// [_groupsOrder] config is used for regular classes
-  /// [_widgetsGroupsOrder] config is used for widget classes
-  MemberOrderingVisitor(this._groupsOrder, this._widgetsGroupsOrder);
+  MemberOrderingVisitor(this._rule, this._parameters);
 
   @override
-  List<MemberInfo> visitClassDeclaration(ClassDeclaration node) {
+  void visitClassDeclaration(ClassDeclaration node) {
     super.visitClassDeclaration(node);
 
     _membersInfo.clear();
@@ -58,17 +61,72 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
     final isFlutterWidget =
         isWidgetOrSubclass(type) || isWidgetStateOrSubclass(type);
 
-    for (final member in node.members) {
-      if (member is FieldDeclaration) {
-        _visitFieldDeclaration(member, isFlutterWidget);
-      } else if (member is ConstructorDeclaration) {
-        _visitConstructorDeclaration(member, isFlutterWidget);
-      } else if (member is MethodDeclaration) {
-        _visitMethodDeclaration(member, isFlutterWidget);
+    final body = node.body;
+    if (body is BlockClassBody) {
+      for (final member in body.members) {
+        if (member is FieldDeclaration) {
+          _visitFieldDeclaration(member, isFlutterWidget);
+        } else if (member is ConstructorDeclaration) {
+          _visitConstructorDeclaration(member, isFlutterWidget);
+        } else if (member is MethodDeclaration) {
+          _visitMethodDeclaration(member, isFlutterWidget);
+        }
       }
     }
 
-    return _membersInfo;
+    final wrongOrderMembers = _membersInfo.where(
+      (info) => info.memberOrder.isWrong,
+    );
+
+    for (final memberInfo in wrongOrderMembers) {
+      final memberGroup = memberInfo.memberOrder.memberGroup;
+      final previousMemberGroup = memberInfo.memberOrder.previousMemberGroup;
+
+      _rule.reportAtNode(
+        memberInfo.classMember,
+        diagnosticCode: MemberOrderingRule.wrongOrderCode,
+        arguments: [
+          memberGroup.toString(),
+          previousMemberGroup?.toString() ?? '',
+        ],
+      );
+    }
+
+    if (_parameters.alphabetize) {
+      final alphabeticallyWrongOrderMembers = _membersInfo.where(
+        (info) => info.memberOrder.isAlphabeticallyWrong,
+      );
+
+      for (final memberInfo in alphabeticallyWrongOrderMembers) {
+        final names = memberInfo.memberOrder.memberNames;
+        _rule.reportAtNode(
+          memberInfo.classMember,
+          diagnosticCode: MemberOrderingRule.alphabeticalOrderCode,
+          arguments: [
+            names.currentName,
+            names.previousName ?? '',
+          ],
+        );
+      }
+    }
+
+    if (!_parameters.alphabetize && _parameters.alphabetizeByType) {
+      final alphabeticallyByTypeWrongOrderMembers = _membersInfo.where(
+        (info) => info.memberOrder.isByTypeWrong,
+      );
+
+      for (final memberInfo in alphabeticallyByTypeWrongOrderMembers) {
+        final names = memberInfo.memberOrder.memberNames;
+        _rule.reportAtNode(
+          memberInfo.classMember,
+          diagnosticCode: MemberOrderingRule.alphabeticalByTypeOrderCode,
+          arguments: [
+            names.currentName,
+            names.previousName ?? '',
+          ],
+        );
+      }
+    }
   }
 
   void _visitFieldDeclaration(
@@ -107,7 +165,7 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
           memberOrder: _getOrder(
             closestGroup,
             declaration.name?.lexeme ?? '',
-            declaration.returnType.name,
+            declaration.typeName?.name ?? '',
             isFlutterWidget,
           ),
         ),
@@ -119,40 +177,23 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
     MethodDeclaration declaration,
     bool isFlutterWidget,
   ) {
-    if (declaration.isGetter || declaration.isSetter) {
-      final group = GetSetMemberGroup.parse(declaration);
-      final closestGroup = _getClosestGroup(group, isFlutterWidget);
+    final group = (declaration.isGetter || declaration.isSetter)
+        ? GetSetMemberGroup.parse(declaration)
+        : MethodMemberGroup.parse(declaration);
+    final closestGroup = _getClosestGroup(group, isFlutterWidget);
 
-      if (closestGroup != null) {
-        _membersInfo.add(
-          MemberInfo(
-            classMember: declaration,
-            memberOrder: _getOrder(
-              closestGroup,
-              declaration.name.lexeme,
-              declaration.returnType?.type?.getDisplayString() ?? '_',
-              isFlutterWidget,
-            ),
+    if (closestGroup != null) {
+      _membersInfo.add(
+        MemberInfo(
+          classMember: declaration,
+          memberOrder: _getOrder(
+            closestGroup,
+            declaration.name.lexeme,
+            declaration.returnType?.type?.getDisplayString() ?? '_',
+            isFlutterWidget,
           ),
-        );
-      }
-    } else {
-      final group = MethodMemberGroup.parse(declaration);
-      final closestGroup = _getClosestGroup(group, isFlutterWidget);
-
-      if (closestGroup != null) {
-        _membersInfo.add(
-          MemberInfo(
-            classMember: declaration,
-            memberOrder: _getOrder(
-              closestGroup,
-              declaration.name.lexeme,
-              declaration.returnType?.type?.getDisplayString() ?? '_',
-              isFlutterWidget,
-            ),
-          ),
-        );
-      }
+        ),
+      );
     }
   }
 
@@ -160,17 +201,20 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
     MemberGroup parsedGroup,
     bool isFlutterWidget,
   ) {
-    final closestGroups = (isFlutterWidget ? _widgetsGroupsOrder : _groupsOrder)
-        .where(
-          (group) =>
-              _isConstructorGroup(group, parsedGroup) ||
-              _isFieldGroup(group, parsedGroup) ||
-              _isGetSetGroup(group, parsedGroup) ||
-              _isMethodGroup(group, parsedGroup),
-        )
-        .sorted(
-          (a, b) => b.getSortingCoefficient() - a.getSortingCoefficient(),
-        );
+    final closestGroups =
+        (isFlutterWidget
+                ? _parameters.widgetsGroupsOrder
+                : _parameters.groupsOrder)
+            .where(
+              (group) =>
+                  _isConstructorGroup(group, parsedGroup) ||
+                  _isFieldGroup(group, parsedGroup) ||
+                  _isGetSetGroup(group, parsedGroup) ||
+                  _isMethodGroup(group, parsedGroup),
+            )
+            .sorted(
+              (a, b) => b.getSortingCoefficient() - a.getSortingCoefficient(),
+            );
 
     return closestGroups.firstOrNull;
   }
@@ -187,8 +231,8 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
 
       final previousMemberGroup =
           hasSameGroup && lastMemberOrder.previousMemberGroup != null
-              ? lastMemberOrder.previousMemberGroup
-              : lastMemberOrder.memberGroup;
+          ? lastMemberOrder.previousMemberGroup
+          : lastMemberOrder.memberGroup;
 
       final memberNames = MemberNames(
         currentName: memberName,
@@ -199,16 +243,19 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
 
       return MemberOrder(
         memberNames: memberNames,
-        isAlphabeticallyWrong: hasSameGroup &&
+        isAlphabeticallyWrong:
+            hasSameGroup &&
             memberNames.currentName.compareTo(memberNames.previousName!) < 0,
-        isByTypeWrong: hasSameGroup &&
-            memberNames.currentTypeName
-                    .toLowerCase()
-                    .compareTo(memberNames.previousTypeName!.toLowerCase()) <
+        isByTypeWrong:
+            hasSameGroup &&
+            memberNames.currentTypeName.toLowerCase().compareTo(
+                  memberNames.previousTypeName!.toLowerCase(),
+                ) <
                 0,
         memberGroup: memberGroup,
         previousMemberGroup: previousMemberGroup,
-        isWrong: (hasSameGroup && lastMemberOrder.isWrong) ||
+        isWrong:
+            (hasSameGroup && lastMemberOrder.isWrong) ||
             _isCurrentGroupBefore(
               lastMemberOrder.memberGroup,
               memberGroup,
@@ -218,8 +265,10 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
     }
 
     return MemberOrder(
-      memberNames:
-          MemberNames(currentName: memberName, currentTypeName: typeName),
+      memberNames: MemberNames(
+        currentName: memberName,
+        currentTypeName: typeName,
+      ),
       isAlphabeticallyWrong: false,
       isByTypeWrong: false,
       memberGroup: memberGroup,
@@ -232,7 +281,9 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
     MemberGroup memberGroup,
     bool isFlutterWidget,
   ) {
-    final group = isFlutterWidget ? _widgetsGroupsOrder : _groupsOrder;
+    final group = isFlutterWidget
+        ? _parameters.widgetsGroupsOrder
+        : _parameters.groupsOrder;
 
     return group.indexOf(lastMemberGroup) > group.indexOf(memberGroup);
   }
@@ -284,73 +335,4 @@ class MemberOrderingVisitor extends RecursiveAstVisitor<List<MemberInfo>> {
           group.keyword == parsedGroup.keyword) &&
       (group.annotation == Annotation.unset ||
           group.annotation == parsedGroup.annotation);
-}
-
-/// Data class that holds AST class member and it's order info
-class MemberInfo {
-  /// AST instance of an [ClassMember]
-  final ClassMember classMember;
-
-  /// Class member order info
-  final MemberOrder memberOrder;
-
-  /// Creates instance of an [MemberInfo]
-  const MemberInfo({
-    required this.classMember,
-    required this.memberOrder,
-  });
-}
-
-/// Data class holds information about class member order info
-class MemberOrder {
-  /// Indicates if order is wrong
-  final bool isWrong;
-
-  /// Indicates if order is wrong alphabetically
-  final bool isAlphabeticallyWrong;
-
-  /// Indicates if order is wrong alphabetically by type
-  final bool isByTypeWrong;
-
-  /// Info about current and previous class member name
-  final MemberNames memberNames;
-
-  /// Info about current member member group
-  final MemberGroup memberGroup;
-
-  /// Info about previous member member group
-  final MemberGroup? previousMemberGroup;
-
-  /// Creates instance of [MemberOrder]
-  const MemberOrder({
-    required this.isWrong,
-    required this.isAlphabeticallyWrong,
-    required this.isByTypeWrong,
-    required this.memberNames,
-    required this.memberGroup,
-    this.previousMemberGroup,
-  });
-}
-
-/// Data class contains info about current and previous class member names
-class MemberNames {
-  /// Name of current class member
-  final String currentName;
-
-  /// Name of previous class member
-  final String? previousName;
-
-  /// Type name of current class member
-  final String currentTypeName;
-
-  /// Type name of previous class member
-  final String? previousTypeName;
-
-  /// Crates instance of [MemberNames]
-  const MemberNames({
-    required this.currentName,
-    required this.currentTypeName,
-    this.previousName,
-    this.previousTypeName,
-  });
 }

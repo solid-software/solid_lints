@@ -12,6 +12,7 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/fixes/av
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
+import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 
 /// The entry point for the Solid Lints analyser server plugin.
@@ -47,6 +48,9 @@ class SolidLintsPlugin extends Plugin {
         analysisOptionsLoader: analysisLoader,
       ),
       AvoidUnusedParametersRule(
+        analysisOptionsLoader: analysisLoader,
+      ),
+      MemberOrderingRule(
         analysisOptionsLoader: analysisLoader,
       ),
     ];
