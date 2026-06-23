@@ -2,6 +2,8 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../lints/auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(PreferLastRuleTest);
@@ -9,7 +11,7 @@ void main() {
 }
 
 @reflectiveTest
-class PreferLastRuleTest extends AnalysisRuleTest {
+class PreferLastRuleTest extends AnalysisRuleTest with AutoTestLintOffsets {
   @override
   void setUp() {
     rule = PreferLastRule();
@@ -17,19 +19,16 @@ class PreferLastRuleTest extends AnalysisRuleTest {
   }
 
   void test_reports_on_list_index_access_with_length_minus_one() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 final list1 = [0, 1, 2, 3];
-var a = list1[list1.length - 1];
+var a = ${expectLint('list1[list1.length - 1]')};
 
 void main () {
   final list2 = [1, 0, 2, 3];
-  list1[list1.length - 1];
-  list2[list2.length - 1];
+  ${expectLint('list1[list1.length - 1]')};
+  ${expectLint('list2[list2.length - 1]')};
 }
-''',
-      [lint(36, 23), lint(109, 23), lint(136, 23)],
-    );
+''');
   }
 
   void
@@ -43,32 +42,26 @@ var a = list[length - 1];
   }
 
   void test_reports_on_list_subclasses() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 abstract class MyList<T> implements List<T> {}
 
 T getLast<T>(MyList<T> list) {
-  return list[list.length - 1];
+  return ${expectLint('list[list.length - 1]')};
 }
-''',
-      [lint(88, 21)],
-    );
+''');
   }
 
   void test_reports_on_element_at_access_with_length_minus_one() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 final list1 = [0, 1, 2, 3];
-var a = list1.elementAt(list1.length - 1);
+var a = ${expectLint('list1.elementAt(list1.length - 1)')};
 
 void main () {
   final list2 = [1, 0, 2, 3];
-  list1.elementAt(list1.length - 1);
-  list2.elementAt(list2.length - 1);
+  ${expectLint('list1.elementAt(list1.length - 1)')};
+  ${expectLint('list2.elementAt(list2.length - 1)')};
 }
-''',
-      [lint(36, 33), lint(119, 33), lint(156, 33)],
-    );
+''');
   }
 
   void
@@ -82,67 +75,55 @@ var a = list.elementAt(length - 1);
   }
 
   void test_reports_on_iterable_subclasses() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 abstract class MyIterable<T> implements Iterable<T> {}
 
 T getLast<T>(MyIterable<T> iterable) {
-  return iterable.elementAt(iterable.length - 1);
+  return ${expectLint('iterable.elementAt(iterable.length - 1)')};
 }
 
 void main () {
   final set = {0, 1, 2, 3};
   final map = {0: 0, 1: 1, 2: 2, 3: 3};
 
-  set.elementAt(set.length - 1);
-  map.keys.elementAt(map.keys.length - 1);
-  map.values.elementAt(map.values.length - 1);
+  ${expectLint('set.elementAt(set.length - 1)')};
+  ${expectLint('map.keys.elementAt(map.keys.length - 1)')};
+  ${expectLint('map.values.elementAt(map.values.length - 1)')};
 }
-''',
-      [lint(104, 39), lint(234, 29), lint(267, 39), lint(310, 43)],
-    );
+''');
   }
 
   void test_reports_on_cascade_element_at_access_with_length_minus_one() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 void main () {
   final list2 = [1, 0, 2, 3];
-  list2..elementAt(list2.length - 1);
+  list2${expectLint('..elementAt(list2.length - 1)')};
 }
-''',
-      [lint(52, 29)],
-    );
+''');
   }
 
   void test_reports_on_null_aware_index_access_with_length_minus_one() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 List<int>? list1 = [0, 1, 2, 3];
-var a = list1?[list1!.length - 1];
+var a = ${expectLint('list1?[list1!.length - 1]')};
 
 void test(List<int>? list2) {
-  list1?[list1!.length - 1];
-  list2?[list2.length - 1];
+  ${expectLint('list1?[list1!.length - 1]')};
+  ${expectLint('list2?[list2.length - 1]')};
 }
-''',
-      [lint(41, 25), lint(101, 25), lint(130, 24)],
-    );
+''');
   }
 
   void
   test_reports_on_null_aware_element_at_access_with_length_minus_one() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 List<int>? list1 = [0, 1, 2, 3];
-var a = list1?.elementAt(list1!.length - 1);
+var a = ${expectLint('list1?.elementAt(list1!.length - 1)')};
 
 void test(List<int>? list2) {
-  list1?.elementAt(list1!.length - 1);
-  list2?.elementAt(list2.length - 1);
+  ${expectLint('list1?.elementAt(list1!.length - 1)')};
+  ${expectLint('list2?.elementAt(list2.length - 1)')};
 }
-''',
-      [lint(41, 35), lint(111, 35), lint(150, 34)],
-    );
+''');
   }
 }
