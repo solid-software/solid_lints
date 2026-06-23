@@ -1,14 +1,11 @@
-import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
-import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
 import '../../utils/code_generators.dart';
-import '../../utils/table_test_types.dart';
+import '../../utils/table_driven_rule_test.dart';
 import 'models/test_case.dart';
 
 void main() {
@@ -18,8 +15,7 @@ void main() {
 }
 
 @reflectiveTest
-class FunctionLinesOfCodeRuleTest extends AnalysisRuleTest
-    with AutoTestLintOffsets, AnalyzerContextResetMixin {
+class FunctionLinesOfCodeRuleTest extends TableDrivenRuleTest<TestCase> {
   static const _excludedClassName = 'ExcludedClass';
   static const _nonExcludedClassName = 'NonExcludedClass';
   static const _excludedMethodName = 'excludedMethod';
@@ -101,7 +97,8 @@ $_mockAnalysisOptionsContent''',
   ///
   /// Returns the full [source] to analyze and the [lintTarget] substring
   /// that should trigger the lint diagnostic (for fail cases).
-  static ({String source, String lintTarget}) _generateCode(TestCase testCase) {
+  @override
+  ({String source, String lintTarget}) generateCode(TestCase testCase) {
     final indent = testCase.className != null ? '    ' : '  ';
     final singleComment = testCase.comments
         ? '$indent// This is a single-line comment.\n'
@@ -136,27 +133,6 @@ $_mockAnalysisOptionsContent''',
   }
 
   Future<void> test_function_lines_of_code_cases() async {
-    for (final MapEntry(key: testCase, value: expected) in testTable.entries) {
-      final (:source, :lintTarget) = _generateCode(testCase);
-
-      try {
-        switch (expected) {
-          case ExpectedResult.pass:
-            await assertNoDiagnostics(source);
-          case ExpectedResult.fail:
-            final marked = source.replaceFirst(
-              lintTarget,
-              expectLint(lintTarget),
-            );
-            await assertAutoDiagnostics(marked);
-        }
-      } on TestFailure catch (e) {
-        fail('Case $testCase: $e');
-      }
-
-      // Reset the analysis context between test cases to bypass the analyzer's
-      // internal caching and ensure the newly generated code is re-analyzed.
-      await resetAnalyzerContext();
-    }
+    await runTableTests(testTable);
   }
 }
