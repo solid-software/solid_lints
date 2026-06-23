@@ -22,7 +22,7 @@ class CyclomaticComplexityVisitor extends SimpleAstVisitor<void> {
     final visitor = CyclomaticComplexityFlowVisitor();
     body.accept(visitor);
 
-    if (visitor.complexityEntities.length + 1 > _parameters.maxComplexity) {
+    if (visitor.complexityEntities.length >= _parameters.maxComplexity) {
       _rule.reportAtNode(
         body,
         arguments: [_parameters.maxComplexity.toString()],
