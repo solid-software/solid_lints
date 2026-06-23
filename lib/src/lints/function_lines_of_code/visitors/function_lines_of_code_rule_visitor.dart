@@ -47,28 +47,27 @@ class FunctionLinesOfCodeRuleVisitor extends RecursiveAstVisitor<void> {
     final lineInfo = currentUnit.unit.lineInfo;
     final visitor = FunctionLinesOfCodeVisitor(lineInfo);
     node.visitChildren(visitor);
+    if (visitor.linesWithCode.length <= _parameters.maxLines) return;
 
-    if (visitor.linesWithCode.length > _parameters.maxLines) {
-      final reporter = currentUnit.diagnosticReporter;
-
-      if (node is! AnnotatedNode) {
-        reporter.atNode(
-          node,
-          _rule.diagnosticCode,
-          arguments: [_parameters.maxLines],
-        );
-        return;
-      }
-
-      final startOffset = node.firstTokenAfterCommentAndMetadata.offset;
-      final lengthDifference = startOffset - node.offset;
-
-      reporter.atOffset(
-        offset: startOffset,
-        length: node.length - lengthDifference,
-        diagnosticCode: _rule.diagnosticCode,
+    final reporter = currentUnit.diagnosticReporter;
+    if (node is! AnnotatedNode) {
+      reporter.atNode(
+        node,
+        _rule.diagnosticCode,
         arguments: [_parameters.maxLines],
       );
+
+      return;
     }
+
+    final startOffset = node.firstTokenAfterCommentAndMetadata.offset;
+    final lengthDifference = startOffset - node.offset;
+
+    reporter.atOffset(
+      offset: startOffset,
+      length: node.length - lengthDifference,
+      diagnosticCode: _rule.diagnosticCode,
+      arguments: [_parameters.maxLines],
+    );
   }
 }
