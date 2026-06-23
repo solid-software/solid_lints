@@ -95,18 +95,18 @@ class PreferLastVisitor extends RecursiveAstVisitor<void> {
   }
 
   Expression _unwrapExpression(Expression expression) {
-    switch (expression) {
-      case PostfixExpression(
+    return switch (expression) {
+      PostfixExpression(
         :final operand,
         operator: Token(type: TokenType.BANG),
-      ):
-        return _unwrapExpression(operand);
+      ) =>
+        _unwrapExpression(operand),
 
-      case ParenthesizedExpression(:final expression):
-        return _unwrapExpression(expression);
+      ParenthesizedExpression(:final expression) => _unwrapExpression(
+        expression,
+      ),
 
-      default:
-        return expression;
-    }
+      _ => expression,
+    };
   }
 }
