@@ -3,21 +3,21 @@ analyzer:
     - custom_lint
   exclude:
     # General generated files
-    - '**/*.g.dart'
-    - '**/*.gr.dart'
+    - "**/*.g.dart"
+    - "**/*.gr.dart"
 
     # Flutter
-    - 'lib/generated_plugin_registrant.dart'
+    - "lib/generated_plugin_registrant.dart"
 
     # mockito
-    - '*.mocks.dart'
-    - '**/*.mocks.dart'
+    - "*.mocks.dart"
+    - "**/*.mocks.dart"
 
     # freezed
-    - '**/*.freezed.dart'
+    - "**/*.freezed.dart"
 
     # protobuf
-    - '**/*.pb.dart'
+    - "**/*.pb.dart"
 
     # test_coverage
     - test/.test_coverage.dart
@@ -33,6 +33,7 @@ analyzer:
     missing_required_param: error
     missing_return: error
     parameter_assignments: error
+    unnecessary_cast: warning
 
 custom_lint:
   rules:
@@ -48,7 +49,6 @@ custom_lint:
     - avoid_unnecessary_return_variable
     - avoid_unnecessary_setstate
     - avoid_unnecessary_type_assertions
-    - avoid_unnecessary_type_casts
     - avoid_unrelated_type_assertions
     - avoid_unused_parameters
     - avoid_debug_print_in_release
@@ -87,7 +87,7 @@ custom_lint:
     - number_of_parameters:
       max_parameters: 7
       exclude:
-        - method_name: copyWith 
+        - method_name: copyWith
 
     - prefer_conditional_expressions:
       ignore_nested: true
