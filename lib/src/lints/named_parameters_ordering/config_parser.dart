@@ -25,20 +25,13 @@ import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter
 
 /// Helper class to parse member_ordering rule config
 class NamedParametersConfigParser {
-  static const _defaultOrderList = [
-    'required_super',
-    'super',
-    'required',
-    'nullable',
-    'default',
-  ];
-
   /// Parse rule config for regular class order rules
   static List<ParameterType> parseOrder(Object? orderConfig) {
-    final order = orderConfig is Iterable
-        ? List<String>.from(orderConfig)
-        : _defaultOrderList;
+    if (orderConfig is! Iterable) {
+      return ParameterType.defaultOrder;
+    }
 
+    final order = List<String>.from(orderConfig);
     return order.map(ParameterType.fromType).nonNulls.toList();
   }
 }

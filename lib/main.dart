@@ -12,6 +12,8 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/fixes/av
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
+import 'package:solid_lints/src/lints/named_parameters_ordering/fixes/named_parameters_ordering_fix.dart';
+import 'package:solid_lints/src/lints/named_parameters_ordering/named_parameters_ordering_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/fixes/rename_nearest_context_parameter_fix.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/fixes/replace_with_nearest_context_parameter_fix.dart';
@@ -53,6 +55,9 @@ class SolidLintsPlugin extends Plugin {
       AvoidUnusedParametersRule(
         analysisOptionsLoader: analysisLoader,
       ),
+      NamedParametersOrderingRule(
+        analysisOptionsLoader: analysisLoader,
+      ),
       UseNearestContextRule(),
     ];
 
@@ -82,6 +87,11 @@ class SolidLintsPlugin extends Plugin {
     registry.registerFixForRule(
       UseNearestContextRule.code,
       ReplaceWithNearestContextParameterFix.new,
+    );
+
+    registry.registerFixForRule(
+      NamedParametersOrderingRule.code,
+      NamedParametersOrderingFix.new,
     );
   }
 }
