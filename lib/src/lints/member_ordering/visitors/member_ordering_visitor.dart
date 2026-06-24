@@ -84,29 +84,24 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
   }
 
   void _reportWrongOrder() {
-    final wrongOrderMembers = _membersInfo.where(
+    _reportMembers(
       (info) => info.memberOrder.isWrong,
+      MemberOrderingRule.wrongOrderCode,
+      (info) => [
+        info.memberOrder.memberGroup.toString(),
+        info.memberOrder.previousMemberGroup?.toString() ?? '',
+      ],
     );
-
-    for (final memberInfo in wrongOrderMembers) {
-      final memberGroup = memberInfo.memberOrder.memberGroup;
-      final previousMemberGroup = memberInfo.memberOrder.previousMemberGroup;
-
-      _rule.reportAtNode(
-        memberInfo.classMember,
-        diagnosticCode: MemberOrderingRule.wrongOrderCode,
-        arguments: [
-          memberGroup.toString(),
-          previousMemberGroup?.toString() ?? '',
-        ],
-      );
-    }
   }
 
   void _reportAlphabeticalOrder() {
     _reportMembers(
       (info) => info.memberOrder.isAlphabeticallyWrong,
       MemberOrderingRule.alphabeticalOrderCode,
+      (info) => [
+        info.memberOrder.memberNames.currentName,
+        info.memberOrder.memberNames.previousName ?? '',
+      ],
     );
   }
 
@@ -114,21 +109,25 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
     _reportMembers(
       (info) => info.memberOrder.isByTypeWrong,
       MemberOrderingRule.alphabeticalByTypeOrderCode,
+      (info) => [
+        info.memberOrder.memberNames.currentTypeName,
+        info.memberOrder.memberNames.previousTypeName ?? '',
+      ],
     );
   }
 
-  void _reportMembers(bool Function(MemberInfo) filter, LintCode code) {
+  void _reportMembers(
+    bool Function(MemberInfo) filter,
+    LintCode code,
+    List<String> Function(MemberInfo) getArguments,
+  ) {
     final filtered = _membersInfo.where(filter);
 
     for (final memberInfo in filtered) {
-      final names = memberInfo.memberOrder.memberNames;
       _rule.reportAtNode(
         memberInfo.classMember,
         diagnosticCode: code,
-        arguments: [
-          names.currentName,
-          names.previousName ?? '',
-        ],
+        arguments: getArguments(memberInfo),
       );
     }
   }
