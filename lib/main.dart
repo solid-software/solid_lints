@@ -13,7 +13,6 @@ import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_param
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
-import 'package:solid_lints/src/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/fixes/rename_nearest_context_parameter_fix.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/fixes/replace_with_nearest_context_parameter_fix.dart';
@@ -54,7 +53,6 @@ class SolidLintsPlugin extends Plugin {
       ),
       FunctionLinesOfCodeRule(
         analysisOptionsLoader: analysisLoader,
-        parametersParser: FunctionLinesOfCodeParameters.fromJson,
       ),
       AvoidUnusedParametersRule(
         analysisOptionsLoader: analysisLoader,

@@ -36,12 +36,12 @@ class FunctionLinesOfCodeRule
   /// Creates a new instance of [FunctionLinesOfCodeRule]
   FunctionLinesOfCodeRule({
     required super.analysisOptionsLoader,
-    required super.parametersParser,
   }) : super.withParameters(
          name: lintName,
          description:
              'An approximate metric of meaningful lines of source code '
              'inside a function, excluding blank lines and comments.',
+         parametersParser: FunctionLinesOfCodeParameters.fromJson,
        );
 
   @override

@@ -1,7 +1,6 @@
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
-import 'package:solid_lints/src/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../../utils/code_generators.dart';
@@ -82,7 +81,6 @@ plugins:
       analysisOptionsLoader: AnalysisOptionsLoader(
         resourceProvider: resourceProvider,
       ),
-      parametersParser: FunctionLinesOfCodeParameters.fromJson,
     );
     super.setUp();
 

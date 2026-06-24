@@ -2,7 +2,6 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
-import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 void main() {
@@ -103,7 +102,6 @@ class BaseWidget extends StatelessWidget {
       analysisOptionsLoader: AnalysisOptionsLoader(
         resourceProvider: resourceProvider,
       ),
-      parametersParser: AvoidReturningWidgetsParameters.fromJson,
     );
     newPackage('flutter')
       ..addFile('lib/widgets.dart', _mockFlutterWidgetsContent);
