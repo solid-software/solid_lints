@@ -67,7 +67,11 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
         .getRangeText(parameterList.sourceRange)
         .contains('\n');
 
-    if (!isMultiline) {
+    final hasComments = namedParams.any(
+      (p) => p.beginToken.precedingComments != null,
+    );
+
+    if (!isMultiline && !hasComments) {
       // Single-line: no leading comments, simple text replacement
       final sortedTexts = sortedNamedParams
           .map((p) => utils.getRangeText(p.sourceRange))
@@ -122,6 +126,9 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
     // Extend range to include the original trailing comma and any trailing
     // comment on the original last parameter's line.
     var rangeEnd = namedParams.last.end;
+    if (hasTrailingComma) {
+      rangeEnd = namedParams.last.endToken.next!.end;
+    }
     final upperBound =
         parameterList.rightDelimiter?.offset ??
         parameterList.rightParenthesis.offset;
@@ -194,17 +201,23 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
           leadingComment.offset < param.offset) {
         blockStart = leadingComment.offset;
       }
-      final linePrefix = utils.getLinePrefix(blockStart);
-      blockStart -= linePrefix.length;
+      final lineStart = utils.getLineThis(blockStart);
+      final prefixText = utils.getRangeText(
+        SourceRange(lineStart, blockStart - lineStart),
+      );
+      if (prefixText.trim().isEmpty) {
+        blockStart = lineStart;
+      }
 
       // Find trailing comment on the same line as this parameter.
       String? trailingComment;
-      final searchBound =
-          parameterList.rightDelimiter?.offset ??
-          parameterList.rightParenthesis.offset;
-      if (param.end < searchBound) {
+      final nextParamStart = i < namedParams.length - 1
+          ? namedParams[i + 1].offset
+          : (parameterList.rightDelimiter?.offset ??
+              parameterList.rightParenthesis.offset);
+      if (param.end < nextParamStart) {
         final afterParam = utils.getRangeText(
-          SourceRange(param.end, searchBound - param.end),
+          SourceRange(param.end, nextParamStart - param.end),
         );
         final newlineIdx = afterParam.indexOf('\n');
         final sameLine = newlineIdx == -1

@@ -35,6 +35,7 @@ class NamedParametersConfigParser {
         .whereType<String>()
         .map(ParameterType.fromType)
         .nonNulls
+        .toSet()
         .toList();
     final missing = ParameterType.defaultOrder.where(
       (type) => !parsed.contains(type),
