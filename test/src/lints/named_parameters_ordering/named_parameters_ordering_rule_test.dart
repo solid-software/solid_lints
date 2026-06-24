@@ -259,12 +259,91 @@ void example({
 ''');
   }
 
+  Future<void>
+  test_reports_incorrect_ordering_with_trailing_comments() async {
+    await assertAutoDiagnostics('''
+void example({
+  int? age, // the age
+  ${expectLint('required String name')}, // the name
+  bool isActive = true, // active flag
+}) {
+  return;
+}
+''');
+  }
+
+  Future<void>
+  test_reports_incorrect_ordering_with_mixed_comments() async {
+    await assertAutoDiagnostics('''
+void example({
+  /// The age of the user.
+  /// Can be null if unknown.
+  int? age, // optional
+  // The user's name
+  ${expectLint('required String name')}, // must not be empty
+  bool isActive = true,
+}) {
+  return;
+}
+''');
+  }
+
   Future<void> test_reports_incorrect_ordering_with_complex_defaults() async {
     await assertAutoDiagnostics('''
 void example({
   List<String> items = const [],
   int count = 1 + 2,
   ${expectLint('required String name')},
+}) {
+  return;
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_with_partial_custom_config() async {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+${analysisOptionsContent(rules: [rule.name])}
+plugins:
+  solid_lints:
+    diagnostics:
+      named_parameters_ordering:
+        order:
+          - required
+          - nullable
+''');
+    // 'default' is omitted from config but should not cause false positives.
+    // It should be appended after 'nullable' automatically.
+    await assertNoDiagnostics(r'''
+void example({
+  required String name,
+  int? age,
+  bool isActive = true,
+}) {
+  return;
+}
+''');
+  }
+
+  Future<void>
+  test_reports_incorrect_ordering_with_partial_custom_config() async {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+${analysisOptionsContent(rules: [rule.name])}
+plugins:
+  solid_lints:
+    diagnostics:
+      named_parameters_ordering:
+        order:
+          - required
+          - nullable
+''');
+    // Order is [required, nullable, default].
+    // 'default' is appended automatically after 'nullable'.
+    await assertAutoDiagnostics('''
+void example({
+  int? age,
+  ${expectLint('required String name')},
+  bool isActive = true,
 }) {
   return;
 }

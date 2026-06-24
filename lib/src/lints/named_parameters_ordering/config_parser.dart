@@ -23,7 +23,7 @@
 
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_type.dart';
 
-/// Helper class to parse member_ordering rule config
+/// Helper class to parse named_parameters_ordering rule config
 class NamedParametersConfigParser {
   /// Parse rule config for regular class order rules
   static List<ParameterType> parseOrder(Object? orderConfig) {
@@ -31,7 +31,14 @@ class NamedParametersConfigParser {
       return ParameterType.defaultOrder;
     }
 
-    final order = List<String>.from(orderConfig);
-    return order.map(ParameterType.fromType).nonNulls.toList();
+    final parsed = orderConfig
+        .whereType<String>()
+        .map(ParameterType.fromType)
+        .nonNulls
+        .toList();
+    final missing = ParameterType.defaultOrder.where(
+      (type) => !parsed.contains(type),
+    );
+    return [...parsed, ...missing];
   }
 }
