@@ -177,23 +177,19 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
       // to the previous parameter (same line as previous param).
       var blockStart = param.offset;
       Token? leadingComment = param.beginToken.precedingComments;
-      if (i > 0 && leadingComment != null) {
-        final betweenText = utils.getRangeText(
-          SourceRange(
-            namedParams[i - 1].end,
-            leadingComment.offset - namedParams[i - 1].end,
-          ),
-        );
-        if (!betweenText.contains('\n')) {
-          // This comment is a trailing comment of the previous param.
-          // Try the next comment in the chain as our leading comment.
-          final nextComment = leadingComment.next;
-          leadingComment =
-              nextComment != null &&
-                  nextComment.offset >= minOffset &&
-                  nextComment.offset < param.offset
-              ? nextComment
-              : null;
+      if (i > 0) {
+        while (leadingComment != null) {
+          final betweenText = utils.getRangeText(
+            SourceRange(
+              namedParams[i - 1].end,
+              leadingComment.offset - namedParams[i - 1].end,
+            ),
+          );
+          if (!betweenText.contains('\n')) {
+            leadingComment = leadingComment.next;
+          } else {
+            break;
+          }
         }
       }
       if (leadingComment != null &&
