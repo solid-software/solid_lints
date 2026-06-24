@@ -4,7 +4,7 @@ import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_c
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../../utils/code_generators.dart';
-import '../../utils/table_driven_rule_test.dart';
+import '../../utils/table_driven_rule_test_base.dart';
 import 'models/test_case.dart';
 
 void main() {
