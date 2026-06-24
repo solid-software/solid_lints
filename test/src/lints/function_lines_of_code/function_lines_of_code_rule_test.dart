@@ -93,43 +93,50 @@ $_mockAnalysisOptionsContent''',
     );
   }
 
-  /// Generates test source code for the given [testCase].
-  ///
-  /// Returns the full [source] to analyze and the [lintTarget] substring
-  /// that should trigger the lint diagnostic (for fail cases).
+  /// Generates test source code for the given [testCase] based on [expected].
   @override
-  ({String source, String lintTarget}) generateCode(TestCase testCase) {
+  String generateCode(TestCase testCase, ExpectedResult expected) {
     final indent = testCase.className != null ? '    ' : '  ';
-    final singleComment = testCase.comments
-        ? '$indent// This is a single-line comment.\n'
-        : '';
-    final multiComment = testCase.comments
-        ? '\n$indent/*\n$indent * This is a multi-line comment.\n$indent */\n'
-        : '';
+
+    final bodyBuffer = StringBuffer();
+    if (testCase.comments) {
+      bodyBuffer.writeln('$indent// This is a single-line comment.');
+    }
+
+    bodyBuffer.writeln('${indent}var i = 0;');
+
     final extra = testCase.codeLines - 2;
-    final stmts = extra > 0
-        ? '\n${repeatLines('${indent}i++;', extra)}\n'
-        : '\n';
-    final body =
-        '$singleComment${indent}var i = 0;$stmts$multiComment\n${indent}return i;\n';
+    if (extra > 0) {
+      bodyBuffer.writeln('${indent}i++;'.repeatLines(extra));
+    }
+
+    if (testCase.comments) {
+      bodyBuffer.writeln('$indent/*');
+      bodyBuffer.writeln('$indent * This is a multi-line comment.');
+      bodyBuffer.writeln('$indent */');
+    }
+
+    bodyBuffer.write('${indent}return i;\n');
+    final body = bodyBuffer.toString();
+
+    String wrap(String target) {
+      return expected == ExpectedResult.fail ? expectLint(target) : target;
+    }
 
     if (testCase.anonymous) {
       final fn = '() {\n$body}';
-      return (source: 'final longAnonymousFunction = $fn;\n', lintTarget: fn);
+      return 'final longAnonymousFunction = ${wrap(fn)};\n';
     }
 
     final name = testCase.methodName ?? 'function';
 
     if (testCase.className != null) {
       final method = '  int $name() {\n$body  }';
-      return (
-        source: '\nclass ${testCase.className} {\n$method\n}\n',
-        lintTarget: method,
-      );
+      return '\nclass ${testCase.className} {\n${wrap(method)}\n}\n';
     }
 
     final fn = 'int $name() {\n$body}';
-    return (source: '$fn\n', lintTarget: fn);
+    return '${wrap(fn)}\n';
   }
 
   Future<void> test_function_lines_of_code_cases() async {

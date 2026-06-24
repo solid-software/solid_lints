@@ -22,24 +22,20 @@ abstract class TableDrivenRuleTest<T> extends AnalysisRuleTest
     setUp();
   }
 
-  /// Generates the test source code and the lint target for a given [testCase].
-  ({String source, String lintTarget}) generateCode(T testCase);
+  /// Generates the test source code for a given [testCase] based on [expected].
+  String generateCode(T testCase, ExpectedResult expected);
 
   /// Executes all test cases defined in the [testTable] map.
   Future<void> runTableTests(Map<T, ExpectedResult> testTable) async {
     for (final MapEntry(key: testCase, value: expected) in testTable.entries) {
-      final (:source, :lintTarget) = generateCode(testCase);
+      final source = generateCode(testCase, expected);
 
       try {
         switch (expected) {
           case ExpectedResult.pass:
             await assertNoDiagnostics(source);
           case ExpectedResult.fail:
-            final marked = source.replaceFirst(
-              lintTarget,
-              expectLint(lintTarget),
-            );
-            await assertAutoDiagnostics(marked);
+            await assertAutoDiagnostics(source);
         }
       } on TestFailure catch (e) {
         fail('Case $testCase: $e');
