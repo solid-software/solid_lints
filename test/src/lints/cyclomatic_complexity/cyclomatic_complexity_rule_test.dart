@@ -2,7 +2,6 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_rule.dart';
-import 'package:solid_lints/src/lints/cyclomatic_complexity/models/cyclomatic_complexity_parameters.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../../../lints/auto_test_lint_offsets.dart';
@@ -34,7 +33,6 @@ plugins:
       analysisOptionsLoader: AnalysisOptionsLoader(
         resourceProvider: resourceProvider,
       ),
-      parametersParser: CyclomaticComplexityParameters.fromJson,
     );
     super.setUp();
 
