@@ -272,4 +272,20 @@ void fn() {
 }
 ''');
   }
+
+  Future<void> test_does_not_report_in_annotations() async {
+    await assertNoDiagnostics(r'''
+class Timeout {
+  final Duration duration;
+  const Timeout(this.duration);
+}
+class Duration {
+  final int seconds;
+  const Duration({required this.seconds});
+}
+
+@Timeout(Duration(seconds: 30))
+void fn() {}
+''');
+  }
 }

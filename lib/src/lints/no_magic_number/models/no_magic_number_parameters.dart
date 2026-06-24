@@ -63,7 +63,7 @@ class NoMagicNumberParameters {
     return NoMagicNumberParameters(
       allowedNumbers: allowedList,
       allowedInWidgetParams:
-          json[_allowedInWidgetParamsConfigName] as bool? ?? false,
+          json[_allowedInWidgetParamsConfigName] == true,
     );
   }
 }

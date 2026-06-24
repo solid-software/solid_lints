@@ -85,7 +85,8 @@ class NoMagicNumberRuleVisitor extends SimpleAstVisitor<void> {
 
   bool _isNotInsideConstConstructor(Literal l) =>
       l.thisOrAncestorMatching((ancestor) {
-        return ancestor is InstanceCreationExpression && ancestor.isConst;
+        return (ancestor is InstanceCreationExpression && ancestor.isConst) ||
+            ancestor is Annotation;
       }) ==
       null;
 
