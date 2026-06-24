@@ -23,6 +23,7 @@
 
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 
@@ -40,9 +41,9 @@ class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
     required AnalysisRule rule,
     required bool allowWithComments,
     required ExcludedIdentifiersListParameter exclude,
-  })  : _rule = rule,
-        _allowWithComments = allowWithComments,
-        _exclude = exclude;
+  }) : _rule = rule,
+       _allowWithComments = allowWithComments,
+       _exclude = exclude;
 
   @override
   void visitBlock(Block node) {
@@ -62,8 +63,16 @@ class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
     _rule.reportAtNode(node);
   }
 
-  static bool _isPrecedingCommentToDo(Block node) =>
-      node.endToken.precedingComments?.lexeme.contains(_todoComment) ?? false;
+  static bool _isPrecedingCommentToDo(Block node) {
+    Token? comment = node.endToken.precedingComments;
+    while (comment != null) {
+      if (comment.lexeme.contains(_todoComment)) {
+        return true;
+      }
+      comment = comment.next;
+    }
+    return false;
+  }
 
   static bool _isPrecedingCommentAny(Block node) =>
       node.endToken.precedingComments != null;

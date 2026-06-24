@@ -60,6 +60,16 @@ void fun() {
 ''');
   }
 
+  Future<void> test_does_not_report_on_todo_comment_with_other_comments() async {
+    await assertNoDiagnostics(r'''
+// ignore_for_file: todo
+void fun() {
+  // some other comment
+  // TODO: implement
+}
+''');
+  }
+
   Future<void> test_does_not_report_on_any_comment_if_allowed() async {
     newAnalysisOptionsYamlFile(
       testPackageRootPath,
