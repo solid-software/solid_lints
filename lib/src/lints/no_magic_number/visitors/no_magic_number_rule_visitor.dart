@@ -80,7 +80,10 @@ class NoMagicNumberRuleVisitor extends SimpleAstVisitor<void> {
   /// intermediate [PrefixExpression] node.
   bool _isNotInsideCollectionLiteral(Literal l) {
     final p = _effectiveParent(l);
-    return p is! TypedLiteral && p is! MapLiteralEntry;
+    return p is! TypedLiteral &&
+        p is! MapLiteralEntry &&
+        p is! RecordLiteral &&
+        !(p is NamedExpression && p.parent is RecordLiteral);
   }
 
   bool _isNotInsideConstConstructor(Literal l) =>

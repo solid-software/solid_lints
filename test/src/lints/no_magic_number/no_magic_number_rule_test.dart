@@ -289,4 +289,13 @@ class Duration {
 void fn() {}
 ''');
   }
+
+  Future<void> test_does_not_report_in_records() async {
+    await assertNoDiagnostics(r'''
+void fn() {
+  var point = (10, 20);
+  var named = (x: 100, y: 200);
+}
+''');
+  }
 }
