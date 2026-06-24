@@ -1,14 +1,21 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/avoid_unused_parameters/models/avoid_unused_parameters.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/avoid_unused_parameters/models/avoid_unused_parameters_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_unused_parameters/visitors/avoid_unused_parameters_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-/// Warns about unused function, method, constructor or factory parameters.
+/// Warns about unused function, method, constructor, or factory parameters.
 ///
-/// ### Example:
+/// Named parameters are always allowed because they document the API surface.
+/// Parameters whose names consist only of underscores are also ignored.
+/// Overridden methods and methods used as tear-offs are skipped.
+///
+/// {@template solid_lints.avoid_unused_parameters.example}
+/// ### Example
+///
 /// #### BAD:
+///
 /// ```dart
 /// typedef MaxFun = int Function(int a, int b);
 /// final MaxFun bad = (int a, int b) => 1; // LINT
@@ -18,6 +25,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// final optional = (int a, [int b = 0]) { // LINT
 ///   return a;
 /// };
+///
 /// void fun(String x) {} // LINT
 /// void fun2(String x, String y) { // LINT
 ///   print(y);
@@ -35,6 +43,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```
 ///
 /// #### GOOD:
+///
 /// ```dart
 /// typedef MaxFun = int Function(int a, int b);
 /// final MaxFun good = (int a, int b) => a + b;
@@ -47,63 +56,67 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 ///
 /// class TestClass {
-///   static void staticMethod(int _) {} // OK
-///   void method(String _) {} // OK
+///   static void staticMethod(int _) {}
+///   void method(String _) {}
 ///
-///   TestClass([int _]); // OK
-///   factory TestClass.named(int _) { // OK
+///   TestClass([int _]);
+///   factory TestClass.named(int _) {
 ///     return TestClass();
 ///   }
 /// }
 /// ```
 ///
 /// #### Allowed:
+///
 /// ```dart
 /// typedef Named = String Function({required String text});
 /// final Named named = ({required text}) {
-///  return '';
+///   return '';
 /// };
-///
 /// ```
-class AvoidUnusedParametersRule extends SolidLintRule<AvoidUnusedParameters> {
-  /// This lint rule represents
-  /// the error whether we use bad formatted double literals.
-  static const String lintName = 'avoid_unused_parameters';
+/// {@endtemplate}
+class AvoidUnusedParametersRule
+    extends SolidLintRule<AvoidUnusedParametersParameters> {
+  /// The name of this lint rule.
+  static const lintName = 'avoid_unused_parameters';
 
-  AvoidUnusedParametersRule._(super.config);
-
-  /// Creates a new instance of [AvoidUnusedParametersRule]
-  /// based on the lint configuration.
-  factory AvoidUnusedParametersRule.createRule(
-    CustomLintConfigs configs,
-  ) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      paramsParser: AvoidUnusedParameters.fromJson,
-      problemMessage: (_) => 'Parameter is unused.',
-    );
-
-    return AvoidUnusedParametersRule._(rule);
-  }
+  /// Reported when a parameter is declared but never read in the body.
+  ///
+  /// {@macro solid_lints.avoid_unused_parameters.example}
+  static const LintCode _code = LintCode(
+    lintName,
+    'Avoid unused parameters.',
+    correctionMessage:
+        'Remove the parameter or replace its name with underscores.',
+  );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => _code;
+
+  /// Creates a new instance of [AvoidUnusedParametersRule].
+  AvoidUnusedParametersRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+         name: lintName,
+         description:
+             'Warns about unused function, method, constructor, or factory '
+             'parameters.',
+         parametersParser: AvoidUnusedParametersParameters.fromJson,
+       );
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addDeclaration((node) {
-      final isIgnored = config.parameters.exclude.shouldIgnore(node);
+    super.registerNodeProcessors(registry, context);
 
-      if (isIgnored) return;
+    final parameters =
+        getParametersForContext(context) ??
+        AvoidUnusedParametersParameters.empty();
 
-      final visitor = AvoidUnusedParametersVisitor();
-      node.accept(visitor);
+    final visitor = AvoidUnusedParametersVisitor(this, parameters);
 
-      for (final element in visitor.unusedParameters) {
-        reporter.atNode(element, code);
-      }
-    });
+    registry.addCompilationUnit(this, visitor);
   }
 }

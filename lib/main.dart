@@ -7,14 +7,17 @@ import 'package:solid_lints/src/lints/avoid_final_with_getter/fixes/avoid_final_
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
-import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/fixes/avoid_unnecessary_type_assertions_fix.dart';
+import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/models/function_lines_of_code_parameters.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
+import 'package:solid_lints/src/lints/use_nearest_context/fixes/rename_nearest_context_parameter_fix.dart';
+import 'package:solid_lints/src/lints/use_nearest_context/fixes/replace_with_nearest_context_parameter_fix.dart';
+import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
 
 /// The entry point for the Solid Lints analyser server plugin.
 ///
@@ -37,6 +40,7 @@ class SolidLintsPlugin extends Plugin {
     final avoidUnnecessaryTypeAssertionsRule =
         AvoidUnnecessaryTypeAssertionsRule();
     final doubleLiteralFormatRule = DoubleLiteralFormatRule();
+
     final lintRules = [
       AvoidFinalWithGetterRule(),
       AvoidGlobalStateRule(),
@@ -47,12 +51,15 @@ class SolidLintsPlugin extends Plugin {
       ProperSuperCallsRule(),
       AvoidReturningWidgetsRule(
         analysisOptionsLoader: analysisLoader,
-        parametersParser: AvoidReturningWidgetsParameters.fromJson,
       ),
       FunctionLinesOfCodeRule(
         analysisOptionsLoader: analysisLoader,
         parametersParser: FunctionLinesOfCodeParameters.fromJson,
       ),
+      AvoidUnusedParametersRule(
+        analysisOptionsLoader: analysisLoader,
+      ),
+      UseNearestContextRule(),
     ];
 
     for (final lintRule in lintRules) {
@@ -67,9 +74,20 @@ class SolidLintsPlugin extends Plugin {
       AvoidFinalWithGetterRule.code,
       AvoidFinalWithGetterFix.new,
     );
+
     registry.registerFixForRule(
       avoidUnnecessaryTypeAssertionsRule.diagnosticCode,
       AvoidUnnecessaryTypeAssertionsFix.new,
+    );
+
+    registry.registerFixForRule(
+      UseNearestContextRule.code,
+      RenameNearestContextParameterFix.new,
+    );
+
+    registry.registerFixForRule(
+      UseNearestContextRule.code,
+      ReplaceWithNearestContextParameterFix.new,
     );
   }
 }

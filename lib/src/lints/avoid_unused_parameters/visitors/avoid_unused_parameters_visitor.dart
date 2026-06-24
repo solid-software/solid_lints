@@ -25,16 +25,18 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
+import 'package:solid_lints/src/lints/avoid_unused_parameters/models/avoid_unused_parameters_parameters.dart';
 import 'package:solid_lints/src/utils/node_utils.dart';
 import 'package:solid_lints/src/utils/parameter_utils.dart';
 
-/// AST Visitor which finds all is expressions and checks if they are
-/// unrelated (result always false)
+/// A visitor that reports unused formal parameters.
 class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
-  final _unusedParameters = <FormalParameter>[];
+  final AvoidUnusedParametersRule _rule;
+  final AvoidUnusedParametersParameters _parameters;
 
-  /// List of unused parameters
-  Iterable<FormalParameter> get unusedParameters => _unusedParameters;
+  /// Creates a new instance of [AvoidUnusedParametersVisitor].
+  AvoidUnusedParametersVisitor(this._rule, this._parameters);
 
   @override
   void visitConstructorDeclaration(ConstructorDeclaration node) {
@@ -48,15 +50,18 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
         parameters.parameters.isEmpty) {
       return;
     }
+
+    if (_isExcluded(node)) return;
+
     final unused = _getUnusedParameters(
       node.body,
       parameters.parameters,
       initializers: node.initializers,
     ).whereNot(nameConsistsOfUnderscoresOnly);
 
-    _unusedParameters.addAll(
-      unused,
-    );
+    for (final parameter in unused) {
+      _rule.reportAtNode(parameter);
+    }
   }
 
   @override
@@ -73,33 +78,40 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    final isTearOff = _usedAsTearOff(node);
+    if (_isExcluded(node) || isOverride(node.metadata) || _isATearOff(node)) {
+      return;
+    }
 
-    if (!isOverride(node.metadata) && !isTearOff) {
-      _unusedParameters.addAll(
-        _filterOutUnderscoresAndNamed(
-          node.body,
-          parameters.parameters,
-        ),
-      );
+    for (final parameter in _filterOutUnderscoresAndNamed(
+      node.body,
+      parameters.parameters,
+    )) {
+      _rule.reportAtNode(parameter);
     }
   }
 
   @override
   void visitFunctionExpression(FunctionExpression node) {
     super.visitFunctionExpression(node);
-    final params = node.parameters;
-    if (params == null) {
-      return;
-    }
 
-    _unusedParameters.addAll(
-      _filterOutUnderscoresAndNamed(
-        node.body,
-        params.parameters,
-      ),
-    );
+    final declaration =
+        node.thisOrAncestorOfType<FunctionDeclaration>() ??
+        node.thisOrAncestorOfType<MethodDeclaration>() ??
+        node.thisOrAncestorOfType<ConstructorDeclaration>();
+    if (declaration != null && _isExcluded(declaration)) return;
+
+    final params = node.parameters;
+    if (params == null) return;
+
+    for (final parameter in _filterOutUnderscoresAndNamed(
+      node.body,
+      params.parameters,
+    )) {
+      _rule.reportAtNode(parameter);
+    }
   }
+
+  bool _isExcluded(Declaration node) => _parameters.exclude.shouldIgnore(node);
 
   Iterable<FormalParameter> _filterOutUnderscoresAndNamed(
     AstNode body,
@@ -109,9 +121,10 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
       body,
       parameters,
     );
-    return unused.whereNot(nameConsistsOfUnderscoresOnly).where(
-          (param) => !param.isNamed,
-        );
+
+    return unused
+        .whereNot(nameConsistsOfUnderscoresOnly)
+        .where((param) => !param.isNamed);
   }
 
   Set<FormalParameter> _getUnusedParameters(
@@ -145,7 +158,6 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
         isFieldFormalParameter = parameter.toSource().contains('this.');
         isSuperFormalParameter = parameter.toSource().contains('super.');
       }
-      //
 
       if (name != null &&
           !isPresentInAll &&
@@ -158,7 +170,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     return result;
   }
 
-  bool _usedAsTearOff(MethodDeclaration node) {
+  bool _isATearOff(MethodDeclaration node) {
     final name = node.name.lexeme;
     if (!Identifier.isPrivateName(name)) {
       return false;
