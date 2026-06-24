@@ -11,67 +11,51 @@ import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
 /// Extension methods for [MemberGroup] to check if a parsed group matches
 /// the properties of this group.
 extension MemberGroupExtensions on MemberGroup {
-  /// Checks whether this [MemberGroup] satisfies the properties 
+  /// Checks whether this [MemberGroup] satisfies the properties
   /// of the [parsedGroup].
-  bool satisfies(MemberGroup parsedGroup) =>
-      _isConstructorGroup(parsedGroup) ||
-      _isFieldGroup(parsedGroup) ||
-      _isGetSetGroup(parsedGroup) ||
-      _isMethodGroup(parsedGroup);
+  bool satisfies(MemberGroup parsedGroup) {
+    if (!_matchesBaseProperties(parsedGroup)) {
+      return false;
+    }
 
-  bool _isConstructorGroup(MemberGroup parsedGroup) {
     final group = this;
-    return group is ConstructorMemberGroup &&
-        parsedGroup is ConstructorMemberGroup &&
-        (!group.isFactory || group.isFactory == parsedGroup.isFactory) &&
-        (!group.isNamed || group.isNamed == parsedGroup.isNamed) &&
-        (group.modifier == Modifier.unset ||
-            group.modifier == parsedGroup.modifier) &&
-        (group.annotation == Annotation.unset ||
-            group.annotation == parsedGroup.annotation);
+    return switch ((group, parsedGroup)) {
+      (final ConstructorMemberGroup g, final ConstructorMemberGroup p) =>
+        _isConstructor(g, p),
+      (final MethodMemberGroup g, final MethodMemberGroup p) => _isMethod(g, p),
+      (final GetSetMemberGroup g, final GetSetMemberGroup p) => _isGetSet(g, p),
+      (final FieldMemberGroup g, final FieldMemberGroup p) => _isField(g, p),
+      _ => false,
+    };
   }
 
-  bool _isMethodGroup(MemberGroup parsedGroup) {
-    final group = this;
-    return group is MethodMemberGroup &&
-        parsedGroup is MethodMemberGroup &&
-        (!group.isStatic || group.isStatic == parsedGroup.isStatic) &&
-        (!group.isNullable || group.isNullable == parsedGroup.isNullable) &&
-        (group.name == null || group.name == parsedGroup.name) &&
-        (group.modifier == Modifier.unset ||
-            group.modifier == parsedGroup.modifier) &&
-        (group.annotation == Annotation.unset ||
-            group.annotation == parsedGroup.annotation);
-  }
+  bool _matchesBaseProperties(MemberGroup parsedGroup) =>
+      (modifier == Modifier.unset || modifier == parsedGroup.modifier) &&
+      (annotation == Annotation.unset || annotation == parsedGroup.annotation);
 
-  bool _isGetSetGroup(MemberGroup parsedGroup) {
-    final group = this;
-    return group is GetSetMemberGroup &&
-        parsedGroup is GetSetMemberGroup &&
-        (group.memberType == parsedGroup.memberType ||
-            (group.memberType == MemberType.getterAndSetter &&
-                (parsedGroup.memberType == MemberType.getter ||
-                    parsedGroup.memberType == MemberType.setter))) &&
-        (!group.isStatic || group.isStatic == parsedGroup.isStatic) &&
-        (!group.isNullable || group.isNullable == parsedGroup.isNullable) &&
-        (group.modifier == Modifier.unset ||
-            group.modifier == parsedGroup.modifier) &&
-        (group.annotation == Annotation.unset ||
-            group.annotation == parsedGroup.annotation);
-  }
+  bool _isConstructor(
+    ConstructorMemberGroup g,
+    ConstructorMemberGroup p,
+  ) =>
+      (!g.isFactory || g.isFactory == p.isFactory) &&
+      (!g.isNamed || g.isNamed == p.isNamed);
 
-  bool _isFieldGroup(MemberGroup parsedGroup) {
-    final group = this;
-    return group is FieldMemberGroup &&
-        parsedGroup is FieldMemberGroup &&
-        (!group.isLate || group.isLate == parsedGroup.isLate) &&
-        (!group.isStatic || group.isStatic == parsedGroup.isStatic) &&
-        (!group.isNullable || group.isNullable == parsedGroup.isNullable) &&
-        (group.modifier == Modifier.unset ||
-            group.modifier == parsedGroup.modifier) &&
-        (group.keyword == FieldKeyword.unset ||
-            group.keyword == parsedGroup.keyword) &&
-        (group.annotation == Annotation.unset ||
-            group.annotation == parsedGroup.annotation);
-  }
+  bool _isMethod(MethodMemberGroup g, MethodMemberGroup p) =>
+      (!g.isStatic || g.isStatic == p.isStatic) &&
+      (!g.isNullable || g.isNullable == p.isNullable) &&
+      (g.name == null || g.name == p.name);
+
+  bool _isGetSet(GetSetMemberGroup g, GetSetMemberGroup p) =>
+      (g.memberType == p.memberType ||
+          (g.memberType == MemberType.getterAndSetter &&
+              (p.memberType == MemberType.getter ||
+                  p.memberType == MemberType.setter))) &&
+      (!g.isStatic || g.isStatic == p.isStatic) &&
+      (!g.isNullable || g.isNullable == p.isNullable);
+
+  bool _isField(FieldMemberGroup g, FieldMemberGroup p) =>
+      (!g.isLate || g.isLate == p.isLate) &&
+      (!g.isStatic || g.isStatic == p.isStatic) &&
+      (!g.isNullable || g.isNullable == p.isNullable) &&
+      (g.keyword == FieldKeyword.unset || g.keyword == p.keyword);
 }
