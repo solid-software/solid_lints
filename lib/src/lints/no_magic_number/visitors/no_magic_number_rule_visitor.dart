@@ -90,7 +90,8 @@ class NoMagicNumberRuleVisitor extends SimpleAstVisitor<void> {
       }) ==
       null;
 
-  bool _isNotInsideIndexExpression(Literal l) => l.parent is! IndexExpression;
+  bool _isNotInsideIndexExpression(Literal l) =>
+      _effectiveParent(l) is! IndexExpression;
 
   bool _isNotDefaultValue(Literal literal) {
     return literal.thisOrAncestorOfType<DefaultFormalParameter>() == null;

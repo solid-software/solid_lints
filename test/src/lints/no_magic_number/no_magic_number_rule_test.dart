@@ -235,6 +235,7 @@ void fn(int x) {
     await assertNoDiagnostics(r'''
 void fn(List<int> list) {
   var x = list[42];
+  var y = list[-42];
 }
 ''');
   }
