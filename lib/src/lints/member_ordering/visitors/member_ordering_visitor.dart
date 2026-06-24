@@ -23,21 +23,19 @@
 
 import 'package:analyzer/dart/ast/ast.dart' hide Annotation;
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
-import 'package:solid_lints/src/lints/member_ordering/models/annotation.dart';
-import 'package:solid_lints/src/lints/member_ordering/models/field_keyword.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/constructor_member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/field_member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/get_set_member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
+import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group_extensions.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/method_member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_info.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_names.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_order.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_ordering_parameters.dart';
-import 'package:solid_lints/src/lints/member_ordering/models/member_type.dart';
-import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// AST Visitor which finds all class members and checks if they are
@@ -64,16 +62,28 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
     final body = node.body;
     if (body is BlockClassBody) {
       for (final member in body.members) {
-        if (member is FieldDeclaration) {
-          _visitFieldDeclaration(member, isFlutterWidget);
-        } else if (member is ConstructorDeclaration) {
-          _visitConstructorDeclaration(member, isFlutterWidget);
-        } else if (member is MethodDeclaration) {
-          _visitMethodDeclaration(member, isFlutterWidget);
+        switch (member) {
+          case FieldDeclaration():
+            _visitFieldDeclaration(member, isFlutterWidget);
+          case ConstructorDeclaration():
+            _visitConstructorDeclaration(member, isFlutterWidget);
+          case MethodDeclaration():
+            _visitMethodDeclaration(member, isFlutterWidget);
+          default:
         }
       }
     }
 
+    _reportWrongOrder();
+
+    if (_parameters.alphabetize) {
+      _reportAlphabeticalOrder();
+    } else if (_parameters.alphabetizeByType) {
+      _reportAlphabeticalTypeOrder();
+    }
+  }
+
+  void _reportWrongOrder() {
     final wrongOrderMembers = _membersInfo.where(
       (info) => info.memberOrder.isWrong,
     );
@@ -91,41 +101,35 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
         ],
       );
     }
+  }
 
-    if (_parameters.alphabetize) {
-      final alphabeticallyWrongOrderMembers = _membersInfo.where(
-        (info) => info.memberOrder.isAlphabeticallyWrong,
+  void _reportAlphabeticalOrder() {
+    _reportMembers(
+      (info) => info.memberOrder.isAlphabeticallyWrong,
+      MemberOrderingRule.alphabeticalOrderCode,
+    );
+  }
+
+  void _reportAlphabeticalTypeOrder() {
+    _reportMembers(
+      (info) => info.memberOrder.isByTypeWrong,
+      MemberOrderingRule.alphabeticalByTypeOrderCode,
+    );
+  }
+
+  void _reportMembers(bool Function(MemberInfo) filter, LintCode code) {
+    final filtered = _membersInfo.where(filter);
+
+    for (final memberInfo in filtered) {
+      final names = memberInfo.memberOrder.memberNames;
+      _rule.reportAtNode(
+        memberInfo.classMember,
+        diagnosticCode: code,
+        arguments: [
+          names.currentName,
+          names.previousName ?? '',
+        ],
       );
-
-      for (final memberInfo in alphabeticallyWrongOrderMembers) {
-        final names = memberInfo.memberOrder.memberNames;
-        _rule.reportAtNode(
-          memberInfo.classMember,
-          diagnosticCode: MemberOrderingRule.alphabeticalOrderCode,
-          arguments: [
-            names.currentName,
-            names.previousName ?? '',
-          ],
-        );
-      }
-    }
-
-    if (!_parameters.alphabetize && _parameters.alphabetizeByType) {
-      final alphabeticallyByTypeWrongOrderMembers = _membersInfo.where(
-        (info) => info.memberOrder.isByTypeWrong,
-      );
-
-      for (final memberInfo in alphabeticallyByTypeWrongOrderMembers) {
-        final names = memberInfo.memberOrder.memberNames;
-        _rule.reportAtNode(
-          memberInfo.classMember,
-          diagnosticCode: MemberOrderingRule.alphabeticalByTypeOrderCode,
-          arguments: [
-            names.currentName,
-            names.previousName ?? '',
-          ],
-        );
-      }
     }
   }
 
@@ -133,44 +137,26 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
     FieldDeclaration declaration,
     bool isFlutterWidget,
   ) {
-    final group = FieldMemberGroup.parse(declaration);
-    final closestGroup = _getClosestGroup(group, isFlutterWidget);
-
-    if (closestGroup != null) {
-      _membersInfo.add(
-        MemberInfo(
-          classMember: declaration,
-          memberOrder: _getOrder(
-            closestGroup,
-            declaration.fields.variables.first.name.lexeme,
-            declaration.fields.type?.type?.getDisplayString() ?? '_',
-            isFlutterWidget,
-          ),
-        ),
-      );
-    }
+    _addMemberInfo(
+      classMember: declaration,
+      parsedGroup: FieldMemberGroup.parse(declaration),
+      isFlutterWidget: isFlutterWidget,
+      name: declaration.fields.variables.first.name.lexeme,
+      type: declaration.fields.type?.type?.getDisplayString() ?? '_',
+    );
   }
 
   void _visitConstructorDeclaration(
     ConstructorDeclaration declaration,
     bool isFlutterWidget,
   ) {
-    final group = ConstructorMemberGroup.parse(declaration);
-    final closestGroup = _getClosestGroup(group, isFlutterWidget);
-
-    if (closestGroup != null) {
-      _membersInfo.add(
-        MemberInfo(
-          classMember: declaration,
-          memberOrder: _getOrder(
-            closestGroup,
-            declaration.name?.lexeme ?? '',
-            declaration.typeName?.name ?? '',
-            isFlutterWidget,
-          ),
-        ),
-      );
-    }
+    _addMemberInfo(
+      classMember: declaration,
+      parsedGroup: ConstructorMemberGroup.parse(declaration),
+      isFlutterWidget: isFlutterWidget,
+      name: declaration.name?.lexeme ?? '',
+      type: declaration.typeName?.name ?? '',
+    );
   }
 
   void _visitMethodDeclaration(
@@ -180,16 +166,33 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
     final group = (declaration.isGetter || declaration.isSetter)
         ? GetSetMemberGroup.parse(declaration)
         : MethodMemberGroup.parse(declaration);
-    final closestGroup = _getClosestGroup(group, isFlutterWidget);
+
+    _addMemberInfo(
+      classMember: declaration,
+      parsedGroup: group,
+      isFlutterWidget: isFlutterWidget,
+      name: declaration.name.lexeme,
+      type: declaration.returnType?.type?.getDisplayString() ?? '_',
+    );
+  }
+
+  void _addMemberInfo({
+    required ClassMember classMember,
+    required MemberGroup parsedGroup,
+    required bool isFlutterWidget,
+    required String name,
+    required String type,
+  }) {
+    final closestGroup = _getClosestGroup(parsedGroup, isFlutterWidget);
 
     if (closestGroup != null) {
       _membersInfo.add(
         MemberInfo(
-          classMember: declaration,
+          classMember: classMember,
           memberOrder: _getOrder(
             closestGroup,
-            declaration.name.lexeme,
-            declaration.returnType?.type?.getDisplayString() ?? '_',
+            name,
+            type,
             isFlutterWidget,
           ),
         ),
@@ -205,13 +208,7 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
         (isFlutterWidget
                 ? _parameters.widgetsGroupsOrder
                 : _parameters.groupsOrder)
-            .where(
-              (group) =>
-                  _isConstructorGroup(group, parsedGroup) ||
-                  _isFieldGroup(group, parsedGroup) ||
-                  _isGetSetGroup(group, parsedGroup) ||
-                  _isMethodGroup(group, parsedGroup),
-            )
+            .where((group) => group.satisfies(parsedGroup))
             .sorted(
               (a, b) => b.getSortingCoefficient() - a.getSortingCoefficient(),
             );
@@ -287,52 +284,4 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
 
     return group.indexOf(lastMemberGroup) > group.indexOf(memberGroup);
   }
-
-  bool _isConstructorGroup(MemberGroup group, MemberGroup parsedGroup) =>
-      group is ConstructorMemberGroup &&
-      parsedGroup is ConstructorMemberGroup &&
-      (!group.isFactory || group.isFactory == parsedGroup.isFactory) &&
-      (!group.isNamed || group.isNamed == parsedGroup.isNamed) &&
-      (group.modifier == Modifier.unset ||
-          group.modifier == parsedGroup.modifier) &&
-      (group.annotation == Annotation.unset ||
-          group.annotation == parsedGroup.annotation);
-
-  bool _isMethodGroup(MemberGroup group, MemberGroup parsedGroup) =>
-      group is MethodMemberGroup &&
-      parsedGroup is MethodMemberGroup &&
-      (!group.isStatic || group.isStatic == parsedGroup.isStatic) &&
-      (!group.isNullable || group.isNullable == parsedGroup.isNullable) &&
-      (group.name == null || group.name == parsedGroup.name) &&
-      (group.modifier == Modifier.unset ||
-          group.modifier == parsedGroup.modifier) &&
-      (group.annotation == Annotation.unset ||
-          group.annotation == parsedGroup.annotation);
-
-  bool _isGetSetGroup(MemberGroup group, MemberGroup parsedGroup) =>
-      group is GetSetMemberGroup &&
-      parsedGroup is GetSetMemberGroup &&
-      (group.memberType == parsedGroup.memberType ||
-          (group.memberType == MemberType.getterAndSetter &&
-              (parsedGroup.memberType == MemberType.getter ||
-                  parsedGroup.memberType == MemberType.setter))) &&
-      (!group.isStatic || group.isStatic == parsedGroup.isStatic) &&
-      (!group.isNullable || group.isNullable == parsedGroup.isNullable) &&
-      (group.modifier == Modifier.unset ||
-          group.modifier == parsedGroup.modifier) &&
-      (group.annotation == Annotation.unset ||
-          group.annotation == parsedGroup.annotation);
-
-  bool _isFieldGroup(MemberGroup group, MemberGroup parsedGroup) =>
-      group is FieldMemberGroup &&
-      parsedGroup is FieldMemberGroup &&
-      (!group.isLate || group.isLate == parsedGroup.isLate) &&
-      (!group.isStatic || group.isStatic == parsedGroup.isStatic) &&
-      (!group.isNullable || group.isNullable == parsedGroup.isNullable) &&
-      (group.modifier == Modifier.unset ||
-          group.modifier == parsedGroup.modifier) &&
-      (group.keyword == FieldKeyword.unset ||
-          group.keyword == parsedGroup.keyword) &&
-      (group.annotation == Annotation.unset ||
-          group.annotation == parsedGroup.annotation);
 }
