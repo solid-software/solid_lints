@@ -47,6 +47,15 @@ int fn(int b) {
 ''');
   }
 
+  Future<void>
+  test_reports_magic_numbers_in_ternary_comparison() async {
+    await assertAutoDiagnostics('''
+bool canDrive(int age, {bool isUSA = false}) {
+  return isUSA ? age >= ${expectLint('16')} : age > ${expectLint('18')};
+}
+''');
+  }
+
   Future<void> test_does_not_report_allowed_numbers() async {
     await assertNoDiagnostics(r'''
 void fn() {
@@ -295,6 +304,89 @@ void fn() {}
 void fn() {
   var point = (10, 20);
   var named = (x: 100, y: 200);
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_anonymous_function_default_param() async {
+    await assertNoDiagnostics(r'''
+void fn() {
+  ({int value = 7}) {};
+}
+''');
+  }
+
+  Future<void>
+  test_reports_magic_number_mixed_with_consts_in_constructor() async {
+    await assertAutoDiagnostics('''
+class TestOperation {
+  final double res;
+  const TestOperation({required this.res});
+}
+const n = 15;
+const m = 20;
+void fn() {
+  TestOperation(res: (n / m) * ${expectLint('20')});
+}
+''');
+  }
+
+  Future<void>
+  test_reports_multiple_magic_numbers_in_constructor_expression() async {
+    await assertAutoDiagnostics('''
+class TestOperation {
+  final double res;
+  const TestOperation({required this.res});
+}
+const m = 20;
+const n = 15;
+void fn() {
+  final v = TestOperation(res: (${expectLint('10')} / m + ${expectLint('4')} + n));
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_var_with_const_constructor_call() async {
+    await assertNoDiagnostics(r'''
+class TestOperation {
+  final double res;
+  const TestOperation({required this.res});
+}
+const n = 15;
+void fn() {
+  var v = const TestOperation(res: 15 + (10 / n));
+}
+''');
+  }
+
+  Future<void>
+  test_reports_magic_number_in_constructor_inside_list() async {
+    await assertAutoDiagnostics('''
+class TestOperation {
+  final double res;
+  const TestOperation({required this.res});
+}
+void fn() {
+  final l = [
+    TestOperation(res: ${expectLint('8')}),
+  ];
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_const_constructor_inside_list() async {
+    await assertNoDiagnostics(r'''
+class TestOperation {
+  final double res;
+  const TestOperation({required this.res});
+}
+void fn() {
+  final l = [
+    const TestOperation(res: 9),
+  ];
 }
 ''');
   }
