@@ -4,6 +4,8 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import 'lints/auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(AvoidLateKeywordRuleTest);
@@ -13,7 +15,8 @@ void main() {
 }
 
 @reflectiveTest
-class AvoidLateKeywordRuleTest extends AnalysisRuleTest {
+class AvoidLateKeywordRuleTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   final String _typesDefinitions = '''
 abstract class Animation {}
 
@@ -27,14 +30,13 @@ class ColorTween {}
   @override
   void setUp() {
     rule = AvoidLateKeywordRule(
-      analysisOptionsLoader:
-          AnalysisOptionsLoader(resourceProvider: resourceProvider),
+      analysisOptionsLoader: AnalysisOptionsLoader(
+        resourceProvider: resourceProvider,
+      ),
     );
     super.setUp();
 
-    newAnalysisOptionsYamlFile(
-      testPackageRootPath,
-      '''
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent(rules: [rule.name])}
 plugins:
   solid_lints:
@@ -43,13 +45,11 @@ plugins:
         allow_initialized: false
         ignored_types:
           - Animation
-''',
-    );
+''');
   }
 
   Future<void> test_does_not_report_ignored_types_fields() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 class Test {
   late final Animation animation1;
   late final animation2 = AnimationController();
@@ -57,13 +57,11 @@ class Test {
   late final AnimationController controller1;
 }
 $_typesDefinitions
-    ''',
-    );
+    ''');
   }
 
   Future<void> test_does_not_report_ignored_types_local_variables() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 void test() {
   late final Animation animation1;
   late final animation2 = AnimationController();
@@ -71,65 +69,43 @@ void test() {
   late final AnimationController controller1;
 }
 $_typesDefinitions
-    ''',
-    );
+    ''');
   }
 
   Future<void> test_reports_non_ignored_types_fields() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 class Test {
-  late final ColorTween colorTween1;
-  late final colorTween2 = ColorTween();
-  late final colorTween3 = colorTween2;
-  late final field1 = 'string';
-  late final String field2;
-  late final String field3 = 'string';
-  late final field4;
+  late final ColorTween ${expectLint('colorTween1')};
+  late final ${expectLint('colorTween2 = ColorTween()')};
+  late final ${expectLint('colorTween3 = colorTween2')};
+  late final ${expectLint('field1 = \'string\'')};
+  late final String ${expectLint('field2')};
+  late final String ${expectLint('field3 = \'string\'')};
+  late final ${expectLint('field4')};
 }
 $_typesDefinitions
-    ''',
-      [
-        lint(37, 11),
-        lint(63, 26),
-        lint(104, 25),
-        lint(144, 17),
-        lint(183, 6),
-        lint(211, 17),
-        lint(243, 6),
-      ],
-    );
+    ''');
   }
 
   Future<void> test_reports_non_ignored_types_local_variables() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 void test() {
-  late final ColorTween colorTween1;
-  late final colorTween2 = ColorTween();
-  late final colorTween3 = colorTween2;
-  late final local1 = 'string';
-  late final String local2;
-  late final String local4 = 'string';
-  late final local3;
+  late final ColorTween ${expectLint('colorTween1')};
+  late final ${expectLint('colorTween2 = ColorTween()')};
+  late final ${expectLint('colorTween3 = colorTween2')};
+  late final ${expectLint('local1 = \'string\'')};
+  late final String ${expectLint('local2')};
+  late final String ${expectLint('local4 = \'string\'')};
+  late final ${expectLint('local3')};
 }
 $_typesDefinitions
-    ''',
-      [
-        lint(38, 11),
-        lint(64, 26),
-        lint(105, 25),
-        lint(145, 17),
-        lint(184, 6),
-        lint(212, 17),
-        lint(244, 6),
-      ],
-    );
+    ''');
   }
 }
 
 @reflectiveTest
-class AvoidLateKeywordNoGenericsTest extends AnalysisRuleTest {
+class AvoidLateKeywordNoGenericsTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   final String _typesDefinitions = '''
 class Subscription<T> {}
 
@@ -141,14 +117,13 @@ class NotAllowed {}
   @override
   void setUp() {
     rule = AvoidLateKeywordRule(
-      analysisOptionsLoader:
-          AnalysisOptionsLoader(resourceProvider: resourceProvider),
+      analysisOptionsLoader: AnalysisOptionsLoader(
+        resourceProvider: resourceProvider,
+      ),
     );
     super.setUp();
 
-    newAnalysisOptionsYamlFile(
-      testPackageRootPath,
-      '''
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent(rules: [rule.name])}
 plugins:
   solid_lints:
@@ -157,13 +132,11 @@ plugins:
         allow_initialized: false
         ignored_types:
           - Subscription
-''',
-    );
+''');
   }
 
   Future<void> test_does_not_report_ignored_types_fields() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 class Test {
   late final Subscription subscription1;
   late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
@@ -172,13 +145,11 @@ class Test {
   late final Subscription<Map<dynamic, String>> subscription5;
 }
 $_typesDefinitions
-    ''',
-    );
+    ''');
   }
 
   Future<void> test_does_not_report_ignored_types_local_variables() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 void test() {
   late final Subscription subscription1;
   late final Subscription<ConcreteTypeWithNoGenerics> subscription2;
@@ -187,41 +158,31 @@ void test() {
   late final Subscription<Map<dynamic, String>> subscription5;
 }
 $_typesDefinitions
-    ''',
-    );
+    ''');
   }
 
   Future<void> test_reports_non_ignored_types_fields() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 class Test {
-  late final NotAllowed na1;
+  late final NotAllowed ${expectLint('na1')};
 }
 $_typesDefinitions
-    ''',
-      [
-        lint(37, 3),
-      ],
-    );
+    ''');
   }
 
   Future<void> test_reports_non_ignored_types_local_variables() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 void test() {
-  late final NotAllowed na1;
+  late final NotAllowed ${expectLint('na1')};
 }
 $_typesDefinitions
-    ''',
-      [
-        lint(38, 3),
-      ],
-    );
+    ''');
   }
 }
 
 @reflectiveTest
-class AvoidLateKeywordWithGenericsTest extends AnalysisRuleTest {
+class AvoidLateKeywordWithGenericsTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   final String _typesDefinitions = '''
 class ColorTween {}
 
@@ -241,14 +202,13 @@ class ConcreteTypeWithNoGenerics {}
   @override
   void setUp() {
     rule = AvoidLateKeywordRule(
-      analysisOptionsLoader:
-          AnalysisOptionsLoader(resourceProvider: resourceProvider),
+      analysisOptionsLoader: AnalysisOptionsLoader(
+        resourceProvider: resourceProvider,
+      ),
     );
     super.setUp();
 
-    newAnalysisOptionsYamlFile(
-      testPackageRootPath,
-      '''
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent(rules: [rule.name])}
 plugins:
   solid_lints:
@@ -261,13 +221,11 @@ plugins:
           - Subscription<List<Object?>>
           - Subscription<Map<dynamic, String>>
           - Subscription<ConcreteTypeWithNoGenerics>
-''',
-    );
+''');
   }
 
   Future<void> test_does_not_report_ignored_types_fields() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 class Test {
   late final ColorTween colorTween;
   late final AnimationController controller1;
@@ -283,13 +241,11 @@ class Test {
   late final a = Allowed();
 }
 $_typesDefinitions
-    ''',
-    );
+    ''');
   }
 
   Future<void> test_does_not_report_ignored_types_local_variables() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 void test() {
   late final ColorTween colorTween;
   late final AnimationController controller1;
@@ -302,49 +258,31 @@ void test() {
   late final a = Allowed();
 }
 $_typesDefinitions
-    ''',
-    );
+    ''');
   }
 
   Future<void> test_reports_non_ignored_types_fields() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 class Test {
-  late final String field2;
-  late final field3;
-  late final NotAllowed na1;
-  late final Subscription<String> subscription1;
-  late final Subscription<Map<String, dynamic>> subscription7;
+  late final String ${expectLint('field2')};
+  late final ${expectLint('field3')};
+  late final NotAllowed ${expectLint('na1')};
+  late final Subscription<String> ${expectLint('subscription1')};
+  late final Subscription<Map<String, dynamic>> ${expectLint('subscription7')};
 }
 $_typesDefinitions
-    ''',
-      [
-        lint(33, 6),
-        lint(54, 6),
-        lint(86, 3),
-        lint(125, 13),
-        lint(188, 13),
-      ],
-    );
+    ''');
   }
 
   Future<void> test_reports_non_ignored_types_local_variables() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 void test() {
-  late final String local2;
-  late final local3;
-  late final NotAllowed na1;
-  late final Subscription<String> subscription1;
+  late final String ${expectLint('local2')};
+  late final ${expectLint('local3')};
+  late final NotAllowed ${expectLint('na1')};
+  late final Subscription<String> ${expectLint('subscription1')};
 }
 $_typesDefinitions
-    ''',
-      [
-        lint(34, 6),
-        lint(55, 6),
-        lint(87, 3),
-        lint(126, 13),
-      ],
-    );
+    ''');
   }
 }
