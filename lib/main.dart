@@ -17,6 +17,8 @@ import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_c
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/fixes/prefer_first_fix.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
+import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
+import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/fixes/rename_nearest_context_parameter_fix.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
@@ -43,6 +45,7 @@ class SolidLintsPlugin extends Plugin {
         AvoidUnnecessaryTypeAssertionsRule();
     final doubleLiteralFormatRule = DoubleLiteralFormatRule();
     final preferFirstRule = PreferFirstRule();
+    final preferLastRule = PreferLastRule();
 
     final lintRules = [
       AvoidFinalWithGetterRule(),
@@ -69,6 +72,7 @@ class SolidLintsPlugin extends Plugin {
       ),
       UseNearestContextRule(),
       preferFirstRule,
+      preferLastRule,
       // TODO: Add more lint rules and use analysisLoader
       // for rules that need parameters
       // For example: `CyclomaticComplexityRule(analysisLoader)`
@@ -100,6 +104,11 @@ class SolidLintsPlugin extends Plugin {
     registry.registerFixForRule(
       preferFirstRule.diagnosticCode,
       PreferFirstFix.new,
+    );
+
+    registry.registerFixForRule(
+      preferLastRule.diagnosticCode,
+      PreferLastFix.new,
     );
   }
 }
