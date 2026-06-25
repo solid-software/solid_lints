@@ -20,6 +20,12 @@ class PreferConditionalExpressionsParameters {
     required this.ignoreNested,
   });
 
+  /// Empty [PreferConditionalExpressionsParameters] model.
+  factory PreferConditionalExpressionsParameters.empty() =>
+      const PreferConditionalExpressionsParameters(
+        ignoreNested: false,
+      );
+
   /// Method for creating from json data
   factory PreferConditionalExpressionsParameters.fromJson(
     Map<String, Object?> json,
@@ -28,3 +34,4 @@ class PreferConditionalExpressionsParameters {
         ignoreNested: json[_ignoreNestedConfig] as bool? ?? false,
       );
 }
+

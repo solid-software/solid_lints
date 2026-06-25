@@ -14,6 +14,8 @@ import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexit
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/fixes/prefer_conditional_expressions_fix.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/fixes/prefer_first_fix.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
@@ -42,6 +44,9 @@ class SolidLintsPlugin extends Plugin {
         AvoidUnnecessaryTypeAssertionsRule();
     final doubleLiteralFormatRule = DoubleLiteralFormatRule();
     final preferFirstRule = PreferFirstRule();
+    final preferConditionalExpressionsRule = PreferConditionalExpressionsRule(
+      analysisOptionsLoader: analysisLoader,
+    );
 
     final lintRules = [
       AvoidFinalWithGetterRule(),
@@ -65,6 +70,7 @@ class SolidLintsPlugin extends Plugin {
       ),
       UseNearestContextRule(),
       preferFirstRule,
+      preferConditionalExpressionsRule,
       // TODO: Add more lint rules and use analysisLoader
       // for rules that need parameters
       // For example: `CyclomaticComplexityRule(analysisLoader)`
@@ -96,6 +102,11 @@ class SolidLintsPlugin extends Plugin {
     registry.registerFixForRule(
       preferFirstRule.diagnosticCode,
       PreferFirstFix.new,
+    );
+
+    registry.registerFixForRule(
+      preferConditionalExpressionsRule.diagnosticCode,
+      PreferConditionalExpressionsFix.new,
     );
   }
 }

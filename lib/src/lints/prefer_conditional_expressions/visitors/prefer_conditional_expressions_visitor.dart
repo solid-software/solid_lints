@@ -23,21 +23,20 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
 
 /// The AST visitor that will collect all if statements that can be simplified
 /// into conditional expressions.
 class PreferConditionalExpressionsVisitor extends RecursiveAstVisitor<void> {
-  final _statementsInfo = <StatementInfo>[];
-
+  final PreferConditionalExpressionsRule _rule;
   final bool _ignoreNested;
-
-  /// List of statement info that represents all simple if statements
-  Iterable<StatementInfo> get statementsInfo => _statementsInfo;
 
   /// Creates instance of [PreferConditionalExpressionsVisitor]
   PreferConditionalExpressionsVisitor({
+    required PreferConditionalExpressionsRule rule,
     required bool ignoreNested,
-  }) : _ignoreNested = ignoreNested;
+  }) : _rule = rule,
+       _ignoreNested = ignoreNested;
 
   @override
   void visitIfStatement(IfStatement node) {
@@ -45,85 +44,18 @@ class PreferConditionalExpressionsVisitor extends RecursiveAstVisitor<void> {
 
     if (_ignoreNested) {
       final visitor = _ConditionalsVisitor();
-      node.visitChildren(visitor);
+      node.thenStatement.accept(visitor);
+      node.elseStatement?.accept(visitor);
 
       if (visitor.hasInnerConditionals) {
         return;
       }
     }
 
-    if (node.parent is! IfStatement &&
-        node.elseStatement != null &&
-        node.elseStatement is! IfStatement) {
-      _checkBothAssignment(node);
-      _checkBothReturn(node);
+    final info = StatementInfo.fromIfStatement(node);
+    if (info != null) {
+      _rule.reportAtNode(node);
     }
-  }
-
-  void _checkBothAssignment(IfStatement statement) {
-    final thenAssignment = _getAssignmentExpression(statement.thenStatement);
-    final elseAssignment = _getAssignmentExpression(statement.elseStatement);
-
-    if (thenAssignment != null &&
-        elseAssignment != null &&
-        _haveEqualNames(thenAssignment, elseAssignment)) {
-      _statementsInfo.add(
-        StatementInfo(
-          statement: statement,
-          unwrappedThenStatement: thenAssignment,
-          unwrappedElseStatement: elseAssignment,
-        ),
-      );
-    }
-  }
-
-  AssignmentExpression? _getAssignmentExpression(Statement? statement) {
-    if (statement is ExpressionStatement &&
-        statement.expression is AssignmentExpression) {
-      return statement.expression as AssignmentExpression;
-    }
-
-    if (statement is Block && statement.statements.length == 1) {
-      return _getAssignmentExpression(statement.statements.first);
-    }
-
-    return null;
-  }
-
-  bool _haveEqualNames(
-    AssignmentExpression thenAssignment,
-    AssignmentExpression elseAssignment,
-  ) =>
-      thenAssignment.leftHandSide is Identifier &&
-      elseAssignment.leftHandSide is Identifier &&
-      (thenAssignment.leftHandSide as Identifier).name ==
-          (elseAssignment.leftHandSide as Identifier).name;
-
-  void _checkBothReturn(IfStatement statement) {
-    final thenReturn = _getReturnStatement(statement.thenStatement);
-    final elseReturn = _getReturnStatement(statement.elseStatement);
-
-    if (thenReturn != null && elseReturn != null) {
-      _statementsInfo.add(
-        StatementInfo(
-          statement: statement,
-          unwrappedThenStatement: thenReturn,
-          unwrappedElseStatement: elseReturn,
-        ),
-      );
-    }
-  }
-
-  ReturnStatement? _getReturnStatement(Statement? statement) {
-    if (statement is ReturnStatement) {
-      return statement;
-    }
-
-    if (statement is Block && statement.statements.length == 1) {
-      return _getReturnStatement(statement.statements.first);
-    }
-
-    return null;
   }
 }
 
@@ -133,8 +65,6 @@ class _ConditionalsVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitConditionalExpression(ConditionalExpression node) {
     hasInnerConditionals = true;
-
-    super.visitConditionalExpression(node);
   }
 }
 
@@ -155,4 +85,78 @@ class StatementInfo {
     required this.unwrappedThenStatement,
     required this.unwrappedElseStatement,
   });
+
+  /// Factory constructor to create [StatementInfo] from [IfStatement] if it
+  /// can be simplified.
+  static StatementInfo? fromIfStatement(IfStatement statement) {
+    if (statement.parent is IfStatement ||
+        statement.elseStatement == null ||
+        statement.elseStatement is IfStatement) {
+      return null;
+    }
+
+    final thenAssignment = _getAssignmentExpression(statement.thenStatement);
+    final elseAssignment = _getAssignmentExpression(statement.elseStatement);
+
+    if (thenAssignment != null &&
+        elseAssignment != null &&
+        thenAssignment.operator.type == elseAssignment.operator.type &&
+        _haveEqualNames(thenAssignment, elseAssignment)) {
+      return StatementInfo(
+        statement: statement,
+        unwrappedThenStatement: thenAssignment,
+        unwrappedElseStatement: elseAssignment,
+      );
+    }
+
+    final thenReturn = _getReturnStatement(statement.thenStatement);
+    final elseReturn = _getReturnStatement(statement.elseStatement);
+
+    if (thenReturn != null &&
+        elseReturn != null &&
+        thenReturn.expression != null &&
+        elseReturn.expression != null) {
+      return StatementInfo(
+        statement: statement,
+        unwrappedThenStatement: thenReturn,
+        unwrappedElseStatement: elseReturn,
+      );
+    }
+
+    return null;
+  }
+
+  static AssignmentExpression? _getAssignmentExpression(Statement? statement) {
+    if (statement is ExpressionStatement &&
+        statement.expression is AssignmentExpression) {
+      return statement.expression as AssignmentExpression;
+    }
+
+    if (statement is Block && statement.statements.length == 1) {
+      return _getAssignmentExpression(statement.statements.first);
+    }
+
+    return null;
+  }
+
+  static bool _haveEqualNames(
+    AssignmentExpression thenAssignment,
+    AssignmentExpression elseAssignment,
+  ) =>
+      thenAssignment.leftHandSide is Identifier &&
+      elseAssignment.leftHandSide is Identifier &&
+      (thenAssignment.leftHandSide as Identifier).name ==
+          (elseAssignment.leftHandSide as Identifier).name;
+
+  static ReturnStatement? _getReturnStatement(Statement? statement) {
+    if (statement is ReturnStatement) {
+      return statement;
+    }
+
+    if (statement is Block && statement.statements.length == 1) {
+      return _getReturnStatement(statement.statements.first);
+    }
+
+    return null;
+  }
 }

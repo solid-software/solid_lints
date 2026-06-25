@@ -1,56 +1,55 @@
+import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
+import 'package:analysis_server_plugin/edit/dart/dart_fix_kind_priority.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/diagnostic/diagnostic.dart';
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
+import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/visitors/prefer_conditional_expressions_visitor.dart';
 
 /// A Quick fix for `prefer_conditional_expressions` rule
-/// Suggests to remove unnecessary assertions
-class PreferConditionalExpressionsFix extends DartFix {
-  final Expando<StatementInfo> _diagnosticsInfoExpando;
+/// Suggests to convert simple if statements to conditional expressions
+class PreferConditionalExpressionsFix extends ResolvedCorrectionProducer {
+  static const _fixComment = "Convert to conditional expression.";
 
-  /// A Quick fix for `prefer_conditional_expressions` rule
-  /// Suggests to remove unnecessary assertions
-  PreferConditionalExpressionsFix(this._diagnosticsInfoExpando);
+  /// Creates a new instance of [PreferConditionalExpressionsFix]
+  PreferConditionalExpressionsFix({required super.context});
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    Diagnostic diagnostic,
-    List<Diagnostic> others,
-  ) {
-    context.registry.addIfStatement((node) {
-      if (!diagnostic.sourceRange.intersects(node.sourceRange)) return;
+  FixKind get fixKind => const FixKind(
+    'solid_lints.fix.${PreferConditionalExpressionsRule.lintName}',
+    DartFixKindPriority.standard,
+    _fixComment,
+  );
 
-      final statementInfo = _diagnosticsInfoExpando[diagnostic];
-      if (statementInfo == null) return;
+  @override
+  FixKind get multiFixKind => const FixKind(
+    'solid_lints.fix.multi.${PreferConditionalExpressionsRule.lintName}',
+    DartFixKindPriority.standard,
+    '$_fixComment across files',
+  );
 
-      final correction = _createCorrection(statementInfo);
-      if (correction == null) return;
+  @override
+  CorrectionApplicability get applicability =>
+      CorrectionApplicability.automatically;
 
-      _addReplacement(reporter, statementInfo.statement, correction);
-    });
-  }
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final statement = node.thisOrAncestorOfType<IfStatement>();
+    if (statement == null) return;
 
-  void _addReplacement(
-    ChangeReporter reporter,
-    IfStatement node,
-    String correction,
-  ) {
-    final changeBuilder = reporter.createChangeBuilder(
-      message: "Convert to conditional expression.",
-      priority: 1,
-    );
+    final statementInfo = StatementInfo.fromIfStatement(statement);
+    if (statementInfo == null) return;
 
-    changeBuilder.addDartFileEdit((builder) {
-      builder.addSimpleReplacement(
-        SourceRange(node.offset, node.length),
+    final correction = _createCorrection(statementInfo);
+    if (correction == null) return;
+
+    await builder.addDartFileEdit(
+      file,
+      (builder) => builder.addSimpleReplacement(
+        statement.sourceRange,
         correction,
-      );
-    });
+      ),
+    );
   }
 
   String? _createCorrection(StatementInfo info) {
@@ -64,20 +63,7 @@ class PreferConditionalExpressionsFix extends DartFix {
       final target = thenStatement.leftHandSide;
       final firstExpression = thenStatement.rightHandSide;
       final secondExpression = elseStatement.rightHandSide;
-
-      final thenStatementOperator = thenStatement.operator.type;
-      final elseStatementOperator = elseStatement.operator.type;
-
-      if (_isAssignmentOperatorNotEq(thenStatementOperator) &&
-          _isAssignmentOperatorNotEq(elseStatementOperator)) {
-        final prefix = thenStatement.leftHandSide;
-        final thenPart =
-            '$prefix ${thenStatementOperator.stringValue} $firstExpression';
-        final elsePart =
-            '$prefix ${elseStatementOperator.stringValue} $secondExpression;';
-
-        return '$condition ? $thenPart : $elsePart';
-      }
+      final op = thenStatement.operator.lexeme;
 
       final correctionForLiterals = _createCorrectionForLiterals(
         condition,
@@ -85,7 +71,7 @@ class PreferConditionalExpressionsFix extends DartFix {
         secondExpression,
       );
 
-      return '$target = $correctionForLiterals';
+      return '$target $op $correctionForLiterals';
     }
 
     if (thenStatement is ReturnStatement && elseStatement is ReturnStatement) {
@@ -110,6 +96,9 @@ class PreferConditionalExpressionsFix extends DartFix {
   ) {
     if (firstExpression is BooleanLiteral &&
         secondExpression is BooleanLiteral) {
+      if (firstExpression.value == secondExpression.value) {
+        return '${firstExpression.value};';
+      }
       final isInverted = !firstExpression.value && secondExpression.value;
 
       return '${isInverted ? "!" : ""}$condition;';
@@ -117,7 +106,4 @@ class PreferConditionalExpressionsFix extends DartFix {
 
     return '$condition ? $firstExpression : $secondExpression;';
   }
-
-  bool _isAssignmentOperatorNotEq(TokenType token) =>
-      token.isAssignmentOperator && token != TokenType.EQ;
 }
