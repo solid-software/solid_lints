@@ -4,6 +4,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/no_magic_number/models/no_magic_number_parameters.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
+import 'package:solid_lints/src/utils/node_utils.dart';
 
 /// The AST visitor that checks if double and integer literals are magic numbers.
 class NoMagicNumberRuleVisitor extends SimpleAstVisitor<void> {
@@ -24,53 +25,39 @@ class NoMagicNumberRuleVisitor extends SimpleAstVisitor<void> {
   }
 
   void _checkLiteral(Literal node) {
-    if (!_isMagicNumber(node)) return;
-    if (!_isNotInsideVariable(node)) return;
-    if (!_isNotInsideCollectionLiteral(node)) return;
-    if (!_isNotInsideConstConstructor(node)) return;
-    if (!_isNotInDateTime(node)) return;
-    if (!_isNotInsideIndexExpression(node)) return;
-    if (!_isNotInsideEnumConstantArguments(node)) return;
-    if (!_isNotDefaultValue(node)) return;
-    if (!_isNotInConstructorInitializer(node)) return;
-    if (!_isNotWidgetParameter(node)) return;
+    if (_isNotMagicNumber(node)) return;
+    if (_isInsideVariable(node)) return;
+    if (_isInsideCollectionLiteral(node)) return;
+    if (_isWidgetParameter(node)) return;
+
+    if (node.isInsideConstConstructor) return;
+    if (node.isInDateTime) return;
+    if (node.isInsideIndexExpression) return;
+    if (node.isInsideEnumConstantArguments) return;
+    if (node.isDefaultValue) return;
+    if (node.isInConstructorInitializer) return;
 
     _rule.reportAtNode(node);
   }
 
-  bool _isMagicNumber(Literal l) =>
-      (l is DoubleLiteral && !_parameters.allowedNumbers.contains(l.value)) ||
-      (l is IntegerLiteral && !_parameters.allowedNumbers.contains(l.value));
+  bool _isNotMagicNumber(Literal l) =>
+      (l is DoubleLiteral && _parameters.allowedNumbers.contains(l.value)) ||
+      (l is IntegerLiteral && _parameters.allowedNumbers.contains(l.value));
 
   /// Returns the effective parent of [l], skipping over a unary
   /// [PrefixExpression] (e.g. the `-` in `-42`).
   AstNode? _effectiveParent(Literal l) =>
       l.parent is PrefixExpression ? l.parent?.parent : l.parent;
 
-  /// Returns `true` if the literal is NOT the direct initializer of a variable
+  /// Returns `true` if the literal is the direct initializer of a variable
   /// declaration.
   ///
   /// Allows `var x = 42` (literal gets a name) but reports `var r = x + 42`
   /// (42 is a magic number inside an expression).
-  bool _isNotInsideVariable(Literal l) =>
-      _effectiveParent(l) is! VariableDeclaration;
+  bool _isInsideVariable(Literal l) =>
+      _effectiveParent(l) is VariableDeclaration;
 
-  bool _isNotInDateTime(Literal l) =>
-      l.thisOrAncestorMatching(
-        (a) =>
-            a is InstanceCreationExpression &&
-            a.staticType?.getDisplayString() == 'DateTime',
-      ) ==
-      null;
-
-  bool _isNotInsideEnumConstantArguments(Literal l) {
-    final node = l.thisOrAncestorMatching(
-      (ancestor) => ancestor is EnumConstantArguments,
-    );
-    return node == null;
-  }
-
-  /// Returns `true` if the literal is NOT inside a collection literal.
+  /// Returns `true` if the literal is inside a collection literal.
   ///
   /// Covers list elements (`[42]`, `[-42]`), set elements (`{42}`, `{-42}`),
   /// and map keys/values (`{42: 'a'}`, `{-42: 'a'}`, `{'a': -42}`).
@@ -78,40 +65,22 @@ class NoMagicNumberRuleVisitor extends SimpleAstVisitor<void> {
   /// Unary prefix expressions (e.g. `-42`) are skipped transparently so that
   /// the effective parent—the collection literal—is checked instead of the
   /// intermediate [PrefixExpression] node.
-  bool _isNotInsideCollectionLiteral(Literal l) {
+  bool _isInsideCollectionLiteral(Literal l) {
     final p = _effectiveParent(l);
-    return p is! TypedLiteral &&
-        p is! MapLiteralEntry &&
-        p is! RecordLiteral &&
-        !(p is NamedExpression && p.parent is RecordLiteral);
+    return p is TypedLiteral ||
+        p is MapLiteralEntry ||
+        p is RecordLiteral ||
+        (p is NamedExpression && p.parent is RecordLiteral);
   }
 
-  bool _isNotInsideConstConstructor(Literal l) =>
-      l.thisOrAncestorMatching((ancestor) {
-        return (ancestor is InstanceCreationExpression && ancestor.isConst) ||
-            ancestor is Annotation;
-      }) ==
-      null;
-
-  bool _isNotInsideIndexExpression(Literal l) =>
-      _effectiveParent(l) is! IndexExpression;
-
-  bool _isNotDefaultValue(Literal literal) {
-    return literal.thisOrAncestorOfType<DefaultFormalParameter>() == null;
-  }
-
-  bool _isNotInConstructorInitializer(Literal literal) {
-    return literal.thisOrAncestorOfType<ConstructorInitializer>() == null;
-  }
-
-  bool _isNotWidgetParameter(Literal literal) {
-    if (!_parameters.allowedInWidgetParams) return true;
+  bool _isWidgetParameter(Literal literal) {
+    if (!_parameters.allowedInWidgetParams) return false;
 
     final widgetCreationExpression = literal.thisOrAncestorMatching(
       _isWidgetCreationExpression,
     );
 
-    return widgetCreationExpression == null;
+    return widgetCreationExpression != null;
   }
 
   bool _isWidgetCreationExpression(AstNode node) {

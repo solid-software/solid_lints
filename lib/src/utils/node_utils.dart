@@ -61,3 +61,45 @@ extension SimpleIdentifierExtension on SimpleIdentifier {
     return declOffset >= body.offset && declOffset < body.end;
   }
 }
+
+/// Extension on [AstNode] to provide generic context/traversal checks.
+extension AstNodeExtension on AstNode {
+  /// Returns `true` if the node is within the default value of a formal parameter.
+  bool get isDefaultValue =>
+      thisOrAncestorOfType<DefaultFormalParameter>() != null;
+
+  /// Returns `true` if the node is within a constructor initializer.
+  bool get isInConstructorInitializer =>
+      thisOrAncestorOfType<ConstructorInitializer>() != null;
+
+  /// Returns `true` if the node is within a const constructor invocation or annotation.
+  bool get isInsideConstConstructor =>
+      thisOrAncestorMatching((ancestor) {
+        return (ancestor is InstanceCreationExpression && ancestor.isConst) ||
+            ancestor is Annotation;
+      }) !=
+      null;
+
+  /// Returns `true` if the node is within enum constant arguments.
+  bool get isInsideEnumConstantArguments =>
+      thisOrAncestorMatching(
+        (ancestor) => ancestor is EnumConstantArguments,
+      ) !=
+      null;
+
+  /// Returns `true` if the node is within a DateTime constructor invocation.
+  bool get isInDateTime =>
+      thisOrAncestorMatching(
+        (a) =>
+            a is InstanceCreationExpression &&
+            a.staticType?.getDisplayString() == 'DateTime',
+      ) !=
+      null;
+
+  /// Returns `true` if the node is the child (optionally wrapped in a prefix
+  /// expression) of an index expression (e.g. `list[42]` or `list[-42]`).
+  bool get isInsideIndexExpression {
+    final p = parent is PrefixExpression ? parent?.parent : parent;
+    return p is IndexExpression;
+  }
+}
