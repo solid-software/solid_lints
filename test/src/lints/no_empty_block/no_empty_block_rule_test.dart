@@ -100,7 +100,7 @@ plugins:
         exclude:
           - method_name: excludeMethod
           - class_name: Exclude
-            method_name: excludeMethod
+            method_name: excludeClassMethod
 ''',
     );
 
@@ -108,7 +108,7 @@ plugins:
 void excludeMethod() {}
 
 class Exclude {
-  void excludeMethod() {}
+  void excludeClassMethod() {}
 }
 ''');
   }
