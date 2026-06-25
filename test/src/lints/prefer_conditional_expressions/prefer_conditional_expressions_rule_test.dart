@@ -173,4 +173,16 @@ void main() {
 }
 ''');
   }
+
+  Future<void> test_reports_on_complex_condition_inversion() async {
+    await assertAutoDiagnostics('''
+bool test(int x, int y) {
+  ${expectLint('''if (x > 0 || y < 1) {
+    return false;
+  } else {
+    return true;
+  }''')}
+}
+''');
+  }
 }

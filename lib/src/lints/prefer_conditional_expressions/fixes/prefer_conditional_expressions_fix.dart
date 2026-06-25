@@ -100,8 +100,17 @@ class PreferConditionalExpressionsFix extends ResolvedCorrectionProducer {
         return '${firstExpression.value};';
       }
       final isInverted = !firstExpression.value && secondExpression.value;
+      if (isInverted) {
+        final useParentheses =
+            condition is! Identifier &&
+            condition is! PropertyAccess &&
+            condition is! MethodInvocation &&
+            condition is! IndexExpression &&
+            condition is! ParenthesizedExpression;
+        return '${useParentheses ? '!($condition)' : '!$condition'};';
+      }
 
-      return '${isInverted ? "!" : ""}$condition;';
+      return '$condition;';
     }
 
     return '$condition ? $firstExpression : $secondExpression;';
