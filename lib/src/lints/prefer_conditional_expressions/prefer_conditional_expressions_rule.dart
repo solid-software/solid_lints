@@ -73,10 +73,10 @@ class PreferConditionalExpressionsRule
   PreferConditionalExpressionsRule({
     required super.analysisOptionsLoader,
   }) : super.withParameters(
-          name: _code.lowerCaseName,
-          description: _code.problemMessage,
-          parametersParser: PreferConditionalExpressionsParameters.fromJson,
-        );
+         name: _code.lowerCaseName,
+         description: _code.problemMessage,
+         parametersParser: PreferConditionalExpressionsParameters.fromJson,
+       );
 
   @override
   void registerNodeProcessors(

@@ -23,40 +23,14 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:solid_lints/src/lints/prefer_conditional_expressions/models/statement_info.dart';
-import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
-import 'package:solid_lints/src/lints/prefer_conditional_expressions/visitors/conditionals_visitor.dart';
 
-/// The AST visitor that will collect all if statements that can be simplified
-/// into conditional expressions.
-class PreferConditionalExpressionsVisitor extends RecursiveAstVisitor<void> {
-  final PreferConditionalExpressionsRule _rule;
-  final bool _ignoreNested;
-
-  /// Creates instance of [PreferConditionalExpressionsVisitor]
-  PreferConditionalExpressionsVisitor({
-    required PreferConditionalExpressionsRule rule,
-    required bool ignoreNested,
-  }) : _rule = rule,
-       _ignoreNested = ignoreNested;
+/// A visitor that checks if a node contains nested conditional expressions.
+class ConditionalsVisitor extends RecursiveAstVisitor<void> {
+  /// Whether the visited nodes contain a conditional expression.
+  bool hasInnerConditionals = false;
 
   @override
-  void visitIfStatement(IfStatement node) {
-    super.visitIfStatement(node);
-
-    if (_ignoreNested) {
-      final visitor = ConditionalsVisitor();
-      node.thenStatement.accept(visitor);
-      node.elseStatement?.accept(visitor);
-
-      if (visitor.hasInnerConditionals) {
-        return;
-      }
-    }
-
-    final info = StatementInfo.fromIfStatement(node);
-    if (info != null) {
-      _rule.reportAtNode(node);
-    }
+  void visitConditionalExpression(ConditionalExpression node) {
+    hasInnerConditionals = true;
   }
 }
