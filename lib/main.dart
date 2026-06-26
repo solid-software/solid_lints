@@ -15,8 +15,11 @@ import 'package:solid_lints/src/lints/double_literal_format/double_literal_forma
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/no_magic_number/no_magic_number_rule.dart';
+import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/fixes/prefer_first_fix.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
+import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
+import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/fixes/rename_nearest_context_parameter_fix.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
@@ -43,6 +46,7 @@ class SolidLintsPlugin extends Plugin {
         AvoidUnnecessaryTypeAssertionsRule();
     final doubleLiteralFormatRule = DoubleLiteralFormatRule();
     final preferFirstRule = PreferFirstRule();
+    final preferLastRule = PreferLastRule();
 
     final lintRules = [
       AvoidFinalWithGetterRule(),
@@ -52,23 +56,15 @@ class SolidLintsPlugin extends Plugin {
       AvoidDebugPrintInReleaseRule(),
       doubleLiteralFormatRule,
       ProperSuperCallsRule(),
-      AvoidReturningWidgetsRule(
-        analysisOptionsLoader: analysisLoader,
-      ),
-      FunctionLinesOfCodeRule(
-        analysisOptionsLoader: analysisLoader,
-      ),
-      AvoidUnusedParametersRule(
-        analysisOptionsLoader: analysisLoader,
-      ),
-      CyclomaticComplexityRule(
-        analysisOptionsLoader: analysisLoader,
-      ),
+      AvoidReturningWidgetsRule(analysisOptionsLoader: analysisLoader),
+      FunctionLinesOfCodeRule(analysisOptionsLoader: analysisLoader),
+      AvoidUnusedParametersRule(analysisOptionsLoader: analysisLoader),
+      CyclomaticComplexityRule(analysisOptionsLoader: analysisLoader),
+      NoEmptyBlockRule(analysisOptionsLoader: analysisLoader),
       UseNearestContextRule(),
+      NoMagicNumberRule(analysisOptionsLoader: analysisLoader),
       preferFirstRule,
-      NoMagicNumberRule(
-        analysisOptionsLoader: analysisLoader,
-      ),
+      preferLastRule,
       // TODO: Add more lint rules and use analysisLoader
       // for rules that need parameters
       // For example: `CyclomaticComplexityRule(analysisLoader)`
@@ -100,6 +96,11 @@ class SolidLintsPlugin extends Plugin {
     registry.registerFixForRule(
       preferFirstRule.diagnosticCode,
       PreferFirstFix.new,
+    );
+
+    registry.registerFixForRule(
+      preferLastRule.diagnosticCode,
+      PreferLastFix.new,
     );
   }
 }

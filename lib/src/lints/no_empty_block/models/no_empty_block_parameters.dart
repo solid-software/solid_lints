@@ -17,6 +17,14 @@ class NoEmptyBlockParameters {
     required this.allowWithComments,
   });
 
+  /// Empty [NoEmptyBlockParameters] model, excludes nothing.
+  factory NoEmptyBlockParameters.empty() {
+    return NoEmptyBlockParameters(
+      exclude: ExcludedIdentifiersListParameter(exclude: []),
+      allowWithComments: false,
+    );
+  }
+
   /// Method for creating from json data
   factory NoEmptyBlockParameters.fromJson(Map<String, dynamic> json) {
     return NoEmptyBlockParameters(
