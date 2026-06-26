@@ -108,11 +108,10 @@ class FieldMemberGroup extends MemberGroup {
 }
 
 class _FieldMemberGroupUtils {
-  static FieldKeyword parseKeyWord(FieldDeclaration declaration) {
-    return declaration.fields.isConst
-        ? FieldKeyword.isConst
-        : declaration.fields.isFinal
-        ? FieldKeyword.isFinal
-        : FieldKeyword.unset;
-  }
+  static FieldKeyword parseKeyWord(FieldDeclaration declaration) =>
+      switch ((declaration.fields.isConst, declaration.fields.isFinal)) {
+        (true, _) => FieldKeyword.isConst,
+        (_, true) => FieldKeyword.isFinal,
+        _ => FieldKeyword.unset,
+      };
 }
