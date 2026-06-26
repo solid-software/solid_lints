@@ -45,13 +45,14 @@ enum FieldKeyword {
 
   /// Parses a String field type and returns instance of [FieldKeyword]
   static FieldKeyword parse(String? name) => values.firstWhere(
-        (type) => type.type == name,
-        orElse: () => FieldKeyword.unset,
-      );
+    (type) => type.type == name,
+    orElse: () => FieldKeyword.unset,
+  );
 }
 
 /// Logical implication operation for field keyword
 extension FieldKeywordImplies on FieldKeyword {
   /// Logical implication operation.
-  bool implies(FieldKeyword other) => objectImplies(this, other, FieldKeyword.unset);
+  bool implies(FieldKeyword other) =>
+      objectImplies(this, other, FieldKeyword.unset);
 }

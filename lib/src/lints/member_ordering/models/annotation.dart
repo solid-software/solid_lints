@@ -45,15 +45,16 @@ enum Annotation {
 
   /// Parses a String name and returns instance of [Annotation]
   static Annotation parse(String? name) => values.firstWhere(
-        (annotation) =>
-            annotation.name == name ||
-            (annotation.publicName != null && annotation.publicName == name),
-        orElse: () => Annotation.unset,
-      );
+    (annotation) =>
+        annotation.name == name ||
+        (annotation.publicName != null && annotation.publicName == name),
+    orElse: () => Annotation.unset,
+  );
 }
 
 /// Logical implication operation for annotation
 extension AnnotationImplies on Annotation {
   /// Logical implication operation.
-  bool implies(Annotation other) => objectImplies(this, other, Annotation.unset);
+  bool implies(Annotation other) =>
+      objectImplies(this, other, Annotation.unset);
 }

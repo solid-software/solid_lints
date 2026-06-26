@@ -22,7 +22,6 @@
 // SOFTWARE.
 
 import 'package:analyzer/dart/ast/ast.dart' show FieldDeclaration;
-import 'package:solid_lints/src/utils/implies.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_utils.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/annotation.dart';
@@ -30,6 +29,7 @@ import 'package:solid_lints/src/lints/member_ordering/models/field_keyword.dart'
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
+import 'package:solid_lints/src/utils/implies.dart';
 
 /// Data class represents class field
 class FieldMemberGroup extends MemberGroup {
@@ -63,7 +63,8 @@ class FieldMemberGroup extends MemberGroup {
     final modifier = parseModifier(
       declaration.fields.variables.first.name.lexeme,
     );
-    final isNullable = declaration.fields.type?.type?.nullabilitySuffix ==
+    final isNullable =
+        declaration.fields.type?.type?.nullabilitySuffix ==
         NullabilitySuffix.question;
     final keyword = _FieldMemberGroupUtils.parseKeyWord(declaration);
 
@@ -97,14 +98,13 @@ class FieldMemberGroup extends MemberGroup {
   String toString() => rawRepresentation;
 
   @override
-  bool implies(MemberGroup other) => switch (other) {
-        FieldMemberGroup p => super.implies(p) &&
-            isLate.implies(p.isLate) &&
-            isStatic.implies(p.isStatic) &&
-            isNullable.implies(p.isNullable) &&
-            keyword.implies(p.keyword),
-        _ => false,
-      };
+  bool implies(MemberGroup other) =>
+      other is FieldMemberGroup &&
+      super.implies(other) &&
+      isLate.implies(other.isLate) &&
+      isStatic.implies(other.isStatic) &&
+      isNullable.implies(other.isNullable) &&
+      keyword.implies(other.keyword);
 }
 
 class _FieldMemberGroupUtils {
@@ -112,7 +112,7 @@ class _FieldMemberGroupUtils {
     return declaration.fields.isConst
         ? FieldKeyword.isConst
         : declaration.fields.isFinal
-            ? FieldKeyword.isFinal
-            : FieldKeyword.unset;
+        ? FieldKeyword.isFinal
+        : FieldKeyword.unset;
   }
 }
