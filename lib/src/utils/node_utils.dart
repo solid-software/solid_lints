@@ -2,12 +2,10 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 
-
 /// Check node is override method from its metadata
 bool isOverride(List<Annotation> metadata) => metadata.any(
-      (node) =>
-          node.name.name == 'override' && node.atSign.type == TokenType.AT,
-    );
+  (node) => node.name.name == 'override' && node.atSign.type == TokenType.AT,
+);
 
 /// Returns human readable node type
 /// Self explanatory
@@ -64,7 +62,8 @@ extension SimpleIdentifierExtension on SimpleIdentifier {
 
 /// Extension on [AstNode] to provide generic context/traversal checks.
 extension AstNodeExtension on AstNode {
-  /// Returns `true` if the node is within the default value of a formal parameter.
+  /// Returns `true` if the node is within the default value of a formal
+  /// parameter.
   bool get isDefaultValue =>
       thisOrAncestorOfType<DefaultFormalParameter>() != null;
 
@@ -72,7 +71,8 @@ extension AstNodeExtension on AstNode {
   bool get isInConstructorInitializer =>
       thisOrAncestorOfType<ConstructorInitializer>() != null;
 
-  /// Returns `true` if the node is within a const constructor invocation or annotation.
+  /// Returns `true` if the node is within a const constructor invocation or
+  /// annotation.
   bool get isInsideConstConstructor =>
       thisOrAncestorMatching((ancestor) {
         return (ancestor is InstanceCreationExpression && ancestor.isConst) ||
