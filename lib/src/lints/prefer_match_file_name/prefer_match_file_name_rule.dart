@@ -1,12 +1,11 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:path/path.dart' as p;
+import 'package:solid_lints/src/common/parameters/excluded_entities_list_parameter.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/models/prefer_match_file_name_parameters.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/visitors/prefer_match_file_name_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
-import 'package:solid_lints/src/utils/node_utils.dart';
-
 /// Warns about a mismatch between file name and first declared element inside.
 ///
 /// This improves navigation by matching file content and file name.
@@ -56,62 +55,48 @@ class PreferMatchFileNameRule
   static const String lintName = 'prefer_match_file_name';
   static final _onlySymbolsRegex = RegExp('[^a-zA-Z0-9]');
 
-  PreferMatchFileNameRule._(super.config);
+  static const _code = LintCode(
+    lintName,
+    'File name does not match with first {0} name.',
+  );
+
+  @override
+  DiagnosticCode get diagnosticCode => _code;
 
   /// Creates a new instance of [PreferMatchFileNameRule]
   /// based on the lint configuration.
-  factory PreferMatchFileNameRule.createRule(CustomLintConfigs configs) {
-    final config = RuleConfig(
-      configs: configs,
-      name: lintName,
-      paramsParser: PreferMatchFileNameParameters.fromJson,
-      problemMessage: (value) =>
-          'File name does not match with first declared element name.',
-    );
-
-    return PreferMatchFileNameRule._(config);
-  }
+  PreferMatchFileNameRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+         name: lintName,
+         description: 'Warns about a mismatch between file name and first declared element inside.',
+         parametersParser: PreferMatchFileNameParameters.fromJson,
+       );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addCompilationUnit((node) {
-      final excludedEntities = config.parameters.excludeEntity;
+    super.registerNodeProcessors(registry, context);
 
-      final visitor = PreferMatchFileNameVisitor(
-        excludedEntities: excludedEntities,
-      );
+    final parameters =
+        getParametersForContext(context) ??
+        PreferMatchFileNameParameters(
+          excludeEntity: ExcludedEntitiesListParameter(excludedEntityNames: {}),
+        );
 
-      node.accept(visitor);
+    final visitor = PreferMatchFileNameVisitor(
+      this,
+      context,
+      parameters.excludeEntity,
+    );
 
-      if (visitor.declarations.isEmpty) return;
-
-      final firstDeclaration = visitor.declarations.first;
-
-      if (_doNormalizedNamesMatch(
-        resolver.source.fullName,
-        firstDeclaration.token.lexeme,
-      )) {
-        return;
-      }
-
-      final nodeType =
-          humanReadableNodeType(firstDeclaration.parent).toLowerCase();
-
-      reporter.atToken(
-        firstDeclaration.token,
-        LintCode(
-          name: lintName,
-          problemMessage: 'File name does not match with first $nodeType name.',
-        ),
-      );
-    });
+    registry.addCompilationUnit(this, visitor);
   }
 
-  bool _doNormalizedNamesMatch(String path, String identifierName) {
+  /// Checks if the normalized file path matches the normalized identifier name.
+  bool doNormalizedNamesMatch(String path, String identifierName) {
     final fileName = _normalizePath(path);
     final dartIdentifier = _normalizeDartIdentifierName(identifierName);
 
