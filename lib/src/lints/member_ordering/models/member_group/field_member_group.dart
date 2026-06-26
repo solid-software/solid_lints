@@ -22,6 +22,7 @@
 // SOFTWARE.
 
 import 'package:analyzer/dart/ast/ast.dart' show FieldDeclaration;
+import 'package:solid_lints/src/utils/implies.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_utils.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/annotation.dart';
@@ -94,6 +95,16 @@ class FieldMemberGroup extends MemberGroup {
 
   @override
   String toString() => rawRepresentation;
+
+  @override
+  bool implies(MemberGroup other) => switch (other) {
+        FieldMemberGroup p => super.implies(p) &&
+            isLate.implies(p.isLate) &&
+            isStatic.implies(p.isStatic) &&
+            isNullable.implies(p.isNullable) &&
+            keyword.implies(p.keyword),
+        _ => false,
+      };
 }
 
 class _FieldMemberGroupUtils {

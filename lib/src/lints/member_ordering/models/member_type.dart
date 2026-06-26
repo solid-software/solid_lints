@@ -55,3 +55,12 @@ enum MemberType {
   static MemberType? parse(String? name) => values
       .firstWhereOrNull((type) => name == type.type || name == type.typeAlias);
 }
+
+/// Logical implication operation for member type
+extension MemberTypeImplies on MemberType {
+  /// Logical implication operation.
+  bool implies(MemberType other) =>
+      this == other ||
+      (this == MemberType.getterAndSetter &&
+          (other == MemberType.getter || other == MemberType.setter));
+}

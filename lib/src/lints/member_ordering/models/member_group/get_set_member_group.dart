@@ -22,6 +22,7 @@
 // SOFTWARE.
 
 import 'package:analyzer/dart/ast/ast.dart' show MethodDeclaration;
+import 'package:solid_lints/src/utils/implies.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_utils.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/annotation.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
@@ -76,4 +77,13 @@ class GetSetMemberGroup extends MemberGroup {
 
   @override
   String toString() => rawRepresentation;
+
+  @override
+  bool implies(MemberGroup other) => switch (other) {
+        GetSetMemberGroup p => super.implies(p) &&
+            isStatic.implies(p.isStatic) &&
+            isNullable.implies(p.isNullable) &&
+            memberType.implies(p.memberType),
+        _ => false,
+      };
 }

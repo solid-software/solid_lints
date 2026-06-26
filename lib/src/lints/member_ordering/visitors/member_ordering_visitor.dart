@@ -22,6 +22,7 @@
 // SOFTWARE.
 
 import 'package:analyzer/dart/ast/ast.dart' hide Annotation;
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:collection/collection.dart';
@@ -30,7 +31,6 @@ import 'package:solid_lints/src/lints/member_ordering/models/member_group/constr
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/field_member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/get_set_member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
-import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group_extensions.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/method_member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_info.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_names.dart';
@@ -85,49 +85,49 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
 
   void _reportWrongOrder() {
     _reportMembers(
-      (info) => info.memberOrder.isWrong,
+      (order) => order.isWrong,
       MemberOrderingRule.wrongOrderCode,
-      (info) => [
-        info.memberOrder.memberGroup.toString(),
-        info.memberOrder.previousMemberGroup?.toString() ?? '',
+      (order) => [
+        order.memberGroup.toString(),
+        order.previousMemberGroup?.toString() ?? '',
       ],
     );
   }
 
   void _reportAlphabeticalOrder() {
     _reportMembers(
-      (info) => info.memberOrder.isAlphabeticallyWrong,
+      (order) => order.isAlphabeticallyWrong,
       MemberOrderingRule.alphabeticalOrderCode,
-      (info) => [
-        info.memberOrder.memberNames.currentName,
-        info.memberOrder.memberNames.previousName ?? '',
+      (order) => [
+        order.memberNames.currentName,
+        order.memberNames.previousName ?? '',
       ],
     );
   }
 
   void _reportAlphabeticalTypeOrder() {
     _reportMembers(
-      (info) => info.memberOrder.isByTypeWrong,
+      (order) => order.isByTypeWrong,
       MemberOrderingRule.alphabeticalByTypeOrderCode,
-      (info) => [
-        info.memberOrder.memberNames.currentTypeName,
-        info.memberOrder.memberNames.previousTypeName ?? '',
+      (order) => [
+        order.memberNames.currentTypeName,
+        order.memberNames.previousTypeName ?? '',
       ],
     );
   }
 
   void _reportMembers(
-    bool Function(MemberInfo) filter,
+    bool Function(MemberOrder) filter,
     LintCode code,
-    List<String> Function(MemberInfo) getArguments,
+    List<String> Function(MemberOrder) getArguments,
   ) {
-    final filtered = _membersInfo.where(filter);
+    final filtered = _membersInfo.where((info) => filter(info.memberOrder));
 
     for (final memberInfo in filtered) {
       _rule.reportAtNode(
         memberInfo.classMember,
         diagnosticCode: code,
-        arguments: getArguments(memberInfo),
+        arguments: getArguments(memberInfo.memberOrder),
       );
     }
   }
@@ -140,7 +140,7 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
       classMember: declaration,
       parsedGroup: FieldMemberGroup.parse(declaration),
       isFlutterWidget: isFlutterWidget,
-      name: declaration.fields.variables.first.name.lexeme,
+      token: declaration.fields.variables.first.name,
       type: declaration.fields.type?.type?.getDisplayString() ?? '_',
     );
   }
@@ -153,7 +153,7 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
       classMember: declaration,
       parsedGroup: ConstructorMemberGroup.parse(declaration),
       isFlutterWidget: isFlutterWidget,
-      name: declaration.name?.lexeme ?? '',
+      token: declaration.name,
       type: declaration.typeName?.name ?? '',
     );
   }
@@ -170,7 +170,7 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
       classMember: declaration,
       parsedGroup: group,
       isFlutterWidget: isFlutterWidget,
-      name: declaration.name.lexeme,
+      token: declaration.name,
       type: declaration.returnType?.type?.getDisplayString() ?? '_',
     );
   }
@@ -179,7 +179,7 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
     required ClassMember classMember,
     required MemberGroup parsedGroup,
     required bool isFlutterWidget,
-    required String name,
+    required Token? token,
     required String type,
   }) {
     final closestGroup = _getClosestGroup(parsedGroup, isFlutterWidget);
@@ -190,7 +190,7 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
           classMember: classMember,
           memberOrder: _getOrder(
             closestGroup,
-            name,
+            token?.lexeme ?? '',
             type,
             isFlutterWidget,
           ),
@@ -207,7 +207,7 @@ class MemberOrderingVisitor extends SimpleAstVisitor<void> {
         (isFlutterWidget
                 ? _parameters.widgetsGroupsOrder
                 : _parameters.groupsOrder)
-            .where((group) => group.satisfies(parsedGroup))
+            .where((group) => group.implies(parsedGroup))
             .sorted(
               (a, b) => b.getSortingCoefficient() - a.getSortingCoefficient(),
             );

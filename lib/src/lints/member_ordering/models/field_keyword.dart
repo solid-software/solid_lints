@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import 'package:solid_lints/src/utils/implies.dart';
+
 /// A data model enum represents field type keyword
 enum FieldKeyword {
   /// final keyword
@@ -46,4 +48,10 @@ enum FieldKeyword {
         (type) => type.type == name,
         orElse: () => FieldKeyword.unset,
       );
+}
+
+/// Logical implication operation for field keyword
+extension FieldKeywordImplies on FieldKeyword {
+  /// Logical implication operation.
+  bool implies(FieldKeyword other) => objectImplies(this, other, FieldKeyword.unset);
 }

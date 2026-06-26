@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import 'package:solid_lints/src/utils/implies.dart';
+
 /// A data model enum represents annotation
 enum Annotation {
   /// override annotation
@@ -48,4 +50,10 @@ enum Annotation {
             (annotation.publicName != null && annotation.publicName == name),
         orElse: () => Annotation.unset,
       );
+}
+
+/// Logical implication operation for annotation
+extension AnnotationImplies on Annotation {
+  /// Logical implication operation.
+  bool implies(Annotation other) => objectImplies(this, other, Annotation.unset);
 }
