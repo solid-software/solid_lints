@@ -47,12 +47,23 @@ class NoMagicNumberParameters {
     required this.allowedInWidgetParams,
   });
 
-  /// Method for creating from json data
-  factory NoMagicNumberParameters.fromJson(Map<String, Object?> json) =>
-      NoMagicNumberParameters(
-        allowedNumbers:
-            json[_allowedConfigName] as Iterable<num>? ?? _defaultMagicNumbers,
-        allowedInWidgetParams:
-            json[_allowedInWidgetParamsConfigName] as bool? ?? false,
+  /// Creates an empty/default instance of [NoMagicNumberParameters]
+  factory NoMagicNumberParameters.empty() => const NoMagicNumberParameters(
+        allowedNumbers: _defaultMagicNumbers,
+        allowedInWidgetParams: false,
       );
+
+  /// Method for creating from json data
+  factory NoMagicNumberParameters.fromJson(Map<String, Object?> json) {
+    final allowedRaw = json[_allowedConfigName];
+    final allowedList = allowedRaw is Iterable
+        ? allowedRaw.whereType<num>().toList()
+        : _defaultMagicNumbers;
+
+    return NoMagicNumberParameters(
+      allowedNumbers: allowedList,
+      allowedInWidgetParams:
+          json[_allowedInWidgetParamsConfigName] == true,
+    );
+  }
 }
