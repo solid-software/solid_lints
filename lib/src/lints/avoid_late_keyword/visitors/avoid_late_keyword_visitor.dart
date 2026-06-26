@@ -20,29 +20,14 @@ class AvoidLateKeywordVisitor extends SimpleAstVisitor<void> {
     _rule.reportAtNode(node);
   }
 
-  bool _shouldReport(VariableDeclaration node) {
-    final isLateDeclaration = node.isLate;
-    if (!isLateDeclaration) return false;
+  bool _shouldReport(VariableDeclaration node) =>
+      node.isLate &&
+      !_hasIgnoredType(node) &&
+      !(_parameters.allowInitialized && node.initializer != null);
 
-    final hasIgnoredType = _hasIgnoredType(node);
-    if (hasIgnoredType) return false;
-
-    final allowInitialized = _parameters.allowInitialized;
-    if (!allowInitialized) return true;
-
-    final hasInitializer = node.initializer != null;
-    return !hasInitializer;
-  }
-
-  bool _hasIgnoredType(VariableDeclaration node) {
-    final ignoredTypes = _parameters.ignoredTypes.toSet();
-    if (ignoredTypes.isEmpty) return false;
-
-    final variableType = node.declaredFragment?.element.type;
-    if (variableType == null) return false;
-
-    return variableType.hasIgnoredType(
-      ignoredTypes: ignoredTypes,
-    );
-  }
+  bool _hasIgnoredType(VariableDeclaration node) =>
+      node.declaredFragment?.element.type.hasIgnoredType(
+        ignoredTypes: _parameters.ignoredTypes.toSet(),
+      ) ??
+      false;
 }
