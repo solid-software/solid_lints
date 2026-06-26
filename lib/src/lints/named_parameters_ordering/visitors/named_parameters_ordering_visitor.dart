@@ -25,6 +25,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_type.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/named_parameters_ordering_rule.dart';
+import 'package:solid_lints/src/utils/iterable_utils.dart';
 
 /// AST Visitor which finds all methods, functions and constructor named
 /// parameters and checks if they are in order provided from rule config
@@ -38,41 +39,38 @@ class NamedParametersOrderingVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitFormalParameterList(FormalParameterList node) {
-    final namedParametersList =
-        node.parameters.where((p) => p.isNamed).toList();
+    final namedParametersList = node.parameters
+        .where((p) => p.isNamed)
+        .toList();
 
     if (namedParametersList.isEmpty) {
       return;
     }
 
-    final parametersInfo = <ParameterType>[];
+    final parametersInfo = namedParametersList.map(
+      (p) => (parameter: p, type: ParameterType.fromParameter(p)),
+    );
 
-    for (final parameter in namedParametersList) {
-      final parameterType = ParameterType.fromParameter(parameter);
-      final previousParameterType = parametersInfo.lastOrNull;
+    final badParameters = parametersInfo.pairwise().where(
+      (pair) => _isOrderingWrong(pair.$2.type, pair.$1.type),
+    );
 
-      final isWrong = _isOrderingWrong(parameterType, previousParameterType);
-
-      if (isWrong && previousParameterType != null) {
-        _rule.reportAtNode(
-          parameter,
-          arguments: [
-            parameterType.displayName,
-            previousParameterType.displayName,
-          ],
-        );
-      }
-
-      parametersInfo.add(parameterType);
+    for (final (previous, current) in badParameters) {
+      _rule.reportAtNode(
+        current.parameter,
+        arguments: [
+          current.type.displayName,
+          previous.type.displayName,
+        ],
+      );
     }
   }
 
   bool _isOrderingWrong(
     ParameterType currentParameterType,
-    ParameterType? previousParameterType,
+    ParameterType previousParameterType,
   ) {
-    return previousParameterType != null &&
-        _parametersOrder.indexOf(previousParameterType) >
-            _parametersOrder.indexOf(currentParameterType);
+    return _parametersOrder.indexOf(previousParameterType) >
+        _parametersOrder.indexOf(currentParameterType);
   }
 }
