@@ -29,7 +29,7 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
 
   List<AvoidUsingApiEntryParameters> _getActiveEntries(
     String filePath,
-    String rootPath,
+    String? rootPath,
   ) {
     return parameters.entries.where((entry) {
       return !shouldSkipFile(
@@ -53,7 +53,7 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
 
     final activeEntries = _cachedActiveEntries ??= _getActiveEntries(
       currentUnit.file.path,
-      context.package?.root.path ?? '',
+      context.package?.root.path,
     );
 
     return (
