@@ -37,6 +37,9 @@ class AvoidUsingApiParameters {
     this.severity,
   });
 
+  /// Empty [AvoidUsingApiParameters] model.
+  factory AvoidUsingApiParameters.empty() => const AvoidUsingApiParameters();
+
   /// Method for creating from json data
   factory AvoidUsingApiParameters.fromJson(
     Map<String, Object?> json,

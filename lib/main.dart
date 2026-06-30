@@ -10,6 +10,7 @@ import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_wi
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/fixes/avoid_unnecessary_type_assertions_fix.dart';
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
+import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
@@ -69,11 +70,9 @@ class SolidLintsPlugin extends Plugin {
       NoEmptyBlockRule(analysisOptionsLoader: analysisLoader),
       UseNearestContextRule(),
       NoMagicNumberRule(analysisOptionsLoader: analysisLoader),
+      AvoidUsingApiRule(analysisOptionsLoader: analysisLoader),
       preferFirstRule,
       preferLastRule,
-      // TODO: Add more lint rules and use analysisLoader
-      // for rules that need parameters
-      // For example: `CyclomaticComplexityRule(analysisLoader)`
     ];
 
     for (final lintRule in lintRules) {

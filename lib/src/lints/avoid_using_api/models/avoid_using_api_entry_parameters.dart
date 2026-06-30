@@ -51,10 +51,10 @@ class AvoidUsingApiEntryParameters {
   /// Explain why the code is banned
   final String? reason;
 
-  /// Regex patterns for files to include
+  /// Glob patterns for files to include
   final List<String> includes;
 
-  /// Regex patterns for files to exclude
+  /// Glob patterns for files to exclude
   final List<String> excludes;
 
   /// Constructor for [AvoidUsingApiEntryParameters] model

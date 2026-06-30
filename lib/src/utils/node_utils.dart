@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 /// Check node is override method from its metadata
 bool isOverride(List<Annotation> metadata) => metadata.any(
@@ -58,6 +59,9 @@ extension SimpleIdentifierExtension on SimpleIdentifier {
     if (declOffset == null) return false;
     return declOffset >= body.offset && declOffset < body.end;
   }
+
+  /// Returns the library URI string of the element, or null.
+  String? get sourceUrl => element?.libraryUri;
 }
 
 /// Extension on [AstNode] to provide generic context/traversal checks.
@@ -101,5 +105,35 @@ extension AstNodeExtension on AstNode {
   bool get isInsideIndexExpression {
     final p = parent is PrefixExpression ? parent?.parent : parent;
     return p is IndexExpression;
+  }
+}
+
+/// Extension on [NamedType] to provide source URL utility.
+extension NamedTypeExtension on NamedType {
+  /// Returns the library URI string of the element, or null.
+  String? get sourceUrl => element?.libraryUri;
+}
+
+/// Extension on [ArgumentList] to check for parameter names.
+extension ArgumentListExtension on ArgumentList {
+  /// Returns `true` if this argument list contains a named parameter argument
+  /// with the given [name].
+  bool containsNamed(String name) => arguments.any(
+    (arg) => arg is NamedExpression && arg.name.label.name == name,
+  );
+}
+
+/// Extension on [Element] to provide library URI utility.
+extension ElementLibraryExtension on Element {
+  /// Returns the library URI string of this element, or null.
+  String? get libraryUri => library?.uri.toString();
+}
+
+/// Extension on [VariableDeclaration] to check declared type.
+extension VariableDeclarationExtension on VariableDeclaration {
+  /// Returns the type of the declared variable, or null.
+  DartType? get declaredType {
+    final element = declaredFragment?.element;
+    return element is VariableElement ? element.type : null;
   }
 }
