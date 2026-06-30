@@ -1,7 +1,6 @@
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analysis_server_plugin/edit/dart/dart_fix_kind_priority.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart';
 import 'package:analyzer_plugin/utilities/fixes/fixes.dart';
 import 'package:collection/collection.dart';
@@ -11,9 +10,9 @@ import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter
 import 'package:solid_lints/src/lints/named_parameters_ordering/named_parameters_ordering_rule.dart';
 import 'package:solid_lints/src/utils/correction_utils.dart';
 
-/// A parameter block: the text of a parameter (including leading comments and
-/// indentation) and an optional trailing comment on the same line.
-typedef _ParamBlock = ({String text, String? trailingComment});
+/// A parameter block: the offsets of a parameter (including leading comments
+/// and indentation) and an optional trailing comment on the same line.
+typedef _ParamBlock = ({int blockStart, int blockEnd, String? trailingComment});
 
 /// A Quick fix for [NamedParametersOrderingRule] rule.
 class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
@@ -81,7 +80,7 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
 
     // Multiline: extract parameter blocks including leading and trailing
     // comments
-    final (:blocks, :firstBlockStart) = _extractParamBlocks(
+    final blocks = _extractParamBlocks(
       namedParams,
       parameterList,
     );
@@ -99,8 +98,9 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
     final replacement = sortedBlocks.expandIndexed((i, e) {
       final isLast = i == sortedBlocks.length - 1;
       final trailingComment = e.trailingComment;
+      final text = utils.getTextRange(e.blockStart, e.blockEnd);
       return [
-        e.text,
+        text,
         if (!isLast || hasTrailingComma) ',',
         if (trailingComment != null) ' $trailingComment',
         if (!isLast) '\n',
@@ -121,6 +121,7 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
       }
     }
 
+    final firstBlockStart = blocks.first.blockStart;
     final targetRange = utils.createRange(firstBlockStart, rangeEnd);
 
     await builder.addDartFileEdit(file, (builder) {
@@ -134,12 +135,11 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
   ///
   /// Trailing comments (e.g., `// comment` after a parameter on the same line)
   /// are attributed to the parameter they follow, not the next parameter.
-  ({List<_ParamBlock> blocks, int firstBlockStart}) _extractParamBlocks(
+  List<_ParamBlock> _extractParamBlocks(
     List<FormalParameter> namedParams,
     FormalParameterList parameterList,
   ) {
     final blocks = <_ParamBlock>[];
-    int? firstStart;
 
     final lowerBound =
         parameterList.leftDelimiter?.end ?? parameterList.leftParenthesis.end;
@@ -149,62 +149,35 @@ class NamedParametersOrderingFix extends ResolvedCorrectionProducer {
 
     for (int i = 0; i < namedParams.length; i++) {
       final param = namedParams[i];
-
       final int minOffset = i == 0 ? lowerBound : namedParams[i - 1].end;
 
-      // Find leading comment, skipping any trailing comment that belongs
-      // to the previous parameter (same line as previous param).
-      var blockStart = param.offset;
-      Token? leadingComment = param.beginToken.precedingComments;
-      if (i > 0) {
-        while (leadingComment != null) {
-          final betweenText = utils.getTextRange(
-            namedParams[i - 1].end,
-            leadingComment.offset,
-          );
-          if (!betweenText.contains('\n')) {
-            leadingComment = leadingComment.next;
-          } else {
-            break;
-          }
-        }
-      }
-      if (leadingComment != null &&
-          leadingComment.offset >= minOffset &&
-          leadingComment.offset < param.offset) {
-        blockStart = leadingComment.offset;
-      }
-      final lineStart = utils.getLineThis(blockStart);
-      final prefixText = utils.getTextRange(lineStart, blockStart);
-      if (prefixText.trim().isEmpty) {
-        blockStart = lineStart;
-      }
-
-      // Find trailing comment on the same line as this parameter.
-      String? trailingComment;
       final nextParamStart = i < namedParams.length - 1
           ? namedParams[i + 1].offset
           : upperBound;
-      if (param.end < nextParamStart) {
-        final afterParam = utils.getTextRange(param.end, nextParamStart);
-        final sameLine = afterParam.split('\n').first;
-        final commentIdx = sameLine.indexOf('//');
-        if (commentIdx != -1) {
-          trailingComment = sameLine.substring(commentIdx);
-        }
-      }
+      final previousParamEnd = i > 0 ? namedParams[i - 1].end : null;
 
-      firstStart ??= blockStart;
+      final leadingComment = utils.getLeadingComment(
+        node: param,
+        previousEnd: previousParamEnd,
+      );
+      final blockStart = utils.getDeclarationStartOffset(
+        node: param,
+        leadingComment: leadingComment,
+        minOffset: minOffset,
+      );
+      final trailingComment = utils.getTrailingComment(
+        node: param,
+        nextOffset: nextParamStart,
+      );
+
       blocks.add((
-        text: utils.getTextRange(blockStart, param.end),
+        blockStart: blockStart,
+        blockEnd: param.end,
         trailingComment: trailingComment,
       ));
     }
 
-    return (
-      blocks: blocks,
-      firstBlockStart: firstStart ?? namedParams.first.offset,
-    );
+    return blocks;
   }
 
   List<ParameterType> _getParametersOrder() {
