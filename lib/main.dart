@@ -16,6 +16,7 @@ import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:solid_lints/src/lints/no_magic_number/no_magic_number_rule.dart';
+import 'package:solid_lints/src/lints/number_of_parameters/number_of_parameters_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/fixes/prefer_first_fix.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
@@ -56,6 +57,11 @@ class SolidLintsPlugin extends Plugin {
       AvoidDebugPrintInReleaseRule(),
       doubleLiteralFormatRule,
       ProperSuperCallsRule(),
+      AvoidReturningWidgetsRule(analysisOptionsLoader: analysisLoader),
+      FunctionLinesOfCodeRule(analysisOptionsLoader: analysisLoader),
+      AvoidUnusedParametersRule(analysisOptionsLoader: analysisLoader),
+      CyclomaticComplexityRule(analysisOptionsLoader: analysisLoader),
+      NumberOfParametersRule(analysisOptionsLoader: analysisLoader),
       AvoidReturningWidgetsRule(analysisOptionsLoader: analysisLoader),
       FunctionLinesOfCodeRule(analysisOptionsLoader: analysisLoader),
       AvoidUnusedParametersRule(analysisOptionsLoader: analysisLoader),
