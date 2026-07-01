@@ -283,35 +283,48 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
     DiagnosticReporter reporter,
   ) {
     final source = entry.source;
-    final className = entry.className;
-    if (source == null ||
-        className == null ||
-        node.constructorName.type.name.lexeme != className ||
-        !matchesSource(
-          node.constructorName.type.element?.libraryUri,
-          source,
-        )) {
-      return;
-    }
+    if (source == null) return;
 
+    final className = entry.className;
     final identifier = entry.identifier;
     final namedParameter = entry.namedParameter;
 
-    // Case 1: banUsageWithSpecificNamedParameter
-    if (identifier != null && namedParameter != null) {
-      final expectedConstructorName =
-          identifier != _defaultConstructorIdentifier ? identifier : null;
-      if (node.constructorName.name?.name == expectedConstructorName &&
-          node.argumentList.containsNamed(namedParameter)) {
-        reporter.atNode(node.constructorName.type, _getLintCode(entry));
-      }
-    }
-    // Case 2: banIdFromClassFromSource for default constructor
-    else if (identifier == _defaultConstructorIdentifier &&
-        namedParameter == null) {
-      if (node.constructorName.name == null) {
-        reporter.atNode(node.constructorName.type, _getLintCode(entry));
-      }
+    switch ((className, identifier, namedParameter)) {
+      case (
+        final String className,
+        final String identifier,
+        final String namedParameter,
+      ):
+        // banUsageWithSpecificNamedParameter
+        String? expectedConstructorName;
+        if (identifier != _defaultConstructorIdentifier) {
+          expectedConstructorName = identifier;
+        }
+
+        final actualClassName = node.constructorName.type.name.lexeme;
+        if (actualClassName == className &&
+            node.constructorName.name?.name == expectedConstructorName &&
+            node.argumentList.containsNamed(namedParameter) &&
+            matchesSource(
+              node.constructorName.type.element?.libraryUri,
+              source,
+            )) {
+          reporter.atNode(node.constructorName.type, _getLintCode(entry));
+        }
+
+      case (final String className, _defaultConstructorIdentifier, null):
+        // banIdFromClassFromSource for default constructor
+        final constructorName = node.constructorName.type.name.lexeme;
+        if (constructorName == className &&
+            node.constructorName.name == null &&
+            matchesSource(
+              node.constructorName.type.element?.libraryUri,
+              source,
+            )) {
+          reporter.atNode(node.constructorName.type, _getLintCode(entry));
+        }
+      default:
+        break;
     }
   }
 
