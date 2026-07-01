@@ -6,7 +6,6 @@ import 'package:collection/collection.dart';
 
 // TODO: consider to move here common functions for rules
 // avoid_unnecessary_type_assertions
-// avoid_unnecessary_type_casts (after implementation)
 // avoid_unrelated_type_assertions (after implementation)
 
 /// A class for representing arguments for types checking methods
@@ -66,9 +65,10 @@ class TypeCast {
       return false;
     }
 
-    if (this case TypeCast(source: final objectType, target: final castedType)
-        when objectType is ParameterizedType &&
-            castedType is ParameterizedType) {
+    if (this case TypeCast(
+      source: final objectType,
+      target: final castedType,
+    ) when objectType is ParameterizedType && castedType is ParameterizedType) {
       if (objectType.typeArguments.length != castedType.typeArguments.length) {
         return false;
       }

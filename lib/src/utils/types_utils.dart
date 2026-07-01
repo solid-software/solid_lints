@@ -129,8 +129,11 @@ bool isRowWidget(DartType? type) => type?.getDisplayString() == 'Row';
 
 bool isPaddingWidget(DartType? type) => type?.getDisplayString() == 'Padding';
 
-bool isBuildContext(DartType? type) =>
-    type?.getDisplayString() == 'BuildContext';
+bool isBuildContext(DartType? type) {
+  if (type == null) return false;
+  final displayString = type.getDisplayString();
+  return displayString == 'BuildContext' || displayString == 'BuildContext?';
+}
 
 bool isGameWidget(DartType? type) => type?.getDisplayString() == 'GameWidget';
 
