@@ -32,7 +32,7 @@ enum MemberType {
   method('methods', typeAlias: 'method'),
 
   /// Indicates constructor affiliation
-  constructor('constructors'),
+  constructor('constructors', typeAlias: 'constructor'),
 
   /// Indicates getters affiliation
   getter('getters'),
@@ -52,6 +52,16 @@ enum MemberType {
   const MemberType(this.type, {this.typeAlias});
 
   /// Parses a String member type and returns instance of [MemberType]
-  static MemberType? parse(String? name) => values
-      .firstWhereOrNull((type) => name == type.type || name == type.typeAlias);
+  static MemberType? parse(String? name) => values.firstWhereOrNull(
+    (type) => name == type.type || name == type.typeAlias,
+  );
+}
+
+/// Logical implication operation for member type
+extension MemberTypeImplies on MemberType {
+  /// Logical implication operation.
+  bool implies(MemberType other) =>
+      this == other ||
+      (this == MemberType.getterAndSetter &&
+          (other == MemberType.getter || other == MemberType.setter));
 }

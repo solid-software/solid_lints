@@ -49,4 +49,8 @@ abstract class MemberGroup {
 
   /// Method to get sorting coefficient of the member group
   int getSortingCoefficient();
+
+  /// Logical implication operation.
+  bool implies(MemberGroup other) =>
+      modifier.implies(other.modifier) && annotation.implies(other.annotation);
 }

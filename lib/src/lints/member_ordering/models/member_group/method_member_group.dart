@@ -27,6 +27,7 @@ import 'package:solid_lints/src/lints/member_ordering/models/annotation.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
+import 'package:solid_lints/src/utils/implies.dart';
 
 /// Data class represents class method
 class MethodMemberGroup extends MemberGroup {
@@ -55,16 +56,15 @@ class MethodMemberGroup extends MemberGroup {
     required String name,
     required MemberType memberType,
     required String rawRepresentation,
-  }) =>
-      MethodMemberGroup(
-        name: name,
-        isNullable: false,
-        isStatic: false,
-        modifier: Modifier.unset,
-        annotation: Annotation.unset,
-        memberType: memberType,
-        rawRepresentation: rawRepresentation,
-      );
+  }) => MethodMemberGroup(
+    name: name,
+    isNullable: false,
+    isStatic: false,
+    modifier: Modifier.unset,
+    annotation: Annotation.unset,
+    memberType: memberType,
+    rawRepresentation: rawRepresentation,
+  );
 
   /// Parses [MethodDeclaration] and returns instance of [MethodMemberGroup]
   factory MethodMemberGroup.parse(MethodDeclaration declaration) {
@@ -100,4 +100,12 @@ class MethodMemberGroup extends MemberGroup {
 
   @override
   String toString() => rawRepresentation;
+
+  @override
+  bool implies(MemberGroup other) =>
+      other is MethodMemberGroup &&
+      super.implies(other) &&
+      isStatic.implies(other.isStatic) &&
+      isNullable.implies(other.isNullable) &&
+      name.implies(other.name);
 }

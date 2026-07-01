@@ -29,6 +29,7 @@ import 'package:solid_lints/src/lints/member_ordering/models/field_keyword.dart'
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
+import 'package:solid_lints/src/utils/implies.dart';
 
 /// Data class represents class field
 class FieldMemberGroup extends MemberGroup {
@@ -62,7 +63,8 @@ class FieldMemberGroup extends MemberGroup {
     final modifier = parseModifier(
       declaration.fields.variables.first.name.lexeme,
     );
-    final isNullable = declaration.fields.type?.type?.nullabilitySuffix ==
+    final isNullable =
+        declaration.fields.type?.type?.nullabilitySuffix ==
         NullabilitySuffix.question;
     final keyword = _FieldMemberGroupUtils.parseKeyWord(declaration);
 
@@ -94,14 +96,22 @@ class FieldMemberGroup extends MemberGroup {
 
   @override
   String toString() => rawRepresentation;
+
+  @override
+  bool implies(MemberGroup other) =>
+      other is FieldMemberGroup &&
+      super.implies(other) &&
+      isLate.implies(other.isLate) &&
+      isStatic.implies(other.isStatic) &&
+      isNullable.implies(other.isNullable) &&
+      keyword.implies(other.keyword);
 }
 
 class _FieldMemberGroupUtils {
-  static FieldKeyword parseKeyWord(FieldDeclaration declaration) {
-    return declaration.fields.isConst
-        ? FieldKeyword.isConst
-        : declaration.fields.isFinal
-            ? FieldKeyword.isFinal
-            : FieldKeyword.unset;
-  }
+  static FieldKeyword parseKeyWord(FieldDeclaration declaration) =>
+      switch ((declaration.fields.isConst, declaration.fields.isFinal)) {
+        (true, _) => FieldKeyword.isConst,
+        (_, true) => FieldKeyword.isFinal,
+        _ => FieldKeyword.unset,
+      };
 }
