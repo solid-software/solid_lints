@@ -170,4 +170,54 @@ abstract class ${expectLint('WrongNamedClass')} {}
 class PreferMatchFileNameIgnoreExtensions {}
 ''');
   }
+
+  void test_does_not_report_on_private_extension_type() async {
+    await assertNoDiagnostics(r'''
+extension type _PrivateExtensionType(int id) {}
+
+class Test {}
+''');
+  }
+
+  void test_does_not_report_on_unnamed_extension() async {
+    await assertNoDiagnostics(r'''
+extension on String {
+  void hello() {}
+}
+
+class Test {}
+''');
+  }
+
+  void test_does_not_report_on_empty_file() async {
+    await assertNoDiagnostics(r'''
+// Only comments
+''');
+  }
+
+  void test_does_not_report_on_file_with_only_top_level_members() async {
+    await assertNoDiagnostics(r'''
+void someFunction() {}
+final someVariable = 42;
+''');
+  }
+
+  void test_does_not_report_on_multiple_public_declarations_if_first_matches() async {
+    await assertNoDiagnostics(r'''
+class Test {}
+class AnotherPublicClass {}
+''');
+  }
+
+  void test_reports_when_only_private_class_does_not_match_file_name() async {
+    await assertAutoDiagnostics('''
+class ${expectLint('_WrongPrivateClass')} {}
+''');
+  }
+
+  void test_does_not_report_on_only_private_class_when_matching() async {
+    await assertNoDiagnostics(r'''
+class _Test {}
+''');
+  }
 }
