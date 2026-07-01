@@ -6,8 +6,8 @@ import 'package:solid_lints/src/lints/prefer_match_file_name/models/declaration_
 import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
 import 'package:solid_lints/src/utils/node_utils.dart';
 
-/// The AST visitor that will collect all Class, Enum, Extension, Mixin and Extension Type
-/// declarations
+/// The AST visitor that will collect all Class, Enum, Extension, Mixin and
+/// Extension Type declarations
 class PreferMatchFileNameVisitor extends SimpleAstVisitor<void> {
   /// The lint rule
   final PreferMatchFileNameRule rule;
@@ -35,19 +35,18 @@ class PreferMatchFileNameVisitor extends SimpleAstVisitor<void> {
         continue;
       }
 
-      if (declaration is ClassDeclaration) {
-        declarations.add((token: declaration.name, parent: declaration));
-      } else if (declaration is ExtensionDeclaration) {
-        final name = declaration.name;
-        if (name != null) {
-          declarations.add((token: name, parent: declaration));
-        }
-      } else if (declaration is MixinDeclaration) {
-        declarations.add((token: declaration.name, parent: declaration));
-      } else if (declaration is EnumDeclaration) {
-        declarations.add((token: declaration.name, parent: declaration));
-      } else if (declaration is ExtensionTypeDeclaration) {
-        declarations.add((token: declaration.name, parent: declaration));
+      final token = switch (declaration) {
+        final ClassDeclaration classDecl => classDecl.namePart.typeName,
+        final ExtensionDeclaration extDecl => extDecl.name,
+        final MixinDeclaration mixinDecl => mixinDecl.name,
+        final EnumDeclaration enumDecl => enumDecl.namePart.typeName,
+        final ExtensionTypeDeclaration extTypeDecl =>
+          extTypeDecl.primaryConstructor.typeName,
+        _ => null,
+      };
+
+      if (token != null) {
+        declarations.add((token: token, parent: declaration));
       }
     }
 
@@ -68,7 +67,9 @@ class PreferMatchFileNameVisitor extends SimpleAstVisitor<void> {
       return;
     }
 
-    final nodeType = humanReadableNodeType(firstDeclaration.parent).toLowerCase();
+    final nodeType = humanReadableNodeType(
+      firstDeclaration.parent,
+    ).toLowerCase();
 
     final reporter = context.currentUnit?.diagnosticReporter;
     reporter?.atToken(
@@ -84,13 +85,12 @@ class PreferMatchFileNameVisitor extends SimpleAstVisitor<void> {
   ) {
     final isAPrivate = Identifier.isPrivateName(a.token.lexeme);
     final isBPrivate = Identifier.isPrivateName(b.token.lexeme);
-    if (!isAPrivate && isBPrivate) {
-      return -1;
-    } else if (isAPrivate && !isBPrivate) {
-      return 1;
-    }
-    // no reorder needed;
-    return null;
+
+    return switch ((isAPrivate, isBPrivate)) {
+      (false, true) => -1,
+      (true, false) => 1,
+      _ => null,
+    };
   }
 
   int _byDeclarationOrder(DeclarationTokenInfo a, DeclarationTokenInfo b) {

@@ -2,13 +2,27 @@ import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:path/path.dart' as p;
-import 'package:solid_lints/src/common/parameters/excluded_entities_list_parameter.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/models/prefer_match_file_name_parameters.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/visitors/prefer_match_file_name_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
+
 /// Warns about a mismatch between file name and first declared element inside.
 ///
 /// This improves navigation by matching file content and file name.
+///
+/// ### Example config:
+///
+/// ```yaml
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       prefer_match_file_name:
+///         exclude_entity:
+///           - mixin
+///           - extension
+///           - extension_type
+///           - enum
+/// ```
 ///
 /// ## Tests
 ///
@@ -50,9 +64,8 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///
 class PreferMatchFileNameRule
     extends SolidLintRule<PreferMatchFileNameParameters> {
-  /// This lint rule represents the error if iterable
-  /// access can be simplified.
-  static const String lintName = 'prefer_match_file_name';
+  /// Name of the lint.
+  static const lintName = 'prefer_match_file_name';
   static final _onlySymbolsRegex = RegExp('[^a-zA-Z0-9]');
 
   static const _code = LintCode(
@@ -69,7 +82,9 @@ class PreferMatchFileNameRule
     required super.analysisOptionsLoader,
   }) : super.withParameters(
          name: lintName,
-         description: 'Warns about a mismatch between file name and first declared element inside.',
+         description:
+             'Warns about a mismatch between file name and first declared '
+             'element inside.',
          parametersParser: PreferMatchFileNameParameters.fromJson,
        );
 
@@ -82,9 +97,7 @@ class PreferMatchFileNameRule
 
     final parameters =
         getParametersForContext(context) ??
-        PreferMatchFileNameParameters(
-          excludeEntity: ExcludedEntitiesListParameter(excludedEntityNames: {}),
-        );
+        PreferMatchFileNameParameters.empty();
 
     final visitor = PreferMatchFileNameVisitor(
       this,
@@ -103,12 +116,8 @@ class PreferMatchFileNameRule
     return fileName == dartIdentifier;
   }
 
-  String _normalizePath(String s) => p
-      .basename(s)
-      .split('.')
-      .first
-      .replaceAll(_onlySymbolsRegex, '')
-      .toLowerCase();
+  String _normalizePath(String s) =>
+      _normalizeDartIdentifierName(p.basename(s).split('.').first);
 
   String _normalizeDartIdentifierName(String s) =>
       s.replaceAll(_onlySymbolsRegex, '').toLowerCase();
