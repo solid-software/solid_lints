@@ -23,22 +23,23 @@
 
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_type.dart';
 
-/// Helper class to parse member_ordering rule config
+/// Helper class to parse named_parameters_ordering rule config
 class NamedParametersConfigParser {
-  static const _defaultOrderList = [
-    'required_super',
-    'super',
-    'required',
-    'nullable',
-    'default',
-  ];
-
   /// Parse rule config for regular class order rules
   static List<ParameterType> parseOrder(Object? orderConfig) {
-    final order = orderConfig is Iterable
-        ? List<String>.from(orderConfig)
-        : _defaultOrderList;
+    if (orderConfig is! Iterable) {
+      return ParameterType.defaultOrder;
+    }
 
-    return order.map(ParameterType.fromType).nonNulls.toList();
+    final parsed = orderConfig
+        .whereType<String>()
+        .map(ParameterType.fromType)
+        .nonNulls
+        .toSet()
+        .toList();
+    final missing = ParameterType.defaultOrder.where(
+      (type) => !parsed.contains(type),
+    );
+    return [...parsed, ...missing];
   }
 }

@@ -1,9 +1,9 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/named_parameters_ordering_parameters.dart';
-import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_ordering_info.dart';
+import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_type.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/visitors/named_parameters_ordering_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A lint which allows to enforce a particular named parameter ordering
@@ -28,15 +28,16 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// Assuming config:
 ///
 /// ```yaml
-/// custom_lint:
-///   rules:
-///     - named_parameters_ordering:
-///       order:
-///         - required
-///         - required_super
-///         - default
-///         - nullable
-///         - super
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       named_parameters_ordering:
+///         order:
+///           - required
+///           - required_super
+///           - default
+///           - nullable
+///           - super
 /// ```
 ///
 /// #### BAD:
@@ -105,54 +106,41 @@ class NamedParametersOrderingRule
   /// The name of this lint rule.
   static const lintName = 'named_parameters_ordering';
 
-  late final _visitor = NamedParametersOrderingVisitor(config.parameters.order);
-
-  NamedParametersOrderingRule._(super.config);
-
-  /// Creates a new instance of [NamedParametersOrderingRule]
-  /// based on the lint configuration.
-  factory NamedParametersOrderingRule.createRule(CustomLintConfigs configs) {
-    final config = RuleConfig<NamedParametersOrderingParameters>(
-      configs: configs,
-      name: lintName,
-      paramsParser: NamedParametersOrderingParameters.fromJson,
-      problemMessage: (_) => "Order of named parameter is wrong",
-    );
-
-    return NamedParametersOrderingRule._(config);
-  }
+  /// The [LintCode] for this rule.
+  static const code = LintCode(
+    lintName,
+    '{0} named parameters should be before {1} named parameters.',
+  );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => code;
+
+  /// Creates a new instance of [NamedParametersOrderingRule].
+  NamedParametersOrderingRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+         name: lintName,
+         description:
+             'A lint which allows to enforce a particular named parameter '
+             'ordering conventions.',
+         parametersParser: NamedParametersOrderingParameters.fromJson,
+       );
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addFormalParameterList((node) {
-      final parametersInfo = _visitor.visitFormalParameterList(node);
+    super.registerNodeProcessors(registry, context);
 
-      final wrongOrderParameters = parametersInfo.where(
-        (info) => info.parameterOrderingInfo.isWrong,
-      );
-
-      for (final parameterInfo in wrongOrderParameters) {
-        reporter.atNode(
-          parameterInfo.formalParameter,
-          _createWrongOrderLintCode(parameterInfo.parameterOrderingInfo),
+    final parameters =
+        getParametersForContext(context) ??
+        const NamedParametersOrderingParameters(
+          order: ParameterType.defaultOrder,
         );
-      }
-    });
-  }
 
-  LintCode _createWrongOrderLintCode(ParameterOrderingInfo info) {
-    final parameterOrdering = info.parameterType;
-    final previousParameterOrdering = info.previousParameterType;
+    final visitor = NamedParametersOrderingVisitor(this, parameters.order);
 
-    return LintCode(
-      name: lintName,
-      problemMessage: "${parameterOrdering.displayName} named parameters"
-          " should be before "
-          "${previousParameterOrdering!.displayName} named parameters.",
-    );
+    registry.addFormalParameterList(this, visitor);
   }
 }

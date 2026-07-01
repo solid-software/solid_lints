@@ -27,6 +27,7 @@ import 'package:solid_lints/src/lints/member_ordering/models/annotation.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
+import 'package:solid_lints/src/utils/implies.dart';
 
 /// Data class represents class constructor
 class ConstructorMemberGroup extends MemberGroup {
@@ -80,4 +81,11 @@ class ConstructorMemberGroup extends MemberGroup {
 
   @override
   String toString() => rawRepresentation;
+
+  @override
+  bool implies(MemberGroup other) =>
+      other is ConstructorMemberGroup &&
+      super.implies(other) &&
+      isFactory.implies(other.isFactory) &&
+      isNamed.implies(other.isNamed);
 }

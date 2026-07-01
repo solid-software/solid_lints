@@ -1,8 +1,8 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/no_empty_block/models/no_empty_block_parameters.dart';
 import 'package:solid_lints/src/lints/no_empty_block/visitors/no_empty_block_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 // Inspired by TSLint (https://palantir.github.io/tslint/rules/no-empty/)
@@ -12,6 +12,20 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// excluding catch blocks and to-do comments.
 ///
 /// An empty code block often indicates missing code.
+///
+/// ### Example config:
+///
+/// ```yaml
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       no_empty_block:
+///         allow_with_comments: true
+///         exclude:
+///           - method_name: build
+///           - class_name: MyClass
+///             method_name: build
+/// ```
 ///
 /// ### Example
 ///
@@ -55,40 +69,39 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
   /// the error whether left empty block.
   static const String lintName = 'no_empty_block';
 
-  NoEmptyBlockRule._(super.config);
-
-  /// Creates a new instance of [NoEmptyBlockRule]
-  /// based on the lint configuration.
-  factory NoEmptyBlockRule.createRule(CustomLintConfigs configs) {
-    final config = RuleConfig(
-      configs: configs,
-      name: lintName,
-      paramsParser: NoEmptyBlockParameters.fromJson,
-      problemMessage: (_) =>
-          'Block is empty. Empty blocks are often indicators of missing code.',
-    );
-
-    return NoEmptyBlockRule._(config);
-  }
+  static const _code = LintCode(
+    lintName,
+    'Block is empty. Empty blocks are often indicators of missing code.',
+  );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  DiagnosticCode get diagnosticCode => _code;
+
+  /// Creates a new instance of [NoEmptyBlockRule]
+  NoEmptyBlockRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+          name: lintName,
+          description: _code.problemMessage,
+          parametersParser: NoEmptyBlockParameters.fromJson,
+        );
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addDeclaration((node) {
-      final isIgnored = config.parameters.exclude.shouldIgnore(node);
-      if (isIgnored) return;
+    super.registerNodeProcessors(registry, context);
 
-      final visitor = NoEmptyBlockVisitor(
-        allowWithComments: config.parameters.allowWithComments,
-      );
-      node.accept(visitor);
+    final parameters =
+        getParametersForContext(context) ?? NoEmptyBlockParameters.empty();
 
-      for (final emptyBlock in visitor.emptyBlocks) {
-        reporter.atNode(emptyBlock, code);
-      }
-    });
+    final visitor = NoEmptyBlockVisitor(
+      rule: this,
+      allowWithComments: parameters.allowWithComments,
+      exclude: parameters.exclude,
+    );
+
+    registry.addCompilationUnit(this, visitor);
   }
 }
