@@ -1,9 +1,7 @@
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
-
-/// A function that parses the rule parameters from analysis options json
-typedef RuleParametersParser<T> = T Function(Map<String, Object?>);
+import 'package:solid_lints/src/models/rule_parameters_parser.dart';
 
 /// A base class for emitting information about
 /// issues with user's `.dart` files.

@@ -21,6 +21,22 @@ class AnalysisOptionsLoader {
         (path) => _rulesCache[path]?.rules[ruleName],
       );
 
+  /// Gets the options for a specific rule by looking up the nearest
+  /// `analysis_options.yaml` from the given [filePath]'s directory.
+  ///
+  /// Unlike [getRuleOptions], this method does not require a [RuleContext]
+  /// and can be used from quick fixes.
+  Map<String, Object?>? getRuleOptionsForFile(
+    String filePath,
+    String ruleName,
+  ) {
+    final dirPath = _resourceProvider.pathContext.dirname(filePath);
+    final yamlPath = _findNearestAnalysisOptionsFilePath(dirPath);
+    if (yamlPath == null) return null;
+    _loadRulesOptionsIfNewer(yamlPath);
+    return _rulesCache[yamlPath]?.rules[ruleName];
+  }
+
   /// Loads lint rules from the analysis options file for all rules
   /// using the provided [RuleContext].
   void loadRulesOptionsFromContext(RuleContext context) =>

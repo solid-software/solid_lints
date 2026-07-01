@@ -27,6 +27,7 @@ import 'package:solid_lints/src/lints/member_ordering/models/annotation.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_group/member_group.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
+import 'package:solid_lints/src/utils/implies.dart';
 
 /// Data class represents class getter or setter
 class GetSetMemberGroup extends MemberGroup {
@@ -76,4 +77,12 @@ class GetSetMemberGroup extends MemberGroup {
 
   @override
   String toString() => rawRepresentation;
+
+  @override
+  bool implies(MemberGroup other) =>
+      other is GetSetMemberGroup &&
+      super.implies(other) &&
+      isStatic.implies(other.isStatic) &&
+      isNullable.implies(other.isNullable) &&
+      memberType.implies(other.memberType);
 }

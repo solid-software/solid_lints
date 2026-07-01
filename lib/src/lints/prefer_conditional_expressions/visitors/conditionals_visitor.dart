@@ -21,38 +21,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import 'package:solid_lints/src/utils/implies.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
-/// A data model enum represents field type keyword
-enum FieldKeyword {
-  /// final keyword
-  isFinal('final'),
+/// A visitor that checks if a node contains nested conditional expressions.
+class ConditionalsVisitor extends RecursiveAstVisitor<void> {
+  /// Whether the visited nodes contain a conditional expression.
+  bool hasInnerConditionals = false;
 
-  /// const keyword
-  isConst('const'),
-
-  /// var keyword
-  isVar('var'),
-
-  /// Indicates missing field keyword
-  /// used to handle cases of unsupported field type keywords
-  unset('unset');
-
-  /// String representation of field type keyword
-  final String type;
-
-  const FieldKeyword(this.type);
-
-  /// Parses a String field type and returns instance of [FieldKeyword]
-  static FieldKeyword parse(String? name) => values.firstWhere(
-    (type) => type.type == name,
-    orElse: () => FieldKeyword.unset,
-  );
-}
-
-/// Logical implication operation for field keyword
-extension FieldKeywordImplies on FieldKeyword {
-  /// Logical implication operation.
-  bool implies(FieldKeyword other) =>
-      objectImplies(this, other, FieldKeyword.unset);
+  @override
+  void visitConditionalExpression(ConditionalExpression node) {
+    hasInnerConditionals = true;
+  }
 }
