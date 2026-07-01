@@ -2,6 +2,7 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart';
+import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../../../lints/auto_test_lint_offsets.dart';
@@ -35,10 +36,8 @@ void badFunction() {}
         resourceProvider: resourceProvider,
       ),
     );
-    newPackage('my_dep')
-      ..addFile('lib/my_dep.dart', _mockMyDepContent);
-    newPackage('other_dep')
-      ..addFile('lib/other_dep.dart', 'class BadClass {}');
+    newPackage('my_dep')..addFile('lib/my_dep.dart', _mockMyDepContent);
+    newPackage('other_dep')..addFile('lib/other_dep.dart', 'class BadClass {}');
     super.setUp();
   }
 
@@ -240,8 +239,7 @@ void fn() {
   }
 
   Future<void> test_reports_ban_extension_method() {
-    newPackage('my_dep')
-      ..addFile('lib/my_dep.dart', '''
+    newPackage('my_dep')..addFile('lib/my_dep.dart', '''
 extension BadExtension on String {
   void badExtMethod() {}
 }
@@ -263,8 +261,7 @@ void fn() {
   }
 
   Future<void> test_reports_ban_static_method() {
-    newPackage('my_dep')
-      ..addFile('lib/my_dep.dart', '''
+    newPackage('my_dep')..addFile('lib/my_dep.dart', '''
 class BadClass {
   static void staticBadMethod() {}
 }
@@ -310,7 +307,8 @@ void fn() {
 ''').then((_) => assertNoDiagnosticsInFile(otherFilePath));
   }
 
-  Future<void> test_reports_ban_usage_with_specific_named_parameter_in_constructors() {
+  Future<void>
+  test_reports_ban_usage_with_specific_named_parameter_in_constructors() {
     _configureRule('''
           - class_name: BadClass
             identifier: "()"
@@ -335,8 +333,7 @@ void fn() {
   }
 
   Future<void> test_reports_ban_extension_getter() {
-    newPackage('my_dep')
-      ..addFile('lib/my_dep.dart', '''
+    newPackage('my_dep')..addFile('lib/my_dep.dart', '''
 extension BadExtension on String {
   String get badExtGetter => '';
 }
@@ -355,5 +352,48 @@ void fn() {
   final val = "".${expectLint('badExtGetter')};
 }
 ''');
+  }
+
+  Future<void> test_reports_ban_with_custom_severities() async {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+${analysisOptionsContent(rules: [rule.name])}
+plugins:
+  solid_lints:
+    diagnostics:
+      avoid_using_api:
+        avoid_using_api: true
+        severity: warning
+        entries:
+          - class_name: BadClass
+            source: package:my_dep/my_dep.dart
+            severity: error
+          - identifier: badGlobal
+            source: package:my_dep/my_dep.dart
+            severity: info
+          - identifier: badFunction
+            source: package:my_dep/my_dep.dart
+''');
+
+    await assertAutoDiagnostics('''
+import 'package:my_dep/my_dep.dart';
+
+void fn() {
+  final ${expectLint('a')} = ${expectLint('BadClass')}();
+  final b = ${expectLint('badGlobal')};
+  ${expectLint('badFunction')}();
+}
+''');
+
+    final diagnostics = result.diagnostics
+        .where((d) => d.diagnosticCode.lowerCaseName == 'avoid_using_api')
+        .toList();
+
+    diagnostics.sort((first, second) => first.offset.compareTo(second.offset));
+
+    expect(diagnostics, hasLength(4));
+    expect(diagnostics[0].severity.name, 'error');
+    expect(diagnostics[1].severity.name, 'error');
+    expect(diagnostics[2].severity.name, 'info');
+    expect(diagnostics[3].severity.name, 'warning');
   }
 }

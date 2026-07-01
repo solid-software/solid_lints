@@ -72,19 +72,18 @@ class AvoidUsingApiEntryParameters {
   /// Method for creating from json data
   factory AvoidUsingApiEntryParameters.fromJson(
     Map<String, Object?> json,
-  ) =>
-      AvoidUsingApiEntryParameters(
-        identifier: json['identifier'] as String?,
-        namedParameter: json['named_parameter'] as String?,
-        className: json['class_name'] as String?,
-        source: json['source'] as String?,
-        severity: decodeErrorSeverity(json['severity'] as String?),
-        reason: json['reason'] as String?,
-        includes: (json['includes'] as List<Object?>? ?? [])
-            .whereType<String>()
-            .toList(),
-        excludes: (json['excludes'] as List<Object?>? ?? [])
-            .whereType<String>()
-            .toList(),
-      );
+  ) => AvoidUsingApiEntryParameters(
+    identifier: json['identifier'] as String?,
+    namedParameter: json['named_parameter'] as String?,
+    className: json['class_name'] as String?,
+    source: json['source'] as String?,
+    severity: decodeErrorSeverity(json['severity'] as String?),
+    reason: json['reason'] as String?,
+    includes: (json['includes'] as List<Object?>? ?? [])
+        .whereType<String>()
+        .toList(),
+    excludes: (json['excludes'] as List<Object?>? ?? [])
+        .whereType<String>()
+        .toList(),
+  );
 }

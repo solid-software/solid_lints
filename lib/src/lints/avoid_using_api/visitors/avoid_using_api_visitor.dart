@@ -62,11 +62,18 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
     );
   }
 
-  LintCode _getLintCode(AvoidUsingApiEntryParameters entry) => LintCode(
-    AvoidUsingApiRule.lintName,
-    entry.reason ?? AvoidUsingApiRule.defaultMessage,
-    severity: entry.severity ?? parameters.severity ?? DiagnosticSeverity.INFO,
-  );
+  LintCode _getLintCode(AvoidUsingApiEntryParameters entry) {
+    final severity =
+        entry.severity ?? parameters.severity ?? DiagnosticSeverity.INFO;
+    final message = entry.reason ?? AvoidUsingApiRule.defaultMessage;
+
+    return LintCode(
+      AvoidUsingApiRule.lintName,
+      message,
+      severity: severity,
+      uniqueName: AvoidUsingApiRule.getUniqueName(severity),
+    );
+  }
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
