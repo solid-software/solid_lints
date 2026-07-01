@@ -1,9 +1,8 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/prefer_conditional_expressions/fixes/prefer_conditional_expressions_fix.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/models/prefer_conditional_expressions_parameters.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/visitors/prefer_conditional_expressions_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 // Inspired by TSLint (https://palantir.github.io/tslint/rules/prefer-conditional-expression/)
@@ -14,10 +13,11 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// custom_lint:
-///   rules:
-///     - prefer_conditional_expressions:
-///       ignore_nested: true
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       prefer_conditional_expressions:
+///         ignore_nested: true
 /// ```
 ///
 /// ### Example
@@ -57,51 +57,43 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```
 class PreferConditionalExpressionsRule
     extends SolidLintRule<PreferConditionalExpressionsParameters> {
-  /// This lint rule represents the error if number of
-  /// parameters reaches the maximum value.
+  /// This lint rule represents the error when an if-else statement
+  /// can be simplified to a conditional expression.
   static const lintName = 'prefer_conditional_expressions';
 
-  final _diagnosticsInfoExpando = Expando<StatementInfo>();
+  static const _code = LintCode(
+    lintName,
+    'Prefer conditional expression.',
+  );
 
-  PreferConditionalExpressionsRule._(super.config);
+  @override
+  LintCode get diagnosticCode => _code;
 
   /// Creates a new instance of [PreferConditionalExpressionsRule]
-  /// based on the lint configuration.
-  factory PreferConditionalExpressionsRule.createRule(
-    CustomLintConfigs configs,
+  PreferConditionalExpressionsRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+         name: _code.lowerCaseName,
+         description: _code.problemMessage,
+         parametersParser: PreferConditionalExpressionsParameters.fromJson,
+       );
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    final config = RuleConfig(
-      configs: configs,
-      name: lintName,
-      paramsParser: PreferConditionalExpressionsParameters.fromJson,
-      problemMessage: (value) => 'Prefer conditional expression.',
+    super.registerNodeProcessors(registry, context);
+
+    final parameters =
+        getParametersForContext(context) ??
+        PreferConditionalExpressionsParameters.empty();
+
+    final visitor = PreferConditionalExpressionsVisitor(
+      rule: this,
+      ignoreNested: parameters.ignoreNested,
     );
 
-    return PreferConditionalExpressionsRule._(config);
+    registry.addCompilationUnit(this, visitor);
   }
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addCompilationUnit((node) {
-      final visitor = PreferConditionalExpressionsVisitor(
-        ignoreNested: config.parameters.ignoreNested,
-      );
-      node.accept(visitor);
-
-      for (final element in visitor.statementsInfo) {
-        final diagnostic = reporter.atNode(element.statement, code);
-
-        _diagnosticsInfoExpando[diagnostic] = element;
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => [
-        PreferConditionalExpressionsFix(_diagnosticsInfoExpando),
-      ];
 }

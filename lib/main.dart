@@ -20,6 +20,8 @@ import 'package:solid_lints/src/lints/named_parameters_ordering/named_parameters
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:solid_lints/src/lints/no_magic_number/no_magic_number_rule.dart';
 import 'package:solid_lints/src/lints/number_of_parameters/number_of_parameters_rule.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/fixes/prefer_conditional_expressions_fix.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/fixes/prefer_first_fix.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
@@ -50,6 +52,9 @@ class SolidLintsPlugin extends Plugin {
         AvoidUnnecessaryTypeAssertionsRule();
     final doubleLiteralFormatRule = DoubleLiteralFormatRule();
     final preferFirstRule = PreferFirstRule();
+    final preferConditionalExpressionsRule = PreferConditionalExpressionsRule(
+      analysisOptionsLoader: analysisLoader,
+    );
     final preferLastRule = PreferLastRule();
 
     final lintRules = [
@@ -71,6 +76,7 @@ class SolidLintsPlugin extends Plugin {
       UseNearestContextRule(),
       NoMagicNumberRule(analysisOptionsLoader: analysisLoader),
       preferFirstRule,
+      preferConditionalExpressionsRule,
       preferLastRule,
       // TODO: Add more lint rules and use analysisLoader
       // for rules that need parameters
@@ -108,6 +114,11 @@ class SolidLintsPlugin extends Plugin {
     registry.registerFixForRule(
       preferLastRule.diagnosticCode,
       PreferLastFix.new,
+    );
+
+    registry.registerFixForRule(
+      preferConditionalExpressionsRule.diagnosticCode,
+      PreferConditionalExpressionsFix.new,
     );
 
     registry.registerFixForRule(
