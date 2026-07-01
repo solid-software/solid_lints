@@ -21,6 +21,8 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
   /// The rule context.
   final RuleContext context;
 
+  List<AvoidUsingApiEntryParameters>? _cachedActiveEntries;
+
   /// Creates a new instance of [AvoidUsingApiVisitor].
   AvoidUsingApiVisitor({
     required this.parameters,
@@ -40,8 +42,6 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
       );
     }).toList();
   }
-
-  List<AvoidUsingApiEntryParameters>? _cachedActiveEntries;
 
   ({
     List<AvoidUsingApiEntryParameters> activeEntries,
@@ -165,18 +165,16 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
   ) {
     final className = entry.className;
     final source = entry.source;
-    if (className == null || source == null) {
-      return;
-    }
-
     final parent = node.parent;
-    if (parent == null || parent is ConstructorDeclaration) {
+    if (className == null ||
+        source == null ||
+        parent == null ||
+        parent is ConstructorDeclaration ||
+        !_isMemberOrClass(node.element, className, source)) {
       return;
     }
 
-    if (_isMemberOrClass(node.element, className, source)) {
-      reporter.atNode(node, _getLintCode(entry));
-    }
+    reporter.atNode(node, _getLintCode(entry));
   }
 
   void _checkIdFromClassFromSource(
@@ -187,23 +185,19 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
     final identifier = entry.identifier;
     final className = entry.className;
     final source = entry.source;
-    if (identifier == null || className == null || source == null) {
-      return;
-    }
-
-    if (identifier == _defaultConstructorIdentifier ||
-        node.name != identifier) {
-      return;
-    }
-
     final parent = node.parent;
-    if (parent == null || parent is ConstructorDeclaration) {
+    if (identifier == null ||
+        className == null ||
+        source == null ||
+        identifier == _defaultConstructorIdentifier ||
+        node.name != identifier ||
+        parent == null ||
+        parent is ConstructorDeclaration ||
+        !_isMemberOrClass(node.element, className, source)) {
       return;
     }
 
-    if (_isMemberOrClass(node.element, className, source)) {
-      reporter.atNode(node, _getLintCode(entry));
-    }
+    reporter.atNode(node, _getLintCode(entry));
   }
 
   void _checkSource(
@@ -212,11 +206,9 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
     DiagnosticReporter reporter,
   ) {
     final source = entry.source;
-    if (source == null || !matchesSource(node.sourceUrl, source)) {
-      return;
-    }
-
-    if (node.parent is ConstructorDeclaration) {
+    if (source == null ||
+        !matchesSource(node.sourceUrl, source) ||
+        node.parent is ConstructorDeclaration) {
       return;
     }
 
@@ -230,26 +222,18 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
   ) {
     final identifier = entry.identifier;
     final source = entry.source;
-    if (identifier == null || source == null) {
+    if (identifier == null ||
+        source == null ||
+        node.name != identifier ||
+        !matchesSource(node.sourceUrl, source) ||
+        node.parent is ConstructorDeclaration) {
       return;
     }
 
-    if (node.name != identifier) {
-      return;
-    }
-
-    if (!matchesSource(node.sourceUrl, source)) {
-      return;
-    }
-
-    if (node.parent is ConstructorDeclaration) {
-      return;
-    }
-
-    final element = node.element;
-    if (element is LocalFunctionElement ||
-        element is TopLevelFunctionElement ||
-        element is PropertyAccessorElement) {
+    if (node.element
+        case LocalFunctionElement() ||
+            TopLevelFunctionElement() ||
+            PropertyAccessorElement()) {
       reporter.atNode(node, _getLintCode(entry));
     }
   }
@@ -260,26 +244,14 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
     DiagnosticReporter reporter,
   ) {
     final source = entry.source;
-    if (source == null) return;
-
-    final className = entry.className;
-    final identifier = entry.identifier;
-
-    switch ((className, identifier)) {
-      case (null, null):
-        // banSource
-        if (matchesSource(node.sourceUrl, source)) {
-          reporter.atNode(node, _getLintCode(entry));
-        }
-      case (final String className, null):
-        // banClassFromSource
-        if (node.name.lexeme == className &&
-            matchesSource(node.sourceUrl, source)) {
-          reporter.atNode(node, _getLintCode(entry));
-        }
-      default:
-        break;
+    if (source == null ||
+        entry.identifier != null ||
+        !matchesSource(node.sourceUrl, source) ||
+        (entry.className != null && node.name.lexeme != entry.className)) {
+      return;
     }
+
+    reporter.atNode(node, _getLintCode(entry));
   }
 
   void _checkVariableDeclaration(
@@ -288,25 +260,21 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
     DiagnosticReporter reporter,
   ) {
     final source = entry.source;
-    if (source == null) return;
-
     final className = entry.className;
-
-    switch ((className, entry.identifier)) {
-      case (final String className, null):
-        // banClassFromSource
-        final typeElement = node.declaredType?.element;
-        if (typeElement?.name == className &&
-            matchesSource(typeElement?.libraryUri, source)) {
-          reporter.atOffset(
-            offset: node.name.offset,
-            length: node.name.length,
-            diagnosticCode: _getLintCode(entry),
-          );
-        }
-      default:
-        break;
+    final typeElement = node.declaredType?.element;
+    if (source == null ||
+        entry.identifier != null ||
+        className == null ||
+        typeElement?.name != className ||
+        !matchesSource(typeElement?.libraryUri, source)) {
+      return;
     }
+
+    reporter.atOffset(
+      offset: node.name.offset,
+      length: node.name.length,
+      diagnosticCode: _getLintCode(entry),
+    );
   }
 
   void _checkInstanceCreation(
@@ -315,59 +283,35 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
     DiagnosticReporter reporter,
   ) {
     final source = entry.source;
-    if (source == null) return;
-
     final className = entry.className;
+    if (source == null ||
+        className == null ||
+        node.constructorName.type.name.lexeme != className ||
+        !matchesSource(
+          node.constructorName.type.element?.libraryUri,
+          source,
+        )) {
+      return;
+    }
+
     final identifier = entry.identifier;
     final namedParameter = entry.namedParameter;
 
-    switch ((className, identifier, namedParameter)) {
-      case (
-        final String className,
-        final String identifier,
-        final String namedParameter,
-      ):
-        // banUsageWithSpecificNamedParameter
-        String? expectedConstructorName;
-        if (identifier != _defaultConstructorIdentifier) {
-          expectedConstructorName = identifier;
-        }
-
-        final actualClassName = node.constructorName.type.name.lexeme;
-        if (actualClassName != className) {
-          return;
-        }
-
-        if (node.constructorName.name?.name != expectedConstructorName) {
-          return;
-        }
-
-        if (!node.argumentList.containsNamed(namedParameter)) {
-          return;
-        }
-
-        if (matchesSource(
-          node.constructorName.type.element?.libraryUri,
-          source,
-        )) {
-          reporter.atNode(node.constructorName.type, _getLintCode(entry));
-        }
-
-      case (final String className, _defaultConstructorIdentifier, null):
-        // banIdFromClassFromSource for default constructor
-        final constructorName = node.constructorName.type.name.lexeme;
-        if (constructorName != className || node.constructorName.name != null) {
-          return;
-        }
-
-        if (matchesSource(
-          node.constructorName.type.element?.libraryUri,
-          source,
-        )) {
-          reporter.atNode(node.constructorName.type, _getLintCode(entry));
-        }
-      default:
-        break;
+    // Case 1: banUsageWithSpecificNamedParameter
+    if (identifier != null && namedParameter != null) {
+      final expectedConstructorName =
+          identifier != _defaultConstructorIdentifier ? identifier : null;
+      if (node.constructorName.name?.name == expectedConstructorName &&
+          node.argumentList.containsNamed(namedParameter)) {
+        reporter.atNode(node.constructorName.type, _getLintCode(entry));
+      }
+    }
+    // Case 2: banIdFromClassFromSource for default constructor
+    else if (identifier == _defaultConstructorIdentifier &&
+        namedParameter == null) {
+      if (node.constructorName.name == null) {
+        reporter.atNode(node.constructorName.type, _getLintCode(entry));
+      }
     }
   }
 
@@ -377,44 +321,31 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
     DiagnosticReporter reporter,
   ) {
     final source = entry.source;
-    if (source == null) return;
-
     final className = entry.className;
-    final identifier = entry.identifier;
     final namedParameter = entry.namedParameter;
+    if (source == null ||
+        className == null ||
+        namedParameter == null ||
+        node.methodName.name != entry.identifier) {
+      return;
+    }
 
-    final methodName = node.methodName.name;
-    if (methodName != identifier) return;
-
-    switch ((className, identifier, namedParameter)) {
-      case (final String className, String _, final String namedParameter):
-        // banUsageWithSpecificNamedParameter
-        final enclosingElement = node.methodName.element?.enclosingElement;
-        if (enclosingElement == null || enclosingElement.name != className) {
-          return;
-        }
-
-        if (!node.argumentList.containsNamed(namedParameter)) {
-          return;
-        }
-
-        if (matchesSource(enclosingElement.libraryUri, source)) {
-          reporter.atNode(node.methodName, _getLintCode(entry));
-        }
-      default:
-        break;
+    final enclosingElement = node.methodName.element?.enclosingElement;
+    if (enclosingElement != null &&
+        enclosingElement.name == className &&
+        node.argumentList.containsNamed(namedParameter) &&
+        matchesSource(enclosingElement.libraryUri, source)) {
+      reporter.atNode(node.methodName, _getLintCode(entry));
     }
   }
 
   bool _isMemberOrClass(Element? element, String className, String source) {
-    if (element == null) return false;
-
     final target = element is InterfaceElement
         ? element
-        : element.enclosingElement;
-    if (target == null) return false;
+        : element?.enclosingElement;
 
-    if (target is InterfaceElement || target is ExtensionElement) {
+    if (target case InterfaceElement() || ExtensionElement()
+        when target != null) {
       return target.name == className &&
           matchesSource(target.libraryUri, source);
     }
