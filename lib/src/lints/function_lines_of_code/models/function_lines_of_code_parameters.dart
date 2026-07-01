@@ -18,6 +18,14 @@ class FunctionLinesOfCodeParameters {
     required this.exclude,
   });
 
+  /// Empty [FunctionLinesOfCodeParameters] model with default max lines.
+  factory FunctionLinesOfCodeParameters.empty() {
+    return FunctionLinesOfCodeParameters(
+      maxLines: _defaultMaxLines,
+      exclude: ExcludedIdentifiersListParameter(exclude: []),
+    );
+  }
+
   /// Method for creating from json data
   factory FunctionLinesOfCodeParameters.fromJson(Map<String, Object?> json) =>
       FunctionLinesOfCodeParameters(

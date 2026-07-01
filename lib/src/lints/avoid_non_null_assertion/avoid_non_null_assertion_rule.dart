@@ -47,11 +47,11 @@ class AvoidNonNullAssertionRule extends AnalysisRule {
 
   /// creates an instance of [AvoidNonNullAssertionRule]
   AvoidNonNullAssertionRule()
-      : super(
-          name: lintName,
-          description:
-              'Warns about usages of bang operator (!) except valid Map access.',
-        );
+    : super(
+        name: lintName,
+        description:
+            'Warns about usages of bang operator (!) except valid Map access.',
+      );
 
   @override
   LintCode get diagnosticCode => _code;

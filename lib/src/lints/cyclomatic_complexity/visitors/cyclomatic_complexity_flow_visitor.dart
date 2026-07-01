@@ -31,14 +31,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 /// The AST visitor that will collect cyclomatic complexity of visit nodes in an
 ///  AST structure.
 class CyclomaticComplexityFlowVisitor extends RecursiveAstVisitor<void> {
-  static const _complexityTokenTypes = [
-    TokenType.AMPERSAND_AMPERSAND,
-    TokenType.BAR_BAR,
-    TokenType.QUESTION_PERIOD,
-    TokenType.QUESTION_QUESTION,
-    TokenType.QUESTION_QUESTION_EQ,
-  ];
-
   final _complexityEntities = <SyntacticEntity>{};
 
   /// Returns an array of entities that increase cyclomatic complexity.
@@ -52,13 +44,46 @@ class CyclomaticComplexityFlowVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
-  void visitBlockFunctionBody(BlockFunctionBody node) {
-    _visitBlock(
-      node.block.leftBracket.next,
-      node.block.rightBracket,
-    );
+  void visitBinaryExpression(BinaryExpression node) {
+    final type = node.operator.type;
+    if (type == TokenType.AMPERSAND_AMPERSAND ||
+        type == TokenType.BAR_BAR ||
+        type == TokenType.QUESTION_QUESTION) {
+      _increaseComplexity(node);
+    }
+    super.visitBinaryExpression(node);
+  }
 
-    super.visitBlockFunctionBody(node);
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    if (node.operator.type == TokenType.QUESTION_QUESTION_EQ) {
+      _increaseComplexity(node);
+    }
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (node.operator.type == TokenType.QUESTION_PERIOD) {
+      _increaseComplexity(node);
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.operator?.type == TokenType.QUESTION_PERIOD) {
+      _increaseComplexity(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitIndexExpression(IndexExpression node) {
+    if (node.question != null) {
+      _increaseComplexity(node);
+    }
+    super.visitIndexExpression(node);
   }
 
   @override
@@ -76,13 +101,10 @@ class CyclomaticComplexityFlowVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
-  void visitExpressionFunctionBody(ExpressionFunctionBody node) {
-    _visitBlock(
-      node.expression.beginToken.previous,
-      node.expression.endToken.next,
-    );
+  void visitDoStatement(DoStatement node) {
+    _increaseComplexity(node);
 
-    super.visitExpressionFunctionBody(node);
+    super.visitDoStatement(node);
   }
 
   @override
@@ -114,6 +136,79 @@ class CyclomaticComplexityFlowVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitSwitchExpressionCase(SwitchExpressionCase node) {
+    _increaseComplexity(node);
+
+    super.visitSwitchExpressionCase(node);
+  }
+
+  @override
+  void visitSwitchPatternCase(SwitchPatternCase node) {
+    _increaseComplexity(node);
+
+    super.visitSwitchPatternCase(node);
+  }
+
+  @override
+  void visitWhenClause(WhenClause node) {
+    _increaseComplexity(node);
+
+    super.visitWhenClause(node);
+  }
+
+  @override
+  void visitIfElement(IfElement node) {
+    _increaseComplexity(node);
+    super.visitIfElement(node);
+  }
+
+  @override
+  void visitForElement(ForElement node) {
+    _increaseComplexity(node);
+    super.visitForElement(node);
+  }
+
+  @override
+  void visitLogicalAndPattern(LogicalAndPattern node) {
+    _increaseComplexity(node);
+    super.visitLogicalAndPattern(node);
+  }
+
+  @override
+  void visitLogicalOrPattern(LogicalOrPattern node) {
+    _increaseComplexity(node);
+    super.visitLogicalOrPattern(node);
+  }
+
+  @override
+  void visitNullCheckPattern(NullCheckPattern node) {
+    _increaseComplexity(node);
+    super.visitNullCheckPattern(node);
+  }
+
+  @override
+  void visitNullAssertPattern(NullAssertPattern node) {
+    _increaseComplexity(node);
+    super.visitNullAssertPattern(node);
+  }
+
+  @override
+  void visitCascadeExpression(CascadeExpression node) {
+    if (node.isNullAware) {
+      _increaseComplexity(node);
+    }
+    super.visitCascadeExpression(node);
+  }
+
+  @override
+  void visitSpreadElement(SpreadElement node) {
+    if (node.isNullAware) {
+      _increaseComplexity(node);
+    }
+    super.visitSpreadElement(node);
+  }
+
+  @override
   void visitWhileStatement(WhileStatement node) {
     _increaseComplexity(node);
 
@@ -127,15 +222,19 @@ class CyclomaticComplexityFlowVisitor extends RecursiveAstVisitor<void> {
     super.visitYieldStatement(node);
   }
 
-  void _visitBlock(Token? firstToken, Token? lastToken) {
-    var token = firstToken;
-    while (token != lastToken && token != null) {
-      if (token.matchesAny(_complexityTokenTypes)) {
-        _increaseComplexity(token);
-      }
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    // Stop recursion into nested function declarations.
+  }
 
-      token = token.next;
-    }
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    // Stop recursion into nested method declarations.
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Stop recursion into nested function expressions (closures).
   }
 
   void _increaseComplexity(SyntacticEntity entity) {

@@ -1,8 +1,7 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/prefer_last/visitors/prefer_last_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// Warns about usage of `iterable[length - 1]` or
@@ -31,37 +30,23 @@ class PreferLastRule extends SolidLintRule {
   /// access can be simplified.
   static const lintName = 'prefer_last';
 
-  PreferLastRule._(super.config);
+  static const _code = LintCode(
+    lintName,
+    "Use last instead of accessing the last element by index.",
+  );
 
   /// Creates a new instance of [PreferLastRule]
-  /// based on the lint configuration.
-  factory PreferLastRule.createRule(CustomLintConfigs configs) {
-    final config = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (value) =>
-          'Use last instead of accessing the last element by index.',
-    );
-
-    return PreferLastRule._(config);
-  }
+  PreferLastRule() : super(name: lintName, description: _code.problemMessage);
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => _code;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addCompilationUnit((node) {
-      final visitor = PreferLastVisitor();
-      node.accept(visitor);
-
-      for (final element in visitor.expressions) {
-        reporter.atNode(element, code);
-      }
-    });
+    final visitor = PreferLastVisitor(this);
+    registry.addCompilationUnit(this, visitor);
   }
-
-  @override
-  List<Fix> getFixes() => [PreferLastFix()];
 }
