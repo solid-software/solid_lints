@@ -4,6 +4,8 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../../utils/auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(AvoidReturningWidgetsRuleTest);
@@ -11,7 +13,8 @@ void main() {
 }
 
 @reflectiveTest
-class AvoidReturningWidgetsRuleTest extends AnalysisRuleTest {
+class AvoidReturningWidgetsRuleTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   static const _importFlutterWidgets = "import 'package:flutter/widgets.dart';";
   static const _mockFlutterWidgetsContent = '''
 abstract class Widget {
@@ -115,76 +118,66 @@ $_mockAnalysisOptionsContent''',
   }
 
   Future<void> test_reports_on_static_function() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 $_importFlutterWidgets
 
-Widget avoidReturningWidgets() => const SizedBox();
+${expectLint('Widget avoidReturningWidgets() => const SizedBox();')}
 
-Widget build() {
+${expectLint('''Widget build() {
   return SizedBox();
-}
-''',
-      [lint(40, 51), lint(93, 39)],
-    );
+}''')}
+''');
   }
 
   Future<void> test_reports_on_methods() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 $_importFlutterWidgets
 
 class BaseWidget extends StatelessWidget {
   const BaseWidget({super.key});
 
-  Widget decoratedBox() {
+  ${expectLint('''Widget decoratedBox() {
     return DecoratedBox(decoration: BoxDecoration());
-  }
+  }''')}
 }
-''',
-      [lint(119, 81)],
-    );
+''');
   }
 
   Future<void> test_reports_on_getters_but_not_setters() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 $_importFlutterWidgets
 
 class BaseWidget extends StatelessWidget {
   const BaseWidget({super.key});
 
-  Widget get box => SizedBox();
+  ${expectLint('Widget get box => SizedBox();')}
 
   set box(Widget value) {
     throw 'unimplemented';
   }
 }
-''',
-      [lint(119, 29)],
-    );
+''');
   }
 
   Future<void> test_reports_on_private_members() async {
     _addBaseWidgetFile();
 
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 $_importFlutterWidgets
 import 'base_widget.dart';
 
 class MyWidget extends BaseWidget {
   const MyWidget({super.key});
 
-  Widget _test1() => const SizedBox();
+  ${expectLint('Widget _test1() => const SizedBox();')}
 
-  Widget _test2() {
+  ${expectLint('''Widget _test2() {
     return const SizedBox(
       child: SizedBox(),
     );
-  }
+  }''')}
 
-  Widget get _test3 => const SizedBox();
+  ${expectLint('Widget get _test3 => const SizedBox();')}
 
   @override
   Widget decoratedBox() {
@@ -199,21 +192,14 @@ class MyWidget extends BaseWidget {
     return const SizedBox();
   }
 }
-''',
-      [
-        lint(137, 36),
-        lint(177, 80),
-        lint(261, 38),
-      ],
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_overridden_members() async {
     _addBaseWidgetFile();
 
     // Shouldn't report even if not annotated with @override
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 $_importFlutterWidgets
 import 'base_widget.dart';
 
@@ -230,13 +216,11 @@ class MyWidget extends BaseWidget {
     return const SizedBox();
   }
 }
-''',
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_excluded() async {
-    await assertNoDiagnostics(
-      '''
+    await assertNoDiagnostics('''
 $_importFlutterWidgets
 
 SizedBox excludeMethod() => const SizedBox();
@@ -251,14 +235,11 @@ class ExcludeWidget extends StatelessWidget {
 
   Widget excludeWidgetMethod() => const SizedBox();
 }
-
-''',
-    );
+''');
   }
 
   Future<void> test_reports_on_non_matching_excluded() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 $_importFlutterWidgets
 
 SizedBox excludeMethod() => const SizedBox();
@@ -271,7 +252,7 @@ class ExcludeWidget extends StatelessWidget {
     return const Placeholder();
   }
 
-  Widget notExcludeWidgetMethod() => const Placeholder();
+  ${expectLint('Widget notExcludeWidgetMethod() => const Placeholder();')}
 }
 
 class NotExcludeWidget extends StatelessWidget {
@@ -282,13 +263,8 @@ class NotExcludeWidget extends StatelessWidget {
     return const Placeholder();
   }
 
-  Widget excludeWidgetMethod() => const SizedBox();
+  ${expectLint('Widget excludeWidgetMethod() => const SizedBox();')}
 }
-''',
-      [
-        lint(260, 55),
-        lint(498, 49),
-      ],
-    );
+''');
   }
 }

@@ -4,7 +4,7 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -127,9 +127,6 @@ abstract class State<T extends StatefulWidget> {
       _configWith(_mockAnalysisOptionsContent),
     );
   }
-
-  @override
-  String get analysisRule => MemberOrderingRule.lintName;
 
   String _configWith(String pluginConfig) =>
       '''${analysisOptionsContent(rules: [rule.name])}
@@ -344,7 +341,8 @@ class WrongWidgetState extends State<StatefulWidget> {
 ''');
   }
 
-  Future<void> test_reports_on_non_alphabetical_fields_and_methods_order() async {
+  Future<void>
+  test_reports_on_non_alphabetical_fields_and_methods_order() async {
     await assertAutoDiagnostics('''
 class AlphabeticalClass {
   final b = 1;
@@ -417,7 +415,8 @@ class FactoryOrder {
 ''');
   }
 
-  Future<void> test_does_not_report_on_correct_order_with_custom_config() async {
+  Future<void>
+  test_does_not_report_on_correct_order_with_custom_config() async {
     await assertNoDiagnostics('''
 class CorrectOrder {
   final publicField = 1;
@@ -462,7 +461,8 @@ class WrongOrder {
 ''');
   }
 
-  Future<void> test_reports_on_partially_wrong_order_with_custom_config() async {
+  Future<void>
+  test_reports_on_partially_wrong_order_with_custom_config() async {
     await assertAutoDiagnostics('''
 class PartiallyWrongOrder {
   final publicField = 1;
@@ -486,7 +486,8 @@ class PartiallyWrongOrder {
 ''');
   }
 
-  Future<void> test_does_not_report_on_correct_widget_order_with_custom_config() async {
+  Future<void>
+  test_does_not_report_on_correct_widget_order_with_custom_config() async {
     await assertNoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
@@ -572,7 +573,8 @@ class _WrongWidgetState extends State<WrongWidget> {
 ''');
   }
 
-  Future<void> test_reports_on_partially_correct_widget_order_with_custom_config() async {
+  Future<void>
+  test_reports_on_partially_correct_widget_order_with_custom_config() async {
     await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 

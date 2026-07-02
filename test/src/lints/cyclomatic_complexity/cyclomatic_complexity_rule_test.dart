@@ -4,7 +4,7 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -42,9 +42,6 @@ plugins:
 $_mockAnalysisOptionsContent''',
     );
   }
-
-  @override
-  String get analysisRule => CyclomaticComplexityRule.lintName;
 
   Future<void> test_reports_when_complexity_exceeds_threshold() async {
     await assertAutoDiagnostics('''
@@ -280,7 +277,6 @@ void test(List<int> l1, List<int> l2, List<int> l3, List<int> l4) ${expectLint(r
 }''')}
 ''');
   }
-
 
   Future<void>
   test_reports_when_complexity_exceeds_threshold_due_to_logical_and_pattern() async {

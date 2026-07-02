@@ -4,7 +4,7 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/number_of_parameters/number_of_parameters_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -42,9 +42,6 @@ plugins:
 $_mockAnalysisOptionsContent''',
     );
   }
-
-  @override
-  String get analysisRule => NumberOfParametersRule.lintName;
 
   Future<void> test_reports_on_exceeding_max_parameters() async {
     await assertAutoDiagnostics('''

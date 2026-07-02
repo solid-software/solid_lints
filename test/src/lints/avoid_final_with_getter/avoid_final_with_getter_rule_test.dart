@@ -2,6 +2,8 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/avoid_final_with_getter_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../../utils/auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(AvoidFinalWithGetterRuleTest);
@@ -9,7 +11,8 @@ void main() {
 }
 
 @reflectiveTest
-class AvoidFinalWithGetterRuleTest extends AnalysisRuleTest {
+class AvoidFinalWithGetterRuleTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   @override
   void setUp() {
     rule = AvoidFinalWithGetterRule();
@@ -17,71 +20,56 @@ class AvoidFinalWithGetterRuleTest extends AnalysisRuleTest {
   }
 
   Future<void> test_reports_on_getter_with_same_name_as_field() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 class Test {
   final int _myField = 0;
   
-  int get myField => _myField;
+  ${expectLint('int get myField => _myField;')}
 }
-''',
-      [lint(44, 28)],
-    );
+''');
   }
 
   Future<void> test_reports_on_getter_with_different_name_from_field() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 class Test {
   final int _myField = 0;
   
-  int get myFieldInt => _myField;
+  ${expectLint('int get myFieldInt => _myField;')}
 }
-''',
-      [lint(44, 31)],
-    );
+''');
   }
 
   Future<void> test_reports_on_static_getter_with_private_field() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 class Test {
   static final int _myField = 0;
   
-  static int get myField => _myField;
+  ${expectLint('static int get myField => _myField;')}
 }
-''',
-      [lint(51, 35)],
-    );
+''');
   }
 
   Future<void> test_reports_on_getter_with_this_property_access() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 class Test {
   final int _myField = 0;
   
-  int get myField => this._myField;
+  ${expectLint('int get myField => this._myField;')}
 }
-''',
-      [lint(44, 33)],
-    );
+''');
   }
 
   Future<void>
   test_reports_on_block_body_getter_returning_private_field() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 class Test {
   final int _myField = 0;
   
-  int get myField {
+  ${expectLint('''int get myField {
     return _myField;
-  }
+  }''')}
 }
-''',
-      [lint(44, 42)],
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_getter_that_contains_logic() async {

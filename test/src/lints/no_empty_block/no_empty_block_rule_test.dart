@@ -4,7 +4,7 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -23,9 +23,6 @@ class NoEmptyBlockRuleTest extends AnalysisRuleTest with AutoTestLintOffsets {
     );
     super.setUp();
   }
-
-  @override
-  String get analysisRule => NoEmptyBlockRule.lintName;
 
   Future<void> test_reports_on_empty_function() async {
     await assertAutoDiagnostics('''
@@ -60,7 +57,8 @@ void fun() {
 ''');
   }
 
-  Future<void> test_does_not_report_on_todo_comment_with_other_comments() async {
+  Future<void>
+  test_does_not_report_on_todo_comment_with_other_comments() async {
     await assertNoDiagnostics(r'''
 // ignore_for_file: todo
 void fun() {
