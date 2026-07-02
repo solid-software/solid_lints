@@ -103,9 +103,9 @@ class AnalysisOptionsLoader {
       return {};
     }
 
-    final optionsString = analysisOptionsFile.readAsStringSync();
     Object? yaml;
     try {
+      final optionsString = analysisOptionsFile.readAsStringSync();
       yaml = loadYaml(optionsString);
     } catch (_) {
       return {};
