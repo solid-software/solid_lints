@@ -4,8 +4,6 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:solid_lints/src/common/parameter_parser/cached_package_rules.dart';
 import 'package:yaml/yaml.dart';
 
-typedef _OptionsMap = Map<Object?, Object?>;
-
 /// Loads and parses analysis options from a Dart project's YAML file.
 class AnalysisOptionsLoader {
   final ResourceProvider _resourceProvider;
@@ -110,11 +108,14 @@ class AnalysisOptionsLoader {
       return {};
     }
 
-    final rawDiagnostics = yaml is _OptionsMap
-        ? ((yaml['solid_lints'] as _OptionsMap?)?['diagnostics'] ??
-              ((yaml['plugins'] as _OptionsMap?)?['solid_lints']
-                  as _OptionsMap?)?['diagnostics'])
-        : null;
+    Object? rawDiagnostics;
+    if (yaml case {'solid_lints': {'diagnostics': final diagnostics}}) {
+      rawDiagnostics = diagnostics;
+    } else if (yaml case {
+      'plugins': {'solid_lints': {'diagnostics': final diagnostics}},
+    }) {
+      rawDiagnostics = diagnostics;
+    }
 
     if (rawDiagnostics is! Map) return {};
 

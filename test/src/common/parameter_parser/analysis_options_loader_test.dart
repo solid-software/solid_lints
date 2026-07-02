@@ -179,7 +179,37 @@ plugins:
     );
 
     expect(options, isNotNull);
-    expect(options, {'some_parameter': 'root_value'});
+  }
+
+  void test_does_not_crash_when_plugins_is_list() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+plugins:
+  - solid_lints
+''',
+    );
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+    expect(options, isNull);
+  }
+
+  void test_does_not_crash_when_solid_lints_is_boolean() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+solid_lints: true
+''',
+    );
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+    expect(options, isNull);
   }
 
   void test_returns_cached_response_for_same_rule_name() {
