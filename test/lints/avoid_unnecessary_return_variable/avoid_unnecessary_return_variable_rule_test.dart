@@ -242,4 +242,16 @@ class Test {
 }
 ''');
   }
+
+  void test_does_not_report_if_used_in_other_return_statement() async {
+    await assertNoDiagnostics(r'''
+String test() {
+  final someCondition = 1 == 1;
+  final a = 'test';
+  if (someCondition) return a;
+
+  return 'something $a';
+}
+''');
+  }
 }
