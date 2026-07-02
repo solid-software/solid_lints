@@ -73,11 +73,11 @@ class AnalysisOptionsLoader {
     );
   }
 
-  String? _findNearestAnalysisOptionsFilePath(String packageRootPath) {
+  String? _findNearestAnalysisOptionsFilePath(String startDirectoryPath) {
     final pathContext = _resourceProvider.pathContext;
-    String currentDirectoryPath = packageRootPath;
+    String currentDirectoryPath = startDirectoryPath;
 
-    while (pathContext.dirname(currentDirectoryPath) != currentDirectoryPath) {
+    while (true) {
       final candidatePath = pathContext.join(
         currentDirectoryPath,
         'analysis_options.yaml',
@@ -89,6 +89,9 @@ class AnalysisOptionsLoader {
       }
 
       final parentDir = pathContext.dirname(currentDirectoryPath);
+      if (parentDir == currentDirectoryPath) {
+        break;
+      }
       currentDirectoryPath = parentDir;
     }
 
@@ -122,7 +125,11 @@ class AnalysisOptionsLoader {
     return {
       for (final entry in rawDiagnostics.entries)
         if (entry.key is String && entry.value is Map)
-          entry.key as String: Map<String, Object?>.from(entry.value as Map),
+          entry.key as String: <String, Object?>{
+            for (final optionEntry in (entry.value as Map).entries)
+              if (optionEntry.key is String)
+                optionEntry.key as String: optionEntry.value,
+          },
     };
   }
 }

@@ -212,6 +212,27 @@ solid_lints: true
     expect(options, isNull);
   }
 
+  void test_does_not_crash_when_rule_option_has_non_string_key() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+plugins:
+  solid_lints:
+    diagnostics:
+      $_mockRuleThatNeedsConfigName:
+        123: true
+        some_parameter: root_value
+''',
+    );
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+    expect(options, isNotNull);
+    expect(options, {'some_parameter': 'root_value'});
+  }
+
   void test_returns_cached_response_for_same_rule_name() {
     analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
 
