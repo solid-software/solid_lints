@@ -4,6 +4,8 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:solid_lints/src/common/parameter_parser/cached_package_rules.dart';
 import 'package:yaml/yaml.dart';
 
+typedef _OptionsMap = Map<Object?, Object?>;
+
 /// Loads and parses analysis options from a Dart project's YAML file.
 class AnalysisOptionsLoader {
   final ResourceProvider _resourceProvider;
@@ -11,8 +13,7 @@ class AnalysisOptionsLoader {
 
   /// Creates an instance of [AnalysisOptionsLoader]
   AnalysisOptionsLoader({ResourceProvider? resourceProvider})
-      : _resourceProvider =
-            resourceProvider ?? PhysicalResourceProvider.INSTANCE;
+    : _resourceProvider = resourceProvider ?? PhysicalResourceProvider.INSTANCE;
 
   /// Gets the options for a specific rule by its name.
   Map<String, Object?>? getRuleOptions(RuleContext context, String ruleName) =>
@@ -49,10 +50,10 @@ class AnalysisOptionsLoader {
     RuleContext context,
     T Function(String) f,
   ) {
-    final packageRootPath = context.package?.root.path;
-    if (packageRootPath == null) return null;
+    final filePath = context.definingUnit.file.path;
+    final dirPath = _resourceProvider.pathContext.dirname(filePath);
+    final yamlPath = _findNearestAnalysisOptionsFilePath(dirPath);
 
-    final yamlPath = _findNearestAnalysisOptionsFilePath(packageRootPath);
     if (yamlPath == null) return null;
 
     return f(yamlPath);
@@ -79,8 +80,10 @@ class AnalysisOptionsLoader {
     String currentDirectoryPath = packageRootPath;
 
     while (pathContext.dirname(currentDirectoryPath) != currentDirectoryPath) {
-      final candidatePath =
-          pathContext.join(currentDirectoryPath, 'analysis_options.yaml');
+      final candidatePath = pathContext.join(
+        currentDirectoryPath,
+        'analysis_options.yaml',
+      );
       final candidateFile = _resourceProvider.getFile(candidatePath);
 
       if (candidateFile.exists) {
@@ -102,24 +105,23 @@ class AnalysisOptionsLoader {
     final optionsString = analysisOptionsFile.readAsStringSync();
     Object? yaml;
     try {
-      yaml = loadYaml(optionsString) as Object?;
-    } catch (err) {
+      yaml = loadYaml(optionsString);
+    } catch (_) {
       return {};
     }
 
-    if (yaml
-        case {'plugins': {'solid_lints': {'diagnostics': final diagnostics?}}}
-        when diagnostics is Map) {
-      return Map.fromEntries(
-        diagnostics.entries.where((e) => e.key is String && e.value is Map).map(
-              (e) => MapEntry(
-                e.key as String,
-                Map<String, Object?>.from(e.value as Map),
-              ),
-            ),
-      );
-    }
+    final rawDiagnostics = yaml is _OptionsMap
+        ? ((yaml['solid_lints'] as _OptionsMap?)?['diagnostics'] ??
+              ((yaml['plugins'] as _OptionsMap?)?['solid_lints']
+                  as _OptionsMap?)?['diagnostics'])
+        : null;
 
-    return {};
+    if (rawDiagnostics is! Map) return {};
+
+    return {
+      for (final entry in rawDiagnostics.entries)
+        if (entry.key is String && entry.value is Map)
+          entry.key as String: Map<String, Object?>.from(entry.value as Map),
+    };
   }
 }

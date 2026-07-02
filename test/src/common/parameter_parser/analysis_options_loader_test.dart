@@ -25,7 +25,7 @@ plugins:
   solid_lints:
     diagnostics:
       $_mockRuleThatNeedsConfigName:
-        abc: def
+        some_parameter: root_value
       $_mockRule2Name:
         foo: bar
         exclude:
@@ -43,7 +43,7 @@ plugins:
   solid_lints:
     diagnostics:
       $_mockRuleThatNeedsConfigName:
-        abc: ghi
+        some_parameter: nested_value
       $_mockRule2Name:
         foo: baz
         exclude:
@@ -128,7 +128,7 @@ plugins:
     );
 
     expect(mockRuleThatNeedsConfigOptions, isNotNull);
-    expect(mockRuleThatNeedsConfigOptions, {'abc': 'def'});
+    expect(mockRuleThatNeedsConfigOptions, {'some_parameter': 'root_value'});
 
     expect(mockRule2Options, isNotNull);
     expect(mockRule2Options, {
@@ -165,8 +165,8 @@ plugins:
       _mockRuleThatNeedsConfigName,
     );
 
-    expect(initialOptions, {'abc': 'def'});
-    expect(updatedOptions, {'abc': 'ghi'});
+    expect(initialOptions, {'some_parameter': 'root_value'});
+    expect(updatedOptions, {'some_parameter': 'nested_value'});
     expect(updatedOptions, isNot(same(initialOptions)));
   }
 
@@ -179,7 +179,7 @@ plugins:
     );
 
     expect(options, isNotNull);
-    expect(options, {'abc': 'def'});
+    expect(options, {'some_parameter': 'root_value'});
   }
 
   void test_returns_cached_response_for_same_rule_name() {
@@ -197,9 +197,46 @@ plugins:
     expect(secondOptions, same(firstOptions));
   }
 
-  RuleContext _createMockContextForPackage(String packageRootPath) {
+  void test_resolves_nested_analysis_options_for_nested_files() {
+    final nestedDirPath = '$testPackageRootPath/test';
+    final nestedFilePath = '$nestedDirPath/some_test.dart';
+
+    newFolder(nestedDirPath);
+    newFile(nestedFilePath, 'void main() {}');
+
+    newAnalysisOptionsYamlFile(
+      nestedDirPath,
+      _mockDifferentAnalysisOptionsContent,
+    );
+
+    final nestedFile = getFile(nestedFilePath);
+    final mockNestedContext = _createMockContextForPackage(
+      testPackageRootPath,
+      definingUnit: _TestRuleContextUnit(nestedFile),
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockNestedContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockNestedContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, isNotNull);
+    expect(options, {'some_parameter': 'nested_value'});
+  }
+
+  RuleContext _createMockContextForPackage(
+    String packageRootPath, {
+    RuleContextUnit? definingUnit,
+  }) {
+    final rootFolder = getFolder(packageRootPath);
     return _TestRuleContext(
-      _TestWorkspacePackage(getFolder(packageRootPath)),
+      _TestWorkspacePackage(rootFolder),
+      definingUnit: definingUnit ??
+          _TestRuleContextUnit(
+            rootFolder.getChildAssumingFile('lib/dummy.dart'),
+          ),
     );
   }
 }
@@ -208,7 +245,23 @@ class _TestRuleContext implements RuleContext {
   @override
   final WorkspacePackage? package;
 
-  _TestRuleContext(this.package);
+  @override
+  final RuleContextUnit definingUnit;
+
+  _TestRuleContext(
+    this.package, {
+    required this.definingUnit,
+  });
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _TestRuleContextUnit implements RuleContextUnit {
+  @override
+  final File file;
+
+  _TestRuleContextUnit(this.file);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
