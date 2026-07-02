@@ -228,7 +228,7 @@ int test(bool b) {
   void test_does_not_report_if_type_promoted() async {
     await assertNoDiagnostics(r'''
 class Test {
-  final Map<String, dynamic> _map = {};
+  final Map<String, Object> _map = {};
 
   T get<T>(String key) {
     final value = _map[key];
@@ -245,8 +245,7 @@ class Test {
 
   void test_does_not_report_if_used_in_other_return_statement() async {
     await assertNoDiagnostics(r'''
-String test() {
-  final someCondition = 1 == 1;
+String test(bool someCondition) {
   final a = 'test';
   if (someCondition) return a;
 
