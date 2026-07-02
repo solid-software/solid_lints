@@ -213,7 +213,8 @@ int test() {
     );
   }
 
-  void test_does_not_report_if_return_is_cached_and_used_after_return_nested_block() async {
+  void
+  test_does_not_report_if_return_is_cached_and_used_after_return_nested_block() async {
     await assertNoDiagnostics(r'''
 int test(bool b) {
   final a = 3;
@@ -224,5 +225,23 @@ int test(bool b) {
 }
 ''');
   }
-}
 
+  void test_does_not_report_if_type_promoted() async {
+    await assertNoDiagnostics(r'''
+class Test {
+  final Map<String, dynamic> _map = {};
+
+  T get<T>(String key) {
+    final value = _map[key];
+    
+    if (value is T) {
+      // local variable is promoted to T
+      return value;
+    }
+
+    throw Exception('value is not of type $T');
+  }
+}
+''');
+  }
+}
