@@ -50,7 +50,10 @@ custom_lint:
     - avoid_unnecessary_setstate
     - avoid_unnecessary_type_assertions
     - avoid_unrelated_type_assertions
-    - avoid_unused_parameters
+    - avoid_unused_parameters:
+      exclude_annotation:
+        - freezed
+        - unfreezed
     - avoid_debug_print_in_release
     - avoid_final_with_getter
 

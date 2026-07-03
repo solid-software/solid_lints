@@ -50,6 +50,7 @@ class Placeholder extends StatelessWidget {
               'SimpleClassName',
               'exclude',
             ],
+            'exclude_annotation': ['freezed'],
           },
         );
 
@@ -380,5 +381,37 @@ class SimpleClassName {
 ''',
       [lint(38, 8), lint(118, 8)],
     );
+  }
+
+  Future<void>
+  test_does_not_report_on_redirecting_factory_constructors() async {
+    await assertNoDiagnostics(r'''
+class RedirectingClass {
+  const factory RedirectingClass({required int parameter}) = _RedirectingClass;
+}
+
+class _RedirectingClass implements RedirectingClass {
+  final int parameter;
+  const _RedirectingClass({required this.parameter});
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_freezed_classes() async {
+    await assertNoDiagnostics(r'''
+const freezed = Object();
+
+@freezed
+class Test {
+  const factory Test({
+    bool test,
+  }) = _Test;
+}
+
+class _Test implements Test {
+  final bool? test;
+  const _Test({this.test});
+}
+''');
   }
 }
