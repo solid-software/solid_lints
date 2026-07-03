@@ -41,17 +41,13 @@ class ExcludedAnnotationsListParameter {
 
     AstNode? current = node;
     while (current != null) {
-      if (current is ClassDeclaration ||
-          current is MixinDeclaration ||
-          current is EnumDeclaration ||
-          current is ExtensionDeclaration ||
-          current is ExtensionTypeDeclaration) {
-        final declaration = current as Declaration;
-        return declaration.metadata.any((annotation) {
+      if (current is Declaration) {
+        final hasAnnotation = current.metadata.any((annotation) {
           final name = annotation.name.name;
           final simpleName = name.split('.').last;
           return excludedAnnotations.contains(simpleName);
         });
+        if (hasAnnotation) return true;
       }
       current = current.parent;
     }
