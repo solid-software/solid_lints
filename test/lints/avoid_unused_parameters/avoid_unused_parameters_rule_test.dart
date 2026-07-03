@@ -403,14 +403,7 @@ const freezed = Object();
 
 @freezed
 class Test {
-  const factory Test({
-    bool test,
-  }) = _Test;
-}
-
-class _Test implements Test {
-  final bool? test;
-  const _Test({this.test});
+  const Test(int unusedParameter);
 }
 ''');
   }
@@ -434,14 +427,7 @@ const freezed = Object();
 
 @freezed
 class Test {
-  const factory Test({
-    bool test,
-  }) = _Test;
-}
-
-class _Test implements Test {
-  final bool? test;
-  const _Test({this.test});
+  const Test(int unusedParameter);
 }
 
 class Meta {
@@ -451,14 +437,7 @@ const meta = Meta();
 
 @meta.freezed
 class TestWithPrefix {
-  const factory TestWithPrefix({
-    bool test,
-  }) = _TestWithPrefix;
-}
-
-class _TestWithPrefix implements TestWithPrefix {
-  final bool? test;
-  const _TestWithPrefix({this.test});
+  const TestWithPrefix(int unusedParameter);
 }
 
 void excludeMethod(String s) {
