@@ -36,7 +36,8 @@ class AvoidNonNullAssertionParameters {
     final raw = json['ignored_types'];
     final excludeList = switch (raw) {
       Iterable() => raw.whereType<String>().toSet(),
-      Map() || String() => {raw.toString()},
+      Map() => raw.keys.whereType<String>().toSet(),
+      String() => {raw},
       _ => const <String>{},
     };
 
