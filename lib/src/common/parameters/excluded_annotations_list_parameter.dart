@@ -45,7 +45,8 @@ class ExcludedAnnotationsListParameter {
         final hasAnnotation = current.metadata.any((annotation) {
           final name = annotation.name.name;
           final simpleName = name.split('.').last;
-          return excludedAnnotations.contains(simpleName);
+          return excludedAnnotations.contains(name) ||
+              excludedAnnotations.contains(simpleName);
         });
         if (hasAnnotation) return true;
       }
