@@ -35,9 +35,10 @@ class AvoidNonNullAssertionParameters {
   factory AvoidNonNullAssertionParameters.fromJson(Map<String, Object?> json) {
     final raw = json['ignored_types'];
     final excludeList = switch (raw) {
-      Iterable() => raw.whereType<String>().toSet(),
-      Map() => raw.keys.whereType<String>().toSet(),
-      String() => {raw},
+      final Iterable<Object?> rawList => rawList.whereType<String>().toSet(),
+      final Map<Object?, Object?> rawMap =>
+        rawMap.keys.whereType<String>().toSet(),
+      final String rawString => {rawString},
       _ => const <String>{},
     };
 
