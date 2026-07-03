@@ -70,6 +70,15 @@ void main() {
       expect(param.exclude[0].declarationName, 'my_function');
     });
 
+    test('parses single map', () {
+      final param = ExcludedIdentifiersListParameter.defaultFromJson({
+        'exclude': {'class_name': 'MyClass', 'method_name': 'my_method'},
+      });
+      expect(param.exclude.length, 1);
+      expect(param.exclude[0].className, 'MyClass');
+      expect(param.exclude[0].methodName, 'my_method');
+    });
+
     test('parses empty or invalid input', () {
       final param = ExcludedIdentifiersListParameter.defaultFromJson({});
       expect(param.exclude, isEmpty);

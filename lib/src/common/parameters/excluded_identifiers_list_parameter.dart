@@ -45,14 +45,11 @@ class ExcludedIdentifiersListParameter {
   ) {
     final raw = json[ExcludedIdentifiersListParameter.excludeParameterName];
 
-    final Iterable<dynamic> excludeList;
-    if (raw is Iterable) {
-      excludeList = raw;
-    } else if (raw is String) {
-      excludeList = [raw];
-    } else {
-      excludeList = [];
-    }
+    final excludeList = switch (raw) {
+      Iterable() => raw,
+      Map() || String() => [raw],
+      _ => const [],
+    };
 
     return ExcludedIdentifiersListParameter.fromJson(
       excludeList: excludeList,

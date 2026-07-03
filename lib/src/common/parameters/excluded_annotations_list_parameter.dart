@@ -18,7 +18,7 @@ class ExcludedAnnotationsListParameter {
   /// Method for creating from json data
   factory ExcludedAnnotationsListParameter.fromJson(Map<String, dynamic> json) {
     final raw = json[excludeAnnotationKey];
-    if (raw is List) {
+    if (raw is Iterable) {
       return ExcludedAnnotationsListParameter(
         excludedAnnotations: Set<String>.from(raw.whereType<String>()),
       );

@@ -45,7 +45,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     final parent = node.parent;
     final parameters = node.parameters;
 
-    if (parent is ClassDeclaration && parent.abstractKeyword != null ||
+    if ((parent is ClassDeclaration && parent.abstractKeyword != null) ||
         node.externalKeyword != null ||
         node.redirectedConstructor != null ||
         _hasExcludedAnnotationClass(node) ||
@@ -73,7 +73,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     final parent = node.parent;
     final parameters = node.parameters;
 
-    if (parent is ClassDeclaration && parent.abstractKeyword != null ||
+    if ((parent is ClassDeclaration && parent.abstractKeyword != null) ||
         node.isAbstract ||
         node.externalKeyword != null ||
         (parameters == null || parameters.parameters.isEmpty)) {
