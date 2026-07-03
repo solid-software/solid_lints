@@ -15,6 +15,16 @@ void main() {
 @reflectiveTest
 class AvoidNonNullAssertionRuleTest extends AnalysisRuleTest
     with AutoTestLintOffsets {
+  static const _mockAnalysisOptionsContent = '''
+plugins:
+  solid_lints:
+    diagnostics:
+      avoid_non_null_assertion:
+        ignored_types:
+          - IMap
+          - BuiltMap
+  ''';
+
   @override
   void setUp() {
     rule = AvoidNonNullAssertionRule(
@@ -24,16 +34,11 @@ class AvoidNonNullAssertionRuleTest extends AnalysisRuleTest
     );
     super.setUp();
 
-    newAnalysisOptionsYamlFile(testPackageRootPath, '''
-${analysisOptionsContent(rules: [rule.name])}
-plugins:
-  solid_lints:
-    diagnostics:
-      ${rule.name}:
-        ignored_types:
-          - IMap
-          - BuiltMap
-''');
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''${analysisOptionsContent(rules: [rule.name])}
+$_mockAnalysisOptionsContent''',
+    );
   }
 
   Future<void> test_reports_non_null_assertion_on_nullable_value() async {
