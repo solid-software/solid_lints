@@ -60,7 +60,7 @@ class SolidLintsPlugin extends Plugin {
     final lintRules = [
       AvoidFinalWithGetterRule(),
       AvoidGlobalStateRule(),
-      AvoidNonNullAssertionRule(),
+      AvoidNonNullAssertionRule(analysisOptionsLoader: analysisLoader),
       avoidUnnecessaryTypeAssertionsRule,
       AvoidDebugPrintInReleaseRule(),
       doubleLiteralFormatRule,

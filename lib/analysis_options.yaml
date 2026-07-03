@@ -44,7 +44,10 @@ custom_lint:
       ignored_types:
         - AnimationController
 
-    - avoid_non_null_assertion
+    - avoid_non_null_assertion:
+      ignored_types:
+        - IMap
+        - BuiltMap
     - avoid_returning_widgets
     - avoid_unnecessary_return_variable
     - avoid_unnecessary_setstate
