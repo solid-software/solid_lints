@@ -49,7 +49,7 @@ class AvoidNonNullAssertionVisitor extends SimpleAstVisitor<void> {
     }
 
     return type.hasIgnoredType(
-      ignoredTypes: _parameters.ignoredTypes.toSet(),
+      ignoredTypes: _parameters.ignoredTypes,
     );
   }
 }

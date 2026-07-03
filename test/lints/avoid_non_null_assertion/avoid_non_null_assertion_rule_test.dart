@@ -96,4 +96,25 @@ void m() {
 }
 ''');
   }
+
+  Future<void> test_does_not_report_imap_access_with_single_string() async {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''${analysisOptionsContent(rules: [rule.name])}
+plugins:
+  solid_lints:
+    diagnostics:
+      avoid_non_null_assertion:
+        ignored_types: IMap''',
+    );
+    await assertNoDiagnostics(r'''
+class IMap<K, V> {
+  V? operator [](K key) => null;
+}
+
+void m(IMap<String, String> map) {
+  map['key']!;
+}
+''');
+  }
 }

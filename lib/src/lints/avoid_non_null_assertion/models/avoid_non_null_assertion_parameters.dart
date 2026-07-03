@@ -18,7 +18,7 @@ class AvoidNonNullAssertionParameters {
   /// IMap<String, String> map;
   /// map['key']!; // OK
   /// ```
-  final Iterable<String> ignoredTypes;
+  final Set<String> ignoredTypes;
 
   /// Constructor for [AvoidNonNullAssertionParameters] model
   const AvoidNonNullAssertionParameters({
@@ -28,14 +28,20 @@ class AvoidNonNullAssertionParameters {
   /// Empty [AvoidNonNullAssertionParameters] model, ignores nothing.
   factory AvoidNonNullAssertionParameters.empty() =>
       const AvoidNonNullAssertionParameters(
-        ignoredTypes: [],
+        ignoredTypes: {},
       );
 
   /// Method for creating from json data
-  factory AvoidNonNullAssertionParameters.fromJson(Map<String, Object?> json) =>
-      AvoidNonNullAssertionParameters(
-        ignoredTypes: List<String>.from(
-          json['ignored_types'] as Iterable? ?? [],
-        ),
-      );
+  factory AvoidNonNullAssertionParameters.fromJson(Map<String, Object?> json) {
+    final raw = json['ignored_types'];
+    final excludeList = switch (raw) {
+      Iterable() => raw.whereType<String>().toSet(),
+      Map() || String() => {raw.toString()},
+      _ => const <String>{},
+    };
+
+    return AvoidNonNullAssertionParameters(
+      ignoredTypes: excludeList,
+    );
+  }
 }
