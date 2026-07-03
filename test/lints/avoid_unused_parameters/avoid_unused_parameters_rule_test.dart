@@ -415,7 +415,8 @@ class _Test implements Test {
 ''');
   }
 
-  Future<void> test_does_not_report_on_excluded_declaration_and_annotation_single_string() async {
+  Future<void>
+  test_does_not_report_on_excluded_declaration_and_annotation_single_string() async {
     final FakeAnalysisOptionsLoader fakeAnalysisOptionsLoader =
         FakeAnalysisOptionsLoader(
           ruleOptions: {
@@ -441,6 +442,23 @@ class Test {
 class _Test implements Test {
   final bool? test;
   const _Test({this.test});
+}
+
+class Meta {
+  const Meta();
+}
+const meta = Meta();
+
+@meta.freezed
+class TestWithPrefix {
+  const factory TestWithPrefix({
+    bool test,
+  }) = _TestWithPrefix;
+}
+
+class _TestWithPrefix implements TestWithPrefix {
+  final bool? test;
+  const _TestWithPrefix({this.test});
 }
 
 void excludeMethod(String s) {

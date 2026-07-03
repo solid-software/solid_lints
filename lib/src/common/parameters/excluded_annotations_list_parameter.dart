@@ -34,16 +34,28 @@ class ExcludedAnnotationsListParameter {
   }
 
   /// Returns whether the target node should be ignored during analysis because
-  /// its enclosing class is annotated with one of the excluded annotations.
+  /// its enclosing declaration is annotated with one of the excluded
+  /// annotations.
   bool shouldIgnore(Declaration node) {
     if (excludedAnnotations.isEmpty) return false;
 
-    final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
-    if (classDecl == null) return false;
+    AstNode? current = node;
+    while (current != null) {
+      if (current is ClassDeclaration ||
+          current is MixinDeclaration ||
+          current is EnumDeclaration ||
+          current is ExtensionDeclaration ||
+          current is ExtensionTypeDeclaration) {
+        final declaration = current as Declaration;
+        return declaration.metadata.any((annotation) {
+          final name = annotation.name.name;
+          final simpleName = name.split('.').last;
+          return excludedAnnotations.contains(simpleName);
+        });
+      }
+      current = current.parent;
+    }
 
-    return classDecl.metadata.any((annotation) {
-      final name = annotation.name.name;
-      return excludedAnnotations.contains(name);
-    });
+    return false;
   }
 }
