@@ -24,7 +24,11 @@ class ExcludedEntitiesListParameter {
     final raw = json['exclude_entity'];
     if (raw is List) {
       return ExcludedEntitiesListParameter(
-        excludedEntityNames: Set<String>.from(raw),
+        excludedEntityNames: Set<String>.from(raw.whereType<String>()),
+      );
+    } else if (raw is String) {
+      return ExcludedEntitiesListParameter(
+        excludedEntityNames: {raw},
       );
     }
 

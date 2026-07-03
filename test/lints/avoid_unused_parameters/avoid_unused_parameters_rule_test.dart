@@ -414,4 +414,38 @@ class _Test implements Test {
 }
 ''');
   }
+
+  Future<void> test_does_not_report_on_excluded_declaration_and_annotation_single_string() async {
+    final FakeAnalysisOptionsLoader fakeAnalysisOptionsLoader =
+        FakeAnalysisOptionsLoader(
+          ruleOptions: {
+            'exclude': 'excludeMethod',
+            'exclude_annotation': 'freezed',
+          },
+        );
+
+    rule = AvoidUnusedParametersRule(
+      analysisOptionsLoader: fakeAnalysisOptionsLoader,
+    );
+
+    await assertNoDiagnostics(r'''
+const freezed = Object();
+
+@freezed
+class Test {
+  const factory Test({
+    bool test,
+  }) = _Test;
+}
+
+class _Test implements Test {
+  final bool? test;
+  const _Test({this.test});
+}
+
+void excludeMethod(String s) {
+  return;
+}
+''');
+  }
 }

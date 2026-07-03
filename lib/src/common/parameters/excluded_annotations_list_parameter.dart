@@ -22,6 +22,10 @@ class ExcludedAnnotationsListParameter {
       return ExcludedAnnotationsListParameter(
         excludedAnnotations: Set<String>.from(raw.whereType<String>()),
       );
+    } else if (raw is String) {
+      return ExcludedAnnotationsListParameter(
+        excludedAnnotations: {raw},
+      );
     }
 
     return ExcludedAnnotationsListParameter(

@@ -43,10 +43,16 @@ class ExcludedIdentifiersListParameter {
   factory ExcludedIdentifiersListParameter.defaultFromJson(
     Map<String, dynamic> json,
   ) {
-    final excludeList =
-        json[ExcludedIdentifiersListParameter.excludeParameterName]
-                as Iterable? ??
-            [];
+    final raw = json[ExcludedIdentifiersListParameter.excludeParameterName];
+
+    final Iterable<dynamic> excludeList;
+    if (raw is Iterable) {
+      excludeList = raw;
+    } else if (raw is String) {
+      excludeList = [raw];
+    } else {
+      excludeList = [];
+    }
 
     return ExcludedIdentifiersListParameter.fromJson(
       excludeList: excludeList,
