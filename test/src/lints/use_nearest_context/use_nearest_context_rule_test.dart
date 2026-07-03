@@ -3,7 +3,7 @@ import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../utils/auto_test_lint_offsets.dart';
+import '../../../lints/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {

@@ -4,7 +4,7 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../utils/auto_test_lint_offsets.dart';
+import '../../../lints/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
