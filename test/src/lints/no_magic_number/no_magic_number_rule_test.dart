@@ -47,8 +47,7 @@ int fn(int b) {
 ''');
   }
 
-  Future<void>
-  test_reports_magic_numbers_in_ternary_comparison() async {
+  Future<void> test_reports_magic_numbers_in_ternary_comparison() async {
     await assertAutoDiagnostics('''
 bool canDrive(int age, {bool isUSA = false}) {
   return isUSA ? age >= ${expectLint('16')} : age > ${expectLint('18')};
@@ -308,8 +307,7 @@ void fn() {
 ''');
   }
 
-  Future<void>
-  test_does_not_report_anonymous_function_default_param() async {
+  Future<void> test_does_not_report_anonymous_function_default_param() async {
     await assertNoDiagnostics(r'''
 void fn() {
   ({int value = 7}) {};
@@ -347,8 +345,7 @@ void fn() {
 ''');
   }
 
-  Future<void>
-  test_does_not_report_var_with_const_constructor_call() async {
+  Future<void> test_does_not_report_var_with_const_constructor_call() async {
     await assertNoDiagnostics(r'''
 class TestOperation {
   final double res;
@@ -361,8 +358,7 @@ void fn() {
 ''');
   }
 
-  Future<void>
-  test_reports_magic_number_in_constructor_inside_list() async {
+  Future<void> test_reports_magic_number_in_constructor_inside_list() async {
     await assertAutoDiagnostics('''
 class TestOperation {
   final double res;
@@ -376,8 +372,7 @@ void fn() {
 ''');
   }
 
-  Future<void>
-  test_does_not_report_const_constructor_inside_list() async {
+  Future<void> test_does_not_report_const_constructor_inside_list() async {
     await assertNoDiagnostics(r'''
 class TestOperation {
   final double res;

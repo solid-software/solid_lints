@@ -19,9 +19,6 @@ class AvoidUnnecessaryTypeAssertionsRuleTest extends AnalysisRuleTest
     super.setUp();
   }
 
-  @override
-  String get analysisRule => AvoidUnnecessaryTypeAssertionsRule.lintName;
-
   Future<void>
   test_does_not_report_if_is_expression_checks_nullable_source() async {
     await assertNoDiagnostics(r'''
