@@ -1,8 +1,9 @@
-import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/avoid_non_null_assertion/models/avoid_non_null_assertion_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/visitors/avoid_non_null_assertion_visitor.dart';
+import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// Rule which warns about usages of bang operator ("!")
 /// as it may result in unexpected runtime exceptions.
@@ -35,7 +36,8 @@ import 'package:solid_lints/src/lints/avoid_non_null_assertion/visitors/avoid_no
 /// final map = {'key': 'value'};
 /// map['key']!;
 /// ```
-class AvoidNonNullAssertionRule extends AnalysisRule {
+class AvoidNonNullAssertionRule
+    extends SolidLintRule<AvoidNonNullAssertionParameters> {
   /// Name of the lint
   static const String lintName = 'avoid_non_null_assertion';
 
@@ -46,11 +48,12 @@ class AvoidNonNullAssertionRule extends AnalysisRule {
   );
 
   /// creates an instance of [AvoidNonNullAssertionRule]
-  AvoidNonNullAssertionRule()
-    : super(
+  AvoidNonNullAssertionRule({required super.analysisOptionsLoader})
+    : super.withParameters(
         name: lintName,
         description:
             'Warns about usages of bang operator (!) except valid Map access.',
+        parametersParser: AvoidNonNullAssertionParameters.fromJson,
       );
 
   @override
@@ -61,6 +64,13 @@ class AvoidNonNullAssertionRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext context,
   ) {
-    registry.addPostfixExpression(this, AvoidNonNullAssertionVisitor(this));
+    final parameters =
+        getParametersForContext(context) ??
+        AvoidNonNullAssertionParameters.empty();
+
+    registry.addPostfixExpression(
+      this,
+      AvoidNonNullAssertionVisitor(this, parameters),
+    );
   }
 }
