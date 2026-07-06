@@ -1,5 +1,7 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/syntactic_entity.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/error.dart';
@@ -76,134 +78,138 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
   }
 
   @override
-  void visitSimpleIdentifier(SimpleIdentifier node) {
-    super.visitSimpleIdentifier(node);
+  void visitSimpleIdentifier(SimpleIdentifier node) =>
+      _visit(node, super.visitSimpleIdentifier, _checkSimpleIdentifier);
+
+  @override
+  void visitNamedType(NamedType node) =>
+      _visit(node, super.visitNamedType, _checkNamedType);
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) =>
+      _visit(node, super.visitVariableDeclaration, _checkVariableDeclaration);
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) =>
+      _visit(
+        node,
+        super.visitInstanceCreationExpression,
+        _checkInstanceCreation,
+      );
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) =>
+      _visit(node, super.visitMethodInvocation, _checkMethodInvocation);
+
+  void _visit<T>(
+    T node,
+    void Function(T) visitSuper,
+    void Function(
+      T,
+      AvoidUsingApiEntryParameters,
+      void Function(SyntacticEntity),
+    )
+    visitEntry,
+  ) {
+    visitSuper(node);
 
     final resolved = _resolveContext();
     if (resolved == null) return;
     final (:activeEntries, :reporter) = resolved;
 
     for (final entry in activeEntries) {
-      final source = entry.source;
-      if (source == null) continue;
-
-      switch ((entry.className, entry.identifier, entry.namedParameter)) {
-        case (String _, String _, String _):
-          // Handled in visitMethodInvocation and
-          // visitInstanceCreationExpression
-          continue;
-        case (String _, String _, null):
-          _checkIdFromClassFromSource(node, entry, reporter);
-        case (String _, null, null):
-          _checkClassFromSource(node, entry, reporter);
-        case (null, String _, null):
-          _checkIdFromSource(node, entry, reporter);
-        case (null, null, null):
-          _checkSource(node, entry, reporter);
-        default:
-          break;
-      }
+      visitEntry(node, entry, (target) {
+        if (target is AstNode) {
+          reporter.atNode(target, _getLintCode(entry));
+        } else if (target is Token) {
+          reporter.atToken(target, _getLintCode(entry));
+        }
+      });
     }
   }
 
-  @override
-  void visitNamedType(NamedType node) {
-    super.visitNamedType(node);
+  void _checkSimpleIdentifier(
+    SimpleIdentifier node,
+    AvoidUsingApiEntryParameters entry,
+    void Function(SyntacticEntity) report,
+  ) {
+    final source = entry.source;
+    if (source == null) return;
 
-    final resolved = _resolveContext();
-    if (resolved == null) return;
-    final (:activeEntries, :reporter) = resolved;
-
-    for (final entry in activeEntries) {
-      _checkNamedType(node, entry, reporter);
-    }
-  }
-
-  @override
-  void visitVariableDeclaration(VariableDeclaration node) {
-    super.visitVariableDeclaration(node);
-
-    final resolved = _resolveContext();
-    if (resolved == null) return;
-    final (:activeEntries, :reporter) = resolved;
-
-    for (final entry in activeEntries) {
-      _checkVariableDeclaration(node, entry, reporter);
-    }
-  }
-
-  @override
-  void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    super.visitInstanceCreationExpression(node);
-
-    final resolved = _resolveContext();
-    if (resolved == null) return;
-    final (:activeEntries, :reporter) = resolved;
-
-    for (final entry in activeEntries) {
-      _checkInstanceCreation(node, entry, reporter);
-    }
-  }
-
-  @override
-  void visitMethodInvocation(MethodInvocation node) {
-    super.visitMethodInvocation(node);
-
-    final resolved = _resolveContext();
-    if (resolved == null) return;
-    final (:activeEntries, :reporter) = resolved;
-
-    for (final entry in activeEntries) {
-      _checkMethodInvocation(node, entry, reporter);
+    switch ((entry.className, entry.identifier, entry.namedParameter)) {
+      case (String _, String _, String _):
+        // Handled in visitMethodInvocation and
+        // visitInstanceCreationExpression
+        break;
+      case (String _, String _, null):
+        _checkIdFromClassFromSource(node, entry, report);
+      case (String _, null, null):
+        _checkClassFromSource(node, entry, report);
+      case (null, String _, null):
+        _checkIdFromSource(node, entry, report);
+      case (null, null, null):
+        _checkSource(node, entry, report);
+      default:
+        break;
     }
   }
 
   void _checkClassFromSource(
     SimpleIdentifier node,
     AvoidUsingApiEntryParameters entry,
-    DiagnosticReporter reporter,
+    void Function(SyntacticEntity) report,
   ) {
     final className = entry.className;
     final source = entry.source;
     final parent = node.parent;
+    final element = node.element;
     if (className == null ||
         source == null ||
         parent == null ||
+        element == null ||
         parent is ConstructorDeclaration ||
-        !_isMemberOrClass(node.element, className, source)) {
+        !element.isMemberOrClass(
+          className: className,
+          source: source,
+        )) {
       return;
     }
 
-    reporter.atNode(node, _getLintCode(entry));
+    report(node);
   }
 
   void _checkIdFromClassFromSource(
     SimpleIdentifier node,
     AvoidUsingApiEntryParameters entry,
-    DiagnosticReporter reporter,
+    void Function(SyntacticEntity) report,
   ) {
     final identifier = entry.identifier;
     final className = entry.className;
     final source = entry.source;
     final parent = node.parent;
+    final element = node.element;
     if (identifier == null ||
         className == null ||
         source == null ||
+        element == null ||
         identifier == _defaultConstructorIdentifier ||
         node.name != identifier ||
         parent == null ||
         parent is ConstructorDeclaration ||
-        !_isMemberOrClass(node.element, className, source)) {
+        !element.isMemberOrClass(
+          className: className,
+          source: source,
+        )) {
       return;
     }
 
-    reporter.atNode(node, _getLintCode(entry));
+    report(node);
   }
 
   void _checkSource(
     SimpleIdentifier node,
     AvoidUsingApiEntryParameters entry,
-    DiagnosticReporter reporter,
+    void Function(SyntacticEntity) report,
   ) {
     final source = entry.source;
     if (source == null ||
@@ -212,13 +218,13 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
       return;
     }
 
-    reporter.atNode(node, _getLintCode(entry));
+    report(node);
   }
 
   void _checkIdFromSource(
     SimpleIdentifier node,
     AvoidUsingApiEntryParameters entry,
-    DiagnosticReporter reporter,
+    void Function(SyntacticEntity) report,
   ) {
     final identifier = entry.identifier;
     final source = entry.source;
@@ -234,14 +240,14 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
         case LocalFunctionElement() ||
             TopLevelFunctionElement() ||
             PropertyAccessorElement()) {
-      reporter.atNode(node, _getLintCode(entry));
+      report(node);
     }
   }
 
   void _checkNamedType(
     NamedType node,
     AvoidUsingApiEntryParameters entry,
-    DiagnosticReporter reporter,
+    void Function(SyntacticEntity) report,
   ) {
     final source = entry.source;
     if (source == null ||
@@ -251,13 +257,13 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
       return;
     }
 
-    reporter.atNode(node, _getLintCode(entry));
+    report(node);
   }
 
   void _checkVariableDeclaration(
     VariableDeclaration node,
     AvoidUsingApiEntryParameters entry,
-    DiagnosticReporter reporter,
+    void Function(SyntacticEntity) report,
   ) {
     final source = entry.source;
     final className = entry.className;
@@ -270,17 +276,13 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
       return;
     }
 
-    reporter.atOffset(
-      offset: node.name.offset,
-      length: node.name.length,
-      diagnosticCode: _getLintCode(entry),
-    );
+    report(node.name);
   }
 
   void _checkInstanceCreation(
     InstanceCreationExpression node,
     AvoidUsingApiEntryParameters entry,
-    DiagnosticReporter reporter,
+    void Function(SyntacticEntity) report,
   ) {
     final source = entry.source;
     if (source == null) return;
@@ -309,7 +311,7 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
               node.constructorName.type.element?.libraryUri,
               source,
             )) {
-          reporter.atNode(node.constructorName.type, _getLintCode(entry));
+          report(node.constructorName.type);
         }
 
       case (final String className, _defaultConstructorIdentifier, null):
@@ -321,7 +323,7 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
               node.constructorName.type.element?.libraryUri,
               source,
             )) {
-          reporter.atNode(node.constructorName.type, _getLintCode(entry));
+          report(node.constructorName.type);
         }
       default:
         break;
@@ -331,38 +333,25 @@ class AvoidUsingApiVisitor extends SimpleAstVisitor<void> {
   void _checkMethodInvocation(
     MethodInvocation node,
     AvoidUsingApiEntryParameters entry,
-    DiagnosticReporter reporter,
+    void Function(SyntacticEntity) report,
   ) {
-    final source = entry.source;
-    final className = entry.className;
-    final namedParameter = entry.namedParameter;
+    final AvoidUsingApiEntryParameters(:source, :className, :namedParameter) =
+        entry;
+
+    final methodName = node.methodName;
+    final enclosingElement = methodName.element?.enclosingElement;
+
     if (source == null ||
         className == null ||
         namedParameter == null ||
-        node.methodName.name != entry.identifier) {
+        methodName.name != entry.identifier ||
+        enclosingElement == null ||
+        enclosingElement.name != className ||
+        !node.argumentList.containsNamed(namedParameter) ||
+        !matchesSource(enclosingElement.libraryUri, source)) {
       return;
     }
 
-    final enclosingElement = node.methodName.element?.enclosingElement;
-    if (enclosingElement != null &&
-        enclosingElement.name == className &&
-        node.argumentList.containsNamed(namedParameter) &&
-        matchesSource(enclosingElement.libraryUri, source)) {
-      reporter.atNode(node.methodName, _getLintCode(entry));
-    }
-  }
-
-  bool _isMemberOrClass(Element? element, String className, String source) {
-    final target = element is InterfaceElement
-        ? element
-        : element?.enclosingElement;
-
-    if (target case InterfaceElement() || ExtensionElement()
-        when target != null) {
-      return target.name == className &&
-          matchesSource(target.libraryUri, source);
-    }
-
-    return false;
+    report(methodName);
   }
 }

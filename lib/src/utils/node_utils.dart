@@ -2,6 +2,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:solid_lints/src/utils/path_utils.dart';
 
 /// Check node is override method from its metadata
 bool isOverride(List<Annotation> metadata) => metadata.any(
@@ -123,10 +124,27 @@ extension ArgumentListExtension on ArgumentList {
   );
 }
 
-/// Extension on [Element] to provide library URI utility.
-extension ElementLibraryExtension on Element {
+/// Extension on [Element] to provide element utility checks.
+extension ElementExtension on Element {
   /// Returns the library URI string of this element, or null.
   String? get libraryUri => library?.uri.toString();
+
+  /// Returns `true` if this element or its enclosing element matches the
+  /// given [className] and [source].
+  bool isMemberOrClass({
+    required String className,
+    required String source,
+  }) {
+    final target = this is InterfaceElement ? this : enclosingElement;
+
+    if (target case InterfaceElement() || ExtensionElement()
+        when target != null) {
+      return target.name == className &&
+          matchesSource(target.libraryUri, source);
+    }
+
+    return false;
+  }
 }
 
 /// Extension on [VariableDeclaration] to check declared type.
