@@ -3,6 +3,7 @@ import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_param
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../../utils/fake_analysis_options_loader.dart';
+import '../auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -11,7 +12,8 @@ void main() {
 }
 
 @reflectiveTest
-class AvoidUnusedParametersRuleTest extends AnalysisRuleTest {
+class AvoidUnusedParametersRuleTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   static const _importFlutterMaterial =
       "import 'package:flutter/material.dart';";
 
@@ -62,90 +64,72 @@ class Placeholder extends StatelessWidget {
   }
 
   Future<void> test_reports_on_unused_function_expression_parameters() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 typedef MaxFun = int Function(int a, int b);
 
-final MaxFun bad = (int a, int b) => 1;
+final MaxFun bad = (${expectLint('int a')}, ${expectLint('int b')}) => 1;
 
-final MaxFun tetsFun = (int a, int b) {
+final MaxFun tetsFun = (${expectLint('int a')}, ${expectLint('int b')}) {
   return 4;
 };
 
-var c = (String g) {
+var c = (${expectLint('String g')}) {
   return '0';
 };
 
-final MaxFun maxFunInstance = (int a, int b) => 1;
-''',
-      [
-        lint(66, 5),
-        lint(73, 5),
-        lint(111, 5),
-        lint(118, 5),
-        lint(152, 8),
-        lint(213, 5),
-        lint(220, 5),
-      ],
-    );
+final MaxFun maxFunInstance = (${expectLint('int a')}, ${expectLint('int b')}) => 1;
+''');
   }
 
   Future<void> test_reports_on_unused_optional_and_named_parameters() async {
-    await assertDiagnostics(
-      r'''
-final optional = (int a, [int b = 0]) {
+    await assertAutoDiagnostics('''
+final optional = (int a, [${expectLint('int b = 0')}]) {
   return a;
 };
 
-final named = (int a, {required int b, int c = 0}) {
+final named = (${expectLint('int a')}, {required int b, int c = 0}) {
   return c;
 };
-''',
-      [lint(26, 9), lint(71, 5)],
-    );
+''');
   }
 
   Future<void> test_reports_on_unused_top_level_functions() async {
-    await assertDiagnostics(
-      r'''
-void fun(String s) {
+    await assertAutoDiagnostics('''
+void fun(${expectLint('String s')}) {
   return;
 }
 
-void fun2(String s) {
+void fun2(${expectLint('String s')}) {
   return;
 }
 
-void closure(int a) {
+void closure(${expectLint('int a')}) {
   void internal(int a) {
     print(a);
   }
 }
-''',
-      [lint(9, 8), lint(44, 8), lint(82, 5)],
-    );
+''');
   }
 
   Future<void> test_reports_on_unused_parameters_in_methods() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 class TestClass {
-  static void staticMethod(int a) {}
+  static void staticMethod(${expectLint('int a')}) {}
 
-  void method(String s) {
+  void method(${expectLint('String s')}) {
     return;
   }
 }
 
 class SomeOtherClass {
-  final MaxFun maxFunLint = (int a, int b) => 1;
+  final MaxFun maxFunLint = (${expectLint('int a')}, ${expectLint('int b')}) => 1;
 
   // Good
   final MaxFun good = (int a, int b) {
     return a * b;
   };
 
-  void method(String s) {
+  void method(${expectLint('String s')}) {
     return;
   }
 }
@@ -158,55 +142,42 @@ class SomeOtherAnotherClass {
     return;
   }
 
-  void anonymousCallback(Function(int a) cb) {}
+  void anonymousCallback(${expectLint('Function(int a) cb')}) {}
 }
-''',
-      [
-        lint(45, 5),
-        lint(70, 8),
-        lint(153, 5),
-        lint(160, 5),
-        lint(261, 8),
-        lint(450, 18),
-      ],
-    );
+''');
   }
 
   Future<void> test_reports_on_unused_parameters_in_constructors() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 class Foo {
   final int a;
   final int? b;
 
-  Foo.another({required int c})
+  Foo.another({${expectLint('required int c')}})
       : a = 1,
         b = 0;
 
-  factory Foo.aOnly(int a) {
+  factory Foo.aOnly(${expectLint('int a')}) {
     return Foo._(1, null);
   }
 
   Foo._(this.a, this.b);
 }
-''',
-      [lint(59, 14), lint(127, 5)],
-    );
+''');
   }
 
   Future<void> test_reports_on_unused_widget_constructor_parameters() async {
-    await assertDiagnostics(
-      '''
+    await assertAutoDiagnostics('''
 $_importFlutterMaterial
 
 class TestWidget extends StatelessWidget {
   const TestWidget({
     super.key,
-    int a = 1,
-    String k = '',
+    ${expectLint('int a = 1')},
+    ${expectLint("String k = ''")},
   });
 
-  factory TestWidget.a([int b = 0]) {
+  factory TestWidget.a([${expectLint('int b = 0')}]) {
     return const TestWidget();
   }
 
@@ -215,9 +186,7 @@ class TestWidget extends StatelessWidget {
     return const Placeholder();
   }
 }
-''',
-      [lint(124, 9), lint(139, 13), lint(185, 9)],
-    );
+''');
   }
 
   Future<void> test_does_not_report_on_used_parameters() async {
@@ -364,21 +333,18 @@ class SimpleClassName {
   }
 
   Future<void> test_reports_on_non_matching_excluded_declarations() async {
-    await assertDiagnostics(
-      r'''
+    await assertAutoDiagnostics('''
 class Exclude {
-  void excludeMethod2(String s) {
+  void excludeMethod2(${expectLint('String s')}) {
     return;
   }
 }
 
 class SimpleClassName {
-  void simpleMethodName2(String s) {
+  void simpleMethodName2(${expectLint('String s')}) {
     return;
   }
 }
-''',
-      [lint(38, 8), lint(118, 8)],
-    );
+''');
   }
 }

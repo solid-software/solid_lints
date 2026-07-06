@@ -2,6 +2,8 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/avoid_unnecessary_return_variable_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(AvoidUnnecessaryReturnVariableTest);
@@ -9,25 +11,23 @@ void main() {
 }
 
 @reflectiveTest
-class AvoidUnnecessaryReturnVariableTest extends AnalysisRuleTest {
+class AvoidUnnecessaryReturnVariableTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   @override
   void setUp() {
     rule = AvoidUnnecessaryReturnVariableRule();
     super.setUp();
   }
 
-  @override
-  String get analysisRule => rule.name;
-
-  void test_does_not_report_if_return_good_trivial() async {
+  Future<void> test_does_not_report_if_return_good_trivial() async {
     await assertNoDiagnostics(r'''
 int returnVarTestTrivial() {
   return 1;
 }
-  ''');
+''');
   }
 
-  void test_does_not_report_if_return_is_mutable() async {
+  Future<void> test_does_not_report_if_return_is_mutable() async {
     await assertNoDiagnostics(r'''
 int returnVarTestMutable() {
   var a = 1;
@@ -35,18 +35,18 @@ int returnVarTestMutable() {
 
   return a;
 }
-  ''');
+''');
   }
 
-  void test_does_not_report_if_returns_parameter() async {
+  Future<void> test_does_not_report_if_returns_parameter() async {
     await assertNoDiagnostics(r'''
 int returnVarTestReturnParameter(int param) {
   return param;
 }
-  ''');
+''');
   }
 
-  void test_does_not_report_if_return_is_cached_mutable() async {
+  Future<void> test_does_not_report_if_return_is_cached_mutable() async {
     await assertNoDiagnostics(r'''
 int returnVarTestCachedMutable() {
   var a = 1;
@@ -57,26 +57,24 @@ int returnVarTestCachedMutable() {
 }
 
 void _doNothing() {}
-  ''');
+''');
   }
 
-  void test_reports_if_return_follows_declaration() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_if_return_follows_declaration() async {
+    await assertAutoDiagnostics('''
 int returnVarTestReturnFollowsDeclaration() {
   var a = 1;
   final result = a;
 
   //Some comment here
 
-  return result;
+  ${expectLint('return result;')}
 }
-  ''',
-      [lint(105, 14)],
-    );
+''');
   }
 
-  void test_does_not_report_if_return_is_cached_another_method_result() async {
+  Future<void>
+  test_does_not_report_if_return_is_cached_another_method_result() async {
     await assertNoDiagnostics(r'''
 int returnVarTestCachedAnotherMethodResult() {
   var a = 1;
@@ -94,7 +92,7 @@ void _doNothing() {}
 ''');
   }
 
-  void test_does_not_report_if_return_is_cached_object_field() async {
+  Future<void> test_does_not_report_if_return_is_cached_object_field() async {
     await assertNoDiagnostics(r'''
 int returnVarTestCachedObjectField() {
   final obj = _TestClass();
@@ -116,7 +114,7 @@ void _doNothing() {}
 ''');
   }
 
-  void test_does_not_report_if_return_used_variable() async {
+  Future<void> test_does_not_report_if_return_used_variable() async {
     await assertNoDiagnostics(r'''
 int returnVarTestUsedVariable() {
   var a = 1;
@@ -128,22 +126,18 @@ int returnVarTestUsedVariable() {
 ''');
   }
 
-  void test_reports_if_return_is_bad_trivial() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_if_return_is_bad_trivial() async {
+    await assertAutoDiagnostics('''
 int returnVarTestBadTrivial() {
   final result = 1;
 
-  return result;
+  ${expectLint('return result;')}
 }
-''',
-      [lint(55, 14)],
-    );
+''');
   }
 
-  void test_reports_if_return_is_bad_immutable_expression() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_if_return_is_bad_immutable_expression() async {
+    await assertAutoDiagnostics('''
 int returnVarTestBadImmutableExpression() {
   const constLocal = 1;
   final finalLocal = 1;
@@ -156,7 +150,7 @@ int returnVarTestBadImmutableExpression() {
       testObj.finalField;
   _doNothing();
 
-  return result;
+  ${expectLint('return result;')}
 }
 
 class _TestClass {
@@ -168,12 +162,10 @@ class _TestClass {
 }
 
 void _doNothing() {}
-''',
-      [lint(304, 14)],
-    );
+''');
   }
 
-  void test_does_not_report_if_return_is_cached_nested_block() async {
+  Future<void> test_does_not_report_if_return_is_cached_nested_block() async {
     await assertNoDiagnostics(r'''
 Future<String?> testAvoidUnnecessaryReturnVariableNestedBlock() async {
   final cached = 'cached';
@@ -186,34 +178,30 @@ Future<String?> testAvoidUnnecessaryReturnVariableNestedBlock() async {
 ''');
   }
 
-  void test_reports_if_return_is_cached_and_only_returned_nested_block() async {
-    await assertDiagnostics(
-      r'''
+  Future<void>
+  test_reports_if_return_is_cached_and_only_returned_nested_block() async {
+    await assertAutoDiagnostics('''
 int test(bool b) {
   final a = 3;
   if (b) {
-    return a;
+    ${expectLint('return a;')}
   }
   return 0;
 }
-''',
-      [lint(49, 9)],
-    );
+''');
   }
 
-  void test_reports_if_return_in_parentheses() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_if_return_in_parentheses() async {
+    await assertAutoDiagnostics('''
 int test() {
   final a = 3;
-  return (a);
+  ${expectLint('return (a);')}
 }
-''',
-      [lint(30, 11)],
-    );
+''');
   }
 
-  void test_does_not_report_if_cached_and_used_after_nested_block() async {
+  Future<void>
+  test_does_not_report_if_cached_and_used_after_nested_block() async {
     await assertNoDiagnostics(r'''
 int test(bool b) {
   final a = 3;
