@@ -11,8 +11,7 @@ class AnalysisOptionsLoader {
 
   /// Creates an instance of [AnalysisOptionsLoader]
   AnalysisOptionsLoader({ResourceProvider? resourceProvider})
-      : _resourceProvider =
-            resourceProvider ?? PhysicalResourceProvider.INSTANCE;
+    : _resourceProvider = resourceProvider ?? PhysicalResourceProvider.INSTANCE;
 
   /// Gets the options for a specific rule by its name.
   Map<String, Object?>? getRuleOptions(RuleContext context, String ruleName) =>
@@ -49,10 +48,10 @@ class AnalysisOptionsLoader {
     RuleContext context,
     T Function(String) f,
   ) {
-    final packageRootPath = context.package?.root.path;
-    if (packageRootPath == null) return null;
+    final filePath = context.definingUnit.file.path;
+    final dirPath = _resourceProvider.pathContext.dirname(filePath);
+    final yamlPath = _findNearestAnalysisOptionsFilePath(dirPath);
 
-    final yamlPath = _findNearestAnalysisOptionsFilePath(packageRootPath);
     if (yamlPath == null) return null;
 
     return f(yamlPath);
@@ -74,13 +73,15 @@ class AnalysisOptionsLoader {
     );
   }
 
-  String? _findNearestAnalysisOptionsFilePath(String packageRootPath) {
+  String? _findNearestAnalysisOptionsFilePath(String startDirectoryPath) {
     final pathContext = _resourceProvider.pathContext;
-    String currentDirectoryPath = packageRootPath;
+    String currentDirectoryPath = startDirectoryPath;
 
-    while (pathContext.dirname(currentDirectoryPath) != currentDirectoryPath) {
-      final candidatePath =
-          pathContext.join(currentDirectoryPath, 'analysis_options.yaml');
+    while (true) {
+      final candidatePath = pathContext.join(
+        currentDirectoryPath,
+        'analysis_options.yaml',
+      );
       final candidateFile = _resourceProvider.getFile(candidatePath);
 
       if (candidateFile.exists) {
@@ -88,6 +89,9 @@ class AnalysisOptionsLoader {
       }
 
       final parentDir = pathContext.dirname(currentDirectoryPath);
+      if (parentDir == currentDirectoryPath) {
+        break;
+      }
       currentDirectoryPath = parentDir;
     }
 
@@ -99,27 +103,33 @@ class AnalysisOptionsLoader {
       return {};
     }
 
-    final optionsString = analysisOptionsFile.readAsStringSync();
     Object? yaml;
     try {
-      yaml = loadYaml(optionsString) as Object?;
-    } catch (err) {
+      final optionsString = analysisOptionsFile.readAsStringSync();
+      yaml = loadYaml(optionsString);
+    } catch (_) {
       return {};
     }
 
-    if (yaml
-        case {'plugins': {'solid_lints': {'diagnostics': final diagnostics?}}}
-        when diagnostics is Map) {
-      return Map.fromEntries(
-        diagnostics.entries.where((e) => e.key is String && e.value is Map).map(
-              (e) => MapEntry(
-                e.key as String,
-                Map<String, Object?>.from(e.value as Map),
-              ),
-            ),
-      );
+    Object? rawDiagnostics;
+    if (yaml case {'solid_lints': {'diagnostics': final diagnostics}}) {
+      rawDiagnostics = diagnostics;
+    } else if (yaml case {
+      'plugins': {'solid_lints': {'diagnostics': final diagnostics}},
+    }) {
+      rawDiagnostics = diagnostics;
     }
 
-    return {};
+    if (rawDiagnostics is! Map) return {};
+
+    return {
+      for (final entry in rawDiagnostics.entries)
+        if (entry.key is String && entry.value is Map)
+          entry.key as String: <String, Object?>{
+            for (final optionEntry in (entry.value as Map).entries)
+              if (optionEntry.key is String)
+                optionEntry.key as String: optionEntry.value,
+          },
+    };
   }
 }

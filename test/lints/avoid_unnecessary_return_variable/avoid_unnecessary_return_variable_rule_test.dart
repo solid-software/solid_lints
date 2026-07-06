@@ -201,7 +201,7 @@ int test() {
   }
 
   Future<void>
-  test_does_not_report_if_return_is_cached_and_used_after_return_nested_block() async {
+  test_does_not_report_if_cached_and_used_after_nested_block() async {
     await assertNoDiagnostics(r'''
 int test(bool b) {
   final a = 3;
@@ -209,6 +209,35 @@ int test(bool b) {
     return a;
   }
   return a + 1;
+}
+''');
+  }
+
+  void test_does_not_report_if_type_promoted() async {
+    await assertNoDiagnostics(r'''
+class Test {
+  final Map<String, Object> _map = {};
+
+  T get<T>(String key) {
+    final value = _map[key];
+    if (value is T) {
+      // local variable is promoted to T
+      return value;
+    }
+
+    throw Exception('value is not of type $T');
+  }
+}
+''');
+  }
+
+  void test_does_not_report_if_used_in_other_return_statement() async {
+    await assertNoDiagnostics(r'''
+String test(bool someCondition) {
+  final a = 'test';
+  if (someCondition) return a;
+
+  return 'something $a';
 }
 ''');
   }
