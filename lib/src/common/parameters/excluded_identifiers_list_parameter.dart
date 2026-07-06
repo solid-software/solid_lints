@@ -5,7 +5,7 @@ import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.
 /// A model representing "exclude" parameters for linting, defining
 /// identifiers (classes, methods, functions) to be ignored during analysis.
 ///
-/// @docType List<String | Map>
+/// @docType String | Map | List<String | Map>
 class ExcludedIdentifiersListParameter {
   /// A list of identifiers (classes, methods, functions) that should be
   /// excluded from the lint.

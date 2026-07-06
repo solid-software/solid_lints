@@ -23,9 +23,14 @@ class DocsParser<T> {
   T parse(Directory dir, {bool sortRulesAlphabetically = true}) {
     final libDir = dir.parent.parent;
     final customTypes = _scanForCustomTypes(libDir);
+    final templates = ParserUtils.scanForTemplates(libDir);
 
     final rulesDocs = _findRuleFiles(dir)
-        .map((path) => RuleParser(rulePath: path, customTypes: customTypes))
+        .map((path) => RuleParser(
+              rulePath: path,
+              customTypes: customTypes,
+              templates: templates,
+            ))
         .map((parser) => parser.parse())
         .toList(growable: false);
 

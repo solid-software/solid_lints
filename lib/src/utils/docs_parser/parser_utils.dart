@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
@@ -16,17 +18,89 @@ class ParserUtils {
 
   /// Parse a Dart file and return its [CompilationUnit]
   static CompilationUnit parseAst(String path) => parseFile(
-        path: path,
-        featureSet: FeatureSet.latestLanguageVersion(),
-      ).unit;
+    path: path,
+    featureSet: FeatureSet.latestLanguageVersion(),
+  ).unit;
 
   /// Format [documentationComment]
-  static String? formatDocumentationComment(Comment? documentationComment) =>
-      documentationComment?.tokens
-          .map((token) => token.lexeme)
-          .join('\n')
-          .replaceAll('///', '')
-          .trim();
+  static String? formatDocumentationComment(Comment? documentationComment) {
+    if (documentationComment == null) return null;
+    return documentationComment.tokens
+        .map((token) {
+          final lexeme = token.lexeme;
+          if (lexeme.startsWith('/// ')) {
+            return lexeme.substring(4);
+          } else if (lexeme == '///') {
+            return '';
+          } else if (lexeme.startsWith('///')) {
+            return lexeme.substring(3);
+          }
+          return lexeme;
+        })
+        .join('\n')
+        .trim();
+  }
+
+  /// Scan the codebase directory for all `{@template}` definitions
+  static Map<String, String> scanForTemplates(Directory libDir) {
+    final templates = <String, String>{};
+    final templateRegex = RegExp(
+      r'{@template\s+([a-zA-Z0-9_\.-]+)\}([\s\S]*?){@endtemplate\}',
+    );
+
+    for (final entity in libDir.listSync(recursive: true)) {
+      if (entity is! File || !entity.path.endsWith('.dart')) continue;
+
+      try {
+        final content = entity.readAsStringSync();
+        for (final match in templateRegex.allMatches(content)) {
+          final name = match.group(1)!;
+          final rawContent = match.group(2)!;
+          final cleanContent = rawContent
+              .split('\n')
+              .map((line) {
+                final trimmed = line.trim();
+                if (trimmed.startsWith('/// ')) {
+                  return trimmed.substring(4);
+                } else if (trimmed == '///') {
+                  return '';
+                } else if (trimmed.startsWith('///')) {
+                  return trimmed.substring(3);
+                }
+                return trimmed;
+              })
+              .join('\n')
+              .trim();
+
+          templates[name] = cleanContent;
+        }
+      } catch (_) {}
+    }
+    return templates;
+  }
+
+  /// Expand `{@macro}` references in the formatted documentation comment and
+  /// strip template tags
+  static String expandMacros(String text, Map<String, String> templates) {
+    final macroRegex = RegExp(r'{@macro\s+([a-zA-Z0-9_\.-]+)\}');
+    var expanded = text;
+
+    for (var i = 0; i < 5; i++) {
+      final newExpanded = expanded.replaceAllMapped(macroRegex, (match) {
+        final name = match.group(1)!;
+        return templates[name] ?? '';
+      });
+      if (newExpanded == expanded) break;
+      expanded = newExpanded;
+    }
+
+    final templateTagRegex = RegExp(
+      r'{@template\s+[a-zA-Z0-9_\.-]+\}|{@endtemplate\}',
+    );
+    expanded = expanded.replaceAll(templateTagRegex, '');
+
+    return expanded.trim();
+  }
 
   /// Convert camelCase string to snake_case
   static String camelCaseToSnakeCase(String camelCaseString) => camelCaseString

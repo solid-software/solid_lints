@@ -7,7 +7,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 ///   - extension
 ///   - enum
 ///
-/// @docType List<String>
+/// @docType String | List<String>
 class ExcludedEntitiesListParameter {
   /// The parameter model
   final Set<String> excludedEntityNames;

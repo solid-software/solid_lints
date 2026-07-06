@@ -16,10 +16,14 @@ class RuleParser {
   /// Global map of custom types to their primitives
   final Map<String, String> customTypes;
 
+  /// Global map of template definitions
+  final Map<String, String> templates;
+
   /// [RuleParser] constructor
   const RuleParser({
     required this.rulePath,
     required this.customTypes,
+    required this.templates,
   });
 
   ///
@@ -35,13 +39,15 @@ class RuleParser {
     }
 
     final name = _parseClassName(declaration);
-    final doc = ParserUtils.formatDocumentationComment(
+    var doc = ParserUtils.formatDocumentationComment(
       declaration.documentationComment,
     );
 
     if (name == null || doc == null) {
       throw 'Rule at the path "$rulePath" has invalid format.';
     }
+
+    doc = ParserUtils.expandMacros(doc, templates);
 
     final parameters = ParametersParser(
       ruleDirectory: File(rulePath).parent,
