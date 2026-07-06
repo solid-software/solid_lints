@@ -35,37 +35,39 @@ analyzer:
     parameter_assignments: error
     unnecessary_cast: warning
 
-custom_lint:
-  rules:
-    - avoid_global_state
+solid_lints:
+  diagnostics:
+    avoid_global_state: true
 
-    - avoid_late_keyword:
+    avoid_late_keyword:
       allow_initialized: true
       ignored_types:
         - AnimationController
-
-    - avoid_non_null_assertion:
+    avoid_non_null_assertion:
       ignored_types:
         - IMap
         - BuiltMap
-    - avoid_returning_widgets
-    - avoid_unnecessary_return_variable
-    - avoid_unnecessary_setstate
-    - avoid_unnecessary_type_assertions
-    - avoid_unrelated_type_assertions
-    - avoid_unused_parameters
-    - avoid_debug_print_in_release
-    - avoid_final_with_getter
+    avoid_returning_widgets: true
+    avoid_unnecessary_return_variable: true
+    avoid_unnecessary_setstate: true
+    avoid_unnecessary_type_assertions: true
+    avoid_unrelated_type_assertions: true
+    avoid_unused_parameters:
+      exclude_annotation:
+        - freezed
+        - unfreezed
+    avoid_debug_print_in_release: true
+    avoid_final_with_getter: true
 
-    - cyclomatic_complexity:
+    cyclomatic_complexity:
       max_complexity: 10
 
-    - double_literal_format
+    double_literal_format: true
 
-    - function_lines_of_code:
+    function_lines_of_code:
       max_lines: 200
 
-    - member_ordering:
+    member_ordering:
       order:
         - fields
         - getters_setters
@@ -79,26 +81,28 @@ custom_lint:
         - deactivate_method
         - dispose_method
 
-    - newline_before_return
-    - no_empty_block
-    - no_equal_then_else
-    - prefer_early_return
+    newline_before_return: true
+    no_empty_block: true
+    no_equal_then_else: true
+    prefer_early_return: true
 
-    - no_magic_number:
+    no_magic_number:
       allowed_in_widget_params: true
 
-    - number_of_parameters:
+    number_of_parameters:
       max_parameters: 7
       exclude:
         - method_name: copyWith
 
-    - prefer_conditional_expressions:
+    prefer_conditional_expressions:
       ignore_nested: true
 
-    - prefer_first
-    - prefer_last
-    - prefer_match_file_name
-    - proper_super_calls
+    prefer_first: true
+    prefer_last: true
+    prefer_match_file_name: true
+    proper_super_calls: true
+    named_parameters_ordering: true
+    use_nearest_context: true
 
 linter:
   rules:

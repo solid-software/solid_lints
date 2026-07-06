@@ -43,9 +43,6 @@ $_mockAnalysisOptionsContent''',
     );
   }
 
-  @override
-  String get analysisRule => NumberOfParametersRule.lintName;
-
   Future<void> test_reports_on_exceeding_max_parameters() async {
     await assertAutoDiagnostics('''
 void fun${expectLint(r'(int a, int b, int c)')} {}

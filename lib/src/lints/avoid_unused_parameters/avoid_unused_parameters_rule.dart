@@ -11,6 +11,13 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// Parameters whose names consist only of underscores are also ignored.
 /// Overridden methods and methods used as tear-offs are skipped.
 ///
+/// ### Parameters
+///
+/// #### exclude_annotation
+/// A list of class annotations (such as `freezed` or `unfreezed`) whose
+/// constructor parameters should be ignored by this rule (useful for code
+/// generation).
+///
 /// {@template solid_lints.avoid_unused_parameters.example}
 /// ### Example
 ///

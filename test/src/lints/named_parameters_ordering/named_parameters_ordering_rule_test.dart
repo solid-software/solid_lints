@@ -46,9 +46,6 @@ plugins:
     );
   }
 
-  @override
-  String get analysisRule => NamedParametersOrderingRule.lintName;
-
   Future<void> test_does_not_report_correct_constructor_ordering() async {
     await assertNoDiagnostics(r'''
 class Base {
@@ -259,8 +256,7 @@ void example({
 ''');
   }
 
-  Future<void>
-  test_reports_incorrect_ordering_with_trailing_comments() async {
+  Future<void> test_reports_incorrect_ordering_with_trailing_comments() async {
     await assertAutoDiagnostics('''
 void example({
   int? age, // the age
@@ -272,8 +268,7 @@ void example({
 ''');
   }
 
-  Future<void>
-  test_reports_incorrect_ordering_with_mixed_comments() async {
+  Future<void> test_reports_incorrect_ordering_with_mixed_comments() async {
     await assertAutoDiagnostics('''
 void example({
   /// The age of the user.
@@ -300,8 +295,7 @@ void example({
 ''');
   }
 
-  Future<void>
-  test_does_not_report_with_partial_custom_config() async {
+  Future<void> test_does_not_report_with_partial_custom_config() async {
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent(rules: [rule.name])}
 plugins:

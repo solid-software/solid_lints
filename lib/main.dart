@@ -7,8 +7,11 @@ import 'package:solid_lints/src/lints/avoid_final_with_getter/fixes/avoid_final_
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/avoid_returning_widgets_rule.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/avoid_unnecessary_return_variable_rule.dart';
+import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/avoid_unnecessary_set_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/fixes/avoid_unnecessary_type_assertions_fix.dart';
+import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unrelated_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
@@ -17,11 +20,14 @@ import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_c
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/fixes/named_parameters_ordering_fix.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/named_parameters_ordering_rule.dart';
+import 'package:solid_lints/src/lints/newline_before_return/newline_before_return_rule.dart';
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
+import 'package:solid_lints/src/lints/no_equal_then_else/no_equal_then_else_rule.dart';
 import 'package:solid_lints/src/lints/no_magic_number/no_magic_number_rule.dart';
 import 'package:solid_lints/src/lints/number_of_parameters/number_of_parameters_rule.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/fixes/prefer_conditional_expressions_fix.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/fixes/prefer_first_fix.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
@@ -81,6 +87,12 @@ class SolidLintsPlugin extends Plugin {
       // TODO: Add more lint rules and use analysisLoader
       // for rules that need parameters
       // For example: `CyclomaticComplexityRule(analysisLoader)`
+      AvoidUnnecessaryReturnVariableRule(),
+      AvoidUnnecessarySetStateRule(),
+      AvoidUnrelatedTypeAssertionsRule(),
+      NewlineBeforeReturnRule(),
+      NoEqualThenElseRule(),
+      PreferEarlyReturnRule(),
     ];
 
     for (final lintRule in lintRules) {

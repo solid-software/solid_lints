@@ -24,9 +24,6 @@ class NoEmptyBlockRuleTest extends AnalysisRuleTest with AutoTestLintOffsets {
     super.setUp();
   }
 
-  @override
-  String get analysisRule => NoEmptyBlockRule.lintName;
-
   Future<void> test_reports_on_empty_function() async {
     await assertAutoDiagnostics('''
 void fun() ${expectLint('{}')}
@@ -60,7 +57,8 @@ void fun() {
 ''');
   }
 
-  Future<void> test_does_not_report_on_todo_comment_with_other_comments() async {
+  Future<void>
+  test_does_not_report_on_todo_comment_with_other_comments() async {
     await assertNoDiagnostics(r'''
 // ignore_for_file: todo
 void fun() {
