@@ -43,14 +43,16 @@ solid_lints:
       allow_initialized: true
       ignored_types:
         - AnimationController
-
     avoid_non_null_assertion: true
     avoid_returning_widgets: true
     avoid_unnecessary_return_variable: true
     avoid_unnecessary_setstate: true
     avoid_unnecessary_type_assertions: true
     avoid_unrelated_type_assertions: true
-    avoid_unused_parameters: true
+    avoid_unused_parameters:
+      exclude_annotation:
+        - freezed
+        - unfreezed
     avoid_debug_print_in_release: true
     avoid_final_with_getter: true
 

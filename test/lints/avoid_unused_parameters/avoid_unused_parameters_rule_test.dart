@@ -52,6 +52,7 @@ class Placeholder extends StatelessWidget {
               'SimpleClassName',
               'exclude',
             ],
+            'exclude_annotation': ['freezed'],
           },
         );
 
@@ -344,6 +345,69 @@ class SimpleClassName {
   void simpleMethodName2(${expectLint('String s')}) {
     return;
   }
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_on_redirecting_factory_constructors() async {
+    await assertNoDiagnostics(r'''
+class RedirectingClass {
+  const factory RedirectingClass({required int parameter}) = _RedirectingClass;
+}
+
+class _RedirectingClass implements RedirectingClass {
+  final int parameter;
+  const _RedirectingClass({required this.parameter});
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_freezed_classes() async {
+    await assertNoDiagnostics(r'''
+const freezed = Object();
+
+@freezed
+class Test {
+  const Test(int unusedParameter);
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_on_excluded_declaration_and_annotation_single_string() async {
+    final FakeAnalysisOptionsLoader fakeAnalysisOptionsLoader =
+        FakeAnalysisOptionsLoader(
+          ruleOptions: {
+            'exclude': 'excludeMethod',
+            'exclude_annotation': 'freezed',
+          },
+        );
+
+    rule = AvoidUnusedParametersRule(
+      analysisOptionsLoader: fakeAnalysisOptionsLoader,
+    );
+
+    await assertNoDiagnostics(r'''
+const freezed = Object();
+
+@freezed
+class Test {
+  const Test(int unusedParameter);
+}
+
+class Meta {
+  const Meta();
+}
+const meta = Meta();
+
+@meta.freezed
+class TestWithPrefix {
+  const TestWithPrefix(int unusedParameter);
+}
+
+void excludeMethod(String s) {
+  return;
 }
 ''');
   }
