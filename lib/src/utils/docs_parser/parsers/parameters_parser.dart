@@ -1,35 +1,37 @@
 import 'dart:io';
 
-import 'package:analyzer/dart/analysis/features.dart';
-import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:solid_lints/src/utils/docs_parser/models/parameter_doc.dart';
-import 'package:solid_lints/src/utils/docs_parser/parsers/base_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/parser_utils.dart';
 
-///
-class ParametersParser extends BaseParser {
+/// ParametersParser class to parse parameters of rules
+class ParametersParser {
   static const _parametersDir = 'models';
   static const _parametersSuffix = 'parameters';
 
   /// Directory containing rule file
   final Directory ruleDirectory;
 
+  /// Global map of custom types to their primitives
+  final Map<String, String> customTypes;
+
   ///
-  const ParametersParser({required this.ruleDirectory});
+  const ParametersParser({
+    required this.ruleDirectory,
+    required this.customTypes,
+  });
 
   ///
   List<ParameterDoc> parse() {
     final parametersPath = _getParametersFilePath();
     if (parametersPath == null) return [];
 
-    final ast = parseFile(
-      path: parametersPath,
-      featureSet: FeatureSet.latestLanguageVersion(),
-    );
+    final ast = ParserUtils.parseAst(parametersPath);
 
-    final parameterDocs = ast.unit.declarations
+    final parameterDocs =
+        ast.declarations
             .whereType<ClassDeclaration>()
             .map(_parseParametersDocs)
             .firstWhereOrNull((docs) => docs.isNotEmpty) ??
@@ -41,21 +43,27 @@ class ParametersParser extends BaseParser {
   List<ParameterDoc> _parseParametersDocs(ClassDeclaration declaration) {
     final List<ParameterDoc> parameterDocs = [];
 
-    for (final member in declaration.members) {
-      if (member is FieldDeclaration) {
-        final variable = member.fields.variables.first.name;
-        final variableName = variable.lexeme.trim();
+    for (final member in ParserUtils.getClassMembers(declaration)) {
+      if (member is! FieldDeclaration) continue;
+
+      for (final variable in member.fields.variables) {
+        final variableName = variable.name.lexeme.trim();
         if (variableName.startsWith('_')) continue;
 
-        final name = camelCaseToSnakeCase(variableName);
-        final type = member.fields.type.toString();
-        final doc = formatDocumentationComment(
+        final name = ParserUtils.camelCaseToSnakeCase(variableName);
+        var type = member.fields.type.toString();
+        type = type.replaceAllMapped(ParserUtils.wordRegex, (match) {
+          final word = match.group(0)!;
+          return customTypes[word] ?? word;
+        });
+
+        final doc = ParserUtils.formatDocumentationComment(
           member.documentationComment,
         );
 
         if (doc == null) {
           throw 'Documentation is not specified for class: '
-              '${declaration.name.stringValue}';
+              '${ParserUtils.getDeclarationName(declaration)}';
         }
 
         parameterDocs.add(
@@ -78,7 +86,8 @@ class ParametersParser extends BaseParser {
     return dir
         .listSync()
         .firstWhereOrNull(
-          (entity) => fileNameSuffix(entity.uri) == _parametersSuffix,
+          (entity) =>
+              ParserUtils.fileNameSuffix(entity.uri) == _parametersSuffix,
         )
         ?.path;
   }

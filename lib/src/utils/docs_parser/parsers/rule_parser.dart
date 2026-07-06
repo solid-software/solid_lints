@@ -1,34 +1,33 @@
 import 'dart:io';
 
-import 'package:analyzer/dart/analysis/features.dart';
-import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/src/utils/docs_parser/models/rule_doc.dart';
-import 'package:solid_lints/src/utils/docs_parser/parsers/base_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/parser_utils.dart';
 import 'package:solid_lints/src/utils/docs_parser/parsers/parameters_parser.dart';
 
-///
-class RuleParser extends BaseParser {
+/// RuleParser class to parse lint rules
+class RuleParser {
   static const _lintNameVariable = 'lintName';
 
   /// Path to the rule file
   final String rulePath;
 
+  /// Global map of custom types to their primitives
+  final Map<String, String> customTypes;
+
   /// [RuleParser] constructor
-  const RuleParser(this.rulePath);
+  const RuleParser({
+    required this.rulePath,
+    required this.customTypes,
+  });
 
   ///
   RuleDoc parse() {
-    final ast = parseFile(
-      path: rulePath,
-      featureSet: FeatureSet.latestLanguageVersion(),
-    );
+    final ast = ParserUtils.parseAst(rulePath);
     final declaration =
-        ast.unit.declarations.whereType<ClassDeclaration>().firstWhereOrNull(
-              (declaration) =>
-                  declaration.documentationComment?.childEntities.isNotEmpty ??
-                  false,
+        ast.declarations.whereType<ClassDeclaration>().firstWhereOrNull(
+              (declaration) => declaration.documentationComment != null,
             );
 
     if (declaration == null) {
@@ -36,7 +35,7 @@ class RuleParser extends BaseParser {
     }
 
     final name = _parseClassName(declaration);
-    final doc = formatDocumentationComment(
+    final doc = ParserUtils.formatDocumentationComment(
       declaration.documentationComment,
     );
 
@@ -46,6 +45,7 @@ class RuleParser extends BaseParser {
 
     final parameters = ParametersParser(
       ruleDirectory: File(rulePath).parent,
+      customTypes: customTypes,
     ).parse();
 
     return RuleDoc(
@@ -56,15 +56,16 @@ class RuleParser extends BaseParser {
   }
 
   String? _parseClassName(ClassDeclaration classDeclaration) {
-    for (final member in classDeclaration.members) {
-      if (member is FieldDeclaration &&
-          member.isStatic &&
-          member.fields.variables.first.name.lexeme == _lintNameVariable) {
-        final variableName = member.fields.variables.first.initializer;
+    for (final member in ParserUtils.getClassMembers(classDeclaration)) {
+      if (member is! FieldDeclaration || !member.isStatic) continue;
 
-        if (variableName is StringLiteral) {
-          return variableName.stringValue;
-        }
+      final variable = member.fields.variables.firstWhereOrNull(
+        (v) => v.name.lexeme == _lintNameVariable,
+      );
+      final initializer = variable?.initializer;
+
+      if (initializer is StringLiteral) {
+        return initializer.stringValue;
       }
     }
 

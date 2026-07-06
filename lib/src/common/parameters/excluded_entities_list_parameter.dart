@@ -3,10 +3,11 @@ import 'package:analyzer/dart/ast/ast.dart';
 /// A model representing "exclude_entity" parameters for linting, defining
 /// identifiers (classes, mixins, enums, extensions) to be ignored during
 /// analysis.
-/// Supported entities:
 ///   - mixin
 ///   - extension
 ///   - enum
+///
+/// @docType List<String>
 class ExcludedEntitiesListParameter {
   /// The parameter model
   final Set<String> excludedEntityNames;

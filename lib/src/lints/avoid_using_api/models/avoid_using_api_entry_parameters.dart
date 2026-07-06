@@ -32,6 +32,7 @@ import 'package:solid_lints/src/utils/parameter_utils.dart';
 ///         includes: []
 ///         excludes: []
 /// ```
+/// @docType Map
 class AvoidUsingApiEntryParameters {
   /// Variable/method name
   final String? identifier;
