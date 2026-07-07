@@ -1,7 +1,9 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
 import 'package:solid_lints/src/lints/prefer_last/visitors/prefer_last_visitor.dart';
+import 'package:solid_lints/src/models/rule_with_fixes.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// Warns about usage of `iterable[length - 1]` or
@@ -25,7 +27,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///
 /// a.last; // OK
 /// ```
-class PreferLastRule extends SolidLintRule {
+class PreferLastRule extends SolidLintRule implements RuleWithFixes {
   /// This lint rule represents the error if iterable
   /// access can be simplified.
   static const lintName = 'prefer_last';
@@ -40,6 +42,10 @@ class PreferLastRule extends SolidLintRule {
 
   @override
   LintCode get diagnosticCode => _code;
+
+  @override
+  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
+      const [MapEntry(_code, PreferLastFix.new)];
 
   @override
   void registerNodeProcessors(

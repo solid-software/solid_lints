@@ -2,7 +2,9 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/avoid_final_with_getter/fixes/avoid_final_with_getter_fix.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/visitors/avoid_final_with_getter_visitor.dart';
+import 'package:solid_lints/src/models/rule_with_fixes.dart';
 
 /// Avoid using final private fields with getters.
 ///
@@ -30,7 +32,7 @@ import 'package:solid_lints/src/lints/avoid_final_with_getter/visitors/avoid_fin
 /// }
 /// ```
 ///
-class AvoidFinalWithGetterRule extends AnalysisRule {
+class AvoidFinalWithGetterRule extends AnalysisRule implements RuleWithFixes {
   /// This lint rule represents
   /// the error whether we use final private fields with getters.
   static const lintName = 'avoid_final_with_getter';
@@ -44,10 +46,14 @@ class AvoidFinalWithGetterRule extends AnalysisRule {
 
   /// Creates a new instance of [AvoidFinalWithGetterRule]
   AvoidFinalWithGetterRule()
-      : super(name: lintName, description: code.problemMessage);
+    : super(name: lintName, description: code.problemMessage);
 
   @override
   LintCode get diagnosticCode => code;
+
+  @override
+  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
+      const [MapEntry(code, AvoidFinalWithGetterFix.new)];
 
   @override
   void registerNodeProcessors(

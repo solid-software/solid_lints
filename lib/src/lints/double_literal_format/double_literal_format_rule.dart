@@ -2,7 +2,9 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/double_literal_format/fixes/double_literal_format_fix.dart';
 import 'package:solid_lints/src/lints/double_literal_format/visitors/double_literal_format_visitor.dart';
+import 'package:solid_lints/src/models/rule_with_fixes.dart';
 
 /// A `double_literal_format` rule which
 /// checks that double literals should begin with 0. instead of just .,
@@ -23,7 +25,8 @@ import 'package:solid_lints/src/lints/double_literal_format/visitors/double_lite
 /// var a = 5.23, b = 0.16e+5, c = -0.25, d = -0.4e-5;
 /// ```
 /// {@endtemplate}
-class DoubleLiteralFormatRule extends MultiAnalysisRule {
+class DoubleLiteralFormatRule extends MultiAnalysisRule
+    implements RuleWithFixes {
   /// This lint rule represents
   /// the error whether we use bad formatted double literals.
   static const lintName = 'double_literal_format';
@@ -96,13 +99,6 @@ class DoubleLiteralFormatRule extends MultiAnalysisRule {
     uniqueName: 'trailingZero',
   );
 
-  @override
-  List<DiagnosticCode> get diagnosticCodes => [
-    leadingZeroCode,
-    leadingDecimalCode,
-    trailingZeroCode,
-  ];
-
   /// Creates a new instance of [DoubleLiteralFormatRule]
   DoubleLiteralFormatRule()
     : super(
@@ -112,6 +108,17 @@ class DoubleLiteralFormatRule extends MultiAnalysisRule {
             'should not end with a trailing 0 and '
             'should not start with a leading 0',
       );
+
+  @override
+  List<DiagnosticCode> get diagnosticCodes => [
+    leadingZeroCode,
+    leadingDecimalCode,
+    trailingZeroCode,
+  ];
+
+  @override
+  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
+      diagnosticCodes.map((code) => MapEntry(code, DoubleLiteralFormatFix.new));
 
   @override
   void registerNodeProcessors(
