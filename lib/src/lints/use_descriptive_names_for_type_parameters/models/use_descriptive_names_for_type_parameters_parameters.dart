@@ -11,7 +11,7 @@ class UseDescriptiveNamesForTypeParametersParameters {
     required this.minTypeParameters,
   });
 
-  /// Method for creating from json data
+  /// Method for creating from json data.
   factory UseDescriptiveNamesForTypeParametersParameters.fromJson(
     Map<String, Object?> json,
   ) =>
