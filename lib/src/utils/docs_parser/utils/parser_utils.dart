@@ -119,7 +119,7 @@ class ParserUtils {
 
   /// Get the dart file name suffix
   static String fileNameSuffix(Uri uri) =>
-      p.basenameWithoutExtension(uri.path).split('_').last;
+      uri.pathSegments.last.replaceFirst(RegExp(r'\.dart$'), '').split('_').last;
 
   /// Safely get the name of a ClassDeclaration or EnumDeclaration
   static String? getDeclarationName(CompilationUnitMember declaration) =>
