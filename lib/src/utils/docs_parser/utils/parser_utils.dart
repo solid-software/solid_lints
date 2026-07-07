@@ -69,7 +69,11 @@ class ParserUtils {
 
   /// Expand `{@macro}` references in the formatted documentation comment and
   /// strip template tags
-  static String expandMacros(String text, Map<String, String> templates) {
+  static String expandMacros(
+    String text,
+    Map<String, String> templates, {
+    String? source,
+  }) {
     var expanded = text;
 
     if (expanded.contains('{@macro')) {
@@ -80,7 +84,9 @@ class ParserUtils {
             final name = match.group(1)!;
             final template = templates[name];
             if (template == null) {
-              throw 'Macro reference to non-existent template: "$name"';
+              final sourceSuffix = source != null ? ' in $source' : '';
+              throw 'Macro reference to non-existent template: '
+                  '"$name"$sourceSuffix';
             }
             return template;
           },
@@ -91,8 +97,9 @@ class ParserUtils {
         expanded = newExpanded;
 
         if (i == _maxMacroDepth - 1 && expanded.contains('{@macro')) {
+          final sourceSuffix = source != null ? ' in $source' : '';
           throw 'Circular macro dependency detected or macro expansion depth '
-              'exceeded the limit of $_maxMacroDepth';
+              'exceeded the limit of $_maxMacroDepth$sourceSuffix';
         }
       }
     }

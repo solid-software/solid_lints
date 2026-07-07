@@ -48,7 +48,7 @@ class RuleParser {
       throw 'Rule at the path "$rulePath" does not have documentation string';
     }
 
-    doc = ParserUtils.expandMacros(doc, templates);
+    doc = ParserUtils.expandMacros(doc, templates, source: rulePath);
 
     final parameters = ParametersParser(
       ruleDirectory: File(rulePath).parent,

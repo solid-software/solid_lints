@@ -61,7 +61,8 @@ class ParametersParser {
         final doc = member.documentationComment.formatted;
 
         if (doc == null) {
-          throw 'Documentation is not specified for class: '
+          throw 'Documentation is not specified for field '
+              '"$variableName" in class: '
               '${ParserUtils.getDeclarationName(declaration)}';
         }
 
