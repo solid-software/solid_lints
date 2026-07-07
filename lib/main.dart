@@ -81,8 +81,7 @@ class SolidLintsPlugin extends Plugin {
     for (final lintRule in lintRules) {
       registry.registerLintRule(lintRule);
       if (lintRule is RuleWithFixes) {
-        final ruleWithFixes = lintRule as RuleWithFixes;
-        for (final entry in ruleWithFixes.fixesForCodes) {
+        for (final entry in (lintRule as RuleWithFixes).fixesForCodes) {
           registry.registerFixForRule(entry.key, entry.value);
         }
       }
