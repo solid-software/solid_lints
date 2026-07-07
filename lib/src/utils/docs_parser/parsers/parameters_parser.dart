@@ -52,7 +52,7 @@ class ParametersParser {
         if (variableName.startsWith('_')) continue;
 
         final name = ParserUtils.camelCaseToSnakeCase(variableName);
-        var type = member.fields.type.toString();
+        var type = member.fields.type?.toString() ?? 'dynamic';
         type = type.replaceAllMapped(ParserRegexes.wordRegex, (match) {
           final word = match.group(0)!;
           return customTypes[word] ?? word;

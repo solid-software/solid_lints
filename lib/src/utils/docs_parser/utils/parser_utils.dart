@@ -88,12 +88,12 @@ class ParserUtils {
 
         if (newExpanded == expanded) break;
 
-        if (i == _maxMacroDepth - 1) {
+        expanded = newExpanded;
+
+        if (i == _maxMacroDepth - 1 && expanded.contains('{@macro')) {
           throw 'Circular macro dependency detected or macro expansion depth '
               'exceeded the limit of $_maxMacroDepth';
         }
-
-        expanded = newExpanded;
       }
     }
 
