@@ -11,6 +11,18 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// "Bang" operator with Maps is allowed, as [Dart docs](https://dart.dev/null-safety/understanding-null-safety#the-map-index-operator-is-nullable)
 /// recommend using it for accessing Map values that are known to be present.
 ///
+/// ### Example config:
+///
+/// ```yaml
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       avoid_non_null_assertion:
+///         ignored_types:
+///           - IMap
+///           - BuiltMap
+/// ```
+///
 /// ### Example
 /// #### BAD:
 ///

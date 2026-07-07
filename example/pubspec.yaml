@@ -10,7 +10,6 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  custom_lint: ^0.8.1
   solid_lints:
     path: ../
   test: ^1.25.14

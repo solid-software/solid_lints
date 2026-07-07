@@ -15,6 +15,18 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///
 /// More details: https://github.com/flutter/flutter/issues/19269
 ///
+/// ### Example config:
+///
+/// ```yaml
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       avoid_returning_widgets:
+///         exclude:
+///           - class_name: MyWidget
+///             method_name: buildCustomButton
+/// ```
+///
 /// ### Example
 ///
 /// #### BAD:

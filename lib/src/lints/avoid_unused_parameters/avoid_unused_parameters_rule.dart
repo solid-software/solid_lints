@@ -11,6 +11,20 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// Parameters whose names consist only of underscores are also ignored.
 /// Overridden methods and methods used as tear-offs are skipped.
 ///
+/// ### Example config:
+///
+/// ```yaml
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       avoid_unused_parameters:
+///         exclude:
+///           - class_name: MyClass
+///             method_name: myMethod
+///         exclude_annotation:
+///           - freezed
+/// ```
+///
 /// {@template solid_lints.avoid_unused_parameters.example}
 /// ### Example
 ///
