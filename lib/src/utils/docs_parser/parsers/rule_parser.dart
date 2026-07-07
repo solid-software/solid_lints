@@ -1,15 +1,12 @@
 import 'dart:io';
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:collection/collection.dart';
 import 'package:solid_lints/src/utils/docs_parser/models/rule_doc.dart';
-import 'package:solid_lints/src/utils/docs_parser/parser_utils.dart';
 import 'package:solid_lints/src/utils/docs_parser/parsers/parameters_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
 /// RuleParser class to parse lint rules
 class RuleParser {
-  static const _lintNameVariable = 'lintName';
-
   /// Path to the rule file
   final String rulePath;
 
@@ -29,22 +26,26 @@ class RuleParser {
   ///
   RuleDoc parse() {
     final ast = ParserUtils.parseAst(rulePath);
-    final declaration =
-        ast.declarations.whereType<ClassDeclaration>().firstWhereOrNull(
-              (declaration) => declaration.documentationComment != null,
-            );
 
-    if (declaration == null) {
-      throw 'Rule at the path "$rulePath" does not have documentation string';
+    ClassDeclaration? ruleClass;
+    String? name;
+
+    for (final declaration in ast.declarations.whereType<ClassDeclaration>()) {
+      final parsedName = ParserUtils.getLintName(declaration);
+      if (parsedName != null) {
+        ruleClass = declaration;
+        name = parsedName;
+        break;
+      }
     }
 
-    final name = _parseClassName(declaration);
-    var doc = ParserUtils.formatDocumentationComment(
-      declaration.documentationComment,
-    );
+    if (ruleClass == null || name == null) {
+      throw 'Rule class with "lintName" not found in "$rulePath".';
+    }
 
-    if (name == null || doc == null) {
-      throw 'Rule at the path "$rulePath" has invalid format.';
+    var doc = ruleClass.documentationComment.formatted;
+    if (doc == null) {
+      throw 'Rule at the path "$rulePath" does not have documentation string';
     }
 
     doc = ParserUtils.expandMacros(doc, templates);
@@ -61,20 +62,4 @@ class RuleParser {
     );
   }
 
-  String? _parseClassName(ClassDeclaration classDeclaration) {
-    for (final member in ParserUtils.getClassMembers(classDeclaration)) {
-      if (member is! FieldDeclaration || !member.isStatic) continue;
-
-      final variable = member.fields.variables.firstWhereOrNull(
-        (v) => v.name.lexeme == _lintNameVariable,
-      );
-      final initializer = variable?.initializer;
-
-      if (initializer is StringLiteral) {
-        return initializer.stringValue;
-      }
-    }
-
-    return null;
-  }
 }

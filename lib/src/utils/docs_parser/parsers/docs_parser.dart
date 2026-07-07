@@ -2,8 +2,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:solid_lints/src/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
-import 'package:solid_lints/src/utils/docs_parser/parser_utils.dart';
 import 'package:solid_lints/src/utils/docs_parser/parsers/rule_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_regexes.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
 /// DocsParser orchestration class
 class DocsParser<T> {
@@ -21,16 +22,18 @@ class DocsParser<T> {
 
   ///
   T parse(Directory dir, {bool sortRulesAlphabetically = true}) {
-    final libDir = dir.parent.parent;
+    final libDir = ParserUtils.findLibDir(dir);
     final customTypes = _scanForCustomTypes(libDir);
     final templates = ParserUtils.scanForTemplates(libDir);
 
     final rulesDocs = _findRuleFiles(dir)
-        .map((path) => RuleParser(
-              rulePath: path,
-              customTypes: customTypes,
-              templates: templates,
-            ))
+        .map(
+          (path) => RuleParser(
+            rulePath: path,
+            customTypes: customTypes,
+            templates: templates,
+          ),
+        )
         .map((parser) => parser.parse())
         .toList(growable: false);
 
@@ -63,12 +66,10 @@ class DocsParser<T> {
           final name = ParserUtils.getDeclarationName(declaration);
           if (name == null) continue;
 
-          final doc = ParserUtils.formatDocumentationComment(
-            declaration.documentationComment,
-          );
+          final doc = declaration.documentationComment.formatted;
           if (doc == null) continue;
 
-          final match = ParserUtils.docTypeRegex.firstMatch(doc);
+          final match = ParserRegexes.docTypeRegex.firstMatch(doc);
           final type = match?.group(1);
           if (type != null) {
             customTypes[name] = type.trim();
