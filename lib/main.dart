@@ -33,6 +33,7 @@ import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/fixes/prefer_last_fix.dart';
 import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
+import 'package:solid_lints/src/lints/use_descriptive_names_for_type_parameters/use_descriptive_names_for_type_parameters_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/fixes/rename_nearest_context_parameter_fix.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
 
@@ -80,6 +81,9 @@ class SolidLintsPlugin extends Plugin {
       CyclomaticComplexityRule(analysisOptionsLoader: analysisLoader),
       NoEmptyBlockRule(analysisOptionsLoader: analysisLoader),
       UseNearestContextRule(),
+      UseDescriptiveNamesForTypeParametersRule(
+        analysisOptionsLoader: analysisLoader,
+      ),
       NoMagicNumberRule(analysisOptionsLoader: analysisLoader),
       preferFirstRule,
       preferConditionalExpressionsRule,

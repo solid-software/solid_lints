@@ -11,12 +11,18 @@ class UseDescriptiveNamesForTypeParametersParameters {
     required this.minTypeParameters,
   });
 
+  /// Empty [UseDescriptiveNamesForTypeParametersParameters] model.
+  factory UseDescriptiveNamesForTypeParametersParameters.empty() {
+    return const UseDescriptiveNamesForTypeParametersParameters(
+      minTypeParameters: _defaultMinTypeParameters,
+    );
+  }
+
   /// Method for creating from json data.
   factory UseDescriptiveNamesForTypeParametersParameters.fromJson(
     Map<String, Object?> json,
-  ) =>
-      UseDescriptiveNamesForTypeParametersParameters(
-        minTypeParameters:
-            json['min_type_parameters'] as int? ?? _defaultMinTypeParameters,
-      );
+  ) => UseDescriptiveNamesForTypeParametersParameters(
+    minTypeParameters:
+        json['min_type_parameters'] as int? ?? _defaultMinTypeParameters,
+  );
 }

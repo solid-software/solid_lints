@@ -1,76 +1,88 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/use_descriptive_names_for_type_parameters/models/use_descriptive_names_for_type_parameters_parameters.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
+import 'package:solid_lints/src/lints/use_descriptive_names_for_type_parameters/visitors/use_descriptive_names_for_type_parameters_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A `use_descriptive_names_for_type_parameters` rule which
 /// warns about single-letter type parameter names when there are
 /// three or more type parameters.
+///
+/// ### Example:
+///
+/// Assuming config:
+///
+/// ```yaml
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       use_descriptive_names_for_type_parameters:
+///         min_type_parameters: 3
+/// ```
+///
+/// #### BAD:
+/// ```dart
+/// class MyClass<T, U, V> {} // LINT
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class MyClass<TSource, TResult, TError> {} // OK
+/// class MyClass2<T, U> {} // OK
+/// ```
 class UseDescriptiveNamesForTypeParametersRule
     extends SolidLintRule<UseDescriptiveNamesForTypeParametersParameters> {
   /// The lint rule name.
   static const lintName = 'use_descriptive_names_for_type_parameters';
 
-  UseDescriptiveNamesForTypeParametersRule._(super.config);
-
-  /// Creates a new instance of [UseDescriptiveNamesForTypeParametersRule]
-  /// based on the lint configuration.
-  factory UseDescriptiveNamesForTypeParametersRule.createRule(
-    CustomLintConfigs configs,
-  ) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      paramsParser: UseDescriptiveNamesForTypeParametersParameters.fromJson,
-      problemMessage: (value) =>
-          'Type parameters should have descriptive names instead '
-          'of single letters when there are ${value.minTypeParameters} or '
-          'more type parameters.',
-    );
-
-    return UseDescriptiveNamesForTypeParametersRule._(rule);
-  }
+  static const _code = LintCode(
+    lintName,
+    'Type parameters should have descriptive names instead '
+    'of single letters when there are {0} or '
+    'more type parameters.',
+  );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    ErrorReporter reporter,
-    CustomLintContext context,
+  DiagnosticCode get diagnosticCode => _code;
+
+  /// Creates a new instance of [UseDescriptiveNamesForTypeParametersRule].
+  UseDescriptiveNamesForTypeParametersRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+         name: lintName,
+         description:
+             'Warns about single-letter type parameter names when there are '
+             'three or more type parameters.',
+         parametersParser:
+             UseDescriptiveNamesForTypeParametersParameters.fromJson,
+       );
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    void checkTypeParameters(TypeParameterList? typeParameters) {
-      _checkAndReport(typeParameters, reporter);
-    }
+    super.registerNodeProcessors(registry, context);
 
-    context.registry
-      ..addClassDeclaration((node) => checkTypeParameters(node.typeParameters))
-      ..addFunctionDeclaration(
-        (node) => checkTypeParameters(node.functionExpression.typeParameters),
-      )
-      ..addMethodDeclaration((node) => checkTypeParameters(node.typeParameters))
-      ..addGenericTypeAlias((node) => checkTypeParameters(node.typeParameters))
-      ..addExtensionDeclaration(
-        (node) => checkTypeParameters(node.typeParameters),
-      )
-      ..addMixinDeclaration((node) => checkTypeParameters(node.typeParameters));
-  }
+    final parameters =
+        getParametersForContext(context) ??
+        UseDescriptiveNamesForTypeParametersParameters.empty();
 
-  void _checkAndReport(
-    TypeParameterList? typeParameters,
-    ErrorReporter reporter,
-  ) {
-    if (typeParameters == null ||
-        typeParameters.typeParameters.length <
-            config.parameters.minTypeParameters) {
-      return;
-    }
+    final visitor = UseDescriptiveNamesForTypeParametersVisitor(
+      this,
+      parameters,
+    );
 
-    for (final param in typeParameters.typeParameters) {
-      final name = param.name.lexeme;
-      if (name.length == 1) {
-        reporter.atNode(param, code);
-      }
-    }
+    registry.addClassDeclaration(this, visitor);
+    registry.addEnumDeclaration(this, visitor);
+    registry.addFunctionExpression(this, visitor);
+    registry.addMethodDeclaration(this, visitor);
+    registry.addGenericTypeAlias(this, visitor);
+    registry.addFunctionTypeAlias(this, visitor);
+    registry.addGenericFunctionType(this, visitor);
+    registry.addExtensionDeclaration(this, visitor);
+    registry.addMixinDeclaration(this, visitor);
+    registry.addExtensionTypeDeclaration(this, visitor);
   }
 }
