@@ -43,9 +43,6 @@ $_mockAnalysisOptionsContent''',
     );
   }
 
-  @override
-  String get analysisRule => CyclomaticComplexityRule.lintName;
-
   Future<void> test_reports_when_complexity_exceeds_threshold() async {
     await assertAutoDiagnostics('''
 void cyclomaticComplexity() ${expectLint(r'''{
@@ -280,7 +277,6 @@ void test(List<int> l1, List<int> l2, List<int> l3, List<int> l4) ${expectLint(r
 }''')}
 ''');
   }
-
 
   Future<void>
   test_reports_when_complexity_exceeds_threshold_due_to_logical_and_pattern() async {

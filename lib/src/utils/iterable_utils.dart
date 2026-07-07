@@ -6,10 +6,22 @@ extension MultiSortedByIterable<T> on Iterable<T> {
   ///
   /// The first key selector that produces a non-zero comparison is used.
   List<T> multiSortedBy(List<Comparable<dynamic> Function(T)> keys) => sorted(
-        (a, b) =>
-            keys
-                .map((key) => key(a).compareTo(key(b)))
-                .firstWhereOrNull((comparison) => comparison != 0) ??
-            0,
-      );
+    (a, b) =>
+        keys
+            .map((key) => key(a).compareTo(key(b)))
+            .firstWhereOrNull((comparison) => comparison != 0) ??
+        0,
+  );
+}
+
+/// Extension on [Iterable] that provides a [pairwise] method for grouping
+/// elements.
+extension IterablePairwise<T> on Iterable<T> {
+  /// Returns an iterable of overlapping pairs of elements.
+  /// For example, `[1, 2, 3].pairwise()` returns `[(1, 2), (2, 3)]`.
+  Iterable<(T, T)> pairwise() sync* {
+    for (var i = 0; i + 1 < length; i++) {
+      yield (elementAt(i), elementAt(i + 1));
+    }
+  }
 }

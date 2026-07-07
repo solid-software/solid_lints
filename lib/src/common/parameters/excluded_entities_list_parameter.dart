@@ -20,12 +20,16 @@ class ExcludedEntitiesListParameter {
     required this.excludedEntityNames,
   });
 
-  /// Method for creating from json data
+  /// Creates an [ExcludedEntitiesListParameter] from JSON.
   factory ExcludedEntitiesListParameter.fromJson(Map<String, Object?> json) {
-    final excludedEntities = json['exclude_entity'];
-    if (excludedEntities is Iterable) {
+    final raw = json['exclude_entity'];
+    if (raw is Iterable) {
       return ExcludedEntitiesListParameter(
-        excludedEntityNames: excludedEntities.cast<String>().toSet(),
+        excludedEntityNames: raw.whereType<String>().toSet(),
+      );
+    } else if (raw is String) {
+      return ExcludedEntitiesListParameter(
+        excludedEntityNames: {raw},
       );
     }
 

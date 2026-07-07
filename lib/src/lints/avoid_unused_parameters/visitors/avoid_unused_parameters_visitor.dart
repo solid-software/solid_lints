@@ -45,8 +45,10 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     final parent = node.parent;
     final parameters = node.parameters;
 
-    if (parent is ClassDeclaration && parent.abstractKeyword != null ||
+    if ((parent is ClassDeclaration && parent.abstractKeyword != null) ||
         node.externalKeyword != null ||
+        node.redirectedConstructor != null ||
+        _hasExcludedAnnotationClass(node) ||
         parameters.parameters.isEmpty) {
       return;
     }
@@ -71,7 +73,7 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
     final parent = node.parent;
     final parameters = node.parameters;
 
-    if (parent is ClassDeclaration && parent.abstractKeyword != null ||
+    if ((parent is ClassDeclaration && parent.abstractKeyword != null) ||
         node.isAbstract ||
         node.externalKeyword != null ||
         (parameters == null || parameters.parameters.isEmpty)) {
@@ -112,6 +114,9 @@ class AvoidUnusedParametersVisitor extends RecursiveAstVisitor<void> {
   }
 
   bool _isExcluded(Declaration node) => _parameters.exclude.shouldIgnore(node);
+
+  bool _hasExcludedAnnotationClass(ConstructorDeclaration node) =>
+      _parameters.excludeAnnotation.shouldIgnore(node);
 
   Iterable<FormalParameter> _filterOutUnderscoresAndNamed(
     AstNode body,
