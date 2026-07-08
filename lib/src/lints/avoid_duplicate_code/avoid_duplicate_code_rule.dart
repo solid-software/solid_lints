@@ -19,7 +19,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   solid_lints:
 ///     diagnostics:
 ///       avoid_duplicate_code:
-///         min_statements: 3
+///         min_statements: 10
 ///         ignore_literals: false
 ///         ignore_identifiers: true
 ///         check_blocks: false

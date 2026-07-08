@@ -21,7 +21,7 @@ class AvoidDuplicateCodeParameters {
   /// A list of methods/functions that should be excluded from the lint.
   final ExcludedIdentifiersListParameter exclude;
 
-  static const _defaultMinStatements = 3;
+  static const _defaultMinStatements = 10;
 
   /// Constructor for [AvoidDuplicateCodeParameters] model.
   const AvoidDuplicateCodeParameters({
