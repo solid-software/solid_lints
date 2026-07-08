@@ -2,6 +2,7 @@ import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/avoid_final_with_getter_rule.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/fixes/avoid_final_with_getter_fix.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
@@ -70,6 +71,7 @@ class SolidLintsPlugin extends Plugin {
       AvoidNonNullAssertionRule(analysisOptionsLoader: analysisLoader),
       avoidUnnecessaryTypeAssertionsRule,
       AvoidDebugPrintInReleaseRule(),
+      AvoidDuplicateCodeRule(analysisOptionsLoader: analysisLoader),
       doubleLiteralFormatRule,
       ProperSuperCallsRule(),
       NamedParametersOrderingRule(analysisOptionsLoader: analysisLoader),
