@@ -6,7 +6,8 @@ import 'package:solid_lints/src/lints/no_magic_number/models/no_magic_number_par
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 import 'package:solid_lints/src/utils/node_utils.dart';
 
-/// The AST visitor that checks if double and integer literals are magic numbers.
+/// The AST visitor that checks if double and integer literals are magic
+/// numbers.
 class NoMagicNumberRuleVisitor extends SimpleAstVisitor<void> {
   final SolidLintRule _rule;
   final NoMagicNumberParameters _parameters;

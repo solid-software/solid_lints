@@ -18,30 +18,37 @@ bool shouldSkipFile({
   required String path,
   String? rootPath,
 }) {
+  final includes = includeGlobs.map(Glob.new).toList();
+  final excludes = excludeGlobs.map(Glob.new).toList();
+
   final relative = relativePath(path, rootPath);
-  final shouldAnalyzeFile =
-      (includeGlobs.isEmpty || _matchesAnyGlob(includeGlobs, relative)) &&
-          (excludeGlobs.isEmpty || _doesNotMatchGlobs(excludeGlobs, relative));
-  return !shouldAnalyzeFile;
+
+  final matchesInclude = includes.isEmpty ||
+      _matchesAny(includes, relative) ||
+      _matchesAny(includes, path);
+
+  final matchesExclude = excludes.isNotEmpty &&
+      (_matchesAny(excludes, relative) || _matchesAny(excludes, path));
+
+  return !matchesInclude || matchesExclude;
 }
 
-bool _matchesAnyGlob(List<String> globsList, String path) {
-  final hasMatch =
-      globsList.map(Glob.new).toList().any((glob) => glob.matches(path));
-  return hasMatch;
-}
-
-bool _doesNotMatchGlobs(List<String> globList, String path) {
-  return !_matchesAnyGlob(globList, path);
-}
+bool _matchesAny(List<Glob> globs, String path) =>
+    globs.any((glob) => glob.matches(path));
 
 /// Converts path to relative using posix style and
 /// replaces backslashes with forward slashes
 String relativePath(String path, [String? root]) {
-  final uriNormlizedPath = p.toUri(path).normalizePath().path;
-  final uriNormlizedRoot =
+  final uriNormalizedPath = p.toUri(path).normalizePath().path;
+  final uriNormalizedRoot =
       root != null ? p.toUri(root).normalizePath().path : null;
 
-  final relative = p.posix.relative(uriNormlizedPath, from: uriNormlizedRoot);
-  return relative;
+  return p.posix.relative(uriNormalizedPath, from: uriNormalizedRoot);
 }
+
+/// Checks if the given [libraryUri] matches the [targetSource] string
+/// (either exact match or as a directory/package prefix).
+/// Returns `false` if [libraryUri] is null.
+bool matchesSource(String? libraryUri, String targetSource) =>
+    libraryUri != null &&
+    (libraryUri == targetSource || libraryUri.startsWith('$targetSource/'));
