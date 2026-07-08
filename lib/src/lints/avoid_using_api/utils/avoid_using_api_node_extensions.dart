@@ -11,25 +11,27 @@ const String _defaultConstructorIdentifier = '()';
 extension AvoidUsingApiSimpleIdentifierExtension on SimpleIdentifier {
   /// Returns `true` if this identifier matches the given [entry] parameters.
   bool matches(AvoidUsingApiEntryParameters entry) {
-    final source = entry.source;
+    final AvoidUsingApiEntryParameters(
+      :source,
+      :className,
+      :identifier,
+      :namedParameter,
+    ) = entry;
     if (source == null) return false;
 
-    return switch ((entry.className, entry.identifier, entry.namedParameter)) {
-      (final String _, final String _, null) =>
-        _matchesIdFromClassFromSource(entry),
-      (final String _, null, null) =>
-        _matchesClassFromSource(entry),
-      (null, final String _, null) =>
-        _matchesIdFromSource(entry),
-      (null, null, null) =>
-        _matchesSource(entry),
+    return switch ((className, identifier, namedParameter)) {
+      (final String _, final String _, null) => _matchesIdFromClassFromSource(
+        entry,
+      ),
+      (final String _, null, null) => _matchesClassFromSource(entry),
+      (null, final String _, null) => _matchesIdFromSource(entry),
+      (null, null, null) => _matchesSource(entry),
       _ => false,
     };
   }
 
   bool _matchesClassFromSource(AvoidUsingApiEntryParameters entry) {
-    final className = entry.className;
-    final source = entry.source;
+    final AvoidUsingApiEntryParameters(:className, :source) = entry;
     final parent = this.parent;
     final element = this.element;
     if (className == null ||
@@ -48,9 +50,8 @@ extension AvoidUsingApiSimpleIdentifierExtension on SimpleIdentifier {
   }
 
   bool _matchesIdFromClassFromSource(AvoidUsingApiEntryParameters entry) {
-    final identifier = entry.identifier;
-    final className = entry.className;
-    final source = entry.source;
+    final AvoidUsingApiEntryParameters(:identifier, :className, :source) =
+        entry;
     final parent = this.parent;
     final element = this.element;
     if (identifier == null ||
@@ -83,8 +84,7 @@ extension AvoidUsingApiSimpleIdentifierExtension on SimpleIdentifier {
   }
 
   bool _matchesIdFromSource(AvoidUsingApiEntryParameters entry) {
-    final identifier = entry.identifier;
-    final source = entry.source;
+    final AvoidUsingApiEntryParameters(:identifier, :source) = entry;
     if (identifier == null ||
         source == null ||
         name != identifier ||
@@ -104,11 +104,15 @@ extension AvoidUsingApiSimpleIdentifierExtension on SimpleIdentifier {
 extension AvoidUsingApiNamedTypeExtension on NamedType {
   /// Returns `true` if this named type matches the given [entry] parameters.
   bool matches(AvoidUsingApiEntryParameters entry) {
-    final source = entry.source;
+    final AvoidUsingApiEntryParameters(
+      :source,
+      :className,
+      :identifier,
+    ) = entry;
     if (source == null ||
-        entry.identifier != null ||
+        identifier != null ||
         !matchesSource(sourceUrl, source) ||
-        (entry.className != null && name.lexeme != entry.className)) {
+        (className != null && name.lexeme != className)) {
       return false;
     }
 
@@ -122,11 +126,14 @@ extension AvoidUsingApiVariableDeclarationExtension on VariableDeclaration {
   /// Returns `true` if this variable declaration matches the given [entry]
   /// parameters.
   bool matches(AvoidUsingApiEntryParameters entry) {
-    final source = entry.source;
-    final className = entry.className;
+    final AvoidUsingApiEntryParameters(
+      :source,
+      :className,
+      :identifier,
+    ) = entry;
     final typeElement = declaredType?.element;
     if (source == null ||
-        entry.identifier != null ||
+        identifier != null ||
         className == null ||
         typeElement?.name != className ||
         !matchesSource(typeElement?.libraryUri, source)) {
@@ -143,16 +150,16 @@ extension AvoidUsingApiInstanceCreationExtension on InstanceCreationExpression {
   /// Returns `true` if this instance creation matches the given [entry]
   /// parameters.
   bool matches(AvoidUsingApiEntryParameters entry) {
-    final source = entry.source;
-    if (source == null) return false;
+    final AvoidUsingApiEntryParameters(
+      :source,
+      :className,
+      :identifier,
+      :namedParameter,
+    ) = entry;
+    if (source == null || className == null) return false;
 
-    final className = entry.className;
-    final identifier = entry.identifier;
-    final namedParameter = entry.namedParameter;
-
-    switch ((className, identifier, namedParameter)) {
+    switch ((identifier, namedParameter)) {
       case (
-        final String className,
         final String identifier,
         final String namedParameter,
       ):
@@ -172,7 +179,6 @@ extension AvoidUsingApiInstanceCreationExtension on InstanceCreationExpression {
             );
 
       case (
-        final String className,
         _defaultConstructorIdentifier,
         null,
       ):
@@ -196,15 +202,19 @@ extension AvoidUsingApiMethodInvocationExtension on MethodInvocation {
   /// Returns `true` if this method invocation matches the given [entry]
   /// parameters.
   bool matches(AvoidUsingApiEntryParameters entry) {
-    final AvoidUsingApiEntryParameters(:source, :className, :namedParameter) =
-        entry;
+    final AvoidUsingApiEntryParameters(
+      :source,
+      :className,
+      :identifier,
+      :namedParameter,
+    ) = entry;
 
     final enclosingElement = methodName.element?.enclosingElement;
 
     if (source == null ||
         className == null ||
         namedParameter == null ||
-        methodName.name != entry.identifier ||
+        methodName.name != identifier ||
         enclosingElement == null ||
         enclosingElement.name != className ||
         !argumentList.containsNamed(namedParameter) ||
