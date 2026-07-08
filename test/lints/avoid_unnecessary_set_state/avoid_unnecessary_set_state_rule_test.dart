@@ -25,6 +25,8 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/avoid_unnecessary_set_state_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(AvoidUnnecessarySetStateRuleTest);
@@ -32,14 +34,13 @@ void main() {
 }
 
 @reflectiveTest
-class AvoidUnnecessarySetStateRuleTest extends AnalysisRuleTest {
+class AvoidUnnecessarySetStateRuleTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   @override
   void setUp() {
     final flutter = newPackage('flutter');
 
-    flutter.addFile(
-      'lib/src/widgets/framework.dart',
-      r'''
+    flutter.addFile('lib/src/widgets/framework.dart', r'''
 abstract class Widget {}
 
 abstract class StatefulWidget extends Widget {}
@@ -66,19 +67,14 @@ class ElevatedButton extends Widget {
 
   ElevatedButton({this.onPressed, this.onLongPress, this.child});
 }
-''',
-    );
+''');
 
     rule = AvoidUnnecessarySetStateRule();
     super.setUp();
   }
 
-  @override
-  String get analysisRule => rule.name;
-
-  void test_reports_set_state_in_init_state() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_set_state_in_init_state() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -88,9 +84,7 @@ class _MyWidgetState extends State<StatefulWidget> {
   void initState() {
     super.initState();
 
-    setState(() {
-      _myString = "Hello";
-    });
+    ${expectLint('setState(() {\n      _myString = "Hello";\n    })')};
   }
 
   @override
@@ -100,14 +94,11 @@ class _MyWidgetState extends State<StatefulWidget> {
     );
   }
 }
-    ''',
-      [lint(194, 47)],
-    );
+''');
   }
 
-  void test_reports_set_state_in_init_state_with_condition() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_set_state_in_init_state_with_condition() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -119,9 +110,7 @@ class _MyWidgetState extends State<StatefulWidget> {
     super.initState();
 
     if (_condition) {
-      setState(() {
-        _myString = "Hello";
-      });
+      ${expectLint('setState(() {\n        _myString = "Hello";\n      })')};
     }
   }
 
@@ -132,14 +121,11 @@ class _MyWidgetState extends State<StatefulWidget> {
     );
   }
 }
-    ''',
-      [lint(250, 51)],
-    );
+''');
   }
 
-  void test_reports_set_state_in_init_state_through_method() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_set_state_in_init_state_through_method() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -150,7 +136,7 @@ class _MyWidgetState extends State<StatefulWidget> {
   void initState() {
     super.initState();
 
-    myStateUpdateMethod();
+    ${expectLint('myStateUpdateMethod()')};
   }
 
   void myStateUpdateMethod() {
@@ -166,14 +152,11 @@ class _MyWidgetState extends State<StatefulWidget> {
     );
   }
 }
-    ''',
-      [lint(226, 21)],
-    );
+''');
   }
 
-  void test_reports_set_state_in_did_update_widget() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_set_state_in_did_update_widget() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -182,9 +165,7 @@ class _MyWidgetState extends State<StatefulWidget> {
   @override
   void didUpdateWidget(StatefulWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    setState(() {
-      _myString = "Hello";
-    });
+    ${expectLint('setState(() {\n      _myString = "Hello";\n    })')};
   }
 
   @override
@@ -194,14 +175,11 @@ class _MyWidgetState extends State<StatefulWidget> {
     );
   }
 }
-    ''',
-      [lint(238, 47)],
-    );
+''');
   }
 
-  void test_reports_set_state_in_build_method() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_set_state_in_build_method() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -209,23 +187,18 @@ class _MyWidgetState extends State<StatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      _myString = "Hello";
-    });
+    ${expectLint('setState(() {\n      _myString = "Hello";\n    })')};
     
     return ElevatedButton(
       child: Text(_myString),
     );
   }
 }
-    ''',
-      [lint(188, 47)],
-    );
+''');
   }
 
-  void test_reports_set_state_in_build_method_with_condition() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_set_state_in_build_method_with_condition() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -235,9 +208,7 @@ class _MyWidgetState extends State<StatefulWidget> {
   @override
   Widget build(BuildContext context) {
     if (_condition) {
-      setState(() {
-        _myString = "Hello";
-      });
+      ${expectLint('setState(() {\n        _myString = "Hello";\n      })')};
     }
     
     return ElevatedButton(
@@ -245,14 +216,11 @@ class _MyWidgetState extends State<StatefulWidget> {
     );
   }
 }
-    ''',
-      [lint(244, 51)],
-    );
+''');
   }
 
-  void test_reports_set_state_in_build_method_through_method() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_set_state_in_build_method_through_method() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -266,21 +234,18 @@ class _MyWidgetState extends State<StatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
-    myStateUpdateMethod();
+    ${expectLint('myStateUpdateMethod()')};
     
     return ElevatedButton(
       child: Text(_myString),
     );
   }
 }
-    ''',
-      [lint(277, 21)],
-    );
+''');
   }
 
-  void test_does_not_report_set_state_in_button_on_pressed() async {
-    await assertNoDiagnostics(
-      r'''
+  Future<void> test_does_not_report_set_state_in_button_on_pressed() async {
+    await assertNoDiagnostics(r'''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -300,13 +265,11 @@ class _MyWidgetState extends State<StatefulWidget> {
     );
   }
 }
-    ''',
-    );
+''');
   }
 
-  void test_does_not_report_set_state_in_button_on_long_press() async {
-    await assertNoDiagnostics(
-      r'''
+  Future<void> test_does_not_report_set_state_in_button_on_long_press() async {
+    await assertNoDiagnostics(r'''
 import 'package:flutter/src/widgets/framework.dart';
 
 class _MyWidgetState extends State<StatefulWidget> {
@@ -324,7 +287,6 @@ class _MyWidgetState extends State<StatefulWidget> {
     );
   }
 }
-    ''',
-    );
+''');
   }
 }

@@ -2,6 +2,8 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
+import '../auto_test_lint_offsets.dart';
+
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(ProperSuperCallsRuleTest);
@@ -9,132 +11,108 @@ void main() {
 }
 
 @reflectiveTest
-class ProperSuperCallsRuleTest extends AnalysisRuleTest {
+class ProperSuperCallsRuleTest extends AnalysisRuleTest
+    with AutoTestLintOffsets {
   @override
   void setUp() {
     final flutter = newPackage('flutter');
-    flutter.addFile(
-      'lib/src/widgets/framework.dart',
-      r'''
+    flutter.addFile('lib/src/widgets/framework.dart', r'''
 abstract class StatefulWidget {}
 
 abstract class State<T extends StatefulWidget> {
   void initState() {}
   void dispose() {}
 }
-''',
-    );
+''');
 
     rule = ProperSuperCallsRule();
     super.setUp();
   }
 
-  @override
-  String get analysisRule => ProperSuperCallsRule.lintName;
-
-  void test_initState_reports_when_super_not_first() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_initState_reports_when_super_not_first() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
   @override
-  void initState() {
+  void ${expectLint('initState')}() {
     print('Bad');
     super.initState();
   }
 }
-''',
-      [lint(125, 9)],
-    );
+''');
   }
 
-  void test_dispose_reports_when_super_not_last() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_dispose_reports_when_super_not_last() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
   @override
-  void dispose() {
+  void ${expectLint('dispose')}() {
     super.dispose();
     print('Bad');
   }
 }
-''',
-      [lint(125, 7)],
-    );
+''');
   }
 
-  void test_reports_even_without_explicit_override_annotation() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_even_without_explicit_override_annotation() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
-  void initState() {
+  void ${expectLint('initState')}() {
     print('Bad');
     super.initState();
   }
 }
-''',
-      [lint(113, 9)],
-    );
+''');
   }
 
-  void test_reports_empty_body_missing_super() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_empty_body_missing_super() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
   @override
-  void initState() {}
+  void ${expectLint('initState')}() {}
 }
-''',
-      [lint(125, 9)],
-    );
+''');
   }
 
-  void test_reports_when_wrong_super_method_is_called() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_when_wrong_super_method_is_called() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
   @override
-  void initState() {
+  void ${expectLint('initState')}() {
     super.dispose();  
     print('Bad');
   }
 }
-''',
-      [lint(125, 9)],
-    );
+''');
   }
 
-  void test_reports_in_deep_inheritance() async {
-    await assertDiagnostics(
-      r'''
+  Future<void> test_reports_in_deep_inheritance() async {
+    await assertAutoDiagnostics('''
 import 'package:flutter/src/widgets/framework.dart';
 
 abstract class BaseState extends State<StatefulWidget> {}
 
 class MyWidgetState extends BaseState {
   @override
-  void dispose() {
+  void ${expectLint('dispose')}() {
     super.dispose();
     print('Bad');
   }
 }
-''',
-      [lint(172, 7)],
-    );
+''');
   }
 
-  void test_no_report_for_correct_usage() async {
-    await assertNoDiagnostics(
-      r'''
+  Future<void> test_no_report_for_correct_usage() async {
+    await assertNoDiagnostics(r'''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
@@ -150,13 +128,11 @@ class MyWidgetState extends State<StatefulWidget> {
     super.dispose();
   }
 }
-''',
-    );
+''');
   }
 
-  void test_no_report_for_other_methods() async {
-    await assertNoDiagnostics(
-      r'''
+  Future<void> test_no_report_for_other_methods() async {
+    await assertNoDiagnostics(r'''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
@@ -164,13 +140,11 @@ class MyWidgetState extends State<StatefulWidget> {
     super.initState();   
   }
 }
-''',
-    );
+''');
   }
 
-  void test_no_report_for_async_correct_usage() async {
-    await assertNoDiagnostics(
-      r'''
+  Future<void> test_no_report_for_async_correct_usage() async {
+    await assertNoDiagnostics(r'''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
@@ -188,13 +162,12 @@ class MyWidgetState extends State<StatefulWidget> {
     await super.dispose();
   }
 }
-''',
-    );
+''');
   }
 
-  void test_no_report_for_parenthesized_and_async_correct_usage() async {
-    await assertNoDiagnostics(
-      r'''
+  Future<void>
+  test_no_report_for_parenthesized_and_async_correct_usage() async {
+    await assertNoDiagnostics(r'''
 import 'package:flutter/src/widgets/framework.dart';
 
 class MyWidgetState extends State<StatefulWidget> {
@@ -212,7 +185,6 @@ class MyWidgetState extends State<StatefulWidget> {
     (await super.dispose());
   }
 }
-''',
-    );
+''');
   }
 }

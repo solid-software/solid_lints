@@ -2,7 +2,7 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/src/analysis_rule/pub_package_resolution.dart';
 import 'package:collection/collection.dart';
 
-import 'auto_lint_data.dart';
+import '../src/utils/auto_lint_data.dart';
 
 mixin AutoTestLintOffsets on AnalysisRuleTest {
   int _nextPlaceholderId = 0;
