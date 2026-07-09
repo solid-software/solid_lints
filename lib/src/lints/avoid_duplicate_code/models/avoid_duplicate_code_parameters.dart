@@ -11,7 +11,8 @@ class AvoidDuplicateCodeParameters {
   final bool ignoreLiterals;
 
   /// When `true`, variable and method names (identifiers) are excluded
-  /// from the structural hash, allowing detection of renamed variables (Type 2).
+  /// from the structural hash, allowing detection of renamed variables
+  /// (Type 2).
   final bool ignoreIdentifiers;
 
   /// When `true`, statement blocks (like if-blocks or loops) inside functions

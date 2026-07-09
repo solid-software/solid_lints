@@ -6,11 +6,15 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplic
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A lint rule that detects duplicated code blocks (clones) within a single
-/// file.
+/// file and across multiple files in the project.
 ///
 /// When two or more function/method/constructor bodies have structurally
 /// identical AST subtrees (Type 2 clones — same structure, variable names
 /// may differ), the rule reports all copies except the first occurrence.
+///
+/// Cross-file detection works on a "best-effort" basis: duplicates are
+/// detected against files that have already been analyzed in the current
+/// session. The detection improves as more files are analyzed.
 ///
 /// ### Example config:
 ///
@@ -33,7 +37,7 @@ class AvoidDuplicateCodeRule
 
   static const _code = LintCode(
     lintName,
-    'This code is a duplicate of the function/method at line {0}. '
+    'Perhaps this code is a duplicate.\n'
     'Consider extracting the shared logic into a common function.',
   );
 
@@ -47,7 +51,7 @@ class AvoidDuplicateCodeRule
          name: lintName,
          description:
              'Detects structurally identical function/method bodies '
-             'within a single file (code clones).',
+             'within a single file and across files (code clones).',
          parametersParser: AvoidDuplicateCodeParameters.fromJson,
        );
 
@@ -62,7 +66,13 @@ class AvoidDuplicateCodeRule
         getParametersForContext(context) ??
         AvoidDuplicateCodeParameters.empty();
 
-    final visitor = AvoidDuplicateCodeVisitor(this, parameters);
+    final visitor = AvoidDuplicateCodeVisitor(
+      this,
+      parameters,
+      filePath: context.definingUnit.file.path,
+      modificationStamp: context.definingUnit.file.modificationStamp,
+      contextRoot: context.libraryElement?.session.analysisContext.contextRoot,
+    );
 
     registry.addCompilationUnit(this, visitor);
   }

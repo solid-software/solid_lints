@@ -1,10 +1,12 @@
 analyzer:
   plugins:
-    - custom_lint
+    - solid_lints
   exclude:
     # General generated files
     - "**/*.g.dart"
     - "**/*.gr.dart"
+
+    - "src/lints/avoid_using_api/**"
 
     # Flutter
     - "lib/generated_plugin_registrant.dart"
@@ -38,6 +40,10 @@ analyzer:
 solid_lints:
   diagnostics:
     avoid_global_state: true
+    avoid_duplicate_code:
+      avoid_duplicate_code: true
+      min_statements: 3
+      check_blocks: true
 
     avoid_late_keyword:
       allow_initialized: true

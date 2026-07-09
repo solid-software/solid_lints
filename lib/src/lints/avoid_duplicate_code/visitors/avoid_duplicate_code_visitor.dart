@@ -1,7 +1,16 @@
+import 'dart:io';
+
+import 'package:analyzer/dart/analysis/context_root.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/diagnostic/diagnostic.dart';
+import 'package:analyzer/src/diagnostic/diagnostic_message.dart';
+import 'package:path/path.dart' as path;
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_match.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/ast_structural_hasher.dart';
 
 /// A record representing a block or expression candidate for clone detection.
@@ -11,81 +20,319 @@ typedef _BodyCandidate = ({
 });
 
 /// A visitor that detects duplicate code blocks (at the function level and/or
-/// statement block level) within a single compilation unit.
+/// statement block level) within a single compilation unit and across files.
 class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
+  static int _processedFilesCount = 0;
+  static int _totalDurationMs = 0;
+
   final AvoidDuplicateCodeRule _rule;
   final AvoidDuplicateCodeParameters _parameters;
+  final String _filePath;
+  final int _modificationStamp;
+  final ContextRoot? _contextRoot;
 
   /// Creates a new instance of [AvoidDuplicateCodeVisitor].
-  AvoidDuplicateCodeVisitor(this._rule, this._parameters);
+  AvoidDuplicateCodeVisitor(
+    this._rule,
+    this._parameters, {
+    required String filePath,
+    required int modificationStamp,
+    ContextRoot? contextRoot,
+  }) : _filePath = filePath,
+       _modificationStamp = modificationStamp,
+       _contextRoot = contextRoot;
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
+    final stopwatch = Stopwatch()..start();
+    final startTime = DateTime.now();
+
+    final filePath = _filePath;
+
+    // --- Phase 0: Try to use cached entries if file is unchanged and has no warnings ---
+    if (filePath.isNotEmpty) {
+      final contextRoot = _contextRoot;
+      final packageRoot = contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
+      if (packageRoot.isNotEmpty) {
+        final registry = GlobalHashRegistry.instance;
+        final cachedStamp = registry.getModificationStamp(filePath, packageRoot: packageRoot);
+
+        if (cachedStamp == _modificationStamp) {
+          final cachedEntries = registry.getFileEntries(filePath, packageRoot: packageRoot);
+          if (cachedEntries != null) {
+            // Check if there are any cross-file matches
+            final crossMatches = registry.findCrossFileMatches(
+              filePath,
+              cachedEntries,
+              packageRoot: packageRoot,
+              isFileExcluded: (otherPath) {
+                if (contextRoot == null) return false;
+                final isWithin = otherPath.startsWith(contextRoot.root.path);
+                return isWithin && !contextRoot.isAnalyzed(otherPath);
+              },
+            );
+
+            // Check if there are any intra-file duplicates
+            final hashCounts = <int, int>{};
+            for (final entry in cachedEntries) {
+              hashCounts[entry.hash] = (hashCounts[entry.hash] ?? 0) + 1;
+            }
+            final hasIntraDuplicates = hashCounts.values.any((count) => count > 1);
+            final hasCrossDuplicates = crossMatches.isNotEmpty;
+
+            if (!hasIntraDuplicates && !hasCrossDuplicates) {
+              // 0 warnings and file is unchanged -> Skip entire AST traversal!
+              stopwatch.stop();
+              _writeRunLog(
+                packageRoot,
+                startTime,
+                stopwatch.elapsedMilliseconds,
+                filePath,
+                cachedEntries.length,
+                0,
+                cached: true,
+              );
+              return;
+            }
+          }
+        }
+      }
+    }
+
     final collector = _CandidateCollector(_parameters);
     node.accept(collector);
-
     final candidates = collector.candidates;
-    if (candidates.length < 2) return;
 
     final hasher = AstStructuralHasher(
       ignoreLiterals: _parameters.ignoreLiterals,
       ignoreIdentifiers: _parameters.ignoreIdentifiers,
     );
 
-    // Group candidates by their structural hash
-    final groups = <int, List<_BodyCandidate>>{};
+    // --- Phase A: Build hash entries for cross-file registry ---
+    final hashEntries = <HashEntry>[];
+    final candidateHashes = <AstNode, int>{};
+
     for (final candidate in candidates) {
       final hash = hasher.computeHash(candidate.node);
+      candidateHashes[candidate.node] = hash;
+      final line = node.lineInfo.getLocation(candidate.node.offset).lineNumber;
+      hashEntries.add(
+        HashEntry(
+          hash: hash,
+          lineNumber: line,
+          offset: candidate.node.offset,
+          length: candidate.node.length,
+          statementCount: _statementCount(candidate.node),
+        ),
+      );
+    }
+
+    // --- Phase B: Find Cross-file matches from registry ---
+    final crossFileDuplicatesByHash = <int, List<DuplicateLocation>>{};
+    if (filePath.isNotEmpty) {
+      final contextRoot = _contextRoot;
+      final packageRoot = contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
+
+      final registry = GlobalHashRegistry.instance;
+      final crossMatches = registry.findCrossFileMatches(
+        filePath,
+        hashEntries,
+        packageRoot: packageRoot,
+        isFileExcluded: (otherPath) {
+          if (contextRoot == null) return false;
+          final isWithin = otherPath.startsWith(contextRoot.root.path);
+          return isWithin && !contextRoot.isAnalyzed(otherPath);
+        },
+      );
+      for (final match in crossMatches) {
+        crossFileDuplicatesByHash[match.currentEntry.hash] = match.duplicates;
+      }
+      registry.updateFile(
+        filePath,
+        hashEntries,
+        modificationStamp: _modificationStamp,
+        packageRoot: packageRoot,
+      );
+    }
+
+    // --- Phase C: Group candidates by structural hash for intra-file ---
+    final groups = <int, List<_BodyCandidate>>{};
+    for (final candidate in candidates) {
+      final hash = candidateHashes[candidate.node] ??
+          hasher.computeHash(candidate.node);
       (groups[hash] ??= []).add(candidate);
     }
 
-    final lineInfo = node.lineInfo;
     final suppressed = <AstNode>{};
+    final reported = <AstNode>{};
+    var warningCount = 0;
 
     // Candidates are collected pre-order (parent before children).
-    // By iterating in this order, we can process larger scopes first,
-    // and if a parent block is reported, suppress warnings on its children.
+    // Process larger scopes first, and suppress warnings on children.
     for (final candidate in candidates) {
       if (suppressed.contains(candidate.node)) continue;
+      if (reported.contains(candidate.node)) continue;
 
-      final hash = hasher.computeHash(candidate.node);
+      final hash = candidateHashes[candidate.node] ??
+          hasher.computeHash(candidate.node);
       final group = groups[hash];
       if (group == null) continue;
 
       // Filter group to only include non-suppressed candidates
-      final activeGroup = group
-          .where((c) => !suppressed.contains(c.node))
-          .toList();
-      if (activeGroup.length < 2) continue;
+      final activeGroup =
+          group.where((c) => !suppressed.contains(c.node)).toList();
 
-      final firstOccurrence = activeGroup.first;
-      final firstOffset = firstOccurrence.node.offset;
-      final firstLine = lineInfo.getLocation(firstOffset).lineNumber;
+      final externalPartners = crossFileDuplicatesByHash[hash] ?? const [];
+      final internalPartners = activeGroup.where((c) => c != candidate).toList();
 
-      for (var i = 1; i < activeGroup.length; i++) {
-        final duplicate = activeGroup[i];
+      final hasExternalDuplicates = externalPartners.isNotEmpty;
+      final hasInternalDuplicates = internalPartners.isNotEmpty;
 
-        // Report on the enclosing declaration if it's a function body,
-        // otherwise report directly on the statement block itself.
-        final isFuncBody = duplicate.node.parent is FunctionBody;
-        final reportNode = isFuncBody
-            ? (duplicate.enclosingDeclaration ?? duplicate.node)
-            : duplicate.node;
+      // Report a warning if there are any duplicates (internal or external)
+      final shouldReport = hasInternalDuplicates || hasExternalDuplicates;
+
+      if (shouldReport) {
+        final reportNode = _findReportNode(candidate.node);
+
+        final contextMessages = <DiagnosticMessage>[
+          // Add external partners
+          for (final dup in externalPartners)
+            DiagnosticMessageImpl(
+              filePath: dup.filePath,
+              offset: dup.entry.offset,
+              length: dup.entry.length,
+              message: 'Duplicate',
+              url: null,
+            ),
+          // Add internal partners
+          for (final other in internalPartners)
+            DiagnosticMessageImpl(
+              filePath: filePath,
+              offset: other.node.offset,
+              length: other.node.length,
+              message: 'Duplicate',
+              url: null,
+            ),
+        ];
 
         _rule.reportAtNode(
           reportNode,
-          arguments: [firstLine],
+          contextMessages: contextMessages,
         );
+        warningCount++;
 
-        // Mark this duplicate block and all its descendants as suppressed
-        suppressed.add(duplicate.node);
-        _suppressDescendants(duplicate.node, suppressed);
+        // Mark this duplicate block as reported.
+        reported.add(candidate.node);
+        // Mark all its descendants as suppressed.
+        _suppressDescendants(candidate.node, suppressed);
+      }
+    }
+
+    stopwatch.stop();
+    if (filePath.isNotEmpty) {
+      final contextRoot = _contextRoot;
+      final packageRoot =
+          contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
+      if (packageRoot.isNotEmpty) {
+        _writeRunLog(
+          packageRoot,
+          startTime,
+          stopwatch.elapsedMilliseconds,
+          filePath,
+          candidates.length,
+          warningCount,
+          cached: false,
+        );
       }
     }
   }
 
+  /// Returns the number of statements in a body node.
+  static int _statementCount(AstNode node) {
+    if (node is Block) return node.statements.length;
+    if (node is ExpressionFunctionBody) return 1;
+    return 0;
+  }
+
   void _suppressDescendants(AstNode root, Set<AstNode> suppressed) {
     root.accept(_DescendantCollector(suppressed, root));
+  }
+
+  AstNode _findReportNode(AstNode node) {
+    final parent = node.parent;
+    if (parent is FunctionBody) {
+      final declaration = parent.parent;
+      if (declaration != null) {
+        if (declaration is FunctionDeclaration ||
+            declaration is MethodDeclaration ||
+            declaration is ConstructorDeclaration) {
+          return declaration;
+        }
+        if (declaration is FunctionExpression) {
+          final grandDeclaration = declaration.parent;
+          if (grandDeclaration is FunctionDeclaration) {
+            return grandDeclaration;
+          }
+          return declaration;
+        }
+      }
+    }
+    return node;
+  }
+
+  String? _findPackageRoot(String filePath) {
+    if (filePath.isEmpty) return null;
+    var dir = File(filePath).parent;
+    while (true) {
+      final pubspec = File(path.join(dir.path, 'pubspec.yaml'));
+      if (pubspec.existsSync()) {
+        return dir.path;
+      }
+      final parent = dir.parent;
+      if (parent.path == dir.path) {
+        break;
+      }
+      dir = parent;
+    }
+    return null;
+  }
+
+  void _writeRunLog(
+    String packageRoot,
+    DateTime startTime,
+    int elapsedMs,
+    String filePath,
+    int candidateCount,
+    int warningCount, {
+    required bool cached,
+  }) {
+    try {
+      _processedFilesCount++;
+      _totalDurationMs += elapsedMs;
+      final logFile = File(
+        '$packageRoot/.dart_tool/solid_lints/avoid_duplicate_code_run.log',
+      );
+
+      // Ensure the directory exists
+      final directory = logFile.parent;
+      if (!directory.existsSync()) {
+        directory.createSync(recursive: true);
+      }
+
+      final relativePath =
+          packageRoot.isNotEmpty && filePath.startsWith(packageRoot)
+              ? path.relative(filePath, from: packageRoot)
+              : filePath;
+      final ramMb = ProcessInfo.currentRss / (1024 * 1024);
+      final cacheIndicator = cached ? ' [Cached]' : '';
+      final logLine =
+          '${startTime.toIso8601String()}: Checked #$_processedFilesCount ($relativePath) '
+          'in ${elapsedMs}ms$cacheIndicator | Candidates: $candidateCount | Warnings: $warningCount | RAM: ${ramMb.toStringAsFixed(1)} MB '
+          '(Total session time: ${_totalDurationMs}ms)\n';
+      logFile.writeAsStringSync(logLine, mode: FileMode.append);
+    } catch (_) {
+      // Fail silently
+    }
   }
 }
 

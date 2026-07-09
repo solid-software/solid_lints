@@ -1,7 +1,11 @@
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../../../lints/auto_test_lint_offsets.dart';
@@ -28,6 +32,8 @@ plugins:
 
   @override
   void setUp() {
+    GlobalHashRegistry.instance.clear();
+    GlobalHashRegistry.instance.enablePhysicalFileCleanup = false;
     rule = AvoidDuplicateCodeRule(
       analysisOptionsLoader: AnalysisOptionsLoader(
         resourceProvider: resourceProvider,
@@ -42,18 +48,24 @@ $_mockAnalysisOptionsContent''',
     );
   }
 
+  @override
+  Future<void> tearDown() async {
+    GlobalHashRegistry.instance.clear();
+    await super.tearDown();
+  }
+
   // --- Base Tests (min_statements: 3, check_blocks: true, default) ---
 
   Future<void>
   test_reports_when_two_functions_have_identical_bodies() async {
     await assertAutoDiagnostics('''
-void first() {
+${expectLint(r'''void first() {
   final x = 1;
   if (x > 0) {
     print(x);
   }
   print('done');
-}
+}''')}
 
 ${expectLint(r'''void second() {
   final x = 1;
@@ -68,13 +80,13 @@ ${expectLint(r'''void second() {
   Future<void>
   test_reports_when_functions_have_same_structure_different_names() async {
     await assertAutoDiagnostics('''
-void fetchUsers() {
+${expectLint(r'''void fetchUsers() {
   final response = 'data';
   if (response.isEmpty) {
     throw Exception('error');
   }
   print(response);
-}
+}''')}
 
 ${expectLint(r'''void fetchOrders() {
   final result = 'data';
@@ -126,13 +138,13 @@ void second() {
   test_reports_on_methods_in_same_class() async {
     await assertAutoDiagnostics('''
 class MyClass {
-  void first() {
+  ${expectLint(r'''void first() {
     final x = 1;
     if (x > 0) {
       print(x);
     }
     print('done');
-  }
+  }''')}
 
   ${expectLint(r'''void second() {
     final y = 1;
@@ -148,13 +160,13 @@ class MyClass {
   Future<void>
   test_reports_on_third_clone_also() async {
     await assertAutoDiagnostics('''
-void first() {
+${expectLint(r'''void first() {
   final x = 1;
   if (x > 0) {
     print(x);
   }
   print('done');
-}
+}''')}
 
 ${expectLint(r'''void second() {
   final y = 1;
@@ -190,13 +202,13 @@ plugins:
 ''',
     );
     await assertAutoDiagnostics('''
-void first() {
+${expectLint(r'''void first() {
   final x = 1;
   if (x > 0) {
     print('hello');
   }
   print('world');
-}
+}''')}
 
 ${expectLint(r'''void second() {
   final y = 2;
@@ -293,11 +305,11 @@ void excluded() {
     await assertAutoDiagnostics('''
 void one() {
   final x = 1;
-  if (x > 0) {
+  if (x > 0) ${expectLint(r'''{
     print('hello');
     print('world');
     print('done');
-  }
+  }''')}
 }
 
 void two() {
@@ -314,7 +326,7 @@ void two() {
   Future<void>
   test_reports_parent_but_not_nested_blocks_when_parent_is_reported() async {
     await assertAutoDiagnostics('''
-void one() {
+${expectLint(r'''void one() {
   final x = 1;
   if (x > 0) {
     print('hello');
@@ -322,7 +334,7 @@ void one() {
     print('done');
   }
   print('done');
-}
+}''')}
 
 ${expectLint(r'''void two() {
   final y = 1;
@@ -330,6 +342,43 @@ ${expectLint(r'''void two() {
     print('hello');
     print('world');
     print('done');
+  }
+  print('done');
+}''')}
+''');
+  }
+
+  Future<void> test_reports_cross_file_duplicate_when_in_registry() async {
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+
+    final resolvedOther = await resolveFile(otherFile.path);
+    final visitor = AvoidDuplicateCodeVisitor(
+      rule as AvoidDuplicateCodeRule,
+      AvoidDuplicateCodeParameters(
+        minStatements: 3,
+        ignoreLiterals: false,
+        ignoreIdentifiers: true,
+        checkBlocks: true,
+        exclude: ExcludedIdentifiersListParameter(exclude: []),
+      ),
+      filePath: otherFile.path,
+      modificationStamp: 1,
+    );
+    resolvedOther.unit.accept(visitor);
+
+    await assertAutoDiagnostics('''
+${expectLint(r'''void mainMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
   }
   print('done');
 }''')}
