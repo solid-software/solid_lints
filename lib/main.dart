@@ -12,6 +12,7 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/avoid_unnecessa
 import 'package:solid_lints/src/lints/avoid_unnecessary_type_assertions/avoid_unnecessary_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/avoid_unrelated_type_assertions_rule.dart';
 import 'package:solid_lints/src/lints/avoid_unused_parameters/avoid_unused_parameters_rule.dart';
+import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart';
 import 'package:solid_lints/src/lints/cyclomatic_complexity/cyclomatic_complexity_rule.dart';
 import 'package:solid_lints/src/lints/double_literal_format/double_literal_format_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
@@ -26,6 +27,7 @@ import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_cond
 import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_rule.dart';
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
+import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
 import 'package:solid_lints/src/models/rule_with_fixes.dart';
@@ -60,6 +62,7 @@ class SolidLintsPlugin extends Plugin {
       AvoidUnnecessaryTypeAssertionsRule(),
       AvoidUnrelatedTypeAssertionsRule(),
       AvoidUnusedParametersRule(analysisOptionsLoader: analysisLoader),
+      AvoidUsingApiRule(analysisOptionsLoader: analysisLoader),
       CyclomaticComplexityRule(analysisOptionsLoader: analysisLoader),
       DoubleLiteralFormatRule(),
       FunctionLinesOfCodeRule(analysisOptionsLoader: analysisLoader),
@@ -74,6 +77,7 @@ class SolidLintsPlugin extends Plugin {
       PreferEarlyReturnRule(),
       PreferFirstRule(),
       PreferLastRule(),
+      PreferMatchFileNameRule(analysisOptionsLoader: analysisLoader),
       ProperSuperCallsRule(),
       UseNearestContextRule(),
     ];

@@ -1,11 +1,12 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
 /// A model representing "exclude_entity" parameters for linting, defining
-/// identifiers (classes, mixins, enums, extensions) to be ignored during
-/// analysis.
+/// identifiers (classes, mixins, enums, extensions, extension_types) to be
+/// ignored during analysis.
 /// Supported entities:
 ///   - mixin
 ///   - extension
+///   - extension_type
 ///   - enum
 class ExcludedEntitiesListParameter {
   /// The parameter model
@@ -19,12 +20,12 @@ class ExcludedEntitiesListParameter {
     required this.excludedEntityNames,
   });
 
-  /// Method for creating from json data
-  factory ExcludedEntitiesListParameter.fromJson(Map<String, dynamic> json) {
-    final raw = json['exclude_entity'];
+  /// Creates an [ExcludedEntitiesListParameter] from JSON.
+  factory ExcludedEntitiesListParameter.fromJson(Map<String, Object?> json) {
+    final raw = json[excludeEntityKey];
     if (raw is Iterable) {
       return ExcludedEntitiesListParameter(
-        excludedEntityNames: Set<String>.from(raw.whereType<String>()),
+        excludedEntityNames: raw.whereType<String>().toSet(),
       );
     } else if (raw is String) {
       return ExcludedEntitiesListParameter(
@@ -32,9 +33,7 @@ class ExcludedEntitiesListParameter {
       );
     }
 
-    return ExcludedEntitiesListParameter(
-      excludedEntityNames: {},
-    );
+    return ExcludedEntitiesListParameter(excludedEntityNames: {});
   }
 
   /// Returns whether the target node should be ignored during analysis.
@@ -48,6 +47,9 @@ class ExcludedEntitiesListParameter {
       return true;
     } else if (node is ExtensionDeclaration &&
         excludedEntityNames.contains('extension')) {
+      return true;
+    } else if (node is ExtensionTypeDeclaration &&
+        excludedEntityNames.contains('extension_type')) {
       return true;
     }
 
