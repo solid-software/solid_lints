@@ -117,7 +117,7 @@ class DoubleLiteralFormatRule extends MultiAnalysisRule
   ];
 
   @override
-  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
+  FixesForCodes get fixesForCodes =>
       diagnosticCodes.map((code) => MapEntry(code, DoubleLiteralFormatFix.new));
 
   @override

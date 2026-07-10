@@ -130,8 +130,9 @@ class NamedParametersOrderingRule
   LintCode get diagnosticCode => code;
 
   @override
-  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
-      const [MapEntry(code, NamedParametersOrderingFix.new)];
+  FixesForCodes get fixesForCodes => const [
+    MapEntry(code, NamedParametersOrderingFix.new),
+  ];
 
   @override
   void registerNodeProcessors(

@@ -44,8 +44,7 @@ class PreferLastRule extends SolidLintRule implements RuleWithFixes {
   LintCode get diagnosticCode => _code;
 
   @override
-  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
-      const [MapEntry(_code, PreferLastFix.new)];
+  FixesForCodes get fixesForCodes => const [MapEntry(_code, PreferLastFix.new)];
 
   @override
   void registerNodeProcessors(

@@ -82,8 +82,9 @@ class PreferConditionalExpressionsRule
   LintCode get diagnosticCode => _code;
 
   @override
-  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
-      const [MapEntry(_code, PreferConditionalExpressionsFix.new)];
+  FixesForCodes get fixesForCodes => const [
+    MapEntry(_code, PreferConditionalExpressionsFix.new),
+  ];
 
   @override
   void registerNodeProcessors(

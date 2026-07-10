@@ -52,8 +52,9 @@ class AvoidFinalWithGetterRule extends AnalysisRule implements RuleWithFixes {
   LintCode get diagnosticCode => code;
 
   @override
-  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
-      const [MapEntry(code, AvoidFinalWithGetterFix.new)];
+  FixesForCodes get fixesForCodes => const [
+    MapEntry(code, AvoidFinalWithGetterFix.new),
+  ];
 
   @override
   void registerNodeProcessors(

@@ -8,9 +8,12 @@ typedef ProducerGenerator =
       required CorrectionProducerContext context,
     });
 
+/// A collection of diagnostic codes and their associated fix generators.
+typedef FixesForCodes = Iterable<MapEntry<DiagnosticCode, ProducerGenerator>>;
+
 /// An interface for lint rules that have associated quick fixes.
 abstract interface class RuleWithFixes {
   /// Returns the map entries of diagnostic code and its associated fix
   /// generator.
-  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes;
+  FixesForCodes get fixesForCodes;
 }

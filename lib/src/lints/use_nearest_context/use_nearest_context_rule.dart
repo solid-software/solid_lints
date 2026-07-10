@@ -74,11 +74,10 @@ class UseNearestContextRule extends AnalysisRule implements RuleWithFixes {
   LintCode get diagnosticCode => code;
 
   @override
-  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
-      const [
-        MapEntry(code, RenameNearestContextParameterFix.new),
-        MapEntry(code, ReplaceWithNearestContextParameterFix.new),
-      ];
+  FixesForCodes get fixesForCodes => const [
+    MapEntry(code, RenameNearestContextParameterFix.new),
+    MapEntry(code, ReplaceWithNearestContextParameterFix.new),
+  ];
 
   @override
   void registerNodeProcessors(

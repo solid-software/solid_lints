@@ -40,13 +40,12 @@ class AvoidUnnecessaryTypeAssertionsRule extends AnalysisRule
   DiagnosticCode get diagnosticCode => _unnecessaryTypeAssertionsCode;
 
   @override
-  Iterable<MapEntry<DiagnosticCode, ProducerGenerator>> get fixesForCodes =>
-      const [
-        MapEntry(
-          _unnecessaryTypeAssertionsCode,
-          AvoidUnnecessaryTypeAssertionsFix.new,
-        ),
-      ];
+  FixesForCodes get fixesForCodes => const [
+    MapEntry(
+      _unnecessaryTypeAssertionsCode,
+      AvoidUnnecessaryTypeAssertionsFix.new,
+    ),
+  ];
 
   @override
   void registerNodeProcessors(
