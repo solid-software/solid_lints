@@ -354,6 +354,25 @@ include: package:shared/analysis_options.yaml
     expect(options, {'some_parameter': 'package_value'});
   }
 
+  void test_resolve_include_malformed_package_uri() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: package:foo:bar/baz.yaml
+''',
+    );
+
+    // Should not throw FormatException
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, isNull);
+  }
+
   void test_resolve_include_cyclic() {
     newAnalysisOptionsYamlFile(
       testPackageRootPath,
@@ -418,6 +437,25 @@ analyzer:
     );
   }
 
+  void test_isRuleDisabled_when_suppressed_in_analyzer_errors_as_false() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+analyzer:
+  errors:
+    solid_lints/$_mockRuleThatNeedsConfigName: false
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    expect(
+      analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRuleThatNeedsConfigName),
+      isTrue,
+    );
+  }
+
+
   void test_isRuleDisabled_when_suppressed_in_included_analyzer_errors() {
     final includedOptionsPath = '$testPackageRootPath/included_options.yaml';
     newFile(
@@ -441,6 +479,35 @@ include: included_options.yaml
     expect(
       analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRuleThatNeedsConfigName),
       isTrue,
+    );
+  }
+
+  void test_isRuleDisabled_when_disabled_in_include_but_re_enabled_with_null() {
+    final includedOptionsPath = '$testPackageRootPath/included_options.yaml';
+    newFile(
+      includedOptionsPath,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName: false
+''',
+    );
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: included_options.yaml
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    expect(
+      analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRuleThatNeedsConfigName),
+      isFalse,
     );
   }
 

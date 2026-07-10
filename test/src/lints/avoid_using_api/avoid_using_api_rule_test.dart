@@ -396,4 +396,21 @@ void fn() {
     expect(diagnostics[2].severity.name, 'info');
     expect(diagnostics[3].severity.name, 'warning');
   }
+
+  Future<void> test_does_not_crash_on_invalid_entry_types() async {
+    _configureRule('''
+          - "not_a_map"
+          - 123
+          - class_name: BadClass
+            source: package:my_dep/my_dep.dart
+    ''');
+
+    return assertAutoDiagnostics('''
+import 'package:my_dep/my_dep.dart';
+
+void fn() {
+  final ${expectLint('a')} = ${expectLint('BadClass')}();
+}
+''');
+  }
 }

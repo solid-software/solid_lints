@@ -17,8 +17,8 @@ class PackageConfigResolver {
   String? resolvePackageUri(String baseFilePath, String packageUri) {
     if (!packageUri.startsWith('package:')) return null;
 
-    final uri = Uri.parse(packageUri);
-    if (uri.pathSegments.isEmpty) return null;
+    final uri = Uri.tryParse(packageUri);
+    if (uri == null || uri.pathSegments.isEmpty) return null;
 
     final packageName = uri.pathSegments.first;
     final relativePath = uri.pathSegments.skip(1).join('/');

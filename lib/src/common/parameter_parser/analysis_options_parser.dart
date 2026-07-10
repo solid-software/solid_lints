@@ -167,22 +167,25 @@ class AnalysisOptionsParser {
       final ruleName = key;
       final value = entry.value;
 
-      if (value is Map) {
-        final existingOptions = mergedRules[ruleName] ?? {};
-        mergedRules[ruleName] = <String, Object?>{
-          ...existingOptions,
-          for (final optionEntry in value.entries)
-            if (optionEntry.key is String)
-              optionEntry.key as String: optionEntry.value,
-        };
-        disabledRules.remove(ruleName);
-      } else if (value is bool) {
-        if (value) {
+      switch (value) {
+        case Map():
+          final existingOptions = mergedRules[ruleName] ?? {};
+          mergedRules[ruleName] = <String, Object?>{
+            ...existingOptions,
+            for (final optionEntry in value.entries)
+              if (optionEntry.key is String)
+                optionEntry.key as String: optionEntry.value,
+          };
           disabledRules.remove(ruleName);
-        } else {
-          mergedRules.remove(ruleName);
-          disabledRules.add(ruleName);
-        }
+        case bool():
+          if (value) {
+            disabledRules.remove(ruleName);
+          } else {
+            mergedRules.remove(ruleName);
+            disabledRules.add(ruleName);
+          }
+        case null:
+          disabledRules.remove(ruleName);
       }
     }
   }
@@ -239,7 +242,7 @@ class AnalysisOptionsParser {
       final errorValue = entry.value;
       final ruleName = key.substring(pluginPrefix.length);
 
-      if (errorValue == 'ignore') {
+      if (errorValue == 'ignore' || errorValue == false) {
         mergedRules.remove(ruleName);
         disabledRules.add(ruleName);
       } else {
