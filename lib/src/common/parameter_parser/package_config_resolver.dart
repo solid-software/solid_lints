@@ -1,15 +1,13 @@
 import 'dart:convert';
 import 'package:analyzer/file_system/file_system.dart';
+import 'package:solid_lints/src/common/parameter_parser/cached_package_config.dart';
 
 /// Helper class to resolve package: URIs to physical file system paths.
 class PackageConfigResolver {
   final ResourceProvider _resourceProvider;
 
-  // Caches directory path -> nearest package_config.json path
-  final Map<String, String?> _configPathCache = {};
-
-  // Caches package_config.json path -> Map<packageName, packageRootPath>
-  final Map<String, Map<String, String>> _packagesCache = {};
+  // Caches package_config.json path -> CachedPackageConfig
+  final Map<String, CachedPackageConfig> _packagesCache = {};
 
   /// Creates a new instance of [PackageConfigResolver].
   PackageConfigResolver(this._resourceProvider);
@@ -37,15 +35,7 @@ class PackageConfigResolver {
 
   /// Finds the nearest `.dart_tool/package_config.json` file by walking up
   /// the directory tree starting from [startDirectoryPath].
-  ///
-  /// Results (including `null`) are cached in [_configPathCache] to avoid
-  /// redundant filesystem walks.
   String? _findPackageConfig(String startDirectoryPath) {
-    final cached = _configPathCache[startDirectoryPath];
-    if (cached != null || _configPathCache.containsKey(startDirectoryPath)) {
-      return cached;
-    }
-
     final pathContext = _resourceProvider.pathContext;
     var currentDirectoryPath = startDirectoryPath;
 
@@ -58,7 +48,7 @@ class PackageConfigResolver {
       final candidateFile = _resourceProvider.getFile(candidatePath);
 
       if (candidateFile.exists) {
-        return _configPathCache[startDirectoryPath] = candidatePath;
+        return candidatePath;
       }
 
       final parentDir = pathContext.dirname(currentDirectoryPath);
@@ -68,24 +58,30 @@ class PackageConfigResolver {
       currentDirectoryPath = parentDir;
     }
 
-    return _configPathCache[startDirectoryPath] = null;
+    return null;
   }
 
   String? _resolvePackageRoot(String packageConfigPath, String packageName) {
-    var packageMap = _packagesCache[packageConfigPath];
-    if (packageMap == null) {
-      packageMap = _parsePackageConfig(packageConfigPath);
-      _packagesCache[packageConfigPath] = packageMap;
+    final file = _resourceProvider.getFile(packageConfigPath);
+    final modificationStamp = file.exists ? file.modificationStamp : -1;
+
+    var cached = _packagesCache[packageConfigPath];
+    if (cached == null || cached.modificationStamp != modificationStamp) {
+      final packageMap = _parsePackageConfig(file);
+      cached = CachedPackageConfig(
+        modificationStamp: modificationStamp,
+        packages: packageMap,
+      );
+      _packagesCache[packageConfigPath] = cached;
     }
-    return packageMap[packageName];
+    return cached.packages[packageName];
   }
 
   /// Reads and parses the `.dart_tool/package_config.json` configuration file.
   ///
   /// Returns a map associating each package name (e.g., 'lints') with its
   /// absolute physical path to the `lib/` directory on disk.
-  Map<String, String> _parsePackageConfig(String packageConfigPath) {
-    final file = _resourceProvider.getFile(packageConfigPath);
+  Map<String, String> _parsePackageConfig(File file) {
     if (!file.exists) return const {};
 
     try {
@@ -115,7 +111,7 @@ class PackageConfigResolver {
         final resolvedRootUri = rootUri.isAbsolute
             ? rootUri
             : _resourceProvider.pathContext
-                  .toUri(packageConfigPath)
+                  .toUri(file.path)
                   .resolveUri(rootUri);
 
         if (resolvedRootUri.isScheme('file')) {

@@ -402,7 +402,7 @@ solid_lints:
 analyzer:
   errors:
     solid_lints/$_mockRuleThatNeedsConfigName: ignore
-    $_mockRule2Name: ignore
+    solid_lints/$_mockRule2Name: ignore
 ''',
     );
 
@@ -480,6 +480,59 @@ solid_lints:
       'param_a': 'val_a',
       'param_b': 'local_val_b',
       'param_c': 'val_c',
+    });
+  }
+
+  void test_options_merging_with_multiple_includes() {
+    final includedOptionsPath1 = '$testPackageRootPath/included_options_1.yaml';
+    final includedOptionsPath2 = '$testPackageRootPath/included_options_2.yaml';
+    newFile(
+      includedOptionsPath1,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      param_a: val_a
+      param_b: val_b
+''',
+    );
+    newFile(
+      includedOptionsPath2,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      param_b: val_b_2
+      param_c: val_c
+''',
+    );
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include:
+  - included_options_1.yaml
+  - included_options_2.yaml
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      param_c: local_val_c
+      param_d: val_d
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, {
+      'param_a': 'val_a',
+      'param_b': 'val_b_2',
+      'param_c': 'local_val_c',
+      'param_d': 'val_d',
     });
   }
 

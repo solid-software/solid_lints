@@ -70,10 +70,10 @@ class AnalysisOptionsParser {
   }
 
   Object? _toStandardType(Object? value) => switch (value) {
-        Map() => _toStandardMap(value),
-        Iterable() => value.map(_toStandardType).toList(),
-        _ => value,
-      };
+    Map() => _toStandardMap(value),
+    Iterable() => value.map(_toStandardType).toList(),
+    _ => value,
+  };
 
   void _resolveAndMergeIncludes(
     File baseFile,
@@ -83,13 +83,54 @@ class AnalysisOptionsParser {
     Set<String> disabledRules,
   ) {
     final includeOption = yaml['include'];
-    if (includeOption is! String) return;
+    switch (includeOption) {
+      case String():
+        _resolveAndMergeInclude(
+          baseFile,
+          includeOption,
+          seenPaths,
+          mergedRules,
+          disabledRules,
+        );
+      case List():
+        for (final include in includeOption) {
+          if (include is String) {
+            _resolveAndMergeInclude(
+              baseFile,
+              include,
+              seenPaths,
+              mergedRules,
+              disabledRules,
+            );
+          }
+        }
+    }
+  }
 
-    final includedFile = _resolveIncludedFile(baseFile, includeOption);
+  void _resolveAndMergeInclude(
+    File baseFile,
+    String includePath,
+    Set<String> seenPaths,
+    Map<String, Map<String, Object?>> mergedRules,
+    Set<String> disabledRules,
+  ) {
+    final includedFile = _resolveIncludedFile(baseFile, includePath);
     if (includedFile == null) return;
 
     final includedData = _parseWithSeen(includedFile, seenPaths);
-    mergedRules.addAll(includedData.rules);
+    for (final entry in includedData.rules.entries) {
+      final ruleName = entry.key;
+      final includedOptions = entry.value;
+      final existingOptions = mergedRules[ruleName];
+      if (existingOptions == null) {
+        mergedRules[ruleName] = Map<String, Object?>.from(includedOptions);
+      } else {
+        mergedRules[ruleName] = <String, Object?>{
+          ...existingOptions,
+          ...includedOptions,
+        };
+      }
+    }
     disabledRules.addAll(includedData.disabledRules);
   }
 
@@ -193,12 +234,10 @@ class AnalysisOptionsParser {
 
     for (final entry in errors.entries) {
       final key = entry.key;
-      if (key is! String) continue;
+      if (key is! String || !key.startsWith(pluginPrefix)) continue;
 
       final errorValue = entry.value;
-      final ruleName = key.startsWith(pluginPrefix)
-          ? key.substring(pluginPrefix.length)
-          : key;
+      final ruleName = key.substring(pluginPrefix.length);
 
       if (errorValue == 'ignore') {
         mergedRules.remove(ruleName);
