@@ -21,24 +21,18 @@ class ParserUtils {
     featureSet: FeatureSet.latestLanguageVersion(),
   ).unit;
 
-  static String _cleanCommentLine(String line) {
-    if (line.startsWith('/// ')) {
-      return line.substring(4);
-    }
-    if (line.startsWith('///')) {
-      return line.substring(3);
-    }
-    return line;
-  }
+  static String _cleanCommentLine(String line) => line.substring(switch (line) {
+    _ when line.startsWith('/// ') => 4,
+    _ when line.startsWith('///') => 3,
+    _ => 0,
+  });
 
   /// Format [documentationComment]
-  static String? formatDocumentationComment(Comment? documentationComment) {
-    if (documentationComment == null) return null;
-    return documentationComment.tokens
-        .map((token) => _cleanCommentLine(token.lexeme))
-        .join('\n')
-        .trim();
-  }
+  static String? formatDocumentationComment(Comment? documentationComment) =>
+      documentationComment?.tokens
+          .map((token) => _cleanCommentLine(token.lexeme))
+          .join('\n')
+          .trim();
 
   /// Scan the codebase directory for all `{@template}` definitions
   static Map<String, String> scanForTemplates(Directory libDir) {
@@ -52,15 +46,16 @@ class ParserUtils {
         if (!content.contains('{@template')) continue;
 
         for (final match in ParserRegexes.templateRegex.allMatches(content)) {
-          final name = match.group(1)!;
-          final rawContent = match.group(2)!;
-          final cleanContent = rawContent
-              .split('\n')
-              .map((line) => _cleanCommentLine(line.trim()))
-              .join('\n')
-              .trim();
-
-          templates[name] = cleanContent;
+          if (match.groups([1, 2]) case [
+            final String name,
+            final String rawContent,
+          ]) {
+            templates[name] = rawContent
+                .split('\n')
+                .map((line) => _cleanCommentLine(line.trim()))
+                .join('\n')
+                .trim();
+          }
         }
       } catch (_) {}
     }
@@ -118,8 +113,10 @@ class ParserUtils {
       .toLowerCase();
 
   /// Get the dart file name suffix
-  static String fileNameSuffix(Uri uri) =>
-      uri.pathSegments.last.replaceFirst(RegExp(r'\.dart$'), '').split('_').last;
+  static String fileNameSuffix(Uri uri) => uri.pathSegments.last
+      .replaceFirst(RegExp(r'\.dart$'), '')
+      .split('_')
+      .last;
 
   /// Safely get the name of a ClassDeclaration or EnumDeclaration
   static String? getDeclarationName(CompilationUnitMember declaration) =>
@@ -176,10 +173,4 @@ class ParserUtils {
     }
     return parts.join('`');
   }
-}
-
-/// Extension on [Comment] to format it easily.
-extension CommentExtension on Comment? {
-  /// Format the documentation comment.
-  String? get formatted => ParserUtils.formatDocumentationComment(this);
 }

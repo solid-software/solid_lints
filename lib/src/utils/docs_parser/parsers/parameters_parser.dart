@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:solid_lints/src/utils/docs_parser/models/parameter_doc.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_extensions.dart';
 import 'package:solid_lints/src/utils/docs_parser/utils/parser_regexes.dart';
 import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
@@ -25,68 +26,40 @@ class ParametersParser {
   });
 
   ///
-  List<ParameterDoc> parse() {
-    final parametersPath = _getParametersFilePath();
-    if (parametersPath == null) return [];
+  List<ParameterDoc> parse() =>
+      File(
+            join(
+              ruleDirectory.path,
+              _parametersDir,
+              '${basename(ruleDirectory.path)}_$_parametersSuffix.dart',
+            ),
+          ).declarations
+          ?.whereType<ClassDeclaration>()
+          .map(_parseParametersDocs)
+          .firstWhereOrNull((docs) => docs.isNotEmpty) ??
+      [];
 
-    final ast = ParserUtils.parseAst(parametersPath);
-
-    final parameterDocs =
-        ast.declarations
-            .whereType<ClassDeclaration>()
-            .map(_parseParametersDocs)
-            .firstWhereOrNull((docs) => docs.isNotEmpty) ??
-        [];
-
-    return parameterDocs;
-  }
-
-  List<ParameterDoc> _parseParametersDocs(ClassDeclaration declaration) {
-    final List<ParameterDoc> parameterDocs = [];
-
-    for (final member in ParserUtils.getClassMembers(declaration)) {
-      if (member is! FieldDeclaration || member.isStatic) continue;
-
-      for (final variable in member.fields.variables) {
-        final variableName = variable.name.lexeme.trim();
-        if (variableName.startsWith('_')) continue;
-
-        final name = ParserUtils.camelCaseToSnakeCase(variableName);
-        var type = member.fields.type?.toSource() ?? 'dynamic';
-        type = type.replaceAllMapped(ParserRegexes.wordRegex, (match) {
-          final word = match.group(0)!;
-          return customTypes[word] ?? word;
-        });
-
-        final doc = member.documentationComment.formatted;
-
-        if (doc == null) {
-          throw 'Documentation is not specified for field '
-              '"$variableName" in class: '
-              '${ParserUtils.getDeclarationName(declaration)}';
-        }
-
-        parameterDocs.add(
-          ParameterDoc(
-            name: name,
-            type: type,
-            doc: doc,
-          ),
-        );
-      }
-    }
-
-    return parameterDocs;
-  }
-
-  String? _getParametersFilePath() {
-    final ruleName = basename(ruleDirectory.path);
-    final filePath = join(
-      ruleDirectory.path,
-      _parametersDir,
-      '${ruleName}_$_parametersSuffix.dart',
-    );
-    final file = File(filePath);
-    return file.existsSync() ? file.path : null;
-  }
+  List<ParameterDoc> _parseParametersDocs(ClassDeclaration declaration) => [
+    for (final member in ParserUtils.getClassMembers(declaration))
+      if (member case FieldDeclaration(
+        isStatic: false,
+        :final documentationComment,
+      ))
+        for (final v in member.fields.variables)
+          if (!v.nameString.startsWith('_'))
+            if (documentationComment?.formatted case final doc?)
+              ParameterDoc(
+                name: ParserUtils.camelCaseToSnakeCase(v.nameString),
+                type: (member.fields.type?.toSource() ?? 'dynamic')
+                    .replaceAllMapped(ParserRegexes.wordRegex, (match) {
+                      final word = match.group(0)!;
+                      return customTypes[word] ?? word;
+                    }),
+                doc: doc,
+              )
+            else
+              throw 'Documentation is not specified for field '
+                  '"${v.nameString}" in class: '
+                  '${ParserUtils.getDeclarationName(declaration)}',
+  ];
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:solid_lints/src/utils/docs_parser/models/rule_doc.dart';
 import 'package:solid_lints/src/utils/docs_parser/parsers/parameters_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_extensions.dart';
 import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
 /// RuleParser class to parse lint rules
@@ -61,5 +62,4 @@ class RuleParser {
       parameters: parameters,
     );
   }
-
 }

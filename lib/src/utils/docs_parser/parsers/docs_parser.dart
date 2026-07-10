@@ -1,9 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:solid_lints/src/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
 import 'package:solid_lints/src/utils/docs_parser/parsers/rule_parser.dart';
-import 'package:solid_lints/src/utils/docs_parser/utils/parser_regexes.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_extensions.dart';
 import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
 /// DocsParser orchestration class
@@ -22,79 +23,48 @@ class DocsParser<T> {
 
   ///
   T parse(Directory dir, {bool sortRulesAlphabetically = true}) {
-    final libDir = ParserUtils.findLibDir(dir);
-    final customTypes = _scanForCustomTypes(libDir);
-    final templates = ParserUtils.scanForTemplates(libDir);
-
-    final rulesDocs = _findRuleFiles(dir)
-        .map(
-          (path) => RuleParser(
-            rulePath: path,
-            customTypes: customTypes,
-            templates: templates,
-          ),
+    final files = dir
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where(
+          (f) => ruleFileSuffixes.contains(ParserUtils.fileNameSuffix(f.uri)),
         )
-        .map((parser) => parser.parse())
-        .toList(growable: false);
+        .map((file) => file.path)
+        .toList();
 
-    if (rulesDocs.isEmpty) {
-      throw 'Found no rules in specified directory';
-    }
-    log('Parsed ${rulesDocs.length} rules');
+    if (files.isEmpty) throw 'Found no rules in specified directory';
 
-    if (sortRulesAlphabetically) {
-      rulesDocs.sort((a, b) => a.name.compareTo(b.name));
-    }
+    final libDir = ParserUtils.findLibDir(dir);
 
-    return formatter.format(rulesDocs);
-  }
-
-  Map<String, String> _scanForCustomTypes(Directory libDir) {
-    final customTypes = <String, String>{
+    final customTypes = {
       'DiagnosticSeverity': 'String',
+      for (final entity in libDir.listSync(recursive: true))
+        if (entity case File(hasDocStrings: true, :final declarations?))
+          for (final declaration in declarations)
+            if (declaration case CompilationUnitMember(
+              :final name?,
+              :final type?,
+            ))
+              name: type.trim(),
     };
 
-    for (final entity in libDir.listSync(recursive: true)) {
-      if (entity is! File || !entity.path.endsWith('.dart')) continue;
+    final templates = ParserUtils.scanForTemplates(libDir);
 
-      try {
-        final content = entity.readAsStringSync();
-        if (!content.contains('@docType')) continue;
+    final docs = [
+      for (final path in files)
+        RuleParser(
+          rulePath: path,
+          customTypes: customTypes,
+          templates: templates,
+        ).parse(),
+    ];
 
-        final ast = ParserUtils.parseAst(entity.path);
-        for (final declaration in ast.declarations) {
-          final name = ParserUtils.getDeclarationName(declaration);
-          if (name == null) continue;
+    log('Parsed ${docs.length} rules');
 
-          final doc = declaration.documentationComment.formatted;
-          if (doc == null) continue;
-
-          final match = ParserRegexes.docTypeRegex.firstMatch(doc);
-          final type = match?.group(1);
-          if (type != null) {
-            customTypes[name] = type.trim();
-          }
-        }
-      } catch (_) {
-        // Ignore parse errors on some files if any
-      }
+    if (sortRulesAlphabetically) {
+      docs.sort((a, b) => a.name.compareTo(b.name));
     }
 
-    return customTypes;
-  }
-
-  List<String> _findRuleFiles(Directory dir) {
-    final rulesPaths = <String>[];
-    for (final entity in dir.listSync()) {
-      if (entity is File) {
-        if (ruleFileSuffixes.contains(ParserUtils.fileNameSuffix(entity.uri))) {
-          rulesPaths.add(entity.path);
-        }
-      } else if (entity is Directory) {
-        rulesPaths.addAll(_findRuleFiles(entity));
-      }
-    }
-
-    return rulesPaths;
+    return formatter.format(docs);
   }
 }
