@@ -114,11 +114,13 @@ class PackageConfigResolver {
         final rootUri = Uri.parse(rootUriString);
         final resolvedRootUri = rootUri.isAbsolute
             ? rootUri
-            : Uri.file(packageConfigPath).resolveUri(rootUri);
+            : _resourceProvider.pathContext
+                  .toUri(packageConfigPath)
+                  .resolveUri(rootUri);
 
         if (resolvedRootUri.isScheme('file')) {
           result[name] = _resourceProvider.pathContext.join(
-            resolvedRootUri.toFilePath(),
+            _resourceProvider.pathContext.fromUri(resolvedRootUri),
             packageUriString,
           );
         }

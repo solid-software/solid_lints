@@ -27,7 +27,6 @@ class AnalysisOptionsParser {
     if (seenPaths.contains(path)) {
       return const RulesData.empty();
     }
-    seenPaths.add(path);
 
     final yaml = _parseYaml(analysisOptionsFile);
     if (yaml == null) {
@@ -37,10 +36,11 @@ class AnalysisOptionsParser {
     final mergedRules = <String, Map<String, Object?>>{};
     final disabledRules = <String>{};
 
+    final nextSeenPaths = {...seenPaths, path};
     _resolveAndMergeIncludes(
       analysisOptionsFile,
       yaml,
-      seenPaths,
+      nextSeenPaths,
       mergedRules,
       disabledRules,
     );
@@ -50,19 +50,34 @@ class AnalysisOptionsParser {
     return RulesData(rules: mergedRules, disabledRules: disabledRules);
   }
 
-  Map<dynamic, dynamic>? _parseYaml(File file) {
+  Map<String, Object?>? _parseYaml(File file) {
     try {
       final optionsString = file.readAsStringSync();
       final parsed = loadYaml(optionsString);
-      return parsed is Map ? parsed : null;
+      if (parsed is! Map) return null;
+      return _toStandardMap(parsed);
     } catch (_) {
       return null;
     }
   }
 
+  Map<String, Object?> _toStandardMap(Map<dynamic, dynamic> map) {
+    return {
+      for (final entry in map.entries)
+        if (entry.key is String)
+          entry.key as String: _toStandardType(entry.value),
+    };
+  }
+
+  Object? _toStandardType(Object? value) => switch (value) {
+        Map() => _toStandardMap(value),
+        Iterable() => value.map(_toStandardType).toList(),
+        _ => value,
+      };
+
   void _resolveAndMergeIncludes(
     File baseFile,
-    Map<dynamic, dynamic> yaml,
+    Map<String, Object?> yaml,
     Set<String> seenPaths,
     Map<String, Map<String, Object?>> mergedRules,
     Set<String> disabledRules,
@@ -97,7 +112,7 @@ class AnalysisOptionsParser {
   }
 
   void _parseRuleOptions(
-    Map<dynamic, dynamic> yaml,
+    Map<String, Object?> yaml,
     Map<String, Map<String, Object?>> mergedRules,
     Set<String> disabledRules,
   ) {
@@ -131,7 +146,7 @@ class AnalysisOptionsParser {
     }
   }
 
-  Object? _extractDiagnostics(Map<dynamic, dynamic> yaml) {
+  Object? _extractDiagnostics(Map<String, Object?> yaml) {
     final pluginConfig = yaml[kPluginName];
     if (pluginConfig is Map) {
       return pluginConfig['diagnostics'];
@@ -164,7 +179,7 @@ class AnalysisOptionsParser {
   /// from running, we parse this section and add suppressed rules
   /// to [disabledRules].
   void _parseSuppressedErrors(
-    Map<dynamic, dynamic> yaml,
+    Map<String, Object?> yaml,
     Map<String, Map<String, Object?>> mergedRules,
     Set<String> disabledRules,
   ) {

@@ -10,8 +10,7 @@ class AnalysisOptionsLoader {
   final ResourceProvider _resourceProvider;
   final Map<String, CachedPackageRules> _rulesCache = {};
 
-  // Caches directory path -> nearest analysis_options.yaml file path
-  final Map<String, String?> _nearestYamlCache = {};
+
 
   late final AnalysisOptionsParser _parser;
 
@@ -101,29 +100,27 @@ class AnalysisOptionsLoader {
   }
 
   String? _findNearestAnalysisOptionsFilePath(String startDirectoryPath) {
-    return _nearestYamlCache.putIfAbsent(startDirectoryPath, () {
-      final pathContext = _resourceProvider.pathContext;
-      var currentDirectoryPath = startDirectoryPath;
+    final pathContext = _resourceProvider.pathContext;
+    var currentDirectoryPath = startDirectoryPath;
 
-      while (currentDirectoryPath.isNotEmpty) {
-        final candidatePath = pathContext.join(
-          currentDirectoryPath,
-          'analysis_options.yaml',
-        );
-        final candidateFile = _resourceProvider.getFile(candidatePath);
+    while (currentDirectoryPath.isNotEmpty) {
+      final candidatePath = pathContext.join(
+        currentDirectoryPath,
+        'analysis_options.yaml',
+      );
+      final candidateFile = _resourceProvider.getFile(candidatePath);
 
-        if (candidateFile.exists) {
-          return candidatePath;
-        }
-
-        final parentDir = pathContext.dirname(currentDirectoryPath);
-        if (parentDir == currentDirectoryPath) {
-          break;
-        }
-        currentDirectoryPath = parentDir;
+      if (candidateFile.exists) {
+        return candidatePath;
       }
 
-      return null;
-    });
+      final parentDir = pathContext.dirname(currentDirectoryPath);
+      if (parentDir == currentDirectoryPath) {
+        break;
+      }
+      currentDirectoryPath = parentDir;
+    }
+
+    return null;
   }
 }
