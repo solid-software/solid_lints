@@ -1,17 +1,32 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:solid_lints/src/common/parameter_parser/analysis_options_parser.dart';
 import 'package:solid_lints/src/common/parameter_parser/cached_package_rules.dart';
-import 'package:yaml/yaml.dart';
+import 'package:solid_lints/src/common/parameter_parser/package_config_resolver.dart';
 
 /// Loads and parses analysis options from a Dart project's YAML file.
 class AnalysisOptionsLoader {
   final ResourceProvider _resourceProvider;
   final Map<String, CachedPackageRules> _rulesCache = {};
 
-  /// Creates an instance of [AnalysisOptionsLoader]
-  AnalysisOptionsLoader({ResourceProvider? resourceProvider})
-    : _resourceProvider = resourceProvider ?? PhysicalResourceProvider.INSTANCE;
+  // Caches directory path -> nearest analysis_options.yaml file path
+  final Map<String, String?> _nearestYamlCache = {};
+
+  late final AnalysisOptionsParser _parser;
+
+  /// Creates an instance of [AnalysisOptionsLoader].
+  AnalysisOptionsLoader({
+    ResourceProvider? resourceProvider,
+    AnalysisOptionsParser? parser,
+  }) : _resourceProvider =
+            resourceProvider ?? PhysicalResourceProvider.INSTANCE {
+    _parser = parser ??
+        AnalysisOptionsParser(
+          _resourceProvider,
+          PackageConfigResolver(_resourceProvider),
+        );
+  }
 
   /// Gets the options for a specific rule by its name.
   Map<String, Object?>? getRuleOptions(RuleContext context, String ruleName) =>
@@ -35,6 +50,17 @@ class AnalysisOptionsLoader {
     _loadRulesOptionsIfNewer(yamlPath);
     return _rulesCache[yamlPath]?.rules[ruleName];
   }
+
+  /// Checks if a rule is explicitly disabled.
+  bool isRuleDisabled(RuleContext context, String ruleName) =>
+      _withNearestAnalysisOptionsFilePathForContext<bool>(
+        context,
+        (path) {
+          _loadRulesOptionsIfNewer(path);
+          return _rulesCache[path]?.disabledRules.contains(ruleName) ?? false;
+        },
+      ) ??
+      false;
 
   /// Loads lint rules from the analysis options file for all rules
   /// using the provided [RuleContext].
@@ -66,70 +92,38 @@ class AnalysisOptionsLoader {
       return;
     }
 
-    final rules = _getRules(analysisOptionsFile);
+    final rulesData = _parser.parse(analysisOptionsFile);
     _rulesCache[yamlPath] = CachedPackageRules(
       modificationStamp: modificationStamp,
-      rules: rules,
+      rules: rulesData.rules,
+      disabledRules: rulesData.disabledRules,
     );
   }
 
   String? _findNearestAnalysisOptionsFilePath(String startDirectoryPath) {
-    final pathContext = _resourceProvider.pathContext;
-    String currentDirectoryPath = startDirectoryPath;
+    return _nearestYamlCache.putIfAbsent(startDirectoryPath, () {
+      final pathContext = _resourceProvider.pathContext;
+      var currentDirectoryPath = startDirectoryPath;
 
-    while (true) {
-      final candidatePath = pathContext.join(
-        currentDirectoryPath,
-        'analysis_options.yaml',
-      );
-      final candidateFile = _resourceProvider.getFile(candidatePath);
+      while (currentDirectoryPath.isNotEmpty) {
+        final candidatePath = pathContext.join(
+          currentDirectoryPath,
+          'analysis_options.yaml',
+        );
+        final candidateFile = _resourceProvider.getFile(candidatePath);
 
-      if (candidateFile.exists) {
-        return candidatePath;
+        if (candidateFile.exists) {
+          return candidatePath;
+        }
+
+        final parentDir = pathContext.dirname(currentDirectoryPath);
+        if (parentDir == currentDirectoryPath) {
+          break;
+        }
+        currentDirectoryPath = parentDir;
       }
 
-      final parentDir = pathContext.dirname(currentDirectoryPath);
-      if (parentDir == currentDirectoryPath) {
-        break;
-      }
-      currentDirectoryPath = parentDir;
-    }
-
-    return null;
-  }
-
-  Map<String, Map<String, Object?>> _getRules(File? analysisOptionsFile) {
-    if (analysisOptionsFile == null || !analysisOptionsFile.exists) {
-      return {};
-    }
-
-    Object? yaml;
-    try {
-      final optionsString = analysisOptionsFile.readAsStringSync();
-      yaml = loadYaml(optionsString);
-    } catch (_) {
-      return {};
-    }
-
-    Object? rawDiagnostics;
-    if (yaml case {'solid_lints': {'diagnostics': final diagnostics}}) {
-      rawDiagnostics = diagnostics;
-    } else if (yaml case {
-      'plugins': {'solid_lints': {'diagnostics': final diagnostics}},
-    }) {
-      rawDiagnostics = diagnostics;
-    }
-
-    if (rawDiagnostics is! Map) return {};
-
-    return {
-      for (final entry in rawDiagnostics.entries)
-        if (entry.key is String && entry.value is Map)
-          entry.key as String: <String, Object?>{
-            for (final optionEntry in (entry.value as Map).entries)
-              if (optionEntry.key is String)
-                optionEntry.key as String: optionEntry.value,
-          },
-    };
+      return null;
+    });
   }
 }

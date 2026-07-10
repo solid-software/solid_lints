@@ -1,5 +1,7 @@
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:solid_lints/src/common/constants.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/avoid_final_with_getter_rule.dart';
@@ -30,6 +32,8 @@ import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
+import 'package:solid_lints/src/models/proxy_analysis_rule.dart';
+import 'package:solid_lints/src/models/proxy_multi_analysis_rule.dart';
 import 'package:solid_lints/src/models/rule_with_fixes.dart';
 
 /// The entry point for the Solid Lints analyser server plugin.
@@ -44,7 +48,7 @@ final plugin = SolidLintsPlugin();
 /// by the Dart analyzer during code analysis.
 class SolidLintsPlugin extends Plugin {
   @override
-  String get name => 'solid_lints';
+  String get name => kPluginName;
 
   @override
   void register(PluginRegistry registry) {
@@ -83,7 +87,13 @@ class SolidLintsPlugin extends Plugin {
     ];
 
     for (final lintRule in lintRules) {
-      registry.registerLintRule(lintRule);
+      final ruleToRegister = switch (lintRule) {
+        MultiAnalysisRule() => ProxyMultiAnalysisRule(lintRule, analysisLoader),
+        AnalysisRule() => ProxyAnalysisRule(lintRule, analysisLoader),
+      };
+
+      registry.registerWarningRule(ruleToRegister);
+
       if (lintRule is RuleWithFixes) {
         for (final entry in (lintRule as RuleWithFixes).fixesForCodes) {
           registry.registerFixForRule(entry.key, entry.value);

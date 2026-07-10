@@ -19,4 +19,7 @@ class FakeAnalysisOptionsLoader implements AnalysisOptionsLoader {
 
   @override
   void loadRulesOptionsFromContext(RuleContext context) {}
+
+  @override
+  bool isRuleDisabled(RuleContext context, String ruleName) => false;
 }
