@@ -1,4 +1,3 @@
-import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.dart';
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 
 /// Configuration parameters for the avoid_duplicate_code rule.
@@ -26,13 +25,7 @@ class AvoidDuplicateCodeParameters {
   static const _defaultMinTokens = 50;
 
   static final _defaultExclude = ExcludedIdentifiersListParameter(
-    exclude: const [
-      ExcludedIdentifierParameter(methodName: 'initState'),
-      ExcludedIdentifierParameter(methodName: 'dispose'),
-      ExcludedIdentifierParameter(methodName: 'didChangeDependencies'),
-      ExcludedIdentifierParameter(methodName: 'didUpdateWidget'),
-      ExcludedIdentifierParameter(methodName: 'build'),
-    ],
+    exclude: const [],
   );
 
   /// Constructor for [AvoidDuplicateCodeParameters] model.
@@ -55,23 +48,12 @@ class AvoidDuplicateCodeParameters {
 
   /// Creates parameters from JSON configuration.
   factory AvoidDuplicateCodeParameters.fromJson(Map<String, Object?> json) {
-    final baseExclude = ExcludedIdentifiersListParameter.defaultFromJson(json);
-    final combinedExclude = ExcludedIdentifiersListParameter(
-      exclude: [
-        ..._defaultExclude.exclude,
-        ...baseExclude.exclude,
-      ],
-    );
-
     return AvoidDuplicateCodeParameters(
       minTokens: json['min_tokens'] as int? ?? _defaultMinTokens,
-      ignoreLiterals:
-          json['ignore_literals'] as bool? ??
-          json['ignore_literal_values'] as bool? ??
-          false,
+      ignoreLiterals: json['ignore_literals'] as bool? ?? false,
       ignoreIdentifiers: json['ignore_identifiers'] as bool? ?? true,
       checkBlocks: json['check_blocks'] as bool? ?? false,
-      exclude: combinedExclude,
+      exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
     );
   }
 
