@@ -40,7 +40,9 @@ class GlobalHashRegistry {
 
   void _addToInvertedIndex(String absoluteFilePath, List<HashEntry> entries) {
     for (final entry in entries) {
-      _hashToLocations.putIfAbsent(entry.hash, () => {}).add(
+      _hashToLocations
+          .putIfAbsent(entry.hash, () => {})
+          .add(
             DuplicateLocation(
               entry: entry,
               filePath: absoluteFilePath,
@@ -92,7 +94,8 @@ class GlobalHashRegistry {
     }
   }
 
-  /// Returns the cached modification stamp for [filePath], or `null` if not indexed.
+  /// Returns the cached modification stamp for [filePath], or `null` if no
+  /// indexed.
   int? getModificationStamp(String filePath, {String? packageRoot}) {
     final root = packageRoot ?? Directory.current.path;
     _ensureLoaded(root);
@@ -168,7 +171,8 @@ class GlobalHashRegistry {
           if (key == absoluteCurrentFilePath) continue;
 
           // Check if deleted or excluded on demand only for matched locations
-          final isDeleted = enablePhysicalFileCleanup && !File(key).existsSync();
+          final isDeleted =
+              enablePhysicalFileCleanup && !File(key).existsSync();
           final isExcluded = isFileExcluded != null && isFileExcluded(key);
 
           if (isDeleted || isExcluded) {
@@ -258,7 +262,7 @@ class GlobalHashRegistry {
     // Filter _index for files belonging to this packageRoot
     final subset = <String, FileCacheEntry>{
       for (final MapEntry(:key, :value) in _index.entries)
-        if (key.startsWith(packageRoot)) key: value
+        if (key.startsWith(packageRoot)) key: value,
     };
 
     HashCacheStorage.save(packageRoot, subset);

@@ -63,7 +63,8 @@ class HashCacheStorage {
         '$packageRoot/.dart_tool/solid_lints/duplicate_index_load.log',
       );
       final logLine =
-          '${time.toIso8601String()}: Loaded map in ${elapsedMs}ms (files: ${filesCount >= 0 ? filesCount : 'failed'})\n';
+          '${time.toIso8601String()}: Loaded map in ${elapsedMs}ms '
+          '(files: ${filesCount >= 0 ? filesCount : 'failed'})\n';
       logFile.writeAsStringSync(logLine, mode: FileMode.append);
     } catch (_) {
       // Fail silently

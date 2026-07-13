@@ -4,7 +4,6 @@ import 'package:analyzer/dart/analysis/context_root.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
-import 'package:analyzer/src/diagnostic/diagnostic_message.dart';
 import 'package:path/path.dart' as path;
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
@@ -12,6 +11,7 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_mat
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/ast_structural_hasher.dart';
+import 'package:solid_lints/src/models/solid_diagnostic_message.dart';
 
 /// A record representing a block or expression candidate for clone detection.
 typedef _BodyCandidate = ({
@@ -49,16 +49,24 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
     final filePath = _filePath;
 
-    // --- Phase 0: Try to use cached entries if file is unchanged and has no warnings ---
+    // --- Phase 0: Try to use cached entries if file is unchanged and has no
+    // warnings
     if (filePath.isNotEmpty) {
       final contextRoot = _contextRoot;
-      final packageRoot = contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
+      final packageRoot =
+          contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
       if (packageRoot.isNotEmpty) {
         final registry = GlobalHashRegistry.instance;
-        final cachedStamp = registry.getModificationStamp(filePath, packageRoot: packageRoot);
+        final cachedStamp = registry.getModificationStamp(
+          filePath,
+          packageRoot: packageRoot,
+        );
 
         if (cachedStamp == _modificationStamp) {
-          final cachedEntries = registry.getFileEntries(filePath, packageRoot: packageRoot);
+          final cachedEntries = registry.getFileEntries(
+            filePath,
+            packageRoot: packageRoot,
+          );
           if (cachedEntries != null) {
             // Check if there are any cross-file matches
             final crossMatches = registry.findCrossFileMatches(
@@ -77,7 +85,9 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
             for (final entry in cachedEntries) {
               hashCounts[entry.hash] = (hashCounts[entry.hash] ?? 0) + 1;
             }
-            final hasIntraDuplicates = hashCounts.values.any((count) => count > 1);
+            final hasIntraDuplicates = hashCounts.values.any(
+              (count) => count > 1,
+            );
             final hasCrossDuplicates = crossMatches.isNotEmpty;
 
             if (!hasIntraDuplicates && !hasCrossDuplicates) {
@@ -131,7 +141,8 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     final crossFileDuplicatesByHash = <int, List<DuplicateLocation>>{};
     if (filePath.isNotEmpty) {
       final contextRoot = _contextRoot;
-      final packageRoot = contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
+      final packageRoot =
+          contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
 
       final registry = GlobalHashRegistry.instance;
       final crossMatches = registry.findCrossFileMatches(
@@ -158,8 +169,8 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     // --- Phase C: Group candidates by structural hash for intra-file ---
     final groups = <int, List<_BodyCandidate>>{};
     for (final candidate in candidates) {
-      final hash = candidateHashes[candidate.node] ??
-          hasher.computeHash(candidate.node);
+      final hash =
+          candidateHashes[candidate.node] ?? hasher.computeHash(candidate.node);
       (groups[hash] ??= []).add(candidate);
     }
 
@@ -173,17 +184,20 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       if (suppressed.contains(candidate.node)) continue;
       if (reported.contains(candidate.node)) continue;
 
-      final hash = candidateHashes[candidate.node] ??
-          hasher.computeHash(candidate.node);
+      final hash =
+          candidateHashes[candidate.node] ?? hasher.computeHash(candidate.node);
       final group = groups[hash];
       if (group == null) continue;
 
       // Filter group to only include non-suppressed candidates
-      final activeGroup =
-          group.where((c) => !suppressed.contains(c.node)).toList();
+      final activeGroup = group
+          .where((c) => !suppressed.contains(c.node))
+          .toList();
 
       final externalPartners = crossFileDuplicatesByHash[hash] ?? const [];
-      final internalPartners = activeGroup.where((c) => c != candidate).toList();
+      final internalPartners = activeGroup
+          .where((c) => c != candidate)
+          .toList();
 
       final hasExternalDuplicates = externalPartners.isNotEmpty;
       final hasInternalDuplicates = internalPartners.isNotEmpty;
@@ -197,21 +211,19 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
         final contextMessages = <DiagnosticMessage>[
           // Add external partners
           for (final dup in externalPartners)
-            DiagnosticMessageImpl(
+            SolidDiagnosticMessage(
               filePath: dup.filePath,
               offset: dup.entry.offset,
               length: dup.entry.length,
               message: 'Duplicate',
-              url: null,
             ),
           // Add internal partners
           for (final other in internalPartners)
-            DiagnosticMessageImpl(
+            SolidDiagnosticMessage(
               filePath: filePath,
               offset: other.node.offset,
               length: other.node.length,
               message: 'Duplicate',
-              url: null,
             ),
         ];
 
@@ -321,13 +333,15 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
       final relativePath =
           packageRoot.isNotEmpty && filePath.startsWith(packageRoot)
-              ? path.relative(filePath, from: packageRoot)
-              : filePath;
+          ? path.relative(filePath, from: packageRoot)
+          : filePath;
       final ramMb = ProcessInfo.currentRss / (1024 * 1024);
       final cacheIndicator = cached ? ' [Cached]' : '';
       final logLine =
-          '${startTime.toIso8601String()}: Checked #$_processedFilesCount ($relativePath) '
-          'in ${elapsedMs}ms$cacheIndicator | Candidates: $candidateCount | Warnings: $warningCount | RAM: ${ramMb.toStringAsFixed(1)} MB '
+          '${startTime.toIso8601String()}: Checked '
+          '#$_processedFilesCount ($relativePath) in ${elapsedMs}ms'
+          '$cacheIndicator | Candidates: $candidateCount | '
+          'Warnings: $warningCount | RAM: ${ramMb.toStringAsFixed(1)} MB '
           '(Total session time: ${_totalDurationMs}ms)\n';
       logFile.writeAsStringSync(logLine, mode: FileMode.append);
     } catch (_) {
