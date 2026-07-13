@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_match.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
@@ -29,6 +29,7 @@ class GlobalHashRegistry {
   final _loadedRoots = <String>{};
 
   Timer? _saveTimer;
+  AvoidDuplicateCodeParameters? _currentParams;
 
   /// Whether to automatically clean up files that do not exist physically on
   /// disk.
@@ -66,10 +67,15 @@ class GlobalHashRegistry {
     }
   }
 
-  void _ensureLoaded(String packageRoot) {
+  void _ensureLoaded(
+    String packageRoot, [
+    AvoidDuplicateCodeParameters? currentParams,
+  ]) {
     if (_loadedRoots.contains(packageRoot)) return;
     _loadedRoots.add(packageRoot);
-    final cached = HashCacheStorage.load(packageRoot);
+    final params = currentParams ?? AvoidDuplicateCodeParameters.empty();
+    _currentParams = params;
+    final cached = HashCacheStorage.load(packageRoot, params);
     if (cached != null) {
       _index.addAll(cached);
 
@@ -89,16 +95,20 @@ class GlobalHashRegistry {
       }
 
       if (deletedFiles.isNotEmpty) {
-        _scheduleSave(packageRoot);
+        _scheduleSave(packageRoot, params);
       }
     }
   }
 
   /// Returns the cached modification stamp for [filePath], or `null` if no
   /// indexed.
-  int? getModificationStamp(String filePath, {String? packageRoot}) {
+  int? getModificationStamp(
+    String filePath, {
+    AvoidDuplicateCodeParameters? parameters,
+    String? packageRoot,
+  }) {
     final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root);
+    _ensureLoaded(root, parameters);
     final absoluteFilePath = p.isAbsolute(filePath)
         ? p.normalize(filePath)
         : p.normalize(p.join(root, filePath));
@@ -106,9 +116,13 @@ class GlobalHashRegistry {
   }
 
   /// Returns the cached entries for [filePath], or `null` if not indexed.
-  List<HashEntry>? getFileEntries(String filePath, {String? packageRoot}) {
+  List<HashEntry>? getFileEntries(
+    String filePath, {
+    AvoidDuplicateCodeParameters? parameters,
+    String? packageRoot,
+  }) {
     final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root);
+    _ensureLoaded(root, parameters);
     final absoluteFilePath = p.isAbsolute(filePath)
         ? p.normalize(filePath)
         : p.normalize(p.join(root, filePath));
@@ -120,10 +134,11 @@ class GlobalHashRegistry {
     String filePath,
     List<HashEntry> entries, {
     required int modificationStamp,
+    AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
   }) {
     final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root);
+    _ensureLoaded(root, parameters);
     final absoluteFilePath = p.isAbsolute(filePath)
         ? p.normalize(filePath)
         : p.normalize(p.join(root, filePath));
@@ -138,7 +153,7 @@ class GlobalHashRegistry {
       entries: entries,
     );
     _addToInvertedIndex(absoluteFilePath, entries);
-    _scheduleSave(root);
+    _scheduleSave(root, parameters);
   }
 
   /// Finds cross-file duplicates for [currentEntries] against all other
@@ -148,11 +163,12 @@ class GlobalHashRegistry {
   List<CrossFileMatch> findCrossFileMatches(
     String currentFilePath,
     List<HashEntry> currentEntries, {
+    AvoidDuplicateCodeParameters? parameters,
     bool Function(String filePath)? isFileExcluded,
     String? packageRoot,
   }) {
     final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root);
+    _ensureLoaded(root, parameters);
 
     final absoluteCurrentFilePath = p.isAbsolute(currentFilePath)
         ? p.normalize(currentFilePath)
@@ -208,16 +224,20 @@ class GlobalHashRegistry {
         }
         _index.remove(file);
       }
-      _scheduleSave(root);
+      _scheduleSave(root, parameters);
     }
 
     return matches;
   }
 
   /// Removes [filePath] from the index.
-  void removeFile(String filePath, {String? packageRoot}) {
+  void removeFile(
+    String filePath, {
+    AvoidDuplicateCodeParameters? parameters,
+    String? packageRoot,
+  }) {
     final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root);
+    _ensureLoaded(root, parameters);
     final absoluteFilePath = p.isAbsolute(filePath)
         ? p.normalize(filePath)
         : p.normalize(p.join(root, filePath));
@@ -226,7 +246,7 @@ class GlobalHashRegistry {
       _removeFromInvertedIndex(absoluteFilePath, oldEntry.entries);
     }
     _index.remove(absoluteFilePath);
-    _scheduleSave(root);
+    _scheduleSave(root, parameters);
   }
 
   /// The number of files currently indexed.
@@ -241,70 +261,30 @@ class GlobalHashRegistry {
     _index.clear();
     _hashToLocations.clear();
     HashCacheStorage.delete(Directory.current.path);
-    try {
-      final file = File(
-        '${Directory.current.path}/.dart_tool/solid_lints/duplicate_inverted_index.json',
-      );
-      if (file.existsSync()) {
-        file.deleteSync();
-      }
-    } catch (_) {}
   }
 
-  void _scheduleSave(String packageRoot) {
+  void _scheduleSave(
+    String packageRoot, [
+    AvoidDuplicateCodeParameters? parameters,
+  ]) {
     _saveTimer?.cancel();
     _saveTimer = Timer(const Duration(milliseconds: 500), () {
-      _performSave(packageRoot);
+      _performSave(packageRoot, parameters);
     });
   }
 
-  void _performSave(String packageRoot) {
+  void _performSave(
+    String packageRoot, [
+    AvoidDuplicateCodeParameters? parameters,
+  ]) {
     // Filter _index for files belonging to this packageRoot
     final subset = <String, FileCacheEntry>{
       for (final MapEntry(:key, :value) in _index.entries)
         if (key.startsWith(packageRoot)) key: value,
     };
 
-    HashCacheStorage.save(packageRoot, subset);
-
-    // Save inverted index to duplicate_inverted_index.json
-    try {
-      final jsonInverted = <String, List<Map<String, Object?>>>{};
-      _hashToLocations.forEach((hash, locations) {
-        final packageLocations = locations
-            .where((loc) => loc.filePath.startsWith(packageRoot))
-            .toList();
-        if (packageLocations.isEmpty) return;
-
-        jsonInverted[hash.toString()] = packageLocations.map((loc) {
-          final relativePath = p.isAbsolute(loc.filePath)
-              ? p.relative(loc.filePath, from: packageRoot)
-              : loc.filePath;
-          return {
-            'filePath': relativePath,
-            'entry': loc.entry.toJson(),
-          };
-        }).toList();
-      });
-
-      final file = File(
-        '$packageRoot/.dart_tool/solid_lints/duplicate_inverted_index.json',
-      );
-      if (jsonInverted.isEmpty) {
-        if (file.existsSync()) {
-          file.deleteSync();
-        }
-      } else {
-        final directory = file.parent;
-        if (!directory.existsSync()) {
-          directory.createSync(recursive: true);
-        }
-        file.writeAsStringSync(
-          const JsonEncoder.withIndent('  ').convert(jsonInverted),
-        );
-      }
-    } catch (_) {
-      // Fail silently to avoid breaking analysis server
-    }
+    final params =
+        parameters ?? _currentParams ?? AvoidDuplicateCodeParameters.empty();
+    HashCacheStorage.save(packageRoot, subset, params);
   }
 }

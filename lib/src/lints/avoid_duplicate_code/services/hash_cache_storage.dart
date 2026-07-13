@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_entry.dart';
 
 /// Service responsible for persisting and loading the duplicate code hash
@@ -13,9 +15,10 @@ class HashCacheStorage {
   ///
   /// Returns `null` if the cache file does not exist, is corrupted, or fails
   /// to load.
-  static Map<String, FileCacheEntry>? load(String packageRoot) {
-    final stopwatch = Stopwatch()..start();
-    final startTime = DateTime.now();
+  static Map<String, FileCacheEntry>? load(
+    String packageRoot,
+    AvoidDuplicateCodeParameters currentParams,
+  ) {
     try {
       final file = File(_filePath(packageRoot));
       if (!file.existsSync()) return null;
@@ -23,8 +26,25 @@ class HashCacheStorage {
       final content = file.readAsStringSync();
       final jsonMap = jsonDecode(content) as Map<String, Object?>;
 
+      // Validate config
+      final cachedConfig = jsonMap['config'];
+      if (cachedConfig is! Map<String, Object?>) {
+        return null;
+      }
+
+      final currentConfig = currentParams.toJson();
+      if (!const DeepCollectionEquality().equals(cachedConfig, currentConfig)) {
+        // Configuration mismatch -> discard cache
+        return null;
+      }
+
+      final filesMap = jsonMap['files'];
+      if (filesMap is! Map<String, Object?>) {
+        return null;
+      }
+
       final result = <String, FileCacheEntry>{};
-      for (final MapEntry(:key, :value) in jsonMap.entries) {
+      for (final MapEntry(:key, :value) in filesMap.entries) {
         final absoluteKey = p.isAbsolute(key)
             ? p.normalize(key)
             : p.normalize(p.join(packageRoot, key));
@@ -37,42 +57,18 @@ class HashCacheStorage {
           }
         }
       }
-      stopwatch.stop();
-      _writeLoadLog(
-        packageRoot,
-        startTime,
-        stopwatch.elapsedMilliseconds,
-        result.length,
-      );
       return result;
     } catch (_) {
-      stopwatch.stop();
-      _writeLoadLog(packageRoot, startTime, stopwatch.elapsedMilliseconds, -1);
       return null;
     }
   }
 
-  static void _writeLoadLog(
-    String packageRoot,
-    DateTime time,
-    int elapsedMs,
-    int filesCount,
-  ) {
-    try {
-      final logFile = File(
-        '$packageRoot/.dart_tool/solid_lints/duplicate_index_load.log',
-      );
-      final logLine =
-          '${time.toIso8601String()}: Loaded map in ${elapsedMs}ms '
-          '(files: ${filesCount >= 0 ? filesCount : 'failed'})\n';
-      logFile.writeAsStringSync(logLine, mode: FileMode.append);
-    } catch (_) {
-      // Fail silently
-    }
-  }
-
   /// Saves the [index] to disk for the given [packageRoot].
-  static void save(String packageRoot, Map<String, FileCacheEntry> index) {
+  static void save(
+    String packageRoot,
+    Map<String, FileCacheEntry> index,
+    AvoidDuplicateCodeParameters currentParams,
+  ) {
     try {
       final cacheDir = '$packageRoot/.dart_tool/solid_lints';
       final directory = Directory(cacheDir);
@@ -81,29 +77,22 @@ class HashCacheStorage {
       }
 
       final file = File(_filePath(packageRoot));
-      if (index.isEmpty) {
-        file.writeAsStringSync('{}');
-        return;
-      }
 
-      final buffer = StringBuffer('{\n');
-      final entriesList = index.entries.toList();
-      for (var i = 0; i < entriesList.length; i++) {
-        final entry = entriesList[i];
+      final filesMap = <String, Object?>{};
+      for (final entry in index.entries) {
         final relativeKey = p.isAbsolute(entry.key)
             ? p.relative(entry.key, from: packageRoot)
             : entry.key;
-        final listJson = jsonEncode(entry.value.toJson());
-
-        buffer.write('  ${jsonEncode(relativeKey)}: $listJson');
-        if (i < entriesList.length - 1) {
-          buffer.write(',\n');
-        } else {
-          buffer.write('\n');
-        }
+        filesMap[relativeKey] = entry.value.toJson();
       }
-      buffer.write('}');
-      file.writeAsStringSync(buffer.toString());
+
+      final data = {
+        'version': 1,
+        'config': currentParams.toJson(),
+        'files': filesMap,
+      };
+
+      file.writeAsStringSync(jsonEncode(data));
     } catch (_) {
       // Fail silently to avoid breaking analysis server
     }

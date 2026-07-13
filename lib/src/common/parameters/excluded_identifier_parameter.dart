@@ -21,8 +21,16 @@ class ExcludedIdentifierParameter {
     Map<dynamic, dynamic> json,
   ) {
     return ExcludedIdentifierParameter(
-      methodName: json['method_name'] as String,
+      methodName: json['method_name'] as String?,
       className: json['class_name'] as String?,
+      declarationName: json['declaration_name'] as String?,
     );
   }
+
+  /// Method to convert parameter to JSON Map.
+  Map<String, Object?> toJson() => {
+    if (methodName != null) 'method_name': methodName,
+    if (className != null) 'class_name': className,
+    if (declarationName != null) 'declaration_name': declarationName,
+  };
 }

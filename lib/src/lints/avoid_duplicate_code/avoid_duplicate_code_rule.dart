@@ -10,7 +10,8 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///
 /// When two or more function/method/constructor bodies have structurally
 /// identical AST subtrees (Type 2 clones — same structure, variable names
-/// may differ), the rule reports all copies except the first occurrence.
+/// may differ), the rule reports all copies and provides context messages
+/// linking to the other occurrences.
 ///
 /// Cross-file detection works on a "best-effort" basis: duplicates are
 /// detected against files that have already been analyzed in the current
@@ -23,7 +24,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   solid_lints:
 ///     diagnostics:
 ///       avoid_duplicate_code:
-///         min_statements: 10
+///         min_tokens: 50
 ///         ignore_literals: false
 ///         ignore_identifiers: true
 ///         check_blocks: false

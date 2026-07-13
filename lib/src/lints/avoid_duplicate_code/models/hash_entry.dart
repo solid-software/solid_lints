@@ -13,33 +13,33 @@ class HashEntry {
   /// The length of the code block.
   final int length;
 
-  /// The number of statements in the candidate body.
-  final int statementCount;
+  /// The number of tokens in the candidate body.
+  final int tokenCount;
 
   /// Creates a new [HashEntry].
   const HashEntry({
     required this.hash,
     required this.lineNumber,
-    required this.statementCount,
+    required this.tokenCount,
     this.offset = 0,
     this.length = 0,
   });
 
   /// Converts this [HashEntry] to a JSON-compatible map using shortened keys.
   Map<String, Object?> toJson() => {
-        'h': hash,
-        'n': lineNumber,
-        'o': offset,
-        'l': length,
-        's': statementCount,
-      };
+    'h': hash,
+    'n': lineNumber,
+    'o': offset,
+    'l': length,
+    't': tokenCount,
+  };
 
-  /// Creates a [HashEntry] from a JSON map, supporting both old and new keys.
+  /// Creates a [HashEntry] from a JSON map.
   factory HashEntry.fromJson(Map<String, Object?> json) => HashEntry(
-        hash: (json['h'] ?? json['hash'])! as int,
-        lineNumber: (json['n'] ?? json['lineNumber'])! as int,
-        offset: (json['o'] ?? json['offset'] ?? 0) as int,
-        length: (json['l'] ?? json['length'] ?? 0) as int,
-        statementCount: (json['s'] ?? json['statementCount'])! as int,
-      );
+    hash: json['h']! as int,
+    lineNumber: json['n']! as int,
+    offset: (json['o'] ?? 0) as int,
+    length: (json['l'] ?? 0) as int,
+    tokenCount: (json['t'] ?? json['s'] ?? 0) as int,
+  );
 }

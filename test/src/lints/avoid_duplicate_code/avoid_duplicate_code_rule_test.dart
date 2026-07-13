@@ -24,7 +24,7 @@ plugins:
   solid_lints:
     diagnostics:
       avoid_duplicate_code:
-        min_statements: 3
+        min_tokens: 15
         check_blocks: true
         exclude:
           - method_name: excluded
@@ -54,12 +54,12 @@ $_mockAnalysisOptionsContent''',
     await super.tearDown();
   }
 
-  // --- Base Tests (min_statements: 3, check_blocks: true, default) ---
+  // --- Base Tests (min_tokens: 15, check_blocks: true, default) ---
 
   Future<void>
   test_reports_when_two_functions_have_identical_bodies() async {
     await assertAutoDiagnostics('''
-${expectLint(r'''void first() {
+void first() ${expectLint(r'''{
   final x = 1;
   if (x > 0) {
     print(x);
@@ -67,7 +67,7 @@ ${expectLint(r'''void first() {
   print('done');
 }''')}
 
-${expectLint(r'''void second() {
+void second() ${expectLint(r'''{
   final x = 1;
   if (x > 0) {
     print(x);
@@ -80,7 +80,7 @@ ${expectLint(r'''void second() {
   Future<void>
   test_reports_when_functions_have_same_structure_different_names() async {
     await assertAutoDiagnostics('''
-${expectLint(r'''void fetchUsers() {
+void fetchUsers() ${expectLint(r'''{
   final response = 'data';
   if (response.isEmpty) {
     throw Exception('error');
@@ -88,7 +88,7 @@ ${expectLint(r'''void fetchUsers() {
   print(response);
 }''')}
 
-${expectLint(r'''void fetchOrders() {
+void fetchOrders() ${expectLint(r'''{
   final result = 'data';
   if (result.isEmpty) {
     throw Exception('error');
@@ -120,7 +120,7 @@ void second() {
   }
 
   Future<void>
-  test_does_not_report_when_body_below_min_statements() async {
+  test_does_not_report_when_body_below_min_tokens() async {
     await assertNoDiagnostics(r'''
 void first() {
   print('hello');
@@ -138,7 +138,7 @@ void second() {
   test_reports_on_methods_in_same_class() async {
     await assertAutoDiagnostics('''
 class MyClass {
-  ${expectLint(r'''void first() {
+  void first() ${expectLint(r'''{
     final x = 1;
     if (x > 0) {
       print(x);
@@ -146,7 +146,7 @@ class MyClass {
     print('done');
   }''')}
 
-  ${expectLint(r'''void second() {
+  void second() ${expectLint(r'''{
     final y = 1;
     if (y > 0) {
       print(y);
@@ -160,7 +160,7 @@ class MyClass {
   Future<void>
   test_reports_on_third_clone_also() async {
     await assertAutoDiagnostics('''
-${expectLint(r'''void first() {
+void first() ${expectLint(r'''{
   final x = 1;
   if (x > 0) {
     print(x);
@@ -168,7 +168,7 @@ ${expectLint(r'''void first() {
   print('done');
 }''')}
 
-${expectLint(r'''void second() {
+void second() ${expectLint(r'''{
   final y = 1;
   if (y > 0) {
     print(y);
@@ -176,7 +176,7 @@ ${expectLint(r'''void second() {
   print('done');
 }''')}
 
-${expectLint(r'''void third() {
+void third() ${expectLint(r'''{
   final z = 1;
   if (z > 0) {
     print(z);
@@ -197,12 +197,12 @@ plugins:
   solid_lints:
     diagnostics:
       avoid_duplicate_code:
-        min_statements: 3
+        min_tokens: 15
         ignore_literals: true
 ''',
     );
     await assertAutoDiagnostics('''
-${expectLint(r'''void first() {
+void first() ${expectLint(r'''{
   final x = 1;
   if (x > 0) {
     print('hello');
@@ -210,7 +210,7 @@ ${expectLint(r'''void first() {
   print('world');
 }''')}
 
-${expectLint(r'''void second() {
+void second() ${expectLint(r'''{
   final y = 2;
   if (y > 0) {
     print('foo');
@@ -252,7 +252,7 @@ plugins:
   solid_lints:
     diagnostics:
       avoid_duplicate_code:
-        min_statements: 3
+        min_tokens: 15
         ignore_identifiers: false
 ''',
     );
@@ -326,7 +326,7 @@ void two() {
   Future<void>
   test_reports_parent_but_not_nested_blocks_when_parent_is_reported() async {
     await assertAutoDiagnostics('''
-${expectLint(r'''void one() {
+void one() ${expectLint(r'''{
   final x = 1;
   if (x > 0) {
     print('hello');
@@ -336,7 +336,7 @@ ${expectLint(r'''void one() {
   print('done');
 }''')}
 
-${expectLint(r'''void two() {
+void two() ${expectLint(r'''{
   final y = 1;
   if (y > 0) {
     print('hello');
@@ -363,7 +363,7 @@ void otherMethod() {
     final visitor = AvoidDuplicateCodeVisitor(
       rule as AvoidDuplicateCodeRule,
       AvoidDuplicateCodeParameters(
-        minStatements: 3,
+        minTokens: 15,
         ignoreLiterals: false,
         ignoreIdentifiers: true,
         checkBlocks: true,
@@ -375,7 +375,7 @@ void otherMethod() {
     resolvedOther.unit.accept(visitor);
 
     await assertAutoDiagnostics('''
-${expectLint(r'''void mainMethod() {
+void mainMethod() ${expectLint(r'''{
   final x = 1;
   if (x > 0) {
     print(x);

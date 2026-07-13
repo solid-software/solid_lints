@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
@@ -23,8 +24,8 @@ void main() {
 
     test('updateFile stores entries', () {
       final entries = [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
-        const HashEntry(hash: 456, lineNumber: 20, statementCount: 3),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
+        const HashEntry(hash: 456, lineNumber: 20, tokenCount: 3),
       ];
 
       registry.updateFile('file_a.dart', entries, modificationStamp: 1);
@@ -34,10 +35,10 @@ void main() {
 
     test('findCrossFileMatches finds duplicate in other files', () {
       final fileAEntries = [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ];
       final fileBEntries = [
-        const HashEntry(hash: 123, lineNumber: 15, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 15, tokenCount: 5),
       ];
 
       registry.updateFile('file_a.dart', fileAEntries, modificationStamp: 1);
@@ -54,7 +55,7 @@ void main() {
 
     test('findCrossFileMatches ignores same file', () {
       final entries = [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ];
 
       registry.updateFile('file_a.dart', entries, modificationStamp: 1);
@@ -66,10 +67,10 @@ void main() {
 
     test('updateFile replaces previous entries', () {
       final oldEntries = [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ];
       final newEntries = [
-        const HashEntry(hash: 456, lineNumber: 20, statementCount: 3),
+        const HashEntry(hash: 456, lineNumber: 20, tokenCount: 3),
       ];
 
       registry.updateFile('file_a.dart', oldEntries, modificationStamp: 1);
@@ -79,23 +80,23 @@ void main() {
 
       // File B tries to match against the old hash 123, should find nothing
       final matches1 = registry.findCrossFileMatches('file_b.dart', [
-        const HashEntry(hash: 123, lineNumber: 15, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 15, tokenCount: 5),
       ]);
       expect(matches1, isEmpty);
 
       // File B tries to match against the new hash 456, should match
       final matches2 = registry.findCrossFileMatches('file_b.dart', [
-        const HashEntry(hash: 456, lineNumber: 25, statementCount: 3),
+        const HashEntry(hash: 456, lineNumber: 25, tokenCount: 3),
       ]);
       expect(matches2, hasLength(1));
     });
 
     test('removeFile clears entries for specific file', () {
       registry.updateFile('file_a.dart', [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ], modificationStamp: 1);
       registry.updateFile('file_b.dart', [
-        const HashEntry(hash: 456, lineNumber: 20, statementCount: 5),
+        const HashEntry(hash: 456, lineNumber: 20, tokenCount: 5),
       ], modificationStamp: 1);
 
       expect(registry.fileCount, equals(2));
@@ -105,14 +106,14 @@ void main() {
       expect(registry.fileCount, equals(1));
 
       final matches = registry.findCrossFileMatches('file_c.dart', [
-        const HashEntry(hash: 123, lineNumber: 30, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 30, tokenCount: 5),
       ]);
       expect(matches, isEmpty);
     });
 
     test('clear empties the registry', () {
       registry.updateFile('file_a.dart', [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ], modificationStamp: 1);
       expect(registry.fileCount, equals(1));
 
@@ -123,14 +124,14 @@ void main() {
 
     test('findCrossFileMatches groups multiple duplicate locations', () {
       registry.updateFile('file_a.dart', [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ], modificationStamp: 1);
       registry.updateFile('file_b.dart', [
-        const HashEntry(hash: 123, lineNumber: 20, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 20, tokenCount: 5),
       ], modificationStamp: 1);
 
       final matches = registry.findCrossFileMatches('file_c.dart', [
-        const HashEntry(hash: 123, lineNumber: 30, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 30, tokenCount: 5),
       ]);
 
       expect(matches, hasLength(1));
@@ -150,15 +151,22 @@ void main() {
             HashEntry(
               hash: 123,
               lineNumber: 10,
-              statementCount: 5,
+              tokenCount: 5,
             ),
           ],
         ),
       };
 
-      HashCacheStorage.save(Directory.current.path, index);
+      HashCacheStorage.save(
+        Directory.current.path,
+        index,
+        AvoidDuplicateCodeParameters.empty(),
+      );
 
-      final loaded = HashCacheStorage.load(Directory.current.path);
+      final loaded = HashCacheStorage.load(
+        Directory.current.path,
+        AvoidDuplicateCodeParameters.empty(),
+      );
       expect(loaded, isNotNull);
       expect(loaded!.length, equals(1));
       expect(loaded[absoluteFilePath]!.entries, hasLength(1));
@@ -167,7 +175,7 @@ void main() {
       final entry = loaded[absoluteFilePath]!.entries.first;
       expect(entry.hash, equals(123));
       expect(entry.lineNumber, equals(10));
-      expect(entry.statementCount, equals(5));
+      expect(entry.tokenCount, equals(5));
 
       HashCacheStorage.delete(Directory.current.path);
     });
@@ -178,7 +186,7 @@ void main() {
       tempFile.writeAsStringSync('void main() {}');
 
       registry.updateFile(tempFile.path, [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ], modificationStamp: 1);
       expect(registry.fileCount, equals(1));
 
@@ -187,7 +195,7 @@ void main() {
 
       // Trigger matching, which should clean up the deleted tempFile from registry
       final matches = registry.findCrossFileMatches('other_file.dart', [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ]);
 
       expect(matches, isEmpty);
@@ -199,19 +207,55 @@ void main() {
           p.normalize('/workspace/project/lib/excluded.dart');
 
       registry.updateFile(absoluteExcludedPath, [
-        const HashEntry(hash: 123, lineNumber: 10, statementCount: 5),
+        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ], modificationStamp: 1);
       expect(registry.fileCount, equals(1));
 
       // Trigger matching with a callback that considers absoluteExcludedPath as excluded
       final matches = registry.findCrossFileMatches(
         'other_file.dart',
-        [const HashEntry(hash: 123, lineNumber: 10, statementCount: 5)],
+        [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
         isFileExcluded: (path) => path == absoluteExcludedPath,
       );
 
       expect(matches, isEmpty);
       expect(registry.fileCount, equals(0));
+    });
+
+    test('HashCacheStorage invalidates cache on config change', () {
+      final absoluteFilePath = p.normalize(
+        p.join(Directory.current.path, 'file.dart'),
+      );
+      final index = {
+        absoluteFilePath: FileCacheEntry(
+          modificationStamp: 123456,
+          entries: const [
+            HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
+          ],
+        ),
+      };
+
+      final params1 = AvoidDuplicateCodeParameters.empty();
+      final params2 = AvoidDuplicateCodeParameters(
+        minTokens: 5,
+        ignoreLiterals: true,
+        ignoreIdentifiers: false,
+        checkBlocks: true,
+        exclude: params1.exclude,
+      );
+
+      // Save with params1
+      HashCacheStorage.save(Directory.current.path, index, params1);
+
+      // Loading with params1 should succeed
+      final loaded1 = HashCacheStorage.load(Directory.current.path, params1);
+      expect(loaded1, isNotNull);
+
+      // Loading with params2 (different config) should return null (invalidated)
+      final loaded2 = HashCacheStorage.load(Directory.current.path, params2);
+      expect(loaded2, isNull);
+
+      HashCacheStorage.delete(Directory.current.path);
     });
   });
 }

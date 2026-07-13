@@ -22,9 +22,6 @@ typedef _BodyCandidate = ({
 /// A visitor that detects duplicate code blocks (at the function level and/or
 /// statement block level) within a single compilation unit and across files.
 class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
-  static int _processedFilesCount = 0;
-  static int _totalDurationMs = 0;
-
   final AvoidDuplicateCodeRule _rule;
   final AvoidDuplicateCodeParameters _parameters;
   final String _filePath;
@@ -44,9 +41,6 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
-    final stopwatch = Stopwatch()..start();
-    final startTime = DateTime.now();
-
     final filePath = _filePath;
 
     // --- Phase 0: Try to use cached entries if file is unchanged and has no
@@ -59,12 +53,14 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
         final registry = GlobalHashRegistry.instance;
         final cachedStamp = registry.getModificationStamp(
           filePath,
+          parameters: _parameters,
           packageRoot: packageRoot,
         );
 
         if (cachedStamp == _modificationStamp) {
           final cachedEntries = registry.getFileEntries(
             filePath,
+            parameters: _parameters,
             packageRoot: packageRoot,
           );
           if (cachedEntries != null) {
@@ -72,6 +68,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
             final crossMatches = registry.findCrossFileMatches(
               filePath,
               cachedEntries,
+              parameters: _parameters,
               packageRoot: packageRoot,
               isFileExcluded: (otherPath) {
                 if (contextRoot == null) return false;
@@ -81,29 +78,93 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
             );
 
             // Check if there are any intra-file duplicates
-            final hashCounts = <int, int>{};
+            final hashGroups = <int, List<HashEntry>>{};
             for (final entry in cachedEntries) {
-              hashCounts[entry.hash] = (hashCounts[entry.hash] ?? 0) + 1;
+              (hashGroups[entry.hash] ??= []).add(entry);
             }
-            final hasIntraDuplicates = hashCounts.values.any(
-              (count) => count > 1,
+
+            final hasIntraDuplicates = hashGroups.values.any(
+              (group) => group.length > 1,
             );
             final hasCrossDuplicates = crossMatches.isNotEmpty;
 
             if (!hasIntraDuplicates && !hasCrossDuplicates) {
-              // 0 warnings and file is unchanged -> Skip entire AST traversal!
-              stopwatch.stop();
-              _writeRunLog(
-                packageRoot,
-                startTime,
-                stopwatch.elapsedMilliseconds,
-                filePath,
-                cachedEntries.length,
-                0,
-                cached: true,
-              );
               return;
             }
+
+            // We have warnings, but we can report them directly from the cache!
+
+            final suppressedRanges = <(int offset, int length)>[];
+            final reportedOffsets = <int>{};
+
+            final crossFileDuplicatesByHash = <int, List<DuplicateLocation>>{};
+            for (final match in crossMatches) {
+              crossFileDuplicatesByHash[match.currentEntry.hash] =
+                  match.duplicates;
+            }
+
+            for (final entry in cachedEntries) {
+              // Check if suppressed
+              final isSuppressed = suppressedRanges.any(
+                (range) =>
+                    entry.offset >= range.$1 &&
+                    (entry.offset + entry.length) <= (range.$1 + range.$2),
+              );
+              if (isSuppressed) continue;
+
+              // Also check if we already reported this exact entry
+              if (reportedOffsets.contains(entry.offset)) continue;
+
+              final group = hashGroups[entry.hash];
+              if (group == null) continue;
+
+              final activeGroup = group.where((e) {
+                return !suppressedRanges.any(
+                  (range) =>
+                      e.offset >= range.$1 &&
+                      (e.offset + e.length) <= (range.$1 + range.$2),
+                );
+              }).toList();
+
+              final externalPartners =
+                  crossFileDuplicatesByHash[entry.hash] ?? const [];
+              final internalPartners = activeGroup
+                  .where((e) => e != entry)
+                  .toList();
+
+              final shouldReport =
+                  internalPartners.isNotEmpty || externalPartners.isNotEmpty;
+
+              if (shouldReport) {
+                final contextMessages = <DiagnosticMessage>[
+                  for (final dup in externalPartners)
+                    SolidDiagnosticMessage(
+                      filePath: dup.filePath,
+                      offset: dup.entry.offset,
+                      length: dup.entry.length,
+                      message: 'Duplicate',
+                    ),
+                  for (final other in internalPartners)
+                    SolidDiagnosticMessage(
+                      filePath: filePath,
+                      offset: other.offset,
+                      length: other.length,
+                      message: 'Duplicate',
+                    ),
+                ];
+
+                _rule.reportAtOffset(
+                  entry.offset,
+                  entry.length,
+                  contextMessages: contextMessages,
+                );
+
+                reportedOffsets.add(entry.offset);
+                suppressedRanges.add((entry.offset, entry.length));
+              }
+            }
+
+            return;
           }
         }
       }
@@ -132,7 +193,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
           lineNumber: line,
           offset: candidate.node.offset,
           length: candidate.node.length,
-          statementCount: _statementCount(candidate.node),
+          tokenCount: _tokenCount(candidate.node),
         ),
       );
     }
@@ -148,6 +209,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       final crossMatches = registry.findCrossFileMatches(
         filePath,
         hashEntries,
+        parameters: _parameters,
         packageRoot: packageRoot,
         isFileExcluded: (otherPath) {
           if (contextRoot == null) return false;
@@ -162,6 +224,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
         filePath,
         hashEntries,
         modificationStamp: _modificationStamp,
+        parameters: _parameters,
         packageRoot: packageRoot,
       );
     }
@@ -176,7 +239,6 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
     final suppressed = <AstNode>{};
     final reported = <AstNode>{};
-    var warningCount = 0;
 
     // Candidates are collected pre-order (parent before children).
     // Process larger scopes first, and suppress warnings on children.
@@ -206,8 +268,6 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       final shouldReport = hasInternalDuplicates || hasExternalDuplicates;
 
       if (shouldReport) {
-        final reportNode = _findReportNode(candidate.node);
-
         final contextMessages = <DiagnosticMessage>[
           // Add external partners
           for (final dup in externalPartners)
@@ -228,10 +288,9 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
         ];
 
         _rule.reportAtNode(
-          reportNode,
+          candidate.node,
           contextMessages: contextMessages,
         );
-        warningCount++;
 
         // Mark this duplicate block as reported.
         reported.add(candidate.node);
@@ -239,57 +298,22 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
         _suppressDescendants(candidate.node, suppressed);
       }
     }
-
-    stopwatch.stop();
-    if (filePath.isNotEmpty) {
-      final contextRoot = _contextRoot;
-      final packageRoot =
-          contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
-      if (packageRoot.isNotEmpty) {
-        _writeRunLog(
-          packageRoot,
-          startTime,
-          stopwatch.elapsedMilliseconds,
-          filePath,
-          candidates.length,
-          warningCount,
-          cached: false,
-        );
-      }
-    }
   }
 
-  /// Returns the number of statements in a body node.
-  static int _statementCount(AstNode node) {
-    if (node is Block) return node.statements.length;
-    if (node is ExpressionFunctionBody) return 1;
-    return 0;
+  /// Returns the number of tokens in a body node.
+  static int _tokenCount(AstNode node) {
+    int count = 0;
+    var token = node.beginToken;
+    final end = node.endToken;
+    while (token != end) {
+      count++;
+      token = token.next!;
+    }
+    return count + 1;
   }
 
   void _suppressDescendants(AstNode root, Set<AstNode> suppressed) {
     root.accept(_DescendantCollector(suppressed, root));
-  }
-
-  AstNode _findReportNode(AstNode node) {
-    final parent = node.parent;
-    if (parent is FunctionBody) {
-      final declaration = parent.parent;
-      if (declaration != null) {
-        if (declaration is FunctionDeclaration ||
-            declaration is MethodDeclaration ||
-            declaration is ConstructorDeclaration) {
-          return declaration;
-        }
-        if (declaration is FunctionExpression) {
-          final grandDeclaration = declaration.parent;
-          if (grandDeclaration is FunctionDeclaration) {
-            return grandDeclaration;
-          }
-          return declaration;
-        }
-      }
-    }
-    return node;
   }
 
   String? _findPackageRoot(String filePath) {
@@ -307,46 +331,6 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       dir = parent;
     }
     return null;
-  }
-
-  void _writeRunLog(
-    String packageRoot,
-    DateTime startTime,
-    int elapsedMs,
-    String filePath,
-    int candidateCount,
-    int warningCount, {
-    required bool cached,
-  }) {
-    try {
-      _processedFilesCount++;
-      _totalDurationMs += elapsedMs;
-      final logFile = File(
-        '$packageRoot/.dart_tool/solid_lints/avoid_duplicate_code_run.log',
-      );
-
-      // Ensure the directory exists
-      final directory = logFile.parent;
-      if (!directory.existsSync()) {
-        directory.createSync(recursive: true);
-      }
-
-      final relativePath =
-          packageRoot.isNotEmpty && filePath.startsWith(packageRoot)
-          ? path.relative(filePath, from: packageRoot)
-          : filePath;
-      final ramMb = ProcessInfo.currentRss / (1024 * 1024);
-      final cacheIndicator = cached ? ' [Cached]' : '';
-      final logLine =
-          '${startTime.toIso8601String()}: Checked '
-          '#$_processedFilesCount ($relativePath) in ${elapsedMs}ms'
-          '$cacheIndicator | Candidates: $candidateCount | '
-          'Warnings: $warningCount | RAM: ${ramMb.toStringAsFixed(1)} MB '
-          '(Total session time: ${_totalDurationMs}ms)\n';
-      logFile.writeAsStringSync(logLine, mode: FileMode.append);
-    } catch (_) {
-      // Fail silently
-    }
   }
 }
 
@@ -389,18 +373,18 @@ class _CandidateCollector extends RecursiveAstVisitor<void> {
       return;
     }
 
-    _checkAndCollect(node, node.statements.length);
+    _checkAndCollect(node, AvoidDuplicateCodeVisitor._tokenCount(node));
     super.visitBlock(node);
   }
 
   @override
   void visitExpressionFunctionBody(ExpressionFunctionBody node) {
-    _checkAndCollect(node, 1);
+    _checkAndCollect(node, AvoidDuplicateCodeVisitor._tokenCount(node));
     super.visitExpressionFunctionBody(node);
   }
 
-  void _checkAndCollect(AstNode node, int statementCount) {
-    if (statementCount < parameters.minStatements) return;
+  void _checkAndCollect(AstNode node, int tokenCount) {
+    if (tokenCount < parameters.minTokens) return;
 
     final declaration = node.thisOrAncestorOfType<Declaration>();
     if (declaration != null && parameters.exclude.shouldIgnore(declaration)) {
