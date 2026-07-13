@@ -1,6 +1,4 @@
 analyzer:
-  plugins:
-    - solid_lints
   exclude:
     # General generated files
     - "**/*.g.dart"
