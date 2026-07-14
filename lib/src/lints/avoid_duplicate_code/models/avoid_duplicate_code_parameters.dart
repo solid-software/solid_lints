@@ -10,9 +10,10 @@ class AvoidDuplicateCodeParameters {
   /// from the structural hash, making the check ignore literal differences.
   final bool ignoreLiterals;
 
-  /// When `true`, variable and method names (identifiers) are excluded
+  /// When `true`, local variable and parameter names are excluded
   /// from the structural hash, allowing detection of renamed variables
-  /// (Type 2).
+  /// (Type 2). Note that method, class, and field names are NOT ignored
+  /// to prevent excessive false positives.
   final bool ignoreIdentifiers;
 
   /// When `true`, statement blocks (like if-blocks or loops) inside functions
@@ -42,7 +43,7 @@ class AvoidDuplicateCodeParameters {
     minTokens: _defaultMinTokens,
     ignoreLiterals: false,
     ignoreIdentifiers: true,
-    checkBlocks: false,
+    checkBlocks: true,
     exclude: _defaultExclude,
   );
 
@@ -52,7 +53,7 @@ class AvoidDuplicateCodeParameters {
       minTokens: json['min_tokens'] as int? ?? _defaultMinTokens,
       ignoreLiterals: json['ignore_literals'] as bool? ?? false,
       ignoreIdentifiers: json['ignore_identifiers'] as bool? ?? true,
-      checkBlocks: json['check_blocks'] as bool? ?? false,
+      checkBlocks: json['check_blocks'] as bool? ?? true,
       exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
     );
   }

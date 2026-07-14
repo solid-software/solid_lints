@@ -41,9 +41,14 @@ class AstStructuralHasher extends UnifyingAstVisitor<void> {
     _hasher.add(0x7C); // ASCII code for '|'
   }
 
+  void _appendHash(int hashCode) {
+    _hasher.add(hashCode);
+    _hasher.add(0x7C); // ASCII code for '|'
+  }
+
   @override
   void visitNode(AstNode node) {
-    _append(node.runtimeType.toString());
+    _appendHash(node.runtimeType.hashCode);
     node.visitChildren(this);
     _append('^');
   }
@@ -59,25 +64,25 @@ class AstStructuralHasher extends UnifyingAstVisitor<void> {
 
   @override
   void visitIfStatement(IfStatement node) {
-    _append(node.elseKeyword != null ? 'withElse' : 'noElse');
+    _appendHash(node.elseKeyword != null ? 1 : 0);
     super.visitIfStatement(node);
   }
 
   @override
   void visitTryStatement(TryStatement node) {
-    _append(node.finallyBlock != null ? 'withFinally' : 'noFinally');
+    _appendHash(node.finallyBlock != null ? 1 : 0);
     super.visitTryStatement(node);
   }
 
   @override
   void visitYieldStatement(YieldStatement node) {
-    _append(node.star != null ? 'star' : 'noStar');
+    _appendHash(node.star != null ? 1 : 0);
     super.visitYieldStatement(node);
   }
 
   @override
   void visitBinaryExpression(BinaryExpression node) {
-    _append(node.operator.type.toString());
+    _appendHash(node.operator.type.hashCode);
     super.visitBinaryExpression(node);
   }
 
@@ -90,25 +95,25 @@ class AstStructuralHasher extends UnifyingAstVisitor<void> {
       node.operand.accept(this);
       return;
     }
-    _append(node.operator.type.toString());
+    _appendHash(node.operator.type.hashCode);
     super.visitPrefixExpression(node);
   }
 
   @override
   void visitPostfixExpression(PostfixExpression node) {
-    _append(node.operator.type.toString());
+    _appendHash(node.operator.type.hashCode);
     super.visitPostfixExpression(node);
   }
 
   @override
   void visitAssignmentExpression(AssignmentExpression node) {
-    _append(node.operator.type.toString());
+    _appendHash(node.operator.type.hashCode);
     super.visitAssignmentExpression(node);
   }
 
   @override
   void visitIsExpression(IsExpression node) {
-    _append(node.notOperator != null ? 'not' : 'is');
+    _appendHash(node.notOperator != null ? 1 : 0);
     super.visitIsExpression(node);
   }
 
@@ -155,7 +160,7 @@ class AstStructuralHasher extends UnifyingAstVisitor<void> {
   @override
   void visitBooleanLiteral(BooleanLiteral node) {
     if (!_ignoreLiterals) {
-      _append(node.value.toString());
+      _appendHash(node.value ? 1 : 0);
     }
     super.visitBooleanLiteral(node);
   }
@@ -182,7 +187,7 @@ class AstStructuralHasher extends UnifyingAstVisitor<void> {
             element,
             () => _localVariableIds.length,
           );
-          _append('VAR_$id');
+          _appendHash(id);
         }
       } else {
         // If element is null, we are not sure what it is.

@@ -27,8 +27,8 @@ class GlobalHashRegistry {
   final _hashToLocations = <int, Set<DuplicateLocation>>{};
 
   final _loadedRoots = <String>{};
+  final _saveDebouncer = _Debouncer(const Duration(milliseconds: 500));
 
-  Timer? _saveTimer;
   AvoidDuplicateCodeParameters? _currentParams;
 
   /// Whether to automatically clean up files that do not exist physically on
@@ -38,6 +38,12 @@ class GlobalHashRegistry {
   bool enablePhysicalFileCleanup = true;
 
   GlobalHashRegistry._();
+
+  String _normalizePath(String filePath, String root) {
+    return p.isAbsolute(filePath)
+        ? p.normalize(filePath)
+        : p.normalize(p.join(root, filePath));
+  }
 
   void _addToInvertedIndex(String absoluteFilePath, List<HashEntry> entries) {
     for (final entry in entries) {
@@ -109,9 +115,7 @@ class GlobalHashRegistry {
   }) {
     final root = packageRoot ?? Directory.current.path;
     _ensureLoaded(root, parameters);
-    final absoluteFilePath = p.isAbsolute(filePath)
-        ? p.normalize(filePath)
-        : p.normalize(p.join(root, filePath));
+    final absoluteFilePath = _normalizePath(filePath, root);
     return _index[absoluteFilePath]?.modificationStamp;
   }
 
@@ -123,9 +127,7 @@ class GlobalHashRegistry {
   }) {
     final root = packageRoot ?? Directory.current.path;
     _ensureLoaded(root, parameters);
-    final absoluteFilePath = p.isAbsolute(filePath)
-        ? p.normalize(filePath)
-        : p.normalize(p.join(root, filePath));
+    final absoluteFilePath = _normalizePath(filePath, root);
     return _index[absoluteFilePath]?.entries;
   }
 
@@ -139,9 +141,7 @@ class GlobalHashRegistry {
   }) {
     final root = packageRoot ?? Directory.current.path;
     _ensureLoaded(root, parameters);
-    final absoluteFilePath = p.isAbsolute(filePath)
-        ? p.normalize(filePath)
-        : p.normalize(p.join(root, filePath));
+    final absoluteFilePath = _normalizePath(filePath, root);
 
     final oldEntry = _index[absoluteFilePath];
     if (oldEntry != null) {
@@ -170,12 +170,11 @@ class GlobalHashRegistry {
     final root = packageRoot ?? Directory.current.path;
     _ensureLoaded(root, parameters);
 
-    final absoluteCurrentFilePath = p.isAbsolute(currentFilePath)
-        ? p.normalize(currentFilePath)
-        : p.normalize(p.join(root, currentFilePath));
+    final absoluteCurrentFilePath = _normalizePath(currentFilePath, root);
 
     final matches = <CrossFileMatch>[];
     final filesToRemove = <String>{};
+    final fileStatusCache = <String, bool>{};
 
     for (final entry in currentEntries) {
       final duplicates = <DuplicateLocation>[];
@@ -187,11 +186,16 @@ class GlobalHashRegistry {
           if (key == absoluteCurrentFilePath) continue;
 
           // Check if deleted or excluded on demand only for matched locations
-          final isDeleted =
-              enablePhysicalFileCleanup && !File(key).existsSync();
-          final isExcluded = isFileExcluded != null && isFileExcluded(key);
+          bool? isInvalid = fileStatusCache[key];
+          if (isInvalid == null) {
+            final isDeleted =
+                enablePhysicalFileCleanup && !File(key).existsSync();
+            final isExcluded = isFileExcluded != null && isFileExcluded(key);
+            isInvalid = isDeleted || isExcluded;
+            fileStatusCache[key] = isInvalid;
+          }
 
-          if (isDeleted || isExcluded) {
+          if (isInvalid) {
             filesToRemove.add(key);
             continue;
           }
@@ -238,9 +242,7 @@ class GlobalHashRegistry {
   }) {
     final root = packageRoot ?? Directory.current.path;
     _ensureLoaded(root, parameters);
-    final absoluteFilePath = p.isAbsolute(filePath)
-        ? p.normalize(filePath)
-        : p.normalize(p.join(root, filePath));
+    final absoluteFilePath = _normalizePath(filePath, root);
     final oldEntry = _index[absoluteFilePath];
     if (oldEntry != null) {
       _removeFromInvertedIndex(absoluteFilePath, oldEntry.entries);
@@ -256,7 +258,7 @@ class GlobalHashRegistry {
   ///
   /// Primarily used in tests to ensure test isolation.
   void clear() {
-    _saveTimer?.cancel();
+    _saveDebouncer.cancel();
     _loadedRoots.clear();
     _index.clear();
     _hashToLocations.clear();
@@ -267,8 +269,7 @@ class GlobalHashRegistry {
     String packageRoot, [
     AvoidDuplicateCodeParameters? parameters,
   ]) {
-    _saveTimer?.cancel();
-    _saveTimer = Timer(const Duration(milliseconds: 500), () {
+    _saveDebouncer.run(() {
       _performSave(packageRoot, parameters);
     });
   }
@@ -286,5 +287,21 @@ class GlobalHashRegistry {
     final params =
         parameters ?? _currentParams ?? AvoidDuplicateCodeParameters.empty();
     HashCacheStorage.save(packageRoot, subset, params);
+  }
+}
+
+class _Debouncer {
+  final Duration delay;
+  Timer? _timer;
+
+  _Debouncer(this.delay);
+
+  void run(void Function() action) {
+    _timer?.cancel();
+    _timer = Timer(delay, action);
+  }
+
+  void cancel() {
+    _timer?.cancel();
   }
 }

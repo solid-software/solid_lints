@@ -8,8 +8,11 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_ent
 /// Service responsible for persisting and loading the duplicate code hash
 /// cache.
 class HashCacheStorage {
+  static const _cacheDirName = '.dart_tool/solid_lints';
+  static const _cacheFileName = 'duplicate_index.json';
+
   static String _filePath(String packageRoot) =>
-      '$packageRoot/.dart_tool/solid_lints/duplicate_index.json';
+      p.join(packageRoot, _cacheDirName, _cacheFileName);
 
   /// Loads the cached index from disk for the given [packageRoot].
   ///
@@ -58,7 +61,7 @@ class HashCacheStorage {
         }
       }
       return result;
-    } catch (_) {
+    } on Exception {
       return null;
     }
   }
@@ -70,8 +73,7 @@ class HashCacheStorage {
     AvoidDuplicateCodeParameters currentParams,
   ) {
     try {
-      final cacheDir = '$packageRoot/.dart_tool/solid_lints';
-      final directory = Directory(cacheDir);
+      final directory = Directory(p.join(packageRoot, _cacheDirName));
       if (!directory.existsSync()) {
         directory.createSync(recursive: true);
       }
@@ -93,7 +95,7 @@ class HashCacheStorage {
       };
 
       file.writeAsStringSync(jsonEncode(data));
-    } catch (_) {
+    } on FileSystemException {
       // Fail silently to avoid breaking analysis server
     }
   }
@@ -105,7 +107,7 @@ class HashCacheStorage {
       if (file.existsSync()) {
         file.deleteSync();
       }
-    } catch (_) {
+    } on FileSystemException {
       // Fail silently
     }
   }

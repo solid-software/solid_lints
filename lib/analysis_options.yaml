@@ -40,14 +40,11 @@ solid_lints:
   diagnostics:
     avoid_global_state: true
     avoid_duplicate_code:
-      min_tokens: 50
+      min_tokens: 30
       check_blocks: true
       exclude:
         - method_name: initState
         - method_name: dispose
-        - method_name: didChangeDependencies
-        - method_name: didUpdateWidget
-        - method_name: build
 
     avoid_late_keyword:
       allow_initialized: true
