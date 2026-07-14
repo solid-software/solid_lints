@@ -78,9 +78,9 @@ class AvoidDuplicateCodeParameters {
 
   @override
   int get hashCode => Object.hash(
-        minTokens,
-        ignoreLiterals,
-        ignoreIdentifiers,
-        checkBlocks,
-      );
+    minTokens,
+    ignoreLiterals,
+    ignoreIdentifiers,
+    checkBlocks,
+  );
 }
