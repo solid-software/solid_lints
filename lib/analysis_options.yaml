@@ -4,9 +4,6 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.gr.dart"
 
-    # Exclude unmigrated rules
-    - "src/lints/avoid_using_api/**"
-
     # Flutter
     - "lib/generated_plugin_registrant.dart"
 
