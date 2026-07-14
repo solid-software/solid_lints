@@ -135,7 +135,6 @@ class GlobalHashRegistry {
     }
   }
 
-
   String _resolveAndLoad(
     String filePath,
     String? packageRoot,
