@@ -49,7 +49,11 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitNode(AstNode node) {
-    _appendHash(node.runtimeType.hashCode);
+    // Use the type name string instead of runtimeType.hashCode, because
+    // identity-based hashCode changes between VM/isolate restarts, making
+    // hashes stored in the persistent cache incompatible with newly computed
+    // ones. This caused "flapping" warnings that appeared and disappeared.
+    _append(node.runtimeType.toString());
     node.visitChildren(this);
     _append('^');
   }
@@ -83,7 +87,7 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitBinaryExpression(BinaryExpression node) {
-    _appendHash(node.operator.type.hashCode);
+    _append(node.operator.lexeme);
     super.visitBinaryExpression(node);
   }
 
@@ -96,19 +100,19 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
       node.operand.accept(this);
       return;
     }
-    _appendHash(node.operator.type.hashCode);
+    _append(node.operator.lexeme);
     super.visitPrefixExpression(node);
   }
 
   @override
   void visitPostfixExpression(PostfixExpression node) {
-    _appendHash(node.operator.type.hashCode);
+    _append(node.operator.lexeme);
     super.visitPostfixExpression(node);
   }
 
   @override
   void visitAssignmentExpression(AssignmentExpression node) {
-    _appendHash(node.operator.type.hashCode);
+    _append(node.operator.lexeme);
     super.visitAssignmentExpression(node);
   }
 
@@ -190,6 +194,12 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
         } else {
           _append(node.name);
         }
+      } else {
+        // Fallback for unresolved ASTs:
+        // When the IDE first opens a file, it may send an unresolved AST where
+        // element is null. To ensure the hash doesn't change drastically,
+        // we append the identifier name.
+        _append(node.name);
       }
     }
     super.visitSimpleIdentifier(node);
