@@ -8,6 +8,7 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dar
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/hash_cache_storage.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/debouncer.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/path_utils.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
 
 /// A singleton registry that stores structural hashes for all analyzed files.
 ///
@@ -36,7 +37,7 @@ class GlobalHashRegistry {
   /// Auxiliary inverted index: hash → Set<DuplicateLocation>.
   final _hashToLocations = <int, Set<DuplicateLocation>>{};
 
-  final _loadedRoots = <String>{};
+  final _loadedRoots = <String, AvoidDuplicateCodeParameters>{};
   late final _saveDebouncer = Debouncer(_saveDebounceDuration);
 
   AvoidDuplicateCodeParameters? _currentParams;
@@ -80,9 +81,18 @@ class GlobalHashRegistry {
     String packageRoot, [
     AvoidDuplicateCodeParameters? currentParams,
   ]) {
-    if (_loadedRoots.contains(packageRoot)) return;
-    _loadedRoots.add(packageRoot);
     final params = currentParams ?? AvoidDuplicateCodeParameters.empty();
+    final previousParams = _loadedRoots[packageRoot];
+
+    // If already loaded with the same parameters, skip.
+    if (previousParams != null && previousParams == params) return;
+
+    // If parameters changed, clear entries for this root first.
+    if (previousParams != null) {
+      _clearEntriesForRoot(packageRoot);
+    }
+
+    _loadedRoots[packageRoot] = params;
     _currentParams = params;
     final cached = HashCacheStorage.load(packageRoot, params);
     if (cached != null) {
@@ -108,6 +118,23 @@ class GlobalHashRegistry {
       }
     }
   }
+
+  void _clearEntriesForRoot(String packageRoot) {
+    final keysToRemove = <String>[];
+    for (final key in _index.keys) {
+      if (key.startsWith(packageRoot)) {
+        keysToRemove.add(key);
+      }
+    }
+    for (final key in keysToRemove) {
+      final oldEntry = _index[key];
+      if (oldEntry != null) {
+        _removeFromInvertedIndex(key, oldEntry.entries);
+      }
+      _index.remove(key);
+    }
+  }
+
 
   String _resolveAndLoad(
     String filePath,
@@ -211,6 +238,10 @@ class GlobalHashRegistry {
           }
 
           if (!key.startsWith(root)) continue;
+
+          // Verify tokenCount to guard against hash collisions.
+          if (loc.entry.tokenCount != entry.tokenCount) continue;
+
           duplicates.add(loc);
         }
       }
@@ -288,5 +319,6 @@ class GlobalHashRegistry {
     _index.clear();
     _hashToLocations.clear();
     HashCacheStorage.delete(Directory.current.path);
+    AvoidDuplicateCodeVisitor.clearPackageRootCache();
   }
 }

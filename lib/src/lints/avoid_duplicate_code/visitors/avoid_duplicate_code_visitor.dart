@@ -302,6 +302,10 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
   static final _packageRootCache = <String, String?>{};
 
+  /// Clears the cached package root lookups. Should be called when
+  /// the registry is cleared to avoid stale project path references.
+  static void clearPackageRootCache() => _packageRootCache.clear();
+
   String? _findPackageRoot(String filePath) {
     if (filePath.isEmpty) return null;
     final dirPath = path.dirname(filePath);

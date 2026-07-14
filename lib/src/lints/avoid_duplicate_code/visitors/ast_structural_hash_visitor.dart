@@ -13,6 +13,8 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/jenkins_hasher.
 /// where two code blocks with identical structure but different variable names
 /// are considered clones.
 class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
+  static final _typeNameCache = <Type, String>{};
+
   final JenkinsHasher _hasher = JenkinsHasher();
 
   final bool _ignoreLiterals;
@@ -53,7 +55,14 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
     // identity-based hashCode changes between VM/isolate restarts, making
     // hashes stored in the persistent cache incompatible with newly computed
     // ones. This caused "flapping" warnings that appeared and disappeared.
-    _append(node.runtimeType.toString());
+    //
+    // The result is cached in a static map to avoid repeated toString()
+    // reflection calls during tree traversal.
+    final typeName = _typeNameCache.putIfAbsent(
+      node.runtimeType,
+      () => node.runtimeType.toString(),
+    );
+    _append(typeName);
     node.visitChildren(this);
     _append('^');
   }

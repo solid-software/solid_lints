@@ -13,4 +13,15 @@ class DuplicateLocation {
     required this.entry,
     required this.filePath,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DuplicateLocation &&
+          other.filePath == filePath &&
+          other.entry.hash == entry.hash &&
+          other.entry.offset == entry.offset;
+
+  @override
+  int get hashCode => Object.hash(filePath, entry.hash, entry.offset);
 }

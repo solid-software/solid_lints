@@ -66,4 +66,21 @@ class AvoidDuplicateCodeParameters {
     'check_blocks': checkBlocks,
     'exclude': exclude.exclude.map((e) => e.toJson()).toList(),
   };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AvoidDuplicateCodeParameters &&
+          other.minTokens == minTokens &&
+          other.ignoreLiterals == ignoreLiterals &&
+          other.ignoreIdentifiers == ignoreIdentifiers &&
+          other.checkBlocks == checkBlocks;
+
+  @override
+  int get hashCode => Object.hash(
+        minTokens,
+        ignoreLiterals,
+        ignoreIdentifiers,
+        checkBlocks,
+      );
 }
