@@ -1,11 +1,13 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:path/path.dart' as p;
+
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_match.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/duplicate_location.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/hash_cache_storage.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/debouncer.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/path_utils.dart';
 
 /// A singleton registry that stores structural hashes for all analyzed files.
 ///
@@ -17,8 +19,16 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/services/hash_cache_s
 /// Subsequent file analyses check their hashes against the registry to find
 /// cross-file duplicates.
 class GlobalHashRegistry {
+  static const _saveDebounceDuration = Duration(milliseconds: 500);
+
   /// Singleton instance — lives as long as the plugin isolate.
   static final instance = GlobalHashRegistry._();
+
+  /// Whether to automatically clean up files that do not exist physically on
+  /// disk.
+  ///
+  /// Set to `false` in tests using a virtual resource provider.
+  bool enablePhysicalFileCleanup = true;
 
   /// Internal index: filePath → FileCacheEntry.
   final _index = <String, FileCacheEntry>{};
@@ -27,23 +37,16 @@ class GlobalHashRegistry {
   final _hashToLocations = <int, Set<DuplicateLocation>>{};
 
   final _loadedRoots = <String>{};
-  final _saveDebouncer = _Debouncer(const Duration(milliseconds: 500));
+  late final _saveDebouncer = Debouncer(_saveDebounceDuration);
 
   AvoidDuplicateCodeParameters? _currentParams;
 
-  /// Whether to automatically clean up files that do not exist physically on
-  /// disk.
-  ///
-  /// Set to `false` in tests using a virtual resource provider.
-  bool enablePhysicalFileCleanup = true;
-
   GlobalHashRegistry._();
 
-  String _normalizePath(String filePath, String root) {
-    return p.isAbsolute(filePath)
-        ? p.normalize(filePath)
-        : p.normalize(p.join(root, filePath));
-  }
+  /// The number of files currently indexed.
+  int get fileCount => _index.length;
+
+  String _getRoot(String? packageRoot) => packageRoot ?? Directory.current.path;
 
   void _addToInvertedIndex(String absoluteFilePath, List<HashEntry> entries) {
     for (final entry in entries) {
@@ -106,6 +109,16 @@ class GlobalHashRegistry {
     }
   }
 
+  String _resolveAndLoad(
+    String filePath,
+    String? packageRoot,
+    AvoidDuplicateCodeParameters? parameters,
+  ) {
+    final root = _getRoot(packageRoot);
+    _ensureLoaded(root, parameters);
+    return normalizePath(filePath, root);
+  }
+
   /// Returns the cached modification stamp for [filePath], or `null` if no
   /// indexed.
   int? getModificationStamp(
@@ -113,9 +126,7 @@ class GlobalHashRegistry {
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
   }) {
-    final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root, parameters);
-    final absoluteFilePath = _normalizePath(filePath, root);
+    final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
     return _index[absoluteFilePath]?.modificationStamp;
   }
 
@@ -125,9 +136,7 @@ class GlobalHashRegistry {
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
   }) {
-    final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root, parameters);
-    final absoluteFilePath = _normalizePath(filePath, root);
+    final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
     return _index[absoluteFilePath]?.entries;
   }
 
@@ -139,9 +148,8 @@ class GlobalHashRegistry {
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
   }) {
-    final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root, parameters);
-    final absoluteFilePath = _normalizePath(filePath, root);
+    final root = _getRoot(packageRoot);
+    final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
 
     final oldEntry = _index[absoluteFilePath];
     if (oldEntry != null) {
@@ -167,10 +175,12 @@ class GlobalHashRegistry {
     bool Function(String filePath)? isFileExcluded,
     String? packageRoot,
   }) {
-    final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root, parameters);
-
-    final absoluteCurrentFilePath = _normalizePath(currentFilePath, root);
+    final root = _getRoot(packageRoot);
+    final absoluteCurrentFilePath = _resolveAndLoad(
+      currentFilePath,
+      packageRoot,
+      parameters,
+    );
 
     final matches = <CrossFileMatch>[];
     final filesToRemove = <String>{};
@@ -201,11 +211,6 @@ class GlobalHashRegistry {
           }
 
           if (!key.startsWith(root)) continue;
-          if (key.contains('.dart_tool/')) {
-            if (!key.contains('.dart_tool/generated_test/')) continue;
-            if (p.dirname(key) != p.dirname(absoluteCurrentFilePath)) continue;
-          }
-
           duplicates.add(loc);
         }
       }
@@ -240,29 +245,14 @@ class GlobalHashRegistry {
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
   }) {
-    final root = packageRoot ?? Directory.current.path;
-    _ensureLoaded(root, parameters);
-    final absoluteFilePath = _normalizePath(filePath, root);
+    final root = _getRoot(packageRoot);
+    final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
     final oldEntry = _index[absoluteFilePath];
     if (oldEntry != null) {
       _removeFromInvertedIndex(absoluteFilePath, oldEntry.entries);
     }
     _index.remove(absoluteFilePath);
     _scheduleSave(root, parameters);
-  }
-
-  /// The number of files currently indexed.
-  int get fileCount => _index.length;
-
-  /// Clears the entire index and deletes the persistent cache file.
-  ///
-  /// Primarily used in tests to ensure test isolation.
-  void clear() {
-    _saveDebouncer.cancel();
-    _loadedRoots.clear();
-    _index.clear();
-    _hashToLocations.clear();
-    HashCacheStorage.delete(Directory.current.path);
   }
 
   void _scheduleSave(
@@ -288,20 +278,15 @@ class GlobalHashRegistry {
         parameters ?? _currentParams ?? AvoidDuplicateCodeParameters.empty();
     HashCacheStorage.save(packageRoot, subset, params);
   }
-}
 
-class _Debouncer {
-  final Duration delay;
-  Timer? _timer;
-
-  _Debouncer(this.delay);
-
-  void run(void Function() action) {
-    _timer?.cancel();
-    _timer = Timer(delay, action);
-  }
-
-  void cancel() {
-    _timer?.cancel();
+  /// Clears the entire index and deletes the persistent cache file.
+  ///
+  /// Primarily used in tests to ensure test isolation.
+  void clear() {
+    _saveDebouncer.cancel();
+    _loadedRoots.clear();
+    _index.clear();
+    _hashToLocations.clear();
+    HashCacheStorage.delete(Directory.current.path);
   }
 }

@@ -7,29 +7,23 @@ import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:path/path.dart' as path;
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
-import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_match.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/body_candidate.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/duplicate_location.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
-import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/ast_structural_hasher.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/context_root_extensions.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/range_extension.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/token_utils.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/ast_structural_hash_visitor.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/candidate_visitor.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/descendant_visitor.dart';
 import 'package:solid_lints/src/models/solid_diagnostic_message.dart';
-
-extension _RangeExtension on (int, int) {
-  bool isStrictlyWithin((int, int) parent) {
-    return this.$1 >= parent.$1 &&
-        (this.$1 + this.$2) <= (parent.$1 + parent.$2) &&
-        !(this.$1 == parent.$1 && this.$2 == parent.$2);
-  }
-}
-
-/// A record representing a block or expression candidate for clone detection.
-typedef _BodyCandidate = ({
-  AstNode node,
-  Declaration? enclosingDeclaration,
-});
 
 /// A visitor that detects duplicate code blocks (at the function level and/or
 /// statement block level) within a single compilation unit and across files.
 class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
+  static const _duplicateContextMessage = 'Duplicate';
+
   final AvoidDuplicateCodeRule _rule;
   final AvoidDuplicateCodeParameters _parameters;
   final String _filePath;
@@ -61,7 +55,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
     final candidates = _collectCandidates(node);
 
-    final hasher = AstStructuralHasher(
+    final hasher = AstStructuralHashVisitor(
       ignoreLiterals: _parameters.ignoreLiterals,
       ignoreIdentifiers: _parameters.ignoreIdentifiers,
     );
@@ -79,7 +73,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
           lineNumber: line,
           offset: candidate.node.offset,
           length: candidate.node.length,
-          tokenCount: _tokenCount(candidate.node),
+          tokenCount: getTokenCount(candidate.node),
         ),
       );
     }
@@ -123,7 +117,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       cachedEntries,
       parameters: _parameters,
       packageRoot: packageRoot,
-      isFileExcluded: _isFileExcluded,
+      isFileExcluded: (p) => _contextRoot?.isFileExcluded(p) ?? false,
     );
 
     final hashGroups = <int, List<HashEntry>>{};
@@ -201,15 +195,8 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     return true; // Cache hit and handled
   }
 
-  bool _isFileExcluded(String otherPath) {
-    final contextRoot = _contextRoot;
-    if (contextRoot == null) return false;
-    final isWithin = otherPath.startsWith(contextRoot.root.path);
-    return isWithin && !contextRoot.isAnalyzed(otherPath);
-  }
-
-  List<_BodyCandidate> _collectCandidates(CompilationUnit node) {
-    final collector = _CandidateCollector(_parameters);
+  List<BodyCandidate> _collectCandidates(CompilationUnit node) {
+    final collector = CandidateVisitor(_parameters);
     node.accept(collector);
     return collector.candidates;
   }
@@ -228,7 +215,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       hashEntries,
       parameters: _parameters,
       packageRoot: packageRoot,
-      isFileExcluded: _isFileExcluded,
+      isFileExcluded: (p) => _contextRoot?.isFileExcluded(p) ?? false,
     );
     for (final match in crossMatches) {
       crossFileDuplicatesByHash[match.currentEntry.hash] = match.duplicates;
@@ -246,12 +233,12 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
   void _groupAndReportDuplicates(
     String filePath,
-    List<_BodyCandidate> candidates,
+    List<BodyCandidate> candidates,
     Map<AstNode, int> candidateHashes,
-    AstStructuralHasher hasher,
+    AstStructuralHashVisitor hasher,
     Map<int, List<DuplicateLocation>> crossFileDuplicatesByHash,
   ) {
-    final groups = <int, List<_BodyCandidate>>{};
+    final groups = <int, List<BodyCandidate>>{};
     for (final candidate in candidates) {
       final hash =
           candidateHashes[candidate.node] ?? hasher.computeHash(candidate.node);
@@ -286,14 +273,14 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
               filePath: dup.filePath,
               offset: dup.entry.offset,
               length: dup.entry.length,
-              message: 'Duplicate',
+              message: _duplicateContextMessage,
             ),
           for (final other in internalPartners)
             SolidDiagnosticMessage(
               filePath: filePath,
               offset: other.node.offset,
               length: other.node.length,
-              message: 'Duplicate',
+              message: _duplicateContextMessage,
             ),
         ];
 
@@ -308,19 +295,9 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     }
   }
 
-  static int _tokenCount(AstNode node) {
-    int count = 0;
-    var token = node.beginToken;
-    final end = node.endToken;
-    while (token != end) {
-      count++;
-      token = token.next!;
-    }
-    return count + 1;
-  }
-
   void _suppressDescendants(AstNode root, Set<AstNode> suppressed) {
-    root.accept(_DescendantCollector(suppressed, root));
+    final descendantCollector = DescendantVisitor(suppressed, root);
+    root.accept(descendantCollector);
   }
 
   static final _packageRootCache = <String, String?>{};
@@ -343,69 +320,5 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       }
       return null;
     });
-  }
-}
-
-/// A visitor that collects descendant candidate blocks to suppress them.
-class _DescendantCollector extends RecursiveAstVisitor<void> {
-  final Set<AstNode> suppressed;
-  final AstNode root;
-
-  _DescendantCollector(this.suppressed, this.root);
-
-  @override
-  void visitBlock(Block node) {
-    if (node != root) {
-      suppressed.add(node);
-    }
-    super.visitBlock(node);
-  }
-
-  @override
-  void visitExpressionFunctionBody(ExpressionFunctionBody node) {
-    if (node != root) {
-      suppressed.add(node);
-    }
-    super.visitExpressionFunctionBody(node);
-  }
-}
-
-class _CandidateCollector extends RecursiveAstVisitor<void> {
-  final List<_BodyCandidate> candidates = [];
-  final AvoidDuplicateCodeParameters parameters;
-
-  _CandidateCollector(this.parameters);
-
-  @override
-  void visitBlock(Block node) {
-    // If checkBlocks is false, only consider blocks that represent function
-    // bodies.
-    if (!parameters.checkBlocks && node.parent is! BlockFunctionBody) {
-      super.visitBlock(node);
-      return;
-    }
-
-    _checkAndCollect(node, AvoidDuplicateCodeVisitor._tokenCount(node));
-    super.visitBlock(node);
-  }
-
-  @override
-  void visitExpressionFunctionBody(ExpressionFunctionBody node) {
-    _checkAndCollect(node, AvoidDuplicateCodeVisitor._tokenCount(node));
-    super.visitExpressionFunctionBody(node);
-  }
-
-  void _checkAndCollect(AstNode node, int tokenCount) {
-    if (tokenCount < parameters.minTokens) return;
-
-    final declaration = node.thisOrAncestorOfType<Declaration>();
-    if (declaration != null && parameters.exclude.shouldIgnore(declaration)) {
-      return;
-    }
-
-    candidates.add((
-      node: node,
-      enclosingDeclaration: declaration,
-    ));
   }
 }

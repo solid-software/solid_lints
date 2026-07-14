@@ -12,14 +12,15 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/jenkins_hasher.
 /// variables), whitespace, and comments. This enables Type 2 clone detection
 /// where two code blocks with identical structure but different variable names
 /// are considered clones.
-class AstStructuralHasher extends UnifyingAstVisitor<void> {
+class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
+  final JenkinsHasher _hasher = JenkinsHasher();
+
   final bool _ignoreLiterals;
   final bool _ignoreIdentifiers;
-  final JenkinsHasher _hasher = JenkinsHasher();
   final Map<Element, int> _localVariableIds = {};
 
-  /// Creates a new [AstStructuralHasher].
-  AstStructuralHasher({
+  /// Creates a new [AstStructuralHashVisitor].
+  AstStructuralHashVisitor({
     required bool ignoreLiterals,
     required bool ignoreIdentifiers,
   }) : _ignoreLiterals = ignoreLiterals,
@@ -176,10 +177,8 @@ class AstStructuralHasher extends UnifyingAstVisitor<void> {
       // This preserves field names, getters, methods, class names, etc.
       final element = node.element;
       if (element != null) {
-        if (element is! LocalVariableElement &&
-            element is! FormalParameterElement) {
-          _append(node.name);
-        } else {
+        if (element is LocalVariableElement ||
+            element is FormalParameterElement) {
           // It is a local variable or parameter.
           // Assign it a local ID (De Bruijn Indexing) to distinguish clones
           // that wire their variables differently.
@@ -188,12 +187,9 @@ class AstStructuralHasher extends UnifyingAstVisitor<void> {
             () => _localVariableIds.length,
           );
           _appendHash(id);
+        } else {
+          _append(node.name);
         }
-      } else {
-        // If element is null, we are not sure what it is.
-        // It could be an unresolved local variable or an unresolved property.
-        // We ignore it to preserve standard Type-2 clone behavior (less false
-        // negatives).
       }
     }
     super.visitSimpleIdentifier(node);

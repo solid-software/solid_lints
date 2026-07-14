@@ -56,8 +56,7 @@ $_mockAnalysisOptionsContent''',
 
   // --- Base Tests (min_tokens: 15, check_blocks: true, default) ---
 
-  Future<void>
-  test_reports_when_two_functions_have_identical_bodies() async {
+  Future<void> test_reports_when_two_functions_have_identical_bodies() async {
     await assertAutoDiagnostics('''
 void first() ${expectLint(r'''{
   final x = 1;
@@ -119,8 +118,7 @@ void second() {
 ''');
   }
 
-  Future<void>
-  test_does_not_report_when_body_below_min_tokens() async {
+  Future<void> test_does_not_report_when_body_below_min_tokens() async {
     await assertNoDiagnostics(r'''
 void first() {
   print('hello');
@@ -134,8 +132,7 @@ void second() {
 ''');
   }
 
-  Future<void>
-  test_reports_on_methods_in_same_class() async {
+  Future<void> test_reports_on_methods_in_same_class() async {
     await assertAutoDiagnostics('''
 class MyClass {
   void first() ${expectLint(r'''{
@@ -157,8 +154,7 @@ class MyClass {
 ''');
   }
 
-  Future<void>
-  test_reports_on_third_clone_also() async {
+  Future<void> test_reports_on_third_clone_also() async {
     await assertAutoDiagnostics('''
 void first() ${expectLint(r'''{
   final x = 1;
@@ -188,8 +184,7 @@ void third() ${expectLint(r'''{
 
   // --- Ignore Literals Tests ---
 
-  Future<void>
-  test_reports_when_only_literal_values_differ() async {
+  Future<void> test_reports_when_only_literal_values_differ() async {
     newAnalysisOptionsYamlFile(
       testPackageRootPath,
       '''${analysisOptionsContent(rules: [rule.name])}
@@ -277,8 +272,7 @@ void second() {
 
   // --- Exclude Tests ---
 
-  Future<void>
-  test_does_not_report_on_excluded_function() async {
+  Future<void> test_does_not_report_on_excluded_function() async {
     await assertNoDiagnostics(r'''
 void first() {
   final x = 1;
@@ -382,6 +376,105 @@ void mainMethod() ${expectLint(r'''{
   }
   print('done');
 }''')}
+''');
+  }
+
+  Future<void> test_reports_on_expression_function_bodies() async {
+    // 15+ tokens are needed. We repeat a pattern to ensure token count.
+    await assertAutoDiagnostics('''
+int first(int a, int b) ${expectLint(r'''=> a + b + a + b + 
+  a + b + a + b + a + b + a + b;''')}
+
+int second(int x, int y) ${expectLint(r'''=> x + y + x + y + 
+  x + y + x + y + x + y + x + y;''')}
+''');
+  }
+
+  Future<void> test_reports_despite_different_comments_and_formatting() async {
+    await assertAutoDiagnostics('''
+void first() ${expectLint(r'''{
+  final x = 1;
+  // This is a comment
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}''')}
+
+void second() ${expectLint(r'''{
+  final y = 1;
+
+
+  if (y > 0) {
+    /* multiline
+       comment */
+    print(y);
+  }
+  
+  print('done');
+}''')}
+''');
+  }
+
+  Future<void> test_ignores_nested_blocks_when_check_blocks_false() async {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''${analysisOptionsContent(rules: [rule.name])}
+plugins:
+  solid_lints:
+    diagnostics:
+      avoid_duplicate_code:
+        min_tokens: 15
+        check_blocks: false
+''',
+    );
+
+    // The nested blocks are identical (>15 tokens), but check_blocks is false,
+    // and the outer function bodies differ significantly.
+    await assertNoDiagnostics(r'''
+void one() {
+  final x = 1;
+  if (x > 0) {
+    print('hello');
+    print('world');
+    print('done');
+  }
+}
+
+void two() {
+  print('completely different start');
+  if (true) {
+    print('hello');
+    print('world');
+    print('done');
+  }
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_when_identifiers_are_different_method_calls() async {
+    // Tests that ignore_identifiers=true still differentiates method calls.
+    // Local variables are ignored, but external method names are preserved.
+    await assertNoDiagnostics('''
+void doSomething(int x) {}
+void doAnotherThing(int x) {}
+
+void first() {
+  final x = 1;
+  if (x > 0) {
+    doSomething(x);
+  }
+  print('done');
+}
+
+void second() {
+  final y = 1;
+  if (y > 0) {
+    doAnotherThing(y);
+  }
+  print('done');
+}
 ''');
   }
 }

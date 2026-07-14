@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_entry.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/path_utils.dart';
 
 /// Service responsible for persisting and loading the duplicate code hash
 /// cache.
@@ -48,9 +49,7 @@ class HashCacheStorage {
 
       final result = <String, FileCacheEntry>{};
       for (final MapEntry(:key, :value) in filesMap.entries) {
-        final absoluteKey = p.isAbsolute(key)
-            ? p.normalize(key)
-            : p.normalize(p.join(packageRoot, key));
+        final absoluteKey = normalizePath(key, packageRoot);
 
         if (value is Map<String, Object?>) {
           try {
