@@ -99,7 +99,7 @@ class GlobalHashRegistry {
       _index.addAll(cached);
 
       // Clean up files that were physically deleted once upon loading cache
-      final deletedFiles = <String>[];
+      final deletedFiles = <String>{};
       for (final path in cached.keys) {
         if (enablePhysicalFileCleanup && !File(path).existsSync()) {
           deletedFiles.add(path);
@@ -109,7 +109,8 @@ class GlobalHashRegistry {
         _index.remove(file);
       }
 
-      for (final MapEntry(:key, :value) in _index.entries) {
+      for (final MapEntry(:key, :value) in cached.entries) {
+        if (deletedFiles.contains(key)) continue;
         _addToInvertedIndex(key, value.entries);
       }
 
