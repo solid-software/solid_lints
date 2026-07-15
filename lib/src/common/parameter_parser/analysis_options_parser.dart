@@ -2,6 +2,7 @@ import 'package:analyzer/file_system/file_system.dart';
 import 'package:solid_lints/src/common/parameter_parser/package_config_resolver.dart';
 import 'package:solid_lints/src/common/parameter_parser/rules_data.dart';
 import 'package:solid_lints/src/common/solid_lints_constants.dart';
+import 'package:solid_lints/src/utils/map_utils.dart';
 import 'package:yaml/yaml.dart';
 
 /// Parser for analysis_options.yaml files to extract RulesData.
@@ -61,10 +62,10 @@ class AnalysisOptionsParser {
     }
   }
 
-  Map<String, Object?> _toStandardMap(Map<dynamic, dynamic> map) => {
-    for (final MapEntry(:key, :value) in map.entries)
-      if (key is String) key: _toStandardType(value),
-  };
+  Map<String, Object?> _toStandardMap(Map<dynamic, dynamic> map) =>
+      map.whereKeyType<String>().map(
+            (key, value) => MapEntry(key, _toStandardType(value)),
+          );
 
   Object? _toStandardType(Object? value) => switch (value) {
     Map() => _toStandardMap(value),
@@ -158,8 +159,7 @@ class AnalysisOptionsParser {
         case Map():
           mergedRules[ruleName] = {
             ...?mergedRules[ruleName],
-            for (final MapEntry(:key, :value) in value.entries)
-              if (key is String) key: value,
+            ...value.whereKeyType<String>(),
           };
           disabledRules.remove(ruleName);
         case bool():
@@ -214,8 +214,9 @@ class AnalysisOptionsParser {
 
     const pluginPrefix = '${SolidLintsConstants.pluginName}/';
 
-    for (final MapEntry(key: key, value: errorValue) in errors.entries) {
-      if (key is! String || !key.startsWith(pluginPrefix)) continue;
+    for (final MapEntry(key: key, value: errorValue)
+        in errors.whereKeyType<String>().entries) {
+      if (!key.startsWith(pluginPrefix)) continue;
 
       final ruleName = key.substring(pluginPrefix.length);
 
