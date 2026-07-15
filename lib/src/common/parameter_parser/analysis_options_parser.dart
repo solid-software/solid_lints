@@ -115,18 +115,12 @@ class AnalysisOptionsParser {
     if (includedFile == null) return;
 
     final includedData = _parseWithSeen(includedFile, seenPaths);
-    for (final entry in includedData.rules.entries) {
-      final ruleName = entry.key;
-      final includedOptions = entry.value;
-      final existingOptions = mergedRules[ruleName];
-      if (existingOptions == null) {
-        mergedRules[ruleName] = Map<String, Object?>.from(includedOptions);
-      } else {
-        mergedRules[ruleName] = <String, Object?>{
-          ...existingOptions,
-          ...includedOptions,
-        };
-      }
+    for (final MapEntry(key: ruleName, value: includedOptions)
+        in includedData.rules.entries) {
+      mergedRules[ruleName] = {
+        ...?mergedRules[ruleName],
+        ...includedOptions,
+      };
     }
     disabledRules.addAll(includedData.disabledRules);
   }
