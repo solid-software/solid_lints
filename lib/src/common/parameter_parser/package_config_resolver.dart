@@ -40,26 +40,21 @@ class PackageConfigResolver {
     final pathContext = _resourceProvider.pathContext;
     var currentDirectoryPath = startDirectoryPath;
 
-    while (currentDirectoryPath.isNotEmpty) {
+    while (true) {
       final candidatePath = pathContext.join(
         currentDirectoryPath,
         '.dart_tool',
         'package_config.json',
       );
-      final candidateFile = _resourceProvider.getFile(candidatePath);
 
-      if (candidateFile.exists) {
-        return candidatePath;
-      }
+      final candidateFile = _resourceProvider.getFile(candidatePath);
+      if (candidateFile.exists) return candidatePath;
 
       final parentDir = pathContext.dirname(currentDirectoryPath);
-      if (parentDir == currentDirectoryPath) {
-        break;
-      }
+      if (parentDir == currentDirectoryPath || parentDir.isEmpty) return null;
+
       currentDirectoryPath = parentDir;
     }
-
-    return null;
   }
 
   String? _resolvePackageRoot(String packageConfigPath, String packageName) {
