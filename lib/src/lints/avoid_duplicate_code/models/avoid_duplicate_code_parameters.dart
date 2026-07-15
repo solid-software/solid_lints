@@ -74,7 +74,8 @@ class AvoidDuplicateCodeParameters {
           other.minTokens == minTokens &&
           other.ignoreLiterals == ignoreLiterals &&
           other.ignoreIdentifiers == ignoreIdentifiers &&
-          other.checkBlocks == checkBlocks;
+          other.checkBlocks == checkBlocks &&
+          other.exclude == exclude;
 
   @override
   int get hashCode => Object.hash(
@@ -82,5 +83,6 @@ class AvoidDuplicateCodeParameters {
     ignoreLiterals,
     ignoreIdentifiers,
     checkBlocks,
+    exclude,
   );
 }

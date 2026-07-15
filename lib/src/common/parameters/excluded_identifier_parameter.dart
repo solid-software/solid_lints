@@ -33,4 +33,19 @@ class ExcludedIdentifierParameter {
     if (className != null) 'class_name': className,
     if (declarationName != null) 'declaration_name': declarationName,
   };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExcludedIdentifierParameter &&
+          other.methodName == methodName &&
+          other.className == className &&
+          other.declarationName == declarationName;
+
+  @override
+  int get hashCode => Object.hash(
+    methodName,
+    className,
+    declarationName,
+  );
 }

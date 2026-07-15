@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
@@ -287,6 +289,53 @@ void main() {
       );
 
       expect(loaded, isNull);
+    });
+
+    test('AvoidDuplicateCodeParameters value equality', () {
+      final params1 = AvoidDuplicateCodeParameters(
+        minTokens: 30,
+        ignoreLiterals: false,
+        ignoreIdentifiers: true,
+        checkBlocks: true,
+        exclude: ExcludedIdentifiersListParameter(
+          exclude: [
+            const ExcludedIdentifierParameter(
+              methodName: 'foo',
+              className: 'Bar',
+            ),
+          ],
+        ),
+      );
+
+      final params2 = AvoidDuplicateCodeParameters(
+        minTokens: 30,
+        ignoreLiterals: false,
+        ignoreIdentifiers: true,
+        checkBlocks: true,
+        exclude: ExcludedIdentifiersListParameter(
+          exclude: [
+            const ExcludedIdentifierParameter(
+              methodName: 'foo',
+              className: 'Bar',
+            ),
+          ],
+        ),
+      );
+
+      final paramsDifferentExclude = AvoidDuplicateCodeParameters(
+        minTokens: 30,
+        ignoreLiterals: false,
+        ignoreIdentifiers: true,
+        checkBlocks: true,
+        exclude: ExcludedIdentifiersListParameter(
+          exclude: [const ExcludedIdentifierParameter(methodName: 'different')],
+        ),
+      );
+
+      expect(params1, equals(params2));
+      expect(params1.hashCode, equals(params2.hashCode));
+
+      expect(params1, isNot(equals(paramsDifferentExclude)));
     });
   });
 }
