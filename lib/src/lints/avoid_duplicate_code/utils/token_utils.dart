@@ -8,7 +8,7 @@ int getTokenCount(AstNode node) {
   final end = node.endToken;
   while (token != null && token != end) {
     count++;
-    if (token == token.next) break; // Prevent infinite loop if AST is cyclical
+    if (token == token.next) return count;
     token = token.next;
   }
   return count + 1;
