@@ -291,19 +291,31 @@ void main() {
       expect(loaded, isNull);
     });
 
-    test('HashCacheStorage.load returns null and does not throw when cache file is corrupted', () {
-      final cacheFile = File(p.join(Directory.current.path, '.dart_tool', 'solid_lints', 'duplicate_index.json'));
-      cacheFile.createSync(recursive: true);
-      cacheFile.writeAsStringSync('["invalid", "json", "structure", "not", "a", "map"]');
+    test(
+      'HashCacheStorage.load returns null and does not throw when cache file is corrupted',
+      () {
+        final cacheFile = File(
+          p.join(
+            Directory.current.path,
+            '.dart_tool',
+            'solid_lints',
+            'duplicate_index.json',
+          ),
+        );
+        cacheFile.createSync(recursive: true);
+        cacheFile.writeAsStringSync(
+          '["invalid", "json", "structure", "not", "a", "map"]',
+        );
 
-      final loaded = HashCacheStorage.load(
-        Directory.current.path,
-        AvoidDuplicateCodeParameters.empty(),
-      );
-      expect(loaded, isNull);
+        final loaded = HashCacheStorage.load(
+          Directory.current.path,
+          AvoidDuplicateCodeParameters.empty(),
+        );
+        expect(loaded, isNull);
 
-      HashCacheStorage.delete(Directory.current.path);
-    });
+        HashCacheStorage.delete(Directory.current.path);
+      },
+    );
 
     test('AvoidDuplicateCodeParameters value equality', () {
       final params1 = AvoidDuplicateCodeParameters(
@@ -351,5 +363,53 @@ void main() {
 
       expect(params1, isNot(equals(paramsDifferentExclude)));
     });
+
+    test(
+      'does not match or clear files from sibling directories with prefixing names',
+      () {
+        final currentRoot = Directory.current.path;
+        final siblingRoot = '${currentRoot}_sibling';
+        final siblingFilePath = p.normalize(p.join(siblingRoot, 'file.dart'));
+        final projectFilePath = p.normalize(p.join(currentRoot, 'file.dart'));
+
+        registry.updateFile(projectFilePath, [
+          const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
+        ], modificationStamp: 1);
+
+        registry.updateFile(siblingFilePath, [
+          const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
+        ], modificationStamp: 1);
+
+        expect(registry.fileCount, equals(2));
+
+        // 1. findCrossFileMatches should not find duplicate in siblingFilePath if limited to currentRoot.
+        final matches = registry.findCrossFileMatches(projectFilePath, [
+          const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
+        ], packageRoot: currentRoot);
+        expect(matches, isEmpty);
+
+        // 2. clearEntriesForRoot should not clear siblingFilePath when clearing currentRoot.
+        final newParams = AvoidDuplicateCodeParameters(
+          minTokens: 40,
+          ignoreLiterals: false,
+          ignoreIdentifiers: false,
+          checkBlocks: true,
+          exclude: AvoidDuplicateCodeParameters.empty().exclude,
+        );
+
+        registry.updateFile(
+          projectFilePath,
+          [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
+          modificationStamp: 1,
+          parameters: newParams,
+          packageRoot: currentRoot,
+        );
+
+        expect(
+          registry.getFileEntries(siblingFilePath, packageRoot: siblingRoot),
+          isNotNull,
+        );
+      },
+    );
   });
 }

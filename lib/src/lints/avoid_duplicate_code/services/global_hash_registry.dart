@@ -123,7 +123,7 @@ class GlobalHashRegistry {
   void _clearEntriesForRoot(String packageRoot) {
     final keysToRemove = <String>[];
     for (final key in _index.keys) {
-      if (key.startsWith(packageRoot)) {
+      if (PathUtils.isWithinOrEqual(packageRoot, key)) {
         keysToRemove.add(key);
       }
     }
@@ -143,7 +143,7 @@ class GlobalHashRegistry {
   ) {
     final root = _getRoot(packageRoot);
     _ensureLoaded(root, parameters);
-    return normalizePath(filePath, root);
+    return PathUtils.normalizePath(filePath, root);
   }
 
   /// Returns the cached modification stamp for [filePath], or `null` if no
@@ -237,7 +237,7 @@ class GlobalHashRegistry {
             continue;
           }
 
-          if (!key.startsWith(root)) continue;
+          if (!PathUtils.isWithinOrEqual(root, key)) continue;
 
           // Verify tokenCount to guard against hash collisions.
           if (loc.entry.tokenCount != entry.tokenCount) continue;
@@ -302,7 +302,7 @@ class GlobalHashRegistry {
     // Filter _index for files belonging to this packageRoot
     final subset = <String, FileCacheEntry>{
       for (final MapEntry(:key, :value) in _index.entries)
-        if (key.startsWith(packageRoot)) key: value,
+        if (PathUtils.isWithinOrEqual(packageRoot, key)) key: value,
     };
 
     final params =

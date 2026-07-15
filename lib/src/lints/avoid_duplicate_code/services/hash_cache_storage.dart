@@ -49,7 +49,7 @@ class HashCacheStorage {
 
       final result = <String, FileCacheEntry>{};
       for (final MapEntry(:key, :value) in filesMap.entries) {
-        final absoluteKey = normalizePath(key, packageRoot);
+        final absoluteKey = PathUtils.normalizePath(key, packageRoot);
 
         if (value is Map<String, Object?>) {
           try {

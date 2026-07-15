@@ -73,7 +73,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
           lineNumber: line,
           offset: candidate.node.offset,
           length: candidate.node.length,
-          tokenCount: getTokenCount(candidate.node),
+          tokenCount: TokenUtils.getTokenCount(candidate.node),
         ),
       );
     }
