@@ -1,4 +1,7 @@
-import 'dart:io';
+import 'dart:io' as io;
+
+import 'package:analyzer/file_system/file_system.dart';
+import 'package:analyzer/file_system/physical_file_system.dart';
 
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_match.dart';
@@ -31,6 +34,9 @@ class GlobalHashRegistry {
   /// Set to `false` in tests using a virtual resource provider.
   bool enablePhysicalFileCleanup = true;
 
+  /// The resource provider used for file system operations.
+  ResourceProvider resourceProvider = PhysicalResourceProvider.INSTANCE;
+
   /// Internal index: filePath → FileCacheEntry.
   final _index = <String, FileCacheEntry>{};
 
@@ -45,7 +51,8 @@ class GlobalHashRegistry {
   /// The number of files currently indexed.
   int get fileCount => _index.length;
 
-  String _getRoot(String? packageRoot) => packageRoot ?? Directory.current.path;
+  String _getRoot(String? packageRoot) =>
+      packageRoot ?? io.Directory.current.path;
 
   void _addToInvertedIndex(String absoluteFilePath, List<HashEntry> entries) {
     for (final entry in entries) {
@@ -96,14 +103,15 @@ class GlobalHashRegistry {
     }
 
     _loadedRoots[packageRoot] = params;
-    final cached = HashCacheStorage.load(packageRoot, params);
+    final cached = HashCacheStorage.load(packageRoot, params, resourceProvider);
     if (cached != null) {
       _index.addAll(cached);
 
       // Clean up files that were physically deleted once upon loading cache
       final deletedFiles = <String>{};
       for (final path in cached.keys) {
-        if (enablePhysicalFileCleanup && !File(path).existsSync()) {
+        if (enablePhysicalFileCleanup &&
+            !resourceProvider.getFile(path).exists) {
           deletedFiles.add(path);
         }
       }
@@ -228,7 +236,8 @@ class GlobalHashRegistry {
           bool? isInvalid = fileStatusCache[key];
           if (isInvalid == null) {
             final isDeleted =
-                enablePhysicalFileCleanup && !File(key).existsSync();
+                enablePhysicalFileCleanup &&
+                !resourceProvider.getFile(key).exists;
             final isExcluded = isFileExcluded != null && isFileExcluded(key);
             isInvalid = isDeleted || isExcluded;
             fileStatusCache[key] = isInvalid;
@@ -313,7 +322,7 @@ class GlobalHashRegistry {
         parameters ??
         _loadedRoots[packageRoot] ??
         AvoidDuplicateCodeParameters.empty();
-    HashCacheStorage.save(packageRoot, subset, params);
+    HashCacheStorage.save(packageRoot, subset, params, resourceProvider);
   }
 
   /// Clears the entire index and deletes the persistent cache file.
@@ -327,7 +336,7 @@ class GlobalHashRegistry {
     _loadedRoots.clear();
     _index.clear();
     _hashToLocations.clear();
-    HashCacheStorage.delete(Directory.current.path);
+    HashCacheStorage.delete(io.Directory.current.path, resourceProvider);
     AvoidDuplicateCodeVisitor.clearPackageRootCache();
   }
 }

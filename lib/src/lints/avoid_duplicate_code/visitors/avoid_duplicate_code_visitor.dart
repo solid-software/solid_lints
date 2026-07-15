@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:analyzer/dart/analysis/context_root.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
-import 'package:path/path.dart' as path;
+import 'package:analyzer/file_system/file_system.dart';
+import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/body_candidate.dart';
@@ -29,6 +28,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
   final String _filePath;
   final int _modificationStamp;
   final ContextRoot? _contextRoot;
+  final ResourceProvider _resourceProvider;
 
   /// Creates a new instance of [AvoidDuplicateCodeVisitor].
   AvoidDuplicateCodeVisitor(
@@ -37,14 +37,19 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     required String filePath,
     required int modificationStamp,
     ContextRoot? contextRoot,
+    ResourceProvider? resourceProvider,
   }) : _filePath = filePath,
        _modificationStamp = modificationStamp,
-       _contextRoot = contextRoot;
+       _contextRoot = contextRoot,
+       _resourceProvider =
+           resourceProvider ?? PhysicalResourceProvider.INSTANCE;
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
     final filePath = _filePath;
     if (filePath.isEmpty) return;
+
+    GlobalHashRegistry.instance.resourceProvider = _resourceProvider;
 
     final packageRoot =
         _contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
@@ -308,12 +313,13 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
   String? _findPackageRoot(String filePath) {
     if (filePath.isEmpty) return null;
-    final dirPath = path.dirname(filePath);
+    final pathContext = _resourceProvider.pathContext;
+    final dirPath = pathContext.dirname(filePath);
     return _packageRootCache.putIfAbsent(dirPath, () {
-      var dir = Directory(dirPath);
+      var dir = _resourceProvider.getFolder(dirPath);
       while (true) {
-        final pubspec = File(path.join(dir.path, 'pubspec.yaml'));
-        if (pubspec.existsSync()) {
+        final pubspec = dir.getChildAssumingFile('pubspec.yaml');
+        if (pubspec.exists) {
           return dir.path;
         }
         final parent = dir.parent;

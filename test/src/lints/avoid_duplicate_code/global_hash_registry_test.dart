@@ -1,5 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' as io;
+
+import 'package:analyzer/file_system/memory_file_system.dart';
+import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:path/path.dart' as p;
 import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.dart';
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
@@ -13,15 +16,19 @@ import 'package:test/test.dart';
 void main() {
   group('GlobalHashRegistry', () {
     late GlobalHashRegistry registry;
+    late MemoryResourceProvider memoryResourceProvider;
 
     setUp(() {
+      memoryResourceProvider = MemoryResourceProvider();
       registry = GlobalHashRegistry.instance;
+      registry.resourceProvider = memoryResourceProvider;
       registry.clear();
       registry.enablePhysicalFileCleanup = false;
     });
 
     tearDown(() {
       registry.clear();
+      registry.resourceProvider = PhysicalResourceProvider.INSTANCE;
       registry.enablePhysicalFileCleanup = true;
     });
 
@@ -54,7 +61,7 @@ void main() {
       expect(matches, hasLength(1));
       expect(matches.first.duplicates, hasLength(1));
       final expectedPath = p.normalize(
-        p.join(Directory.current.path, 'file_a.dart'),
+        p.join(io.Directory.current.path, 'file_a.dart'),
       );
       expect(matches.first.duplicates.first.filePath, equals(expectedPath));
       expect(matches.first.duplicates.first.entry.hash, equals(123));
@@ -145,10 +152,10 @@ void main() {
       expect(matches, hasLength(1));
       expect(matches.first.duplicates, hasLength(2));
       final expectedPathA = p.normalize(
-        p.join(Directory.current.path, 'file_a.dart'),
+        p.join(io.Directory.current.path, 'file_a.dart'),
       );
       final expectedPathB = p.normalize(
-        p.join(Directory.current.path, 'file_b.dart'),
+        p.join(io.Directory.current.path, 'file_b.dart'),
       );
       expect(matches.first.duplicates[0].filePath, equals(expectedPathA));
       expect(matches.first.duplicates[1].filePath, equals(expectedPathB));
@@ -156,7 +163,7 @@ void main() {
 
     test('HashCacheStorage saves and loads index', () {
       final absoluteFilePath = p.normalize(
-        p.join(Directory.current.path, 'file_a.dart'),
+        p.join(io.Directory.current.path, 'file_a.dart'),
       );
       final index = {
         absoluteFilePath: const FileCacheEntry(
@@ -166,14 +173,16 @@ void main() {
       };
 
       HashCacheStorage.save(
-        Directory.current.path,
+        io.Directory.current.path,
         index,
         AvoidDuplicateCodeParameters.empty(),
+        memoryResourceProvider,
       );
 
       final loaded = HashCacheStorage.load(
-        Directory.current.path,
+        io.Directory.current.path,
         AvoidDuplicateCodeParameters.empty(),
+        memoryResourceProvider,
       );
       expect(loaded, isNotNull);
       expect(loaded!.length, equals(1));
@@ -185,23 +194,28 @@ void main() {
       expect(entry.lineNumber, equals(10));
       expect(entry.tokenCount, equals(5));
 
-      HashCacheStorage.delete(Directory.current.path);
+      HashCacheStorage.delete(
+        io.Directory.current.path,
+        memoryResourceProvider,
+      );
     });
 
     test('findCrossFileMatches cleans up absolute paths of deleted files', () {
       registry.enablePhysicalFileCleanup = true;
-      final tempFile = File('${Directory.systemTemp.path}/temp_test_file.dart');
-      tempFile.writeAsStringSync('void main() {}');
+      final tempPath = p.normalize(
+        p.join(io.Directory.systemTemp.path, 'temp_test_file.dart'),
+      );
+      memoryResourceProvider.newFile(tempPath, 'void main() {}');
 
-      registry.updateFile(tempFile.path, [
+      registry.updateFile(tempPath, [
         const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
       ], modificationStamp: 1);
       expect(registry.fileCount, equals(1));
 
-      // Delete the file physically
-      tempFile.deleteSync();
+      // Delete the file from the memory resource provider
+      memoryResourceProvider.deleteFile(tempPath);
 
-      // Trigger matching, which should clean up the deleted tempFile
+      // Trigger matching, which should clean up the deleted tempPath
       // from registry
       final matches = registry.findCrossFileMatches('other_file.dart', [
         const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
@@ -233,7 +247,7 @@ void main() {
 
     test('HashCacheStorage invalidates cache on config change', () {
       final absoluteFilePath = p.normalize(
-        p.join(Directory.current.path, 'file.dart'),
+        p.join(io.Directory.current.path, 'file.dart'),
       );
       final index = {
         absoluteFilePath: const FileCacheEntry(
@@ -252,18 +266,34 @@ void main() {
       );
 
       // Save with params1
-      HashCacheStorage.save(Directory.current.path, index, params1);
+      HashCacheStorage.save(
+        io.Directory.current.path,
+        index,
+        params1,
+        memoryResourceProvider,
+      );
 
       // Loading with params1 should succeed
-      final loaded1 = HashCacheStorage.load(Directory.current.path, params1);
+      final loaded1 = HashCacheStorage.load(
+        io.Directory.current.path,
+        params1,
+        memoryResourceProvider,
+      );
       expect(loaded1, isNotNull);
 
       // Loading with params2 (different config) should return null
       // (invalidated)
-      final loaded2 = HashCacheStorage.load(Directory.current.path, params2);
+      final loaded2 = HashCacheStorage.load(
+        io.Directory.current.path,
+        params2,
+        memoryResourceProvider,
+      );
       expect(loaded2, isNull);
 
-      HashCacheStorage.delete(Directory.current.path);
+      HashCacheStorage.delete(
+        io.Directory.current.path,
+        memoryResourceProvider,
+      );
     });
 
     test('findCrossFileMatches processes multiple candidates correctly', () {
@@ -282,41 +312,47 @@ void main() {
 
     test('HashCacheStorage.load returns null when cache file is missing', () {
       // Ensure any existing cache is deleted
-      HashCacheStorage.delete(Directory.current.path);
+      HashCacheStorage.delete(
+        io.Directory.current.path,
+        memoryResourceProvider,
+      );
 
       final loaded = HashCacheStorage.load(
-        Directory.current.path,
+        io.Directory.current.path,
         AvoidDuplicateCodeParameters.empty(),
+        memoryResourceProvider,
       );
 
       expect(loaded, isNull);
     });
 
-    test(
-      'HashCacheStorage.load returns null and does not throw when cache file is corrupted',
-      () {
-        final cacheFile = File(
-          p.join(
-            Directory.current.path,
-            '.dart_tool',
-            'solid_lints',
-            'duplicate_index.json',
-          ),
-        );
-        cacheFile.createSync(recursive: true);
-        cacheFile.writeAsStringSync(
-          '["invalid", "json", "structure", "not", "a", "map"]',
-        );
+    test('HashCacheStorage.load returns null and does not throw when cache '
+        'file is corrupted', () {
+      final cachePath = p.normalize(
+        p.join(
+          io.Directory.current.path,
+          '.dart_tool',
+          'solid_lints',
+          'duplicate_index.json',
+        ),
+      );
+      memoryResourceProvider.newFile(
+        cachePath,
+        '["invalid", "json", "structure", "not", "a", "map"]',
+      );
 
-        final loaded = HashCacheStorage.load(
-          Directory.current.path,
-          AvoidDuplicateCodeParameters.empty(),
-        );
-        expect(loaded, isNull);
+      final loaded = HashCacheStorage.load(
+        io.Directory.current.path,
+        AvoidDuplicateCodeParameters.empty(),
+        memoryResourceProvider,
+      );
+      expect(loaded, isNull);
 
-        HashCacheStorage.delete(Directory.current.path);
-      },
-    );
+      HashCacheStorage.delete(
+        io.Directory.current.path,
+        memoryResourceProvider,
+      );
+    });
 
     test('AvoidDuplicateCodeParameters value equality', () {
       final params1 = AvoidDuplicateCodeParameters(
@@ -368,7 +404,7 @@ void main() {
     test(
       'does not match or clear files from sibling directories with prefixing names',
       () {
-        final currentRoot = Directory.current.path;
+        final currentRoot = io.Directory.current.path;
         final siblingRoot = '${currentRoot}_sibling';
         final siblingFilePath = p.normalize(p.join(siblingRoot, 'file.dart'));
         final projectFilePath = p.normalize(p.join(currentRoot, 'file.dart'));
@@ -383,13 +419,15 @@ void main() {
 
         expect(registry.fileCount, equals(2));
 
-        // 1. findCrossFileMatches should not find duplicate in siblingFilePath if limited to currentRoot.
+        // 1. findCrossFileMatches should not find duplicate in siblingFilePath
+        // if limited to currentRoot.
         final matches = registry.findCrossFileMatches(projectFilePath, [
           const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
         ], packageRoot: currentRoot);
         expect(matches, isEmpty);
 
-        // 2. clearEntriesForRoot should not clear siblingFilePath when clearing currentRoot.
+        // 2. clearEntriesForRoot should not clear siblingFilePath when
+        // clearing currentRoot.
         final newParams = AvoidDuplicateCodeParameters(
           minTokens: 40,
           ignoreLiterals: false,
@@ -416,125 +454,112 @@ void main() {
     test(
       'debounces save operations independently for different package roots',
       () async {
-        final tempDir1 = Directory.systemTemp.createTempSync('package1_');
-        final tempDir2 = Directory.systemTemp.createTempSync('package2_');
+        final tempDir1 = '/temp/package1';
+        final tempDir2 = '/temp/package2';
 
-        try {
-          final file1 = p.normalize(p.join(tempDir1.path, 'file.dart'));
-          final file2 = p.normalize(p.join(tempDir2.path, 'file.dart'));
-
-          registry.updateFile(
-            file1,
-            [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
-            modificationStamp: 1,
-            packageRoot: tempDir1.path,
-          );
-
-          registry.updateFile(
-            file2,
-            [const HashEntry(hash: 456, lineNumber: 10, tokenCount: 5)],
-            modificationStamp: 1,
-            packageRoot: tempDir2.path,
-          );
-
-          // Wait for debounce duration (500ms + some buffer)
-          await Future<void>.delayed(const Duration(milliseconds: 600));
-
-          // Both caches should be saved on disk
-          final loaded1 = HashCacheStorage.load(
-            tempDir1.path,
-            AvoidDuplicateCodeParameters.empty(),
-          );
-          final loaded2 = HashCacheStorage.load(
-            tempDir2.path,
-            AvoidDuplicateCodeParameters.empty(),
-          );
-
-          expect(loaded1, isNotNull);
-          expect(loaded1!.keys.first, equals(file1));
-
-          expect(loaded2, isNotNull);
-          expect(loaded2!.keys.first, equals(file2));
-        } finally {
-          try {
-            tempDir1.deleteSync(recursive: true);
-          } catch (_) {}
-          try {
-            tempDir2.deleteSync(recursive: true);
-          } catch (_) {}
-        }
-      },
-    );
-
-    test('uses correct package-specific parameters during debounced save '
-        'in multi-package workspace', () async {
-      final tempDir1 = Directory.systemTemp.createTempSync('package1_');
-      final tempDir2 = Directory.systemTemp.createTempSync('package2_');
-
-      try {
-        final file1 = p.normalize(p.join(tempDir1.path, 'file.dart'));
-        final file2 = p.normalize(p.join(tempDir2.path, 'file.dart'));
-
-        final params1 = AvoidDuplicateCodeParameters(
-          minTokens: 30,
-          ignoreLiterals: false,
-          ignoreIdentifiers: false,
-          checkBlocks: true,
-          exclude: AvoidDuplicateCodeParameters.empty().exclude,
-        );
-
-        final params2 = AvoidDuplicateCodeParameters(
-          minTokens: 40,
-          ignoreLiterals: false,
-          ignoreIdentifiers: false,
-          checkBlocks: true,
-          exclude: AvoidDuplicateCodeParameters.empty().exclude,
-        );
+        final file1 = p.normalize(p.join(tempDir1, 'file.dart'));
+        final file2 = p.normalize(p.join(tempDir2, 'file.dart'));
 
         registry.updateFile(
           file1,
           [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
           modificationStamp: 1,
-          parameters: params1,
-          packageRoot: tempDir1.path,
+          packageRoot: tempDir1,
         );
 
         registry.updateFile(
           file2,
           [const HashEntry(hash: 456, lineNumber: 10, tokenCount: 5)],
           modificationStamp: 1,
-          parameters: params2,
-          packageRoot: tempDir2.path,
+          packageRoot: tempDir2,
         );
 
         // Wait for debounce duration (500ms + some buffer)
         await Future<void>.delayed(const Duration(milliseconds: 600));
 
-        final cacheFile1 = File(
-          p.join(tempDir1.path, '.dart_tool/solid_lints/duplicate_index.json'),
+        // Both caches should be saved on disk
+        final loaded1 = HashCacheStorage.load(
+          tempDir1,
+          AvoidDuplicateCodeParameters.empty(),
+          memoryResourceProvider,
         );
-        final cacheFile2 = File(
-          p.join(tempDir2.path, '.dart_tool/solid_lints/duplicate_index.json'),
+        final loaded2 = HashCacheStorage.load(
+          tempDir2,
+          AvoidDuplicateCodeParameters.empty(),
+          memoryResourceProvider,
         );
 
-        expect(cacheFile1.existsSync(), isTrue);
-        expect(cacheFile2.existsSync(), isTrue);
+        expect(loaded1, isNotNull);
+        expect(loaded1!.keys.first, equals(file1));
 
-        final content1 =
-            jsonDecode(cacheFile1.readAsStringSync()) as Map<String, dynamic>;
-        final content2 =
-            jsonDecode(cacheFile2.readAsStringSync()) as Map<String, dynamic>;
+        expect(loaded2, isNotNull);
+        expect(loaded2!.keys.first, equals(file2));
+      },
+    );
 
-        expect(content1['config']?['min_tokens'], equals(30));
-        expect(content2['config']?['min_tokens'], equals(40));
-      } finally {
-        try {
-          tempDir1.deleteSync(recursive: true);
-        } catch (_) {}
-        try {
-          tempDir2.deleteSync(recursive: true);
-        } catch (_) {}
-      }
+    test('uses correct package-specific parameters during debounced save '
+        'in multi-package workspace', () async {
+      final tempDir1 = '/temp/package1';
+      final tempDir2 = '/temp/package2';
+
+      final file1 = p.normalize(p.join(tempDir1, 'file.dart'));
+      final file2 = p.normalize(p.join(tempDir2, 'file.dart'));
+
+      final params1 = AvoidDuplicateCodeParameters(
+        minTokens: 30,
+        ignoreLiterals: false,
+        ignoreIdentifiers: false,
+        checkBlocks: true,
+        exclude: AvoidDuplicateCodeParameters.empty().exclude,
+      );
+
+      final params2 = AvoidDuplicateCodeParameters(
+        minTokens: 40,
+        ignoreLiterals: false,
+        ignoreIdentifiers: false,
+        checkBlocks: true,
+        exclude: AvoidDuplicateCodeParameters.empty().exclude,
+      );
+
+      registry.updateFile(
+        file1,
+        [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
+        modificationStamp: 1,
+        parameters: params1,
+        packageRoot: tempDir1,
+      );
+
+      registry.updateFile(
+        file2,
+        [const HashEntry(hash: 456, lineNumber: 10, tokenCount: 5)],
+        modificationStamp: 1,
+        parameters: params2,
+        packageRoot: tempDir2,
+      );
+
+      // Wait for debounce duration (500ms + some buffer)
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+
+      final cachePath1 = p.normalize(
+        p.join(tempDir1, '.dart_tool/solid_lints/duplicate_index.json'),
+      );
+      final cachePath2 = p.normalize(
+        p.join(tempDir2, '.dart_tool/solid_lints/duplicate_index.json'),
+      );
+
+      final cacheFile1 = memoryResourceProvider.getFile(cachePath1);
+      final cacheFile2 = memoryResourceProvider.getFile(cachePath2);
+
+      expect(cacheFile1.exists, isTrue);
+      expect(cacheFile2.exists, isTrue);
+
+      final content1 =
+          jsonDecode(cacheFile1.readAsStringSync()) as Map<String, dynamic>;
+      final content2 =
+          jsonDecode(cacheFile2.readAsStringSync()) as Map<String, dynamic>;
+
+      expect(content1['config']?['min_tokens'], equals(30));
+      expect(content2['config']?['min_tokens'], equals(40));
     });
   });
 }

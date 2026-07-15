@@ -369,6 +369,7 @@ void otherMethod() {
       filePath: otherFile.path,
       modificationStamp: 1,
       contextRoot: resolvedOther.session.analysisContext.contextRoot,
+      resourceProvider: resourceProvider,
     );
     resolvedOther.unit.accept(visitor);
 

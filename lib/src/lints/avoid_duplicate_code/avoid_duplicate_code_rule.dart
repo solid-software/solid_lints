@@ -73,6 +73,7 @@ class AvoidDuplicateCodeRule
       filePath: context.definingUnit.file.path,
       modificationStamp: context.definingUnit.file.modificationStamp,
       contextRoot: context.libraryElement?.session.analysisContext.contextRoot,
+      resourceProvider: context.definingUnit.file.provider,
     );
 
     registry.addCompilationUnit(this, visitor);
