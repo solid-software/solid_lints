@@ -17,20 +17,21 @@ class PackageConfigResolver {
   String? resolvePackageUri(String baseFilePath, String packageUri) {
     if (!packageUri.startsWith('package:')) return null;
 
-    final uri = Uri.tryParse(packageUri);
-    if (uri == null || uri.pathSegments.isEmpty) return null;
-
-    final packageName = uri.pathSegments.first;
-    final relativePath = uri.pathSegments.skip(1).join('/');
+    final pathSegments = Uri.tryParse(packageUri)?.pathSegments;
+    if (pathSegments == null || pathSegments.isEmpty) return null;
 
     final baseDir = _resourceProvider.pathContext.dirname(baseFilePath);
     final packageConfigPath = _findPackageConfig(baseDir);
     if (packageConfigPath == null) return null;
 
+    final [packageName, ...relativePathSegments] = pathSegments;
     final packageRoot = _resolvePackageRoot(packageConfigPath, packageName);
     if (packageRoot == null) return null;
 
-    return _resourceProvider.pathContext.join(packageRoot, relativePath);
+    return _resourceProvider.pathContext.join(
+      packageRoot,
+      relativePathSegments.join('/'),
+    );
   }
 
   /// Finds the nearest `.dart_tool/package_config.json` file by walking up
