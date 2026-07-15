@@ -1,6 +1,7 @@
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
+import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.dart';
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
@@ -361,10 +362,13 @@ void otherMethod() {
         ignoreLiterals: false,
         ignoreIdentifiers: true,
         checkBlocks: true,
-        exclude: ExcludedIdentifiersListParameter(exclude: []),
+        exclude: ExcludedIdentifiersListParameter(
+          exclude: [ExcludedIdentifierParameter(methodName: 'excluded')],
+        ),
       ),
       filePath: otherFile.path,
       modificationStamp: 1,
+      contextRoot: resolvedOther.session.analysisContext.contextRoot,
     );
     resolvedOther.unit.accept(visitor);
 
