@@ -38,7 +38,7 @@ class GlobalHashRegistry {
   final _hashToLocations = <int, Set<DuplicateLocation>>{};
 
   final _loadedRoots = <String, AvoidDuplicateCodeParameters>{};
-  late final _saveDebouncer = Debouncer(_saveDebounceDuration);
+  final _saveDebouncers = <String, Debouncer>{};
 
   AvoidDuplicateCodeParameters? _currentParams;
 
@@ -290,9 +290,11 @@ class GlobalHashRegistry {
     String packageRoot, [
     AvoidDuplicateCodeParameters? parameters,
   ]) {
-    _saveDebouncer.run(() {
-      _performSave(packageRoot, parameters);
-    });
+    _saveDebouncers
+        .putIfAbsent(packageRoot, () => Debouncer(_saveDebounceDuration))
+        .run(() {
+          _performSave(packageRoot, parameters);
+        });
   }
 
   void _performSave(
@@ -314,7 +316,10 @@ class GlobalHashRegistry {
   ///
   /// Primarily used in tests to ensure test isolation.
   void clear() {
-    _saveDebouncer.cancel();
+    for (final debouncer in _saveDebouncers.values) {
+      debouncer.cancel();
+    }
+    _saveDebouncers.clear();
     _loadedRoots.clear();
     _index.clear();
     _hashToLocations.clear();

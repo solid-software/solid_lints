@@ -411,5 +411,58 @@ void main() {
         );
       },
     );
+
+    test(
+      'debounces save operations independently for different package roots',
+      () async {
+        final tempDir1 = Directory.systemTemp.createTempSync('package1_');
+        final tempDir2 = Directory.systemTemp.createTempSync('package2_');
+
+        try {
+          final file1 = p.normalize(p.join(tempDir1.path, 'file.dart'));
+          final file2 = p.normalize(p.join(tempDir2.path, 'file.dart'));
+
+          registry.updateFile(
+            file1,
+            [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
+            modificationStamp: 1,
+            packageRoot: tempDir1.path,
+          );
+
+          registry.updateFile(
+            file2,
+            [const HashEntry(hash: 456, lineNumber: 10, tokenCount: 5)],
+            modificationStamp: 1,
+            packageRoot: tempDir2.path,
+          );
+
+          // Wait for debounce duration (500ms + some buffer)
+          await Future<void>.delayed(const Duration(milliseconds: 600));
+
+          // Both caches should be saved on disk
+          final loaded1 = HashCacheStorage.load(
+            tempDir1.path,
+            AvoidDuplicateCodeParameters.empty(),
+          );
+          final loaded2 = HashCacheStorage.load(
+            tempDir2.path,
+            AvoidDuplicateCodeParameters.empty(),
+          );
+
+          expect(loaded1, isNotNull);
+          expect(loaded1!.keys.first, equals(file1));
+
+          expect(loaded2, isNotNull);
+          expect(loaded2!.keys.first, equals(file2));
+        } finally {
+          try {
+            tempDir1.deleteSync(recursive: true);
+          } catch (_) {}
+          try {
+            tempDir2.deleteSync(recursive: true);
+          } catch (_) {}
+        }
+      },
+    );
   });
 }
