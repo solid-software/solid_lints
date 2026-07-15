@@ -69,7 +69,12 @@ class GlobalHashRegistry {
     for (final entry in entries) {
       final set = _hashToLocations[entry.hash];
       if (set != null) {
-        set.removeWhere((loc) => loc.filePath == absoluteFilePath);
+        set.remove(
+          DuplicateLocation(
+            entry: entry,
+            filePath: absoluteFilePath,
+          ),
+        );
         if (set.isEmpty) {
           _hashToLocations.remove(entry.hash);
         }
