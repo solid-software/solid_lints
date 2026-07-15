@@ -156,12 +156,10 @@ class AnalysisOptionsParser {
 
       switch (value) {
         case Map():
-          final existingOptions = mergedRules[ruleName] ?? {};
-          mergedRules[ruleName] = <String, Object?>{
-            ...existingOptions,
-            for (final optionEntry in value.entries)
-              if (optionEntry.key is String)
-                optionEntry.key as String: optionEntry.value,
+          mergedRules[ruleName] = {
+            ...?mergedRules[ruleName],
+            for (final MapEntry(:key, :value) in value.entries)
+              if (key is String) key: value,
           };
           disabledRules.remove(ruleName);
         case bool():
