@@ -81,45 +81,45 @@ class PackageConfigResolver {
     if (!file.exists) return const {};
 
     try {
-      final content = file.readAsStringSync();
-      final json = jsonDecode(content);
-      if (json is! Map<String, dynamic>) return const {};
-
-      final packagesList = json['packages'];
-      if (packagesList is! List<dynamic>) return const {};
-
-      final result = <String, String>{};
-
-      for (final package in packagesList) {
-        if (package is! Map<String, dynamic>) continue;
-
-        final name = package['name'];
-        final rootUriString = package['rootUri'];
-        final packageUriString = package['packageUri'];
-
-        if (name is! String ||
-            rootUriString is! String ||
-            packageUriString is! String) {
-          continue;
-        }
-
-        final rootUri = Uri.parse(rootUriString);
-        final resolvedRootUri = rootUri.isAbsolute
-            ? rootUri
-            : _resourceProvider.pathContext
-                  .toUri(file.path)
-                  .resolveUri(rootUri);
-
-        if (resolvedRootUri.isScheme('file')) {
-          result[name] = _resourceProvider.pathContext.join(
-            _resourceProvider.pathContext.fromUri(resolvedRootUri),
-            packageUriString,
-          );
-        }
+      if (jsonDecode(file.readAsStringSync()) case {
+        'packages': final List<dynamic> packagesList,
+      }) {
+        return {
+          for (final package in packagesList)
+            if (package case {
+              'name': final String name,
+              'rootUri': final String rootUriString,
+              'packageUri': final String packageUriString,
+            })
+              if (_resolveRootUriFrom(
+                    rootUriString: rootUriString,
+                    filePath: file.path,
+                  )
+                  case final resolvedRootUri?)
+                name: _resourceProvider.pathContext.join(
+                  resolvedRootUri,
+                  packageUriString,
+                ),
+        };
       }
-      return result;
-    } catch (_) {
-      return const {};
+    } catch (_) {}
+
+    return const {};
+  }
+
+  String? _resolveRootUriFrom({
+    required String rootUriString,
+    required String filePath,
+  }) {
+    final rootUri = Uri.parse(rootUriString);
+    final resolvedRootUri = rootUri.isAbsolute
+        ? rootUri
+        : _resourceProvider.pathContext.toUri(filePath).resolveUri(rootUri);
+
+    if (resolvedRootUri.isScheme('file')) {
+      return _resourceProvider.pathContext.fromUri(resolvedRootUri);
     }
+
+    return null;
   }
 }
