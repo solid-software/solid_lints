@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:solid_lints/src/utils/docs_parser/utils/parser_regexes.dart';
+import 'package:solid_lints/src/utils/file_utils.dart';
 
 /// Utils used by parsers
 class ParserUtils {
@@ -35,32 +36,22 @@ class ParserUtils {
           .trim();
 
   /// Scan the codebase directory for all `{@template}` definitions
-  static Map<String, String> scanForTemplates(Directory libDir) {
-    final templates = <String, String>{};
-
-    for (final entity in libDir.listSync(recursive: true)) {
-      if (entity is! File || !entity.path.endsWith('.dart')) continue;
-
-      try {
-        final content = entity.readAsStringSync();
-        if (!content.contains('{@template')) continue;
-
-        for (final match in ParserRegexes.templateRegex.allMatches(content)) {
-          if (match.groups([1, 2]) case [
-            final String name,
-            final String rawContent,
-          ]) {
-            templates[name] = rawContent
-                .split('\n')
-                .map((line) => _cleanCommentLine(line.trim()))
-                .join('\n')
-                .trim();
-          }
-        }
-      } catch (_) {}
-    }
-    return templates;
-  }
+  static Map<String, String> scanForTemplates(Directory libDir) => {
+    for (final entity in libDir.listSync(recursive: true))
+      if (entity case File() when entity.path.endsWith('.dart'))
+        if (entity.tryReadAsStringSync() case final content?
+            when content.contains('{@template'))
+          for (final match in ParserRegexes.templateRegex.allMatches(content))
+            if (match.groups([1, 2]) case [
+              final String name,
+              final String rawContent,
+            ])
+              name: rawContent
+                  .split('\n')
+                  .map((line) => _cleanCommentLine(line.trim()))
+                  .join('\n')
+                  .trim(),
+  };
 
   /// Expand `{@macro}` references in the formatted documentation comment and
   /// strip template tags
@@ -160,17 +151,16 @@ class ParserUtils {
 
   /// Escape angle brackets `<` and `>` in plain text (outside of code blocks)
   /// to make the text safe for Docusaurus MDX parser.
-  static String escapeMdx(String text) {
-    final parts = text.split('`');
-    for (var i = 0; i < parts.length; i++) {
-      if (i.isEven) {
-        parts[i] = parts[i]
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('{', r'\{')
-            .replaceAll('}', r'\}');
-      }
-    }
-    return parts.join('`');
-  }
+  static String escapeMdx(String text) => text
+      .split('`')
+      .mapIndexed(
+        (i, p) => i.isOdd
+            ? p
+            : p
+                  .replaceAll('<', '&lt;')
+                  .replaceAll('>', '&gt;')
+                  .replaceAll('{', r'\{')
+                  .replaceAll('}', r'\}'),
+      )
+      .join('`');
 }
