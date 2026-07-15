@@ -94,7 +94,7 @@ class HashCacheStorage {
       };
 
       file.writeAsStringSync(jsonEncode(data));
-    } on FileSystemException {
+    } catch (_) {
       // Fail silently to avoid breaking analysis server
     }
   }
@@ -106,7 +106,7 @@ class HashCacheStorage {
       if (file.existsSync()) {
         file.deleteSync();
       }
-    } on FileSystemException {
+    } catch (_) {
       // Fail silently
     }
   }
