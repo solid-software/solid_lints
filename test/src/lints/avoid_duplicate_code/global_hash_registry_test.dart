@@ -291,6 +291,20 @@ void main() {
       expect(loaded, isNull);
     });
 
+    test('HashCacheStorage.load returns null and does not throw when cache file is corrupted', () {
+      final cacheFile = File(p.join(Directory.current.path, '.dart_tool', 'solid_lints', 'duplicate_index.json'));
+      cacheFile.createSync(recursive: true);
+      cacheFile.writeAsStringSync('["invalid", "json", "structure", "not", "a", "map"]');
+
+      final loaded = HashCacheStorage.load(
+        Directory.current.path,
+        AvoidDuplicateCodeParameters.empty(),
+      );
+      expect(loaded, isNull);
+
+      HashCacheStorage.delete(Directory.current.path);
+    });
+
     test('AvoidDuplicateCodeParameters value equality', () {
       final params1 = AvoidDuplicateCodeParameters(
         minTokens: 30,

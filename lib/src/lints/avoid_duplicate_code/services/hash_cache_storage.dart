@@ -60,7 +60,7 @@ class HashCacheStorage {
         }
       }
       return result;
-    } on Exception {
+    } catch (_) {
       return null;
     }
   }
