@@ -176,17 +176,11 @@ class AnalysisOptionsParser {
   }
 
   Object? _extractDiagnostics(Map<String, Object?> yaml) {
-    final pluginConfig = yaml[SolidLintsConstants.pluginName];
-    if (pluginConfig is Map) {
-      return pluginConfig['diagnostics'];
-    }
-
-    final pluginsConfig = yaml['plugins'];
-    if (pluginsConfig is Map) {
-      final pluginSubConfig = pluginsConfig[SolidLintsConstants.pluginName];
-      if (pluginSubConfig is Map) {
-        return pluginSubConfig['diagnostics'];
-      }
+    final sources = [yaml, yaml['plugins']];
+    for (final source in sources) {
+      if (source is! Map) continue;
+      final config = source[SolidLintsConstants.pluginName];
+      if (config is Map) return config['diagnostics'];
     }
 
     return null;
