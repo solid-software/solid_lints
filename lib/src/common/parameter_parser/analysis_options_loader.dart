@@ -63,7 +63,7 @@ class AnalysisOptionsLoader {
 
   /// Checks if a rule is explicitly disabled.
   bool isRuleDisabled(RuleContext context, String ruleName) =>
-      _withNearestAnalysisOptionsFilePathForContext<bool>(
+      _withNearestAnalysisOptionsFilePathForContext(
         context,
         (path) {
           _loadRulesOptionsIfNewer(path);
