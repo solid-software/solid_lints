@@ -1,4 +1,0 @@
-custom_lint:
-  rules:
-    - use_descriptive_names_for_type_parameters:
-      min_type_parameters: 3
