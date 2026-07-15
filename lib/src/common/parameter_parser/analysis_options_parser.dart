@@ -151,12 +151,8 @@ class AnalysisOptionsParser {
     final rawDiagnostics = _extractDiagnostics(yaml);
     if (rawDiagnostics is! Map) return;
 
-    for (final entry in rawDiagnostics.entries) {
-      final key = entry.key;
-      if (key is! String) continue;
-
-      final ruleName = key;
-      final value = entry.value;
+    for (final MapEntry(key: ruleName, :value) in rawDiagnostics.entries) {
+      if (ruleName is! String) continue;
 
       switch (value) {
         case Map():
@@ -226,11 +222,9 @@ class AnalysisOptionsParser {
 
     const pluginPrefix = '${SolidLintsConstants.pluginName}/';
 
-    for (final entry in errors.entries) {
-      final key = entry.key;
+    for (final MapEntry(key: key, value: errorValue) in errors.entries) {
       if (key is! String || !key.startsWith(pluginPrefix)) continue;
 
-      final errorValue = entry.value;
       final ruleName = key.substring(pluginPrefix.length);
 
       if (errorValue == 'ignore' || errorValue == false) {
