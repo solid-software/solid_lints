@@ -9,23 +9,34 @@ import 'package:solid_lints/src/common/parameter_parser/package_config_resolver.
 class AnalysisOptionsLoader {
   final ResourceProvider _resourceProvider;
   final Map<String, CachedPackageRules> _rulesCache = {};
-
-
-
-  late final AnalysisOptionsParser _parser;
+  final AnalysisOptionsParser _parser;
 
   /// Creates an instance of [AnalysisOptionsLoader].
-  AnalysisOptionsLoader({
+  factory AnalysisOptionsLoader({
     ResourceProvider? resourceProvider,
     AnalysisOptionsParser? parser,
-  }) : _resourceProvider =
-            resourceProvider ?? PhysicalResourceProvider.INSTANCE {
-    _parser = parser ??
+  }) {
+    final resolvedResourceProvider =
+        resourceProvider ?? PhysicalResourceProvider.INSTANCE;
+
+    final resolvedParser =
+        parser ??
         AnalysisOptionsParser(
-          _resourceProvider,
-          PackageConfigResolver(_resourceProvider),
+          resolvedResourceProvider,
+          PackageConfigResolver(resolvedResourceProvider),
         );
+
+    return AnalysisOptionsLoader._(
+      resourceProvider: resolvedResourceProvider,
+      parser: resolvedParser,
+    );
   }
+
+  AnalysisOptionsLoader._({
+    required ResourceProvider resourceProvider,
+    required AnalysisOptionsParser parser,
+  }) : _resourceProvider = resourceProvider,
+       _parser = parser;
 
   /// Gets the options for a specific rule by its name.
   Map<String, Object?>? getRuleOptions(RuleContext context, String ruleName) =>
