@@ -23,7 +23,7 @@ class AvoidDuplicateCodeParameters {
   /// A list of methods/functions that should be excluded from the lint.
   final ExcludedIdentifiersListParameter exclude;
 
-  static const _defaultMinTokens = 50;
+  static const _defaultMinTokens = 30;
 
   static final _defaultExclude = ExcludedIdentifiersListParameter(
     exclude: const [],
