@@ -40,8 +40,6 @@ class GlobalHashRegistry {
   final _loadedRoots = <String, AvoidDuplicateCodeParameters>{};
   final _saveDebouncers = <String, Debouncer>{};
 
-  AvoidDuplicateCodeParameters? _currentParams;
-
   GlobalHashRegistry._();
 
   /// The number of files currently indexed.
@@ -98,7 +96,6 @@ class GlobalHashRegistry {
     }
 
     _loadedRoots[packageRoot] = params;
-    _currentParams = params;
     final cached = HashCacheStorage.load(packageRoot, params);
     if (cached != null) {
       _index.addAll(cached);
@@ -313,7 +310,9 @@ class GlobalHashRegistry {
     };
 
     final params =
-        parameters ?? _currentParams ?? AvoidDuplicateCodeParameters.empty();
+        parameters ??
+        _loadedRoots[packageRoot] ??
+        AvoidDuplicateCodeParameters.empty();
     HashCacheStorage.save(packageRoot, subset, params);
   }
 

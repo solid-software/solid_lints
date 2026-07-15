@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.dart';
@@ -464,5 +465,76 @@ void main() {
         }
       },
     );
+
+    test('uses correct package-specific parameters during debounced save '
+        'in multi-package workspace', () async {
+      final tempDir1 = Directory.systemTemp.createTempSync('package1_');
+      final tempDir2 = Directory.systemTemp.createTempSync('package2_');
+
+      try {
+        final file1 = p.normalize(p.join(tempDir1.path, 'file.dart'));
+        final file2 = p.normalize(p.join(tempDir2.path, 'file.dart'));
+
+        final params1 = AvoidDuplicateCodeParameters(
+          minTokens: 30,
+          ignoreLiterals: false,
+          ignoreIdentifiers: false,
+          checkBlocks: true,
+          exclude: AvoidDuplicateCodeParameters.empty().exclude,
+        );
+
+        final params2 = AvoidDuplicateCodeParameters(
+          minTokens: 40,
+          ignoreLiterals: false,
+          ignoreIdentifiers: false,
+          checkBlocks: true,
+          exclude: AvoidDuplicateCodeParameters.empty().exclude,
+        );
+
+        registry.updateFile(
+          file1,
+          [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
+          modificationStamp: 1,
+          parameters: params1,
+          packageRoot: tempDir1.path,
+        );
+
+        registry.updateFile(
+          file2,
+          [const HashEntry(hash: 456, lineNumber: 10, tokenCount: 5)],
+          modificationStamp: 1,
+          parameters: params2,
+          packageRoot: tempDir2.path,
+        );
+
+        // Wait for debounce duration (500ms + some buffer)
+        await Future<void>.delayed(const Duration(milliseconds: 600));
+
+        final cacheFile1 = File(
+          p.join(tempDir1.path, '.dart_tool/solid_lints/duplicate_index.json'),
+        );
+        final cacheFile2 = File(
+          p.join(tempDir2.path, '.dart_tool/solid_lints/duplicate_index.json'),
+        );
+
+        expect(cacheFile1.existsSync(), isTrue);
+        expect(cacheFile2.existsSync(), isTrue);
+
+        final content1 =
+            jsonDecode(cacheFile1.readAsStringSync()) as Map<String, dynamic>;
+        final content2 =
+            jsonDecode(cacheFile2.readAsStringSync()) as Map<String, dynamic>;
+
+        expect(content1['config']?['min_tokens'], equals(30));
+        expect(content2['config']?['min_tokens'], equals(40));
+      } finally {
+        try {
+          tempDir1.deleteSync(recursive: true);
+        } catch (_) {}
+        try {
+          tempDir2.deleteSync(recursive: true);
+        } catch (_) {}
+      }
+    });
   });
 }
