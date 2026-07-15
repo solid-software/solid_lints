@@ -1,7 +1,7 @@
 import 'package:analyzer/file_system/file_system.dart';
-import 'package:solid_lints/src/common/constants.dart';
 import 'package:solid_lints/src/common/parameter_parser/package_config_resolver.dart';
 import 'package:solid_lints/src/common/parameter_parser/rules_data.dart';
+import 'package:solid_lints/src/common/solid_lints_constants.dart';
 import 'package:yaml/yaml.dart';
 
 /// Parser for analysis_options.yaml files to extract RulesData.
@@ -191,14 +191,14 @@ class AnalysisOptionsParser {
   }
 
   Object? _extractDiagnostics(Map<String, Object?> yaml) {
-    final pluginConfig = yaml[kPluginName];
+    final pluginConfig = yaml[SolidLintsConstants.pluginName];
     if (pluginConfig is Map) {
       return pluginConfig['diagnostics'];
     }
 
     final pluginsConfig = yaml['plugins'];
     if (pluginsConfig is Map) {
-      final pluginSubConfig = pluginsConfig[kPluginName];
+      final pluginSubConfig = pluginsConfig[SolidLintsConstants.pluginName];
       if (pluginSubConfig is Map) {
         return pluginSubConfig['diagnostics'];
       }
@@ -233,7 +233,7 @@ class AnalysisOptionsParser {
     final errors = analyzer['errors'];
     if (errors is! Map) return;
 
-    const pluginPrefix = '$kPluginName/';
+    const pluginPrefix = '${SolidLintsConstants.pluginName}/';
 
     for (final entry in errors.entries) {
       final key = entry.key;

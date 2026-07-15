@@ -1,8 +1,8 @@
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
-import 'package:solid_lints/src/common/constants.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
+import 'package:solid_lints/src/common/solid_lints_constants.dart';
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/avoid_final_with_getter_rule.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
@@ -48,7 +48,7 @@ final plugin = SolidLintsPlugin();
 /// by the Dart analyzer during code analysis.
 class SolidLintsPlugin extends Plugin {
   @override
-  String get name => kPluginName;
+  String get name => SolidLintsConstants.pluginName;
 
   @override
   void register(PluginRegistry registry) {
