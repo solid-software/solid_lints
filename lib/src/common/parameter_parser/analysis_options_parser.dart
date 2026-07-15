@@ -61,13 +61,10 @@ class AnalysisOptionsParser {
     }
   }
 
-  Map<String, Object?> _toStandardMap(Map<dynamic, dynamic> map) {
-    return {
-      for (final entry in map.entries)
-        if (entry.key is String)
-          entry.key as String: _toStandardType(entry.value),
-    };
-  }
+  Map<String, Object?> _toStandardMap(Map<dynamic, dynamic> map) => {
+    for (final MapEntry(:key, :value) in map.entries)
+      if (key is String) key: _toStandardType(value),
+  };
 
   Object? _toStandardType(Object? value) => switch (value) {
     Map() => _toStandardMap(value),
