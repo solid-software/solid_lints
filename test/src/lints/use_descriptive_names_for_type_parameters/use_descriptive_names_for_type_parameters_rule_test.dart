@@ -49,6 +49,18 @@ class MyClass<
 ''');
   }
 
+  Future<void> test_reports_on_class_type_alias() async {
+    await assertAutoDiagnostics('''
+class Base {}
+mixin MyMixin {}
+class MyAlias<
+  ${expectLint('T')},
+  ${expectLint('U')},
+  ${expectLint('V')}
+> = Base with MyMixin;
+''');
+  }
+
   Future<void> test_reports_on_enum() async {
     await assertAutoDiagnostics('''
 enum MyEnum<
@@ -172,6 +184,22 @@ class MyClass<TSource, TResult, _> {}
   Future<void> test_does_not_report_below_threshold() async {
     await assertNoDiagnostics('''
 class MyClass<T, U> {}
+''');
+  }
+
+  Future<void> test_reports_when_min_type_parameters_is_1() async {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''${analysisOptionsContent(rules: [rule.name])}
+plugins:
+  solid_lints:
+    diagnostics:
+      use_descriptive_names_for_type_parameters:
+        min_type_parameters: 1''',
+    );
+
+    await assertAutoDiagnostics('''
+class MyClass<${expectLint('T')}> {}
 ''');
   }
 }

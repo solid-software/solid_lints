@@ -35,6 +35,11 @@ class UseDescriptiveNamesForTypeParametersVisitor
   }
 
   @override
+  void visitClassTypeAlias(ClassTypeAlias node) {
+    _checkAndReport(node.typeParameters);
+  }
+
+  @override
   void visitEnumDeclaration(EnumDeclaration node) {
     _checkAndReport(node.namePart.typeParameters);
   }

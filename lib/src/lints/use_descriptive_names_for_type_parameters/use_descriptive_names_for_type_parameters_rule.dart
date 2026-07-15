@@ -75,6 +75,7 @@ class UseDescriptiveNamesForTypeParametersRule
     );
 
     registry.addClassDeclaration(this, visitor);
+    registry.addClassTypeAlias(this, visitor);
     registry.addEnumDeclaration(this, visitor);
     registry.addFunctionExpression(this, visitor);
     registry.addMethodDeclaration(this, visitor);
