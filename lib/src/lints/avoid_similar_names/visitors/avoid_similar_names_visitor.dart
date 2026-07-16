@@ -8,7 +8,7 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// A visitor that checks for variables with
 /// confusingly similar names.
-class AvoidSimilarNamesVisitor extends RecursiveAstVisitor<void> {
+class AvoidSimilarNamesVisitor extends SimpleAstVisitor<void> {
   final AvoidSimilarNamesRule _rule;
   final _reportedNodes = <AstNode>{};
   final _collector = LocalVariablesVisitor();
@@ -21,7 +21,6 @@ class AvoidSimilarNamesVisitor extends RecursiveAstVisitor<void> {
   void visitMethodDeclaration(
     MethodDeclaration node,
   ) {
-    super.visitMethodDeclaration(node);
     _checkScope(node.parameters, node.body);
   }
 
@@ -29,7 +28,6 @@ class AvoidSimilarNamesVisitor extends RecursiveAstVisitor<void> {
   void visitConstructorDeclaration(
     ConstructorDeclaration node,
   ) {
-    super.visitConstructorDeclaration(node);
     _checkScope(node.parameters, node.body);
   }
 
@@ -37,7 +35,6 @@ class AvoidSimilarNamesVisitor extends RecursiveAstVisitor<void> {
   void visitFunctionDeclaration(
     FunctionDeclaration node,
   ) {
-    super.visitFunctionDeclaration(node);
     _checkScope(
       node.functionExpression.parameters,
       node.functionExpression.body,
