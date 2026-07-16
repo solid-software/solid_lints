@@ -45,6 +45,7 @@ class AvoidSimilarNamesVisitor extends SimpleAstVisitor<void> {
     FormalParameterList? parameters,
     FunctionBody body,
   ) {
+    _reportedNodes.clear();
     _collector.variables.clear();
     body.accept(_collector);
 
@@ -54,6 +55,7 @@ class AvoidSimilarNamesVisitor extends SimpleAstVisitor<void> {
     ];
 
     _compareVariables(variables);
+    _reportedNodes.clear();
   }
 
   Iterable<ScopeVariable> _extractParameters(
