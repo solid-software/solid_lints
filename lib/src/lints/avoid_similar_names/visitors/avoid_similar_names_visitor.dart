@@ -10,6 +10,7 @@ import 'package:solid_lints/src/lints/avoid_similar_names/visitors/local_variabl
 class AvoidSimilarNamesVisitor extends RecursiveAstVisitor<void> {
   final AvoidSimilarNamesRule _rule;
   final _reportedNodes = <AstNode>{};
+  final _collector = LocalVariablesVisitor();
 
   /// Creates a new instance of
   /// [AvoidSimilarNamesVisitor].
@@ -46,13 +47,13 @@ class AvoidSimilarNamesVisitor extends RecursiveAstVisitor<void> {
     FormalParameterList? parameters,
     FunctionBody body,
   ) {
-    final variables = <ScopeVariable>[];
+    _collector.variables.clear();
+    body.accept(_collector);
 
-    variables.addAll(_extractParameters(parameters));
-
-    final collector = LocalVariablesVisitor();
-    body.accept(collector);
-    variables.addAll(collector.variables);
+    final variables = [
+      ..._extractParameters(parameters),
+      ..._collector.variables,
+    ];
 
     _compareVariables(variables);
   }
@@ -106,6 +107,7 @@ class AvoidSimilarNamesVisitor extends RecursiveAstVisitor<void> {
     for (var k = 0; k < a.tokens.length; k++) {
       if (a.tokens[k] != b.tokens[k]) {
         diffCount++;
+        if (diffCount > 1) return;
         diffIndex = k;
       }
     }

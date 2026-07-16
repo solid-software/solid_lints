@@ -1,11 +1,22 @@
 /// Utility class for tokenizing identifiers and
 /// comparing name similarity.
 abstract final class NameTokenizer {
-  /// Regex pattern to match camelCase/snake_case tokens:
-  /// - `[A-Z]?[a-z]+` : Words (e.g., Class, user)
-  /// - `[A-Z]+`       : Acronyms (e.g., URL, ID)
-  /// - `\d+`          : Numeric sequences (e.g., 1, 10)
+  ///   Regex Fragment            | Meaning
+  ///   =================================================================
+  ///   [A-Z]?[a-z]+              | Match words (e.g., Class, user):
+  ///   [A-Z]?                    | ... optional leading uppercase,
+  ///         [a-z]+              | ... followed by lowercase letters.
+  ///            |                | OR
+  ///             [A-Z]+          | Match acronyms (uppercase letters).
+  ///                    |        | OR
+  ///                     \d+     | Match digits (e.g., 1, 10).
   static final _tokenPattern = RegExp(r'[A-Z]?[a-z]+|[A-Z]+|\d+');
+
+  ///   Regex Fragment            | Meaning
+  ///   =================================================================
+  ///   ^                         | Match start of string.
+  ///    _+                       | Match one or more leading underscores.
+  static final _leadingUnderscoresPattern = RegExp('^_+');
 
   static const _allowedTokens = {'x', 'y', 'z', 'w', 'i', 'j', 'k'};
 
@@ -15,13 +26,14 @@ abstract final class NameTokenizer {
   /// E.g., `someClass1` returns `['some', 'class', '1']`.
   static List<String> tokenize(String name) => [
     for (final match in _tokenPattern.allMatches(name))
-      match.group(0)!.toLowerCase(),
+      if (match.group(0) case final group?) group.toLowerCase(),
   ];
 
   /// Strips leading underscores from a name.
   ///
   /// E.g., `_someName` returns `someName`.
-  static String cleanName(String name) => name.replaceFirst(RegExp('^_+'), '');
+  static String cleanName(String name) =>
+      name.replaceFirst(_leadingUnderscoresPattern, '');
 
   /// Returns `true` if the string consists only
   /// of digit characters.

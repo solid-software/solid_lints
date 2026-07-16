@@ -34,9 +34,9 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```
 class AvoidSimilarNamesRule extends SolidLintRule<void> {
   /// The name of this lint rule.
-  static const String lintName = 'avoid_similar_names';
+  static const lintName = 'avoid_similar_names';
 
-  static const LintCode _code = LintCode(
+  static const _code = LintCode(
     lintName,
     'Avoid using similar names.',
     correctionMessage: 'Use more descriptive names.',
