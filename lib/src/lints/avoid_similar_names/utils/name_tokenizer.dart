@@ -56,6 +56,7 @@ abstract final class NameTokenizer {
     List<String> longer,
     List<String> shorter,
   ) {
+    if (longer.length != shorter.length + 1) return false;
     var i = 0;
     while (i < shorter.length && longer[i] == shorter[i]) {
       i++;

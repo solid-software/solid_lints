@@ -122,6 +122,15 @@ void test() {
 ''');
   }
 
+  Future<void> test_reports_on_subset_with_multi_digit_number() async {
+    await assertAutoDiagnostics('''
+void test() {
+  String ${expectLint('data')} = "a";
+  String ${expectLint('data10')} = "b";
+}
+''');
+  }
+
   Future<void> test_reports_on_mixed_non_descriptive_suffixes() async {
     await assertAutoDiagnostics('''
 void test() {
