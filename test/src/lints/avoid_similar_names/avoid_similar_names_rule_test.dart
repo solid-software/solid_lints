@@ -168,4 +168,15 @@ void test() {
 }
 ''');
   }
+
+  Future<void> test_reports_on_similar_names_in_for_in_loops() async {
+    await assertAutoDiagnostics('''
+void test() {
+  final users = [1, 2];
+  for (final ${expectLint('user1')} in users) {
+    int ${expectLint('user2')} = user1;
+  }
+}
+''');
+  }
 }
