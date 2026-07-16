@@ -7,10 +7,12 @@ abstract final class NameTokenizer {
   ///   [A-Z]?                    | ... optional leading uppercase,
   ///         [a-z]+              | ... followed by lowercase letters.
   ///            |                | OR
-  ///             [A-Z]+          | Match acronyms (uppercase letters).
+  ///   [A-Z]+(?=[A-Z][a-z]|\d|\b)| Match acronyms (uppercase letters).
   ///                    |        | OR
   ///                     \d+     | Match digits (e.g., 1, 10).
-  static final _tokenPattern = RegExp(r'[A-Z]?[a-z]+|[A-Z]+|\d+');
+  static final _tokenPattern = RegExp(
+    r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\b)|\d+',
+  );
 
   ///   Regex Fragment            | Meaning
   ///   =================================================================

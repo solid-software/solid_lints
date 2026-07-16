@@ -159,4 +159,13 @@ void test() {
 }
 ''');
   }
+
+  Future<void> test_reports_on_acronym_and_camel_case_suffix() async {
+    await assertAutoDiagnostics('''
+void test() {
+  int ${expectLint('APIRequest')} = 1;
+  int ${expectLint('apiRequest1')} = 2;
+}
+''');
+  }
 }
