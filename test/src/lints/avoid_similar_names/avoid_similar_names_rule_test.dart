@@ -43,6 +43,16 @@ void test() {
 ''');
   }
 
+  Future<void>
+  test_reports_on_similar_names_with_different_nullability() async {
+    await assertAutoDiagnostics('''
+void test() {
+  int ${expectLint('user1')} = 1;
+  int? ${expectLint('user2')} = 2;
+}
+''');
+  }
+
   Future<void> test_reports_on_borderline_short_names() async {
     await assertAutoDiagnostics('''
 void test() {

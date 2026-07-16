@@ -4,6 +4,7 @@ import 'package:solid_lints/src/lints/avoid_similar_names/avoid_similar_names_ru
 import 'package:solid_lints/src/lints/avoid_similar_names/models/scope_variable.dart';
 import 'package:solid_lints/src/lints/avoid_similar_names/utils/name_tokenizer.dart';
 import 'package:solid_lints/src/lints/avoid_similar_names/visitors/local_variables_visitor.dart';
+import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// A visitor that checks for variables with
 /// confusingly similar names.
@@ -86,7 +87,7 @@ class AvoidSimilarNamesVisitor extends RecursiveAstVisitor<void> {
     ScopeVariable a,
     ScopeVariable b,
   ) {
-    if (a.type != null && b.type != null && a.type != b.type) {
+    if (a.type?.isDifferentIgnoringNullability(b.type) ?? false) {
       return;
     }
 
