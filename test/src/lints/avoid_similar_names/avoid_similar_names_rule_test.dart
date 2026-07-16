@@ -189,4 +189,24 @@ void test() {
 }
 ''');
   }
+
+  Future<void>
+  test_reports_on_similar_names_in_pattern_variable_declarations() async {
+    await assertAutoDiagnostics('''
+void test() {
+  final (${expectLint('user1')}, ${expectLint('user2')}) = (1, 2);
+}
+''');
+  }
+
+  Future<void>
+  test_reports_on_similar_names_in_pattern_matching_if_case() async {
+    await assertAutoDiagnostics('''
+void test(Object obj) {
+  if (obj case [int ${expectLint('user1')}, int ${expectLint('user2')}]) {
+    // ...
+  }
+}
+''');
+  }
 }

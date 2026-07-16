@@ -23,6 +23,12 @@ class LocalVariablesVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitDeclaredVariablePattern(DeclaredVariablePattern node) {
+    _collect(node.name, node.declaredFragment?.element.type, node);
+    super.visitDeclaredVariablePattern(node);
+  }
+
+  @override
   void visitFunctionDeclaration(FunctionDeclaration node) {
     // Stop traversing nested function scopes.
   }
