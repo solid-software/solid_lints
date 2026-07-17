@@ -16,26 +16,22 @@ class CandidateVisitor extends RecursiveAstVisitor<void> {
   CandidateVisitor(this.parameters);
 
   @override
-  void visitBlock(Block node) {
-    // If checkBlocks is false, only consider blocks that represent function
-    // bodies.
-    if (!parameters.checkBlocks && node.parent is! BlockFunctionBody) {
-      super.visitBlock(node);
-      return;
-    }
-
-    _checkAndCollect(node, node.tokenCount);
-    super.visitBlock(node);
-  }
+  void visitBlock(Block node) =>
+      // If checkBlocks is false, only consider blocks that represent function
+      // bodies.
+      !parameters.checkBlocks && node.parent is! BlockFunctionBody
+      ? super.visitBlock(node)
+      : _visit(node, super.visitBlock);
 
   @override
-  void visitExpressionFunctionBody(ExpressionFunctionBody node) {
-    _checkAndCollect(node, node.tokenCount);
-    super.visitExpressionFunctionBody(node);
-  }
+  void visitExpressionFunctionBody(ExpressionFunctionBody node) =>
+      _visit(node, super.visitExpressionFunctionBody);
 
-  void _checkAndCollect(AstNode node, int tokenCount) {
-    if (tokenCount < parameters.minTokens) return;
+  void _visit<T extends AstNode>(
+    T node,
+    void Function(T) visitSuper,
+  ) {
+    if (node.tokenCount < parameters.minTokens) return;
 
     final declaration = node.thisOrAncestorOfType<Declaration>();
     if (declaration != null && parameters.exclude.shouldIgnore(declaration)) {
@@ -46,5 +42,7 @@ class CandidateVisitor extends RecursiveAstVisitor<void> {
       node: node,
       enclosingDeclaration: declaration,
     ));
+
+    visitSuper(node);
   }
 }
