@@ -74,16 +74,17 @@ class UseDescriptiveNamesForTypeParametersRule
       parameters,
     );
 
-    registry.addClassDeclaration(this, visitor);
-    registry.addClassTypeAlias(this, visitor);
-    registry.addEnumDeclaration(this, visitor);
-    registry.addFunctionExpression(this, visitor);
-    registry.addMethodDeclaration(this, visitor);
-    registry.addGenericTypeAlias(this, visitor);
-    registry.addFunctionTypeAlias(this, visitor);
-    registry.addGenericFunctionType(this, visitor);
-    registry.addExtensionDeclaration(this, visitor);
-    registry.addMixinDeclaration(this, visitor);
-    registry.addExtensionTypeDeclaration(this, visitor);
+    registry
+      ..addClassDeclaration(this, visitor)
+      ..addClassTypeAlias(this, visitor)
+      ..addEnumDeclaration(this, visitor)
+      ..addFunctionExpression(this, visitor)
+      ..addMethodDeclaration(this, visitor)
+      ..addGenericTypeAlias(this, visitor)
+      ..addFunctionTypeAlias(this, visitor)
+      ..addGenericFunctionType(this, visitor)
+      ..addExtensionDeclaration(this, visitor)
+      ..addMixinDeclaration(this, visitor)
+      ..addExtensionTypeDeclaration(this, visitor);
   }
 }

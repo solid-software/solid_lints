@@ -9,78 +9,65 @@ class UseDescriptiveNamesForTypeParametersVisitor
   final UseDescriptiveNamesForTypeParametersRule _rule;
   final UseDescriptiveNamesForTypeParametersParameters _parameters;
 
+  int get _minParameters => _parameters.minTypeParameters;
+
   /// Creates a new instance of [UseDescriptiveNamesForTypeParametersVisitor].
   UseDescriptiveNamesForTypeParametersVisitor(this._rule, this._parameters);
 
-  void _checkAndReport(TypeParameterList? typeParameters) {
-    if (typeParameters == null ||
-        typeParameters.typeParameters.length < _parameters.minTypeParameters) {
-      return;
-    }
-
-    for (final param in typeParameters.typeParameters) {
-      final name = param.name.lexeme;
-      if (name.length == 1 && name != '_') {
-        _rule.reportAtNode(
-          param,
-          arguments: [_parameters.minTypeParameters.toString()],
-        );
-      }
+  void _visit(TypeParameterList? types) {
+    if (types case TypeParameterList(
+      typeParameters: final ps,
+    ) when ps.length >= _minParameters) {
+      ps.where(_hasInvalidShortName).forEach(_report);
     }
   }
 
-  @override
-  void visitClassDeclaration(ClassDeclaration node) {
-    _checkAndReport(node.namePart.typeParameters);
-  }
+  bool _hasInvalidShortName(TypeParameter p) =>
+      p.name.length == 1 && p.name.lexeme != '_';
+
+  void _report(TypeParameter p) =>
+      _rule.reportAtNode(p, arguments: ['$_minParameters']);
 
   @override
-  void visitClassTypeAlias(ClassTypeAlias node) {
-    _checkAndReport(node.typeParameters);
-  }
+  void visitClassDeclaration(ClassDeclaration node) =>
+      _visit(node.namePart.typeParameters);
 
   @override
-  void visitEnumDeclaration(EnumDeclaration node) {
-    _checkAndReport(node.namePart.typeParameters);
-  }
+  void visitClassTypeAlias(ClassTypeAlias node) => _visit(node.typeParameters);
 
   @override
-  void visitFunctionExpression(FunctionExpression node) {
-    _checkAndReport(node.typeParameters);
-  }
+  void visitEnumDeclaration(EnumDeclaration node) =>
+      _visit(node.namePart.typeParameters);
 
   @override
-  void visitMethodDeclaration(MethodDeclaration node) {
-    _checkAndReport(node.typeParameters);
-  }
+  void visitFunctionExpression(FunctionExpression node) =>
+      _visit(node.typeParameters);
 
   @override
-  void visitGenericTypeAlias(GenericTypeAlias node) {
-    _checkAndReport(node.typeParameters);
-  }
+  void visitMethodDeclaration(MethodDeclaration node) =>
+      _visit(node.typeParameters);
 
   @override
-  void visitFunctionTypeAlias(FunctionTypeAlias node) {
-    _checkAndReport(node.typeParameters);
-  }
+  void visitGenericTypeAlias(GenericTypeAlias node) =>
+      _visit(node.typeParameters);
 
   @override
-  void visitGenericFunctionType(GenericFunctionType node) {
-    _checkAndReport(node.typeParameters);
-  }
+  void visitFunctionTypeAlias(FunctionTypeAlias node) =>
+      _visit(node.typeParameters);
 
   @override
-  void visitExtensionDeclaration(ExtensionDeclaration node) {
-    _checkAndReport(node.typeParameters);
-  }
+  void visitGenericFunctionType(GenericFunctionType node) =>
+      _visit(node.typeParameters);
 
   @override
-  void visitMixinDeclaration(MixinDeclaration node) {
-    _checkAndReport(node.typeParameters);
-  }
+  void visitExtensionDeclaration(ExtensionDeclaration node) =>
+      _visit(node.typeParameters);
 
   @override
-  void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) {
-    _checkAndReport(node.primaryConstructor.typeParameters);
-  }
+  void visitMixinDeclaration(MixinDeclaration node) =>
+      _visit(node.typeParameters);
+
+  @override
+  void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) =>
+      _visit(node.primaryConstructor.typeParameters);
 }
