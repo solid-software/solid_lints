@@ -65,6 +65,12 @@ Given the quite large threshold configured for this metric we considered extract
 
 Both options didn't look right, so we decided that tests are ok to be long.
 
+## cyclomatic_complexity
+
+State: **Disabled**.
+
+Since we're not using the `function_lines_of_code` rule, the `main()` function in tests can have high cyclomatic complexity. For the rationale against splitting up `main()` in tests, see the comments for `function_lines_of_code` above.
+
 ## prefer_match_file_name
 
 State: **Disabled**.

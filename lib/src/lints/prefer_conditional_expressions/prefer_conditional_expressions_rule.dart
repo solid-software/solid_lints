@@ -1,8 +1,10 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/fixes/prefer_conditional_expressions_fix.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/models/prefer_conditional_expressions_parameters.dart';
 import 'package:solid_lints/src/lints/prefer_conditional_expressions/visitors/prefer_conditional_expressions_visitor.dart';
+import 'package:solid_lints/src/models/rule_with_fixes.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 // Inspired by TSLint (https://palantir.github.io/tslint/rules/prefer-conditional-expression/)
@@ -56,7 +58,8 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class PreferConditionalExpressionsRule
-    extends SolidLintRule<PreferConditionalExpressionsParameters> {
+    extends SolidLintRule<PreferConditionalExpressionsParameters>
+    implements RuleWithFixes {
   /// This lint rule represents the error when an if-else statement
   /// can be simplified to a conditional expression.
   static const lintName = 'prefer_conditional_expressions';
@@ -66,9 +69,6 @@ class PreferConditionalExpressionsRule
     'Prefer conditional expression.',
   );
 
-  @override
-  LintCode get diagnosticCode => _code;
-
   /// Creates a new instance of [PreferConditionalExpressionsRule]
   PreferConditionalExpressionsRule({
     required super.analysisOptionsLoader,
@@ -77,6 +77,14 @@ class PreferConditionalExpressionsRule
          description: _code.problemMessage,
          parametersParser: PreferConditionalExpressionsParameters.fromJson,
        );
+
+  @override
+  LintCode get diagnosticCode => _code;
+
+  @override
+  FixesForCodes get fixesForCodes => const [
+    MapEntry(_code, PreferConditionalExpressionsFix.new),
+  ];
 
   @override
   void registerNodeProcessors(

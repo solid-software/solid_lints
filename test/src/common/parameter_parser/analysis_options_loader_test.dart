@@ -277,6 +277,332 @@ plugins:
     expect(options, {'some_parameter': 'nested_value'});
   }
 
+  void test_resolve_include_relative_path() {
+    final includedOptionsPath = '$testPackageRootPath/included_options.yaml';
+    newFile(
+      includedOptionsPath,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      some_parameter: included_value
+''',
+    );
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: included_options.yaml
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, isNotNull);
+    expect(options, {'some_parameter': 'included_value'});
+  }
+
+  void test_resolve_include_package_path() {
+    final sharedPackageRoot = '/home/shared';
+    newFolder(sharedPackageRoot);
+    newFile(
+      '$sharedPackageRoot/lib/analysis_options.yaml',
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      some_parameter: package_value
+''',
+    );
+
+    newPackageConfigJsonFile(
+      testPackageRootPath,
+      '''
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "shared",
+      "rootUri": "file://$sharedPackageRoot",
+      "packageUri": "lib/"
+    }
+  ]
+}
+''',
+    );
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: package:shared/analysis_options.yaml
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, isNotNull);
+    expect(options, {'some_parameter': 'package_value'});
+  }
+
+  void test_resolve_include_malformed_package_uri() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: package:foo:bar/baz.yaml
+''',
+    );
+
+    // Should not throw FormatException
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, isNull);
+  }
+
+  void test_resolve_include_cyclic() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: analysis_options.yaml
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      some_parameter: cyclic_value
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, isNotNull);
+    expect(options, {'some_parameter': 'cyclic_value'});
+  }
+
+  void test_isRuleDisabled_when_set_to_false() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName: false
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    expect(
+      analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRuleThatNeedsConfigName),
+      isTrue,
+    );
+  }
+
+  void test_isRuleDisabled_when_suppressed_in_analyzer_errors() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+analyzer:
+  errors:
+    solid_lints/$_mockRuleThatNeedsConfigName: ignore
+    solid_lints/$_mockRule2Name: ignore
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    expect(
+      analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRuleThatNeedsConfigName),
+      isTrue,
+    );
+    expect(
+      analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRule2Name),
+      isTrue,
+    );
+  }
+
+  void test_isRuleDisabled_when_suppressed_in_analyzer_errors_as_false() {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+analyzer:
+  errors:
+    solid_lints/$_mockRuleThatNeedsConfigName: false
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    expect(
+      analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRuleThatNeedsConfigName),
+      isTrue,
+    );
+  }
+
+
+  void test_isRuleDisabled_when_suppressed_in_included_analyzer_errors() {
+    final includedOptionsPath = '$testPackageRootPath/included_options.yaml';
+    newFile(
+      includedOptionsPath,
+      '''
+analyzer:
+  errors:
+    solid_lints/$_mockRuleThatNeedsConfigName: ignore
+''',
+    );
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: included_options.yaml
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    expect(
+      analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRuleThatNeedsConfigName),
+      isTrue,
+    );
+  }
+
+  void test_isRuleDisabled_when_disabled_in_include_but_re_enabled_with_null() {
+    final includedOptionsPath = '$testPackageRootPath/included_options.yaml';
+    newFile(
+      includedOptionsPath,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName: false
+''',
+    );
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: included_options.yaml
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    expect(
+      analysisOptionsLoader.isRuleDisabled(mockRuleContext, _mockRuleThatNeedsConfigName),
+      isFalse,
+    );
+  }
+
+  void test_options_merging_with_include() {
+    final includedOptionsPath = '$testPackageRootPath/included_options.yaml';
+    newFile(
+      includedOptionsPath,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      param_a: val_a
+      param_b: val_b
+''',
+    );
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include: included_options.yaml
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      param_b: local_val_b
+      param_c: val_c
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, {
+      'param_a': 'val_a',
+      'param_b': 'local_val_b',
+      'param_c': 'val_c',
+    });
+  }
+
+  void test_options_merging_with_multiple_includes() {
+    final includedOptionsPath1 = '$testPackageRootPath/included_options_1.yaml';
+    final includedOptionsPath2 = '$testPackageRootPath/included_options_2.yaml';
+    newFile(
+      includedOptionsPath1,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      param_a: val_a
+      param_b: val_b
+''',
+    );
+    newFile(
+      includedOptionsPath2,
+      '''
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      param_b: val_b_2
+      param_c: val_c
+''',
+    );
+
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      '''
+include:
+  - included_options_1.yaml
+  - included_options_2.yaml
+solid_lints:
+  diagnostics:
+    $_mockRuleThatNeedsConfigName:
+      param_c: local_val_c
+      param_d: val_d
+''',
+    );
+
+    analysisOptionsLoader.loadRulesOptionsFromContext(mockRuleContext);
+
+    final options = analysisOptionsLoader.getRuleOptions(
+      mockRuleContext,
+      _mockRuleThatNeedsConfigName,
+    );
+
+    expect(options, {
+      'param_a': 'val_a',
+      'param_b': 'val_b_2',
+      'param_c': 'local_val_c',
+      'param_d': 'val_d',
+    });
+  }
+
   RuleContext _createMockContextForPackage(
     String packageRootPath, {
     RuleContextUnit? definingUnit,

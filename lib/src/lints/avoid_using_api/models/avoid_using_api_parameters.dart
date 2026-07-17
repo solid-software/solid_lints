@@ -9,20 +9,20 @@ import 'package:yaml/yaml.dart';
 ///
 /// Parameters:
 /// * entries: A list of BannedCodeOption parameters.
-/// * severity: The default severity of the lint for each entry.
 ///
 /// Example:
 /// ```yaml
-/// custom_lint:
-///   rules:
-///     - avoid_using_api:
-///       severity: error
-///       entries:
-///         - identifier: wait
-///           class_name: Future
-///           source: dart:async
-///           reason: "Future.wait from dart:async isnt allowed"
-///           severity: warning
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       avoid_using_api:
+///         avoid_using_api: error
+///         entries:
+///           - identifier: wait
+///             class_name: Future
+///             source: dart:async
+///             reason: "Future.wait from dart:async isnt allowed"
+///             severity: warning
 /// ```
 class AvoidUsingApiParameters {
   /// A list of BannedCodeOption parameters.
@@ -37,19 +37,34 @@ class AvoidUsingApiParameters {
     this.severity,
   });
 
+  /// Empty [AvoidUsingApiParameters] model.
+  factory AvoidUsingApiParameters.empty() => const AvoidUsingApiParameters();
+
   /// Method for creating from json data
   factory AvoidUsingApiParameters.fromJson(
     Map<String, Object?> json,
-  ) =>
-      AvoidUsingApiParameters(
-        entries: List<AvoidUsingApiEntryParameters>.from(
-          (json['entries'] as Iterable?)?.map(
-                (e) => AvoidUsingApiEntryParameters.fromJson(
-                  (e as YamlMap).toMap(),
-                ),
-              ) ??
-              [],
-        ),
-        severity: decodeErrorSeverity(json['severity'] as String?),
-      );
+  ) {
+    final avoidUsingApi = json['avoid_using_api'];
+    return AvoidUsingApiParameters(
+      entries: List<AvoidUsingApiEntryParameters>.from(
+        (json['entries'] as Iterable?)
+            ?.whereType<Map<dynamic, dynamic>>()
+            .map(
+              (e) {
+                if (e is YamlMap) {
+                  return AvoidUsingApiEntryParameters.fromJson(e.toMap());
+                }
+                return AvoidUsingApiEntryParameters.fromJson(
+                  Map<String, Object?>.from(e),
+                );
+              },
+            ) ??
+            [],
+      ),
+      severity: decodeErrorSeverity(
+        json['severity'] as String? ??
+            (avoidUsingApi is String ? avoidUsingApi : null),
+      ),
+    );
+  }
 }
