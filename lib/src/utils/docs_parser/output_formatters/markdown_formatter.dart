@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/src/utils/docs_parser/models/rule_doc.dart';
 import 'package:solid_lints/src/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
 /// Markdown output formatter
 class MarkdownFormatter implements RulesDocumentationFormatter<String> {
@@ -24,7 +25,7 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
       )
       .join('\n');
 
-  ///
+  /// Format a single rule to Markdown string.
   String formatRuleToMarkdown(
     RuleDoc rule, {
     bool includeName = true,
@@ -36,7 +37,7 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
       formattedString.writeln('## ${rule.name}');
     }
 
-    formattedString.writeln(rule.doc);
+    formattedString.writeln(ParserUtils.escapeMdx(rule.doc));
 
     if (rule.parameters.isNotEmpty) {
       formattedString.writeln('### Parameters');
@@ -48,10 +49,11 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
             ' (_${parameter.type}_)  ',
           ),
         );
-        formattedString.writeln('  ${parameter.doc}');
+        formattedString.writeln('  ${ParserUtils.escapeMdx(parameter.doc)}');
       }
     }
 
     return formattedString.toString();
   }
+
 }

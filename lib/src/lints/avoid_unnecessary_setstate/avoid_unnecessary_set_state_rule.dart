@@ -56,8 +56,8 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/visitors/avoid_
 /// }
 /// ```
 class AvoidUnnecessarySetStateRule extends AnalysisRule {
-  /// The name of the lint rule.
-  static const _lintName = 'avoid_unnecessary_setstate';
+  /// The lint rule name. Must be public to generate docs.
+  static const lintName = 'avoid_unnecessary_setstate';
 
   /// The message shown when the lint rule is triggered.
   static const _lintMessage = 'Avoid calling unnecessary setState. '
@@ -65,14 +65,14 @@ class AvoidUnnecessarySetStateRule extends AnalysisRule {
 
   /// The lint code for this rule.
   static const _code = LintCode(
-    _lintName,
+    lintName,
     _lintMessage,
   );
 
   /// Creates a new instance of [AvoidUnnecessarySetStateRule].
   AvoidUnnecessarySetStateRule()
       : super(
-          name: _lintName,
+          name: lintName,
           description: _lintMessage,
         );
 

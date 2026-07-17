@@ -2,6 +2,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 
 /// Represents a function parameter type
+///
+/// @docType String
 enum ParameterType {
   /// Inherited (super) parameter type (super.parameterName)
   inherited('super'),

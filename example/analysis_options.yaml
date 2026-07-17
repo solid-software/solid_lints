@@ -1,26 +1,25 @@
 include: package:solid_lints/analysis_options.yaml
 
-analyzer:
-  plugins:
-    - custom_lint
+plugins:
+  solid_lints:
 
-custom_lint:
-  rules:
-    - cyclomatic_complexity:
+solid_lints:
+  diagnostics:
+    cyclomatic_complexity:
       max_complexity: 4
-    - number_of_parameters:
+    number_of_parameters:
       max_parameters: 2
-    - function_lines_of_code:
+    function_lines_of_code:
       max_lines: 50
-    - avoid_non_null_assertion
-    - avoid_late_keyword
-    - avoid_global_state
-    - avoid_returning_widgets
-    - avoid_unnecessary_setstate
-    - double_literal_format
-    - avoid_unnecessary_type_assertions
-    - avoid_debug_print_in_release
-    - avoid_using_api:
+    avoid_non_null_assertion: true
+    avoid_late_keyword: true
+    avoid_global_state: true
+    avoid_returning_widgets: true
+    avoid_unnecessary_setstate: true
+    double_literal_format: true
+    avoid_unnecessary_type_assertions: true
+    avoid_debug_print_in_release: true
+    avoid_using_api:
       severity: info
       entries:
         - class_name: Future

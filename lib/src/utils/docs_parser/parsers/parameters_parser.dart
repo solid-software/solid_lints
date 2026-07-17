@@ -1,85 +1,65 @@
 import 'dart:io';
 
-import 'package:analyzer/dart/analysis/features.dart';
-import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:solid_lints/src/utils/docs_parser/models/parameter_doc.dart';
-import 'package:solid_lints/src/utils/docs_parser/parsers/base_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_extensions.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_regexes.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
-///
-class ParametersParser extends BaseParser {
+/// ParametersParser class to parse parameters of rules
+class ParametersParser {
   static const _parametersDir = 'models';
   static const _parametersSuffix = 'parameters';
 
   /// Directory containing rule file
   final Directory ruleDirectory;
 
-  ///
-  const ParametersParser({required this.ruleDirectory});
+  /// Global map of custom types to their primitives
+  final Map<String, String> customTypes;
 
   ///
-  List<ParameterDoc> parse() {
-    final parametersPath = _getParametersFilePath();
-    if (parametersPath == null) return [];
+  const ParametersParser({
+    required this.ruleDirectory,
+    required this.customTypes,
+  });
 
-    final ast = parseFile(
-      path: parametersPath,
-      featureSet: FeatureSet.latestLanguageVersion(),
-    );
+  ///
+  List<ParameterDoc> parse() =>
+      File(
+            join(
+              ruleDirectory.path,
+              _parametersDir,
+              '${basename(ruleDirectory.path)}_$_parametersSuffix.dart',
+            ),
+          ).declarations
+          ?.whereType<ClassDeclaration>()
+          .map(_parseParametersDocs)
+          .firstWhereOrNull((docs) => docs.isNotEmpty) ??
+      [];
 
-    final parameterDocs = ast.unit.declarations
-            .whereType<ClassDeclaration>()
-            .map(_parseParametersDocs)
-            .firstWhereOrNull((docs) => docs.isNotEmpty) ??
-        [];
-
-    return parameterDocs;
-  }
-
-  List<ParameterDoc> _parseParametersDocs(ClassDeclaration declaration) {
-    final List<ParameterDoc> parameterDocs = [];
-
-    for (final member in declaration.members) {
-      if (member is FieldDeclaration) {
-        final variable = member.fields.variables.first.name;
-        final variableName = variable.lexeme.trim();
-        if (variableName.startsWith('_')) continue;
-
-        final name = camelCaseToSnakeCase(variableName);
-        final type = member.fields.type.toString();
-        final doc = formatDocumentationComment(
-          member.documentationComment,
-        );
-
-        if (doc == null) {
-          throw 'Documentation is not specified for class: '
-              '${declaration.name.stringValue}';
-        }
-
-        parameterDocs.add(
-          ParameterDoc(
-            name: name,
-            type: type,
-            doc: doc,
-          ),
-        );
-      }
-    }
-
-    return parameterDocs;
-  }
-
-  String? _getParametersFilePath() {
-    final dir = Directory(join(ruleDirectory.path, _parametersDir));
-    if (!dir.existsSync()) return null;
-
-    return dir
-        .listSync()
-        .firstWhereOrNull(
-          (entity) => fileNameSuffix(entity.uri) == _parametersSuffix,
-        )
-        ?.path;
-  }
+  List<ParameterDoc> _parseParametersDocs(ClassDeclaration declaration) => [
+    for (final member in ParserUtils.getClassMembers(declaration))
+      if (member case FieldDeclaration(
+        isStatic: false,
+        :final documentationComment,
+      ))
+        for (final v in member.fields.variables)
+          if (!v.nameString.startsWith('_'))
+            if (documentationComment?.formatted case final doc?)
+              ParameterDoc(
+                name: ParserUtils.camelCaseToSnakeCase(v.nameString),
+                type: (member.fields.type?.toSource() ?? 'dynamic')
+                    .replaceAllMapped(ParserRegexes.wordRegex, (match) {
+                      final word = match.group(0)!;
+                      return customTypes[word] ?? word;
+                    }),
+                doc: doc,
+              )
+            else
+              throw 'Documentation is not specified for field '
+                  '"${v.nameString}" in class: '
+                  '${ParserUtils.getDeclarationName(declaration)}',
+  ];
 }

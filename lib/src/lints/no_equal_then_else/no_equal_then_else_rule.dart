@@ -42,22 +42,22 @@ import 'package:solid_lints/src/lints/no_equal_then_else/visitors/no_equal_then_
 /// selectedValue = condition ? valueA : valueB;
 /// ```
 class NoEqualThenElseRule extends AnalysisRule {
-  /// The name of the lint rule.
-  static const String _lintName = 'no_equal_then_else';
+  /// The lint rule name. Must be public to generate docs.
+  static const String lintName = 'no_equal_then_else';
 
   /// The message shown when the lint is triggered.
   static const String _lintMessage = 'Then and else branches are equal.';
 
   /// Lint code
   static const _code = LintCode(
-    _lintName,
+    lintName,
     _lintMessage,
   );
 
   /// Create a new instance of [NoEqualThenElseRule]
   NoEqualThenElseRule()
     : super(
-        name: _lintName,
+        name: lintName,
         description: _lintMessage,
       );
 

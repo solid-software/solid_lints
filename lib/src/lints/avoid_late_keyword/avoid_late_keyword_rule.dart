@@ -14,13 +14,14 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// custom_lint:
-///    rules:
-///      - avoid_late_keyword:
-///        allow_initialized: false
-///        ignored_types:
-///         - AnimationController
-///         - ColorTween
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       avoid_late_keyword:
+///         allow_initialized: false
+///         ignored_types:
+///           - AnimationController
+///           - ColorTween
 /// ```
 ///
 /// ### Example
@@ -47,17 +48,18 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
-  static const String _lintName = 'avoid_late_keyword';
+  /// The lint rule name. Must be public to generate docs.
+  static const String lintName = 'avoid_late_keyword';
 
   static const LintCode _code = LintCode(
-    _lintName,
+    lintName,
     'Avoid using the "late" keyword. It may result in runtime exceptions.',
   );
 
   /// Creates an instance of [AvoidLateKeywordRule].
   AvoidLateKeywordRule({required super.analysisOptionsLoader})
       : super.withParameters(
-          name: _lintName,
+          name: lintName,
           description: 'Warns against using the late keyword.',
           parametersParser: AvoidLateKeywordParameters.fromJson,
         );
