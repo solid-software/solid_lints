@@ -1,12 +1,24 @@
+import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart';
+import 'package:collection/collection.dart';
+import 'package:path/path.dart' as p;
 import 'package:solid_lints/src/common/parameters/excluded_entities_list_parameter.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/models/declaration_token_info.dart';
+import 'package:solid_lints/src/utils/iterable_utils.dart';
+import 'package:solid_lints/src/utils/node_utils.dart';
 
-/// The AST visitor that will collect all Class, Enum, Extension and Mixin
-/// declarations
-class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
-  final _declarations = <DeclarationTokenInfo>[];
+/// The AST visitor that will collect all Class, Enum, Extension, Mixin and
+/// Extension Type declarations
+class PreferMatchFileNameVisitor extends SimpleAstVisitor<void> {
+  static final _onlySymbolsRegex = RegExp('[^a-zA-Z0-9]');
+
+  /// The diagnostic code to report
+  final DiagnosticCode diagnosticCode;
+
+  /// The rule context
+  final RuleContext context;
 
   /// Iterable that contains the name of entity (or entities) that should
   /// be ignored
@@ -14,70 +26,72 @@ class PreferMatchFileNameVisitor extends RecursiveAstVisitor<void> {
 
   /// Constructor of [PreferMatchFileNameVisitor] class
   PreferMatchFileNameVisitor({
+    required this.diagnosticCode,
+    required this.context,
     required this.excludedEntities,
   });
 
-  /// List of all declarations
-  Iterable<DeclarationTokenInfo> get declarations => _declarations.where(
-        (declaration) {
-          if (declaration.parent is Declaration) {
-            return !excludedEntities
-                .shouldIgnoreEntity(declaration.parent as Declaration);
-          }
-          return true;
-        },
-      ).toList()
-        ..sort(
-          (a, b) => _publicDeclarationsFirst(a, b) ?? _byDeclarationOrder(a, b),
+  @override
+  void visitCompilationUnit(CompilationUnit node) {
+    final declarations = node.declarations
+        .whereNot(excludedEntities.shouldIgnoreEntity)
+        .map<DeclarationTokenInfo?>(
+          (d) {
+            final token = switch (d) {
+              ClassDeclaration() => d.namePart.typeName,
+              ExtensionDeclaration() => d.name,
+              MixinDeclaration() => d.name,
+              EnumDeclaration() => d.namePart.typeName,
+              ExtensionTypeDeclaration() => d.primaryConstructor.typeName,
+              _ => null,
+            };
+
+            return token == null ? null : (token: token, parent: d);
+          },
+        )
+        .nonNulls
+        .multiSortedBy(
+          [
+            (t) => Identifier.isPrivateName(t.token.lexeme) ? 1 : 0,
+            (t) => t.token.offset,
+          ],
         );
 
-  @override
-  void visitClassDeclaration(ClassDeclaration node) {
-    super.visitClassDeclaration(node);
+    if (declarations.isEmpty) return;
 
-    _declarations.add((token: node.name, parent: node));
-  }
+    final firstDeclaration = declarations.first;
+    final fullName = context.currentUnit?.file.path;
 
-  @override
-  void visitExtensionDeclaration(ExtensionDeclaration node) {
-    super.visitExtensionDeclaration(node);
-
-    final name = node.name;
-    if (name != null) {
-      _declarations.add((token: name, parent: node));
+    if (fullName != null &&
+        _doNormalizedNamesMatch(
+          fullName,
+          firstDeclaration.token.lexeme,
+        )) {
+      return;
     }
+
+    final nodeType = humanReadableNodeType(
+      firstDeclaration.parent,
+    ).toLowerCase();
+
+    final reporter = context.currentUnit?.diagnosticReporter;
+    reporter?.atToken(
+      firstDeclaration.token,
+      diagnosticCode,
+      arguments: [nodeType],
+    );
   }
 
-  @override
-  void visitMixinDeclaration(MixinDeclaration node) {
-    super.visitMixinDeclaration(node);
+  bool _doNormalizedNamesMatch(String path, String identifierName) {
+    final fileName = _normalizePath(path);
+    final dartIdentifier = _normalizeDartIdentifierName(identifierName);
 
-    _declarations.add((token: node.name, parent: node));
+    return fileName == dartIdentifier;
   }
 
-  @override
-  void visitEnumDeclaration(EnumDeclaration node) {
-    super.visitEnumDeclaration(node);
+  String _normalizePath(String s) =>
+      _normalizeDartIdentifierName(p.basename(s).split('.').first);
 
-    _declarations.add((token: node.name, parent: node));
-  }
-
-  int? _publicDeclarationsFirst(
-    DeclarationTokenInfo a,
-    DeclarationTokenInfo b,
-  ) {
-    final isAPrivate = Identifier.isPrivateName(a.token.lexeme);
-    final isBPrivate = Identifier.isPrivateName(b.token.lexeme);
-    if (!isAPrivate && isBPrivate) {
-      return -1;
-    } else if (isAPrivate && !isBPrivate) {
-      return 1;
-    }
-    // no reorder needed;
-    return null;
-  }
-
-  int _byDeclarationOrder(DeclarationTokenInfo a, DeclarationTokenInfo b) {
-    return a.token.offset.compareTo(b.token.offset);
-  }
+  String _normalizeDartIdentifierName(String s) =>
+      s.replaceAll(_onlySymbolsRegex, '').toLowerCase();
 }
