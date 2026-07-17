@@ -83,6 +83,63 @@ extension TypeString on String {
   String replaceGenericString() => replaceFirst(_genericRegex, '');
 }
 
+extension _PropertyAccessorElementExt on PropertyAccessorElement {
+  bool get isPublicInstanceOrigin =>
+      isPublic && !isStatic && isOriginDeclaration;
+}
+
+extension InterfaceElementExt on InterfaceElement {
+  /// Checks whether this element is the same as or a subclass of [superType].
+  bool isSameOrSubclassOf(InterfaceElement superType) =>
+      this == superType ||
+      allSupertypes.any((type) => type.element == superType);
+
+  /// Checks if a class is a Data Class based on Weight of Class.
+  bool get isDataClass {
+    const dataClassWeightThreshold = 0.33;
+
+    final elements = [
+      this,
+      ...allSupertypes.where((s) => !s.isDartCoreObject).map((s) => s.element),
+    ];
+
+    final publicProperties = <String>{
+      for (final el in elements) ...[
+        ...el.getters
+            .where((g) => g.isPublicInstanceOrigin)
+            .map((g) => g.displayName)
+            .where((name) => !const {'hashCode', 'runtimeType'}.contains(name)),
+        ...el.setters
+            .where((s) => s.isPublicInstanceOrigin)
+            .map((s) => s.displayName),
+      ],
+    };
+
+    final publicMethods = <String>{
+      for (final el in elements)
+        ...el.methods
+            .where((m) => m.isPublic && !m.isStatic)
+            .map((m) => m.name)
+            .nonNulls
+            .where(
+              (name) => !const {
+                'toString',
+                '==',
+                'copyWith',
+                'toJson',
+                'noSuchMethod',
+              }.contains(name),
+            ),
+    };
+
+    final totalMembers = publicProperties.length + publicMethods.length;
+    if (totalMembers == 0) return true;
+
+    final weightOfClass = publicMethods.length / totalMembers;
+    return weightOfClass < dataClassWeightThreshold;
+  }
+}
+
 bool hasWidgetType(DartType type) =>
     (isWidgetOrSubclass(type) ||
         _isIterable(type) ||

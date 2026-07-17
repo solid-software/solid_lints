@@ -63,6 +63,22 @@ extension SimpleIdentifierExtension on SimpleIdentifier {
 
   /// Returns the library URI string of the element, or null.
   String? get sourceUrl => element?.libraryUri;
+
+  /// Returns the target expression if this identifier is part of a member
+  /// access (e.g., `target.member`, `target.method()`, `target.field`),
+  /// otherwise null.
+  Expression? get memberAccessTarget => switch (parent) {
+    PropertyAccess(:final propertyName, :final realTarget)
+        when propertyName == this =>
+      realTarget,
+    MethodInvocation(:final methodName, :final realTarget)
+        when methodName == this =>
+      realTarget,
+    PrefixedIdentifier(:final identifier, :final prefix)
+        when identifier == this =>
+      prefix,
+    _ => null,
+  };
 }
 
 /// Extension on [AstNode] to provide generic context/traversal checks.
@@ -107,6 +123,32 @@ extension AstNodeExtension on AstNode {
     final p = parent is PrefixExpression ? parent?.parent : parent;
     return p is IndexExpression;
   }
+
+  /// Traverses up the AST from a pattern node to find the root expression
+  /// being matched.
+  Expression? get matchedPatternExpression {
+    AstNode? current = this;
+    while (current != null) {
+      switch (current) {
+        case PatternField() ||
+            ListPattern() ||
+            MapPattern() ||
+            RecordPattern() ||
+            ForEachPartsWithPattern():
+          return null;
+        case PatternVariableDeclaration(:final expression) ||
+            PatternAssignment(:final expression) ||
+            SwitchStatement(:final expression) ||
+            SwitchExpression(:final expression) ||
+            IfStatement(:final expression) ||
+            IfElement(:final expression):
+          return expression;
+        default:
+          current = current.parent;
+      }
+    }
+    return null;
+  }
 }
 
 /// Extension on [NamedType] to provide source URL utility.
@@ -145,6 +187,53 @@ extension ElementExtension on Element {
 
     return false;
   }
+
+  /// Checks whether this element is a non-static instance member.
+  bool get isInstanceMember => switch (this) {
+    PropertyAccessorElement(:final isStatic) => !isStatic,
+    MethodElement(:final isStatic) => !isStatic,
+    FieldElement(:final isStatic) => !isStatic,
+    _ => false,
+  };
+
+  /// Checks whether this element is a non-static instance method.
+  bool get isInstanceMethod => this is MethodElement && isInstanceMember;
+
+  /// Checks whether this element belongs to the analyzed project.
+  bool get isFromProject {
+    final session = this.session;
+    if (session == null) return false;
+
+    final sourcePath = library?.firstFragment.source.fullName;
+    if (sourcePath == null) return false;
+
+    return session.analysisContext.contextRoot.isAnalyzed(sourcePath);
+  }
+
+  /// Returns the enclosing [InterfaceElement] of this element (recursively),
+  /// or null if none.
+  InterfaceElement? get enclosingInterface {
+    Element? current = this;
+    while (current != null) {
+      if (current case InterfaceElement()) {
+        return current;
+      }
+      current = current.enclosingElement;
+    }
+    return null;
+  }
+
+  /// Resolves type parameters to their bounds recursively to prevent cycle
+  /// loops.
+  Element? get resolveTypeParameter {
+    Element? current = this;
+    final visited = <Element>{};
+    while (current is TypeParameterElement) {
+      if (!visited.add(current)) break;
+      current = current.bound?.element;
+    }
+    return current;
+  }
 }
 
 /// Extension on [VariableDeclaration] to check declared type.
@@ -154,4 +243,75 @@ extension VariableDeclarationExtension on VariableDeclaration {
     final element = declaredFragment?.element;
     return element is VariableElement ? element.type : null;
   }
+}
+
+/// Extension on [BinaryExpression] to check binary expressions.
+extension BinaryExpressionExtension on BinaryExpression {
+  /// Returns `true` if this is an equality expression (== or !=).
+  bool get isEquality =>
+      operator.type == TokenType.EQ_EQ || operator.type == TokenType.BANG_EQ;
+
+  /// Returns `true` if one of the operands is a null literal.
+  bool get hasNullOperand =>
+      leftOperand is NullLiteral || rightOperand is NullLiteral;
+
+  /// Returns `true` if this expression is a null check.
+  bool get isNullCheck => isEquality && hasNullOperand;
+}
+
+/// Extension on [Expression] to provide target unwrapping and resolving
+/// utilities.
+extension ExpressionExtension on Expression {
+  /// Returns the target of a property access, prefixed identifier, or index
+  /// expression, or null for other expressions.
+  Expression? get targetExpression => switch (this) {
+    PropertyAccess(:final realTarget) => realTarget,
+    PrefixedIdentifier(:final prefix) => prefix,
+    IndexExpression(:final realTarget) => realTarget,
+    _ => null,
+  };
+
+  /// Returns the member element referenced or operated on by this expression,
+  /// or null if none.
+  Element? get memberElement => switch (this) {
+    MethodInvocation(:final methodName) => methodName.element,
+    PropertyAccess(:final propertyName) => propertyName.element,
+    AssignmentExpression(:final writeElement, :final readElement) =>
+      writeElement ?? readElement,
+    PrefixExpression(:final writeElement, :final readElement) =>
+      writeElement ?? readElement,
+    PostfixExpression(:final writeElement, :final readElement) =>
+      writeElement ?? readElement,
+    IndexExpression(:final element) => element,
+    BinaryExpression(:final element) => element,
+    _ => null,
+  };
+}
+
+/// Extension on nullable [Expression] to provide helper checks.
+extension ExpressionNullableExtension on Expression? {
+  /// Unwraps casts ([AsExpression]) and null assertions (e.g. `expr!`)
+  /// recursively down to the core expression.
+  Expression? get unwrapTarget {
+    var current = this?.unParenthesized;
+    while (true) {
+      if (current case AsExpression(:final expression)) {
+        current = expression.unParenthesized;
+      } else if (current case PostfixExpression(
+        :final operand,
+        :final operator,
+      ) when operator.type == TokenType.BANG) {
+        current = operand.unParenthesized;
+      } else {
+        return current;
+      }
+    }
+  }
+
+  /// Returns `true` if this expression is `this` or `super` or null.
+  bool get isThisOrSuperOrNull =>
+      this == null || this is ThisExpression || this is SuperExpression;
+
+  /// Returns `true` if this expression is `this` or `super`.
+  bool get isThisOrSuper => this is ThisExpression || this is SuperExpression;
 }
