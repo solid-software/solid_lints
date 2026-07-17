@@ -7,8 +7,6 @@ extension ContextRootExtensions on ContextRoot {
   ///
   /// Returns `true` only if the file is within the context root but is
   /// explicitly excluded (e.g., via analysis_options.yaml).
-  bool isFileExcluded(String filePath) {
-    final isWithin = PathUtils.isWithinOrEqual(root.path, filePath);
-    return isWithin && !isAnalyzed(filePath);
-  }
+  bool isFileExcluded(String filePath) =>
+      PathUtils.isWithinOrEqual(root.path, filePath) && !isAnalyzed(filePath);
 }
