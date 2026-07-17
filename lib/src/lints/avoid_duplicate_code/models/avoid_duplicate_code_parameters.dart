@@ -48,15 +48,14 @@ class AvoidDuplicateCodeParameters {
   );
 
   /// Creates parameters from JSON configuration.
-  factory AvoidDuplicateCodeParameters.fromJson(Map<String, Object?> json) {
-    return AvoidDuplicateCodeParameters(
-      minTokens: json['min_tokens'] as int? ?? _defaultMinTokens,
-      ignoreLiterals: json['ignore_literals'] as bool? ?? false,
-      ignoreIdentifiers: json['ignore_identifiers'] as bool? ?? true,
-      checkBlocks: json['check_blocks'] as bool? ?? true,
-      exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
-    );
-  }
+  factory AvoidDuplicateCodeParameters.fromJson(Map<String, Object?> json) =>
+      AvoidDuplicateCodeParameters(
+        minTokens: json['min_tokens'] as int? ?? _defaultMinTokens,
+        ignoreLiterals: json['ignore_literals'] as bool? ?? false,
+        ignoreIdentifiers: json['ignore_identifiers'] as bool? ?? true,
+        checkBlocks: json['check_blocks'] as bool? ?? true,
+        exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
+      );
 
   /// Converts the parameters to a JSON-compatible Map.
   Map<String, Object?> toJson() => {
