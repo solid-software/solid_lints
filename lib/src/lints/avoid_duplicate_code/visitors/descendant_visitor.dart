@@ -13,18 +13,14 @@ class DescendantVisitor extends RecursiveAstVisitor<void> {
   DescendantVisitor(this.suppressed, this.root);
 
   @override
-  void visitBlock(Block node) {
-    if (node != root) {
-      suppressed.add(node);
-    }
-    super.visitBlock(node);
-  }
+  void visitBlock(Block node) => _visit(node, super.visitBlock);
 
   @override
-  void visitExpressionFunctionBody(ExpressionFunctionBody node) {
-    if (node != root) {
-      suppressed.add(node);
-    }
-    super.visitExpressionFunctionBody(node);
+  void visitExpressionFunctionBody(ExpressionFunctionBody node) =>
+      _visit(node, super.visitExpressionFunctionBody);
+
+  void _visit<T extends AstNode>(T node, void Function(T) visitSuper) {
+    if (node != root) suppressed.add(node);
+    visitSuper(node);
   }
 }
