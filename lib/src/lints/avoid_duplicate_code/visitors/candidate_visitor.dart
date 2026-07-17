@@ -24,13 +24,13 @@ class CandidateVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    _checkAndCollect(node, TokenUtils.getTokenCount(node));
+    _checkAndCollect(node, node.tokenCount);
     super.visitBlock(node);
   }
 
   @override
   void visitExpressionFunctionBody(ExpressionFunctionBody node) {
-    _checkAndCollect(node, TokenUtils.getTokenCount(node));
+    _checkAndCollect(node, node.tokenCount);
     super.visitExpressionFunctionBody(node);
   }
 
