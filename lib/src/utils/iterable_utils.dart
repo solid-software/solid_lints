@@ -25,3 +25,16 @@ extension IterablePairwise<T> on Iterable<T> {
     }
   }
 }
+
+/// Extension on [Iterable] that provides a [tryMap] method.
+extension IterableTryMap<T> on Iterable<T> {
+  /// Maps each element using [f], catching exceptions and returning null for
+  /// those elements.
+  Iterable<U?> tryMap<U>(U Function(T) f) => map((e) {
+    try {
+      return f(e);
+    } catch (_) {
+      return null;
+    }
+  });
+}

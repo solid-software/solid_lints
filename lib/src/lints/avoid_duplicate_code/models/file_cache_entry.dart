@@ -1,4 +1,5 @@
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
+import 'package:solid_lints/src/utils/iterable_utils.dart';
 
 /// A cache entry containing the file's modification stamp and its structural
 /// hashes.
@@ -22,21 +23,16 @@ class FileCacheEntry {
   };
 
   /// Parses a [FileCacheEntry] from a JSON map.
-  factory FileCacheEntry.fromJson(Map<String, Object?> json) {
-    final entriesList = <HashEntry>[];
-    final eValue = json['e'];
-    if (eValue is List) {
-      for (final item in eValue) {
-        if (item is Map<String, Object?>) {
-          try {
-            entriesList.add(HashEntry.fromJson(item));
-          } catch (_) {}
-        }
-      }
-    }
-    return FileCacheEntry(
-      modificationStamp: (json['m'] as int?) ?? 0,
-      entries: entriesList,
-    );
-  }
+  factory FileCacheEntry.fromJson(Map<String, Object?> json) => FileCacheEntry(
+    modificationStamp: (json['m'] as int?) ?? 0,
+    entries: switch (json['e']) {
+      final List<dynamic> eValue =>
+        eValue
+            .whereType<Map<String, Object?>>()
+            .tryMap(HashEntry.fromJson)
+            .nonNulls
+            .toList(),
+      _ => [],
+    },
+  );
 }
