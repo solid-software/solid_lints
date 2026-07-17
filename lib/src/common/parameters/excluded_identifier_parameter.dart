@@ -29,9 +29,9 @@ class ExcludedIdentifierParameter {
 
   /// Method to convert parameter to JSON Map.
   Map<String, Object?> toJson() => {
-    if (methodName != null) 'method_name': methodName,
-    if (className != null) 'class_name': className,
-    if (declarationName != null) 'declaration_name': declarationName,
+    'method_name': ?methodName,
+    'class_name': ?className,
+    'declaration_name': ?declarationName,
   };
 
   @override
