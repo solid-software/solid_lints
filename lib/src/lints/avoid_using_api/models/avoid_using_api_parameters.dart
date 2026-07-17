@@ -47,10 +47,17 @@ class AvoidUsingApiParameters {
     final avoidUsingApi = json['avoid_using_api'];
     return AvoidUsingApiParameters(
       entries: List<AvoidUsingApiEntryParameters>.from(
-        (json['entries'] as Iterable?)?.map(
-              (e) => AvoidUsingApiEntryParameters.fromJson(
-                (e as YamlMap).toMap(),
-              ),
+        (json['entries'] as Iterable?)
+            ?.whereType<Map<dynamic, dynamic>>()
+            .map(
+              (e) {
+                if (e is YamlMap) {
+                  return AvoidUsingApiEntryParameters.fromJson(e.toMap());
+                }
+                return AvoidUsingApiEntryParameters.fromJson(
+                  Map<String, Object?>.from(e),
+                );
+              },
             ) ??
             [],
       ),
