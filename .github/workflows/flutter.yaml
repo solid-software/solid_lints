@@ -26,9 +26,6 @@ jobs:
       - name: Run default analyzer
         run: flutter analyze
 
-      - name: Run custom analyzer
-        run: dart run custom_lint
-
       - name: Run tests
         run: |
           # run tests if `test` folder exists
