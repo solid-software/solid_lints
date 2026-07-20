@@ -5,6 +5,8 @@ import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/path_utils.dart';
+import 'package:solid_lints/src/utils/function_utils.dart';
+import 'package:solid_lints/src/utils/resource_provider_utils.dart';
 
 /// Service responsible for persisting and loading the duplicate code hash
 /// cache.
@@ -12,13 +14,15 @@ abstract final class HashCacheStorage {
   static const _cacheDirName = '.dart_tool/solid_lints';
   static const _cacheFileName = 'duplicate_index.json';
 
-  static String _filePath(
+  static File _getFile(
     String packageRoot,
     ResourceProvider resourceProvider,
-  ) => resourceProvider.pathContext.join(
-    packageRoot,
-    _cacheDirName,
-    _cacheFileName,
+  ) => resourceProvider.getFile(
+    resourceProvider.pathContext.join(
+      packageRoot,
+      _cacheDirName,
+      _cacheFileName,
+    ),
   );
 
   /// Loads the cached index from disk for the given [packageRoot].
@@ -29,49 +33,42 @@ abstract final class HashCacheStorage {
     String packageRoot,
     AvoidDuplicateCodeParameters currentParams,
     ResourceProvider resourceProvider,
+  ) => FunctionUtils.tryOrNull(
+    () => _load(
+      packageRoot,
+      currentParams,
+      resourceProvider,
+    ),
+  );
+
+  static Map<String, FileCacheEntry> _load(
+    String packageRoot,
+    AvoidDuplicateCodeParameters currentParams,
+    ResourceProvider resourceProvider,
   ) {
-    try {
-      final file = resourceProvider.getFile(
-        _filePath(packageRoot, resourceProvider),
-      );
-      if (!file.exists) return null;
-
-      final content = file.readAsStringSync();
-      final jsonMap = jsonDecode(content) as Map<String, Object?>;
-
-      // Validate config
-      final cachedConfig = jsonMap['config'];
-      if (cachedConfig is! Map<String, Object?>) {
-        return null;
+    if (jsonDecode(_getFile(packageRoot, resourceProvider).readAsStringSync())
+        case {
+          'config': final cachedConfig,
+          'files': final Map<String, Object?> filesMap,
+        }) {
+      if (!const DeepCollectionEquality().equals(
+        cachedConfig,
+        currentParams.toJson(),
+      )) {
+        throw ArgumentError('Configuration mismatch');
       }
 
-      final currentConfig = currentParams.toJson();
-      if (!const DeepCollectionEquality().equals(cachedConfig, currentConfig)) {
-        // Configuration mismatch -> discard cache
-        return null;
-      }
-
-      final filesMap = jsonMap['files'];
-      if (filesMap is! Map<String, Object?>) {
-        return null;
-      }
-
-      final result = <String, FileCacheEntry>{};
-      for (final MapEntry(:key, :value) in filesMap.entries) {
-        final absoluteKey = PathUtils.normalizePath(key, packageRoot);
-
-        if (value is Map<String, Object?>) {
-          try {
-            result[absoluteKey] = FileCacheEntry.fromJson(value);
-          } catch (_) {
-            // Skip corrupted entries
-          }
-        }
-      }
-      return result;
-    } catch (_) {
-      return null;
+      return {
+        for (final MapEntry(:key, :value) in filesMap.entries)
+          if (PathUtils.normalizePath(key, packageRoot) case final absoluteKey)
+            if (value is Map<String, Object?>)
+              if (FunctionUtils.tryOrNull(() => FileCacheEntry.fromJson(value))
+                  case final parsed?)
+                absoluteKey: parsed,
+      };
     }
+
+    throw ArgumentError('Bad json');
   }
 
   /// Saves the [index] to disk for the given [packageRoot].
@@ -80,54 +77,29 @@ abstract final class HashCacheStorage {
     Map<String, FileCacheEntry> index,
     AvoidDuplicateCodeParameters currentParams,
     ResourceProvider resourceProvider,
-  ) {
-    try {
-      final pathContext = resourceProvider.pathContext;
-      final directory = resourceProvider.getFolder(
-        pathContext.join(packageRoot, _cacheDirName),
+  ) => FunctionUtils.tryOrNull(
+    () {
+      resourceProvider.ensureFolderExists(packageRoot, _cacheDirName);
+      _getFile(packageRoot, resourceProvider).writeAsStringSync(
+        jsonEncode({
+          'version': 1,
+          'config': currentParams.toJson(),
+          'files': index.map(
+            (k, v) => MapEntry(
+              PathUtils.relativePath(k, packageRoot),
+              v.toJson(),
+            ),
+          ),
+        }),
       );
-      if (!directory.exists) {
-        directory.create();
-      }
-
-      final file = resourceProvider.getFile(
-        _filePath(packageRoot, resourceProvider),
-      );
-
-      final filesMap = <String, Object?>{};
-      for (final entry in index.entries) {
-        final relativeKey = pathContext.isAbsolute(entry.key)
-            ? pathContext.relative(entry.key, from: packageRoot)
-            : entry.key;
-        filesMap[relativeKey] = entry.value.toJson();
-      }
-
-      final data = {
-        'version': 1,
-        'config': currentParams.toJson(),
-        'files': filesMap,
-      };
-
-      file.writeAsStringSync(jsonEncode(data));
-    } catch (_) {
-      // Fail silently to avoid breaking analysis server
-    }
-  }
+    },
+  );
 
   /// Deletes the cache file for [packageRoot] if it exists.
   static void delete(
     String packageRoot,
     ResourceProvider resourceProvider,
-  ) {
-    try {
-      final file = resourceProvider.getFile(
-        _filePath(packageRoot, resourceProvider),
-      );
-      if (file.exists) {
-        file.delete();
-      }
-    } catch (_) {
-      // Fail silently
-    }
-  }
+  ) => FunctionUtils.tryOrNull(
+    () => _getFile(packageRoot, resourceProvider).delete(),
+  );
 }

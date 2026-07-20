@@ -10,6 +10,14 @@ abstract final class PathUtils {
         : p.normalize(p.join(root, filePath));
   }
 
+  /// Converts a file path to a relative path from [root].
+  static String relativePath(String filePath, String root) {
+    if (p.isAbsolute(filePath)) {
+      return p.relative(filePath, from: root);
+    }
+    return filePath;
+  }
+
   /// Checks if [filePath] is equal to [parentPath] or is located within it.
   static bool isWithinOrEqual(String parentPath, String filePath) {
     return p.equals(parentPath, filePath) || p.isWithin(parentPath, filePath);
