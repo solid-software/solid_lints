@@ -24,14 +24,14 @@ jobs:
         run: dart format . --set-exit-if-changed
 
       - name: Run default analyzer
-        run: flutter analyze
+        run: dart analyze
 
       - name: Run tests
         run: |
           # run tests if `test` folder exists
           if [ -d test ]
           then
-              flutter test -r expanded
+              dart test -r expanded
           else
               echo "Tests not found."
           fi
