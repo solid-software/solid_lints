@@ -4,9 +4,11 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/body_candidate.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_match.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/duplicate_location.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
@@ -22,6 +24,7 @@ import 'package:solid_lints/src/models/solid_diagnostic_message.dart';
 /// statement block level) within a single compilation unit and across files.
 class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
   static const _duplicateContextMessage = 'Duplicate';
+  static final _packageRootCache = <String, String?>{};
 
   final AvoidDuplicateCodeRule _rule;
   final AvoidDuplicateCodeParameters _parameters;
@@ -46,51 +49,40 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
-    final filePath = _filePath;
-    if (filePath.isEmpty) return;
-
+    if (_filePath.isEmpty) return;
     GlobalHashRegistry.instance.resourceProvider = _resourceProvider;
-
-    final packageRoot =
-        _contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
-
-    if (_tryReportFromCache(filePath, packageRoot)) {
+    if (_tryReportFromCache(
+      _filePath,
+      _contextRoot?.root.path ?? _findPackageRoot(_filePath) ?? '',
+    )) {
       return;
     }
-
-    final candidates = _collectCandidates(node);
-
     final hasher = AstStructuralHashVisitor(
       ignoreLiterals: _parameters.ignoreLiterals,
       ignoreIdentifiers: _parameters.ignoreIdentifiers,
     );
-
-    final hashEntries = <HashEntry>[];
-    final candidateHashes = <AstNode, int>{};
-
-    for (final candidate in candidates) {
-      final hash = hasher.computeHash(candidate.node);
-      candidateHashes[candidate.node] = hash;
-      final line = node.lineInfo.getLocation(candidate.node.offset).lineNumber;
-      hashEntries.add(
-        HashEntry(
-          hash: hash,
-          lineNumber: line,
-          offset: candidate.node.offset,
-          length: candidate.node.length,
-          tokenCount: candidate.node.tokenCount,
-        ),
-      );
-    }
-
+    final candidates = _collectCandidates(node);
+    final candidateHashes = {
+      for (final BodyCandidate(:node) in candidates)
+        node: hasher.computeHash(node),
+    };
     final crossFileDuplicatesByHash = _findAndSaveCrossFileMatches(
-      filePath,
-      hashEntries,
-      packageRoot,
+      _filePath,
+      candidates
+          .map(
+            (c) => HashEntry(
+              hash: candidateHashes[c.node]!,
+              lineNumber: node.lineInfo.getLocation(c.node.offset).lineNumber,
+              offset: c.node.offset,
+              length: c.node.length,
+              tokenCount: c.node.tokenCount,
+            ),
+          )
+          .toList(),
+      _contextRoot?.root.path ?? _findPackageRoot(_filePath) ?? '',
     );
-
     _groupAndReportDuplicates(
-      filePath,
+      _filePath,
       candidates,
       candidateHashes,
       hasher,
@@ -125,10 +117,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       isFileExcluded: (p) => _contextRoot?.isFileExcluded(p) ?? false,
     );
 
-    final hashGroups = <int, List<HashEntry>>{};
-    for (final entry in cachedEntries) {
-      (hashGroups[entry.hash] ??= []).add(entry);
-    }
+    final hashGroups = groupBy(cachedEntries, (entry) => entry.hash);
 
     final hasIntraDuplicates = hashGroups.values.any(
       (group) => group.length > 1,
@@ -142,49 +131,30 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     final suppressedRanges = <(int, int)>[];
     final reportedOffsets = <int>{};
 
-    final crossFileDuplicatesByHash = <int, List<DuplicateLocation>>{};
-    for (final match in crossMatches) {
-      crossFileDuplicatesByHash[match.currentEntry.hash] = match.duplicates;
-    }
+    final crossFileDuplicatesByHash = crossMatches.toDuplicatesByHash();
 
     for (final entry in cachedEntries) {
-      final isSuppressed = suppressedRanges.any(
-        (range) => (entry.offset, entry.length).isStrictlyWithin(range),
-      );
-      if (isSuppressed) continue;
-
-      if (reportedOffsets.contains(entry.offset)) continue;
-
       final group = hashGroups[entry.hash];
-      if (group == null) continue;
+      if (suppressedRanges.anyContainsStrictly(entry.range) ||
+          reportedOffsets.contains(entry.offset) ||
+          group == null) {
+        continue;
+      }
 
-      final activeGroup = group.where((e) {
-        return !suppressedRanges.any(
-          (range) => (e.offset, e.length).isStrictlyWithin(range),
-        );
-      }).toList();
+      final activeGroup = group
+          .where((e) => !suppressedRanges.anyContainsStrictly(e.range))
+          .toList();
 
       final externalPartners =
           crossFileDuplicatesByHash[entry.hash] ?? const [];
       final internalPartners = activeGroup.where((e) => e != entry).toList();
 
       if (internalPartners.isNotEmpty || externalPartners.isNotEmpty) {
-        final contextMessages = <DiagnosticMessage>[
-          for (final dup in externalPartners)
-            SolidDiagnosticMessage(
-              filePath: dup.filePath,
-              offset: dup.entry.offset,
-              length: dup.entry.length,
-              message: 'Duplicate',
-            ),
-          for (final other in internalPartners)
-            SolidDiagnosticMessage(
-              filePath: filePath,
-              offset: other.offset,
-              length: other.length,
-              message: 'Duplicate',
-            ),
-        ];
+        final contextMessages = _buildContextMessages(
+          currentFilePath: filePath,
+          externalPartners: externalPartners,
+          internalPartners: internalPartners.map((e) => (e.offset, e.length)),
+        );
 
         _rule.reportAtOffset(
           entry.offset,
@@ -211,8 +181,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     List<HashEntry> hashEntries,
     String packageRoot,
   ) {
-    final crossFileDuplicatesByHash = <int, List<DuplicateLocation>>{};
-    if (packageRoot.isEmpty) return crossFileDuplicatesByHash;
+    if (packageRoot.isEmpty) return const {};
 
     final registry = GlobalHashRegistry.instance;
     final crossMatches = registry.findCrossFileMatches(
@@ -222,9 +191,6 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       packageRoot: packageRoot,
       isFileExcluded: (p) => _contextRoot?.isFileExcluded(p) ?? false,
     );
-    for (final match in crossMatches) {
-      crossFileDuplicatesByHash[match.currentEntry.hash] = match.duplicates;
-    }
     registry.updateFile(
       filePath,
       hashEntries,
@@ -233,7 +199,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       packageRoot: packageRoot,
     );
 
-    return crossFileDuplicatesByHash;
+    return crossMatches.toDuplicatesByHash();
   }
 
   void _groupAndReportDuplicates(
@@ -243,60 +209,42 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     AstStructuralHashVisitor hasher,
     Map<int, List<DuplicateLocation>> crossFileDuplicatesByHash,
   ) {
-    final groups = <int, List<BodyCandidate>>{};
-    for (final candidate in candidates) {
-      final hash =
-          candidateHashes[candidate.node] ?? hasher.computeHash(candidate.node);
-      (groups[hash] ??= []).add(candidate);
-    }
+    final groups = groupBy(
+      candidates,
+      (c) => candidateHashes[c.node] ?? hasher.computeHash(c.node),
+    );
 
     final suppressed = <AstNode>{};
-    final reported = <AstNode>{};
 
-    for (final candidate in candidates) {
+    for (final candidate in candidates.toSet()) {
+      // Skip candidates that are descendants of an already reported duplicate
+      // block to prevent nested warnings.
       if (suppressed.contains(candidate.node)) continue;
-      if (reported.contains(candidate.node)) continue;
 
       final hash =
           candidateHashes[candidate.node] ?? hasher.computeHash(candidate.node);
-      final group = groups[hash];
-      if (group == null) continue;
-
-      final activeGroup = group
-          .where((c) => !suppressed.contains(c.node))
-          .toList();
+      final internalPartners = groups[hash]?.toList();
+      if (internalPartners == null) continue;
 
       final externalPartners = crossFileDuplicatesByHash[hash] ?? const [];
-      final internalPartners = activeGroup
-          .where((c) => c != candidate)
-          .toList();
+      internalPartners
+        ..removeWhere((c) => suppressed.contains(c.node))
+        ..remove(candidate);
 
-      if (internalPartners.isNotEmpty || externalPartners.isNotEmpty) {
-        final contextMessages = <DiagnosticMessage>[
-          for (final dup in externalPartners)
-            SolidDiagnosticMessage(
-              filePath: dup.filePath,
-              offset: dup.entry.offset,
-              length: dup.entry.length,
-              message: _duplicateContextMessage,
-            ),
-          for (final other in internalPartners)
-            SolidDiagnosticMessage(
-              filePath: filePath,
-              offset: other.node.offset,
-              length: other.node.length,
-              message: _duplicateContextMessage,
-            ),
-        ];
+      if (internalPartners.isEmpty && externalPartners.isEmpty) continue;
 
-        _rule.reportAtNode(
-          candidate.node,
-          contextMessages: contextMessages,
-        );
+      _rule.reportAtNode(
+        candidate.node,
+        contextMessages: _buildContextMessages(
+          currentFilePath: filePath,
+          externalPartners: externalPartners,
+          internalPartners: internalPartners.map(
+            (c) => (c.node.offset, c.node.length),
+          ),
+        ),
+      );
 
-        reported.add(candidate.node);
-        _suppressDescendants(candidate.node, suppressed);
-      }
+      _suppressDescendants(candidate.node, suppressed);
     }
   }
 
@@ -305,7 +253,28 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     root.accept(descendantCollector);
   }
 
-  static final _packageRootCache = <String, String?>{};
+  List<DiagnosticMessage> _buildContextMessages({
+    required String currentFilePath,
+    required List<DuplicateLocation> externalPartners,
+    required Iterable<(int offset, int length)> internalPartners,
+  }) {
+    return [
+      for (final dup in externalPartners)
+        SolidDiagnosticMessage(
+          filePath: dup.filePath,
+          offset: dup.entry.offset,
+          length: dup.entry.length,
+          message: _duplicateContextMessage,
+        ),
+      for (final (offset, length) in internalPartners)
+        SolidDiagnosticMessage(
+          filePath: currentFilePath,
+          offset: offset,
+          length: length,
+          message: _duplicateContextMessage,
+        ),
+    ];
+  }
 
   /// Clears the cached package root lookups. Should be called when
   /// the registry is cleared to avoid stale project path references.

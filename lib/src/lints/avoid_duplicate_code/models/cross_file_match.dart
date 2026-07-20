@@ -16,3 +16,12 @@ class CrossFileMatch {
     required this.duplicates,
   });
 }
+
+/// Extension on an iterable of [CrossFileMatch] to group duplicates by hash.
+extension CrossFileMatchIterableExtension on Iterable<CrossFileMatch> {
+  /// Converts this iterable of cross-file matches to a map of duplicates
+  /// grouped by hash.
+  Map<int, List<DuplicateLocation>> toDuplicatesByHash() => {
+    for (final match in this) match.currentEntry.hash: match.duplicates,
+  };
+}

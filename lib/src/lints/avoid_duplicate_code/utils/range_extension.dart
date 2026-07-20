@@ -9,3 +9,12 @@ extension RangeExtension on (int, int) {
         !(this.$1 == parent.$1 && this.$2 == parent.$2);
   }
 }
+
+/// Extension on an iterable of (offset, length) ranges.
+extension RangeIterableExtension on Iterable<(int, int)> {
+  /// Returns `true` if any range in this iterable strictly contains the [child]
+  /// range.
+  bool anyContainsStrictly((int, int) child) {
+    return any(child.isStrictlyWithin);
+  }
+}

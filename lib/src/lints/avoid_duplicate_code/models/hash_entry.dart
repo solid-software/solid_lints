@@ -16,6 +16,9 @@ class HashEntry {
   /// The number of tokens in the candidate body.
   final int tokenCount;
 
+  /// Returns the offset and length as a range tuple.
+  (int, int) get range => (offset, length);
+
   /// Creates a new [HashEntry].
   const HashEntry({
     required this.hash,
