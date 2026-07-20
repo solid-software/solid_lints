@@ -12,10 +12,11 @@ NamedType parseNamedTypeFromString(String typeString) {
 
     return namedTypeFinder.foundNamedType!;
   } catch (_) {
-    throw Exception(
+    throw FormatException(
       "No NamedType could be parsed from the input "
       "typeString: '$typeString'. Ensure it's a valid Dart "
       "type declaration.",
+      typeString,
     );
   }
 }
