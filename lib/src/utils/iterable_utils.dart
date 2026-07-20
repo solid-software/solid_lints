@@ -38,3 +38,12 @@ extension IterableTryMap<T> on Iterable<T> {
     }
   });
 }
+
+/// Extension on [Iterable] of [MapEntry] to filter and convert to [Map].
+extension MapEntryIterableExtension<K, V> on Iterable<MapEntry<K, V>> {
+  /// Filters entries by key and returns a new [Map].
+  Map<K, V> whereKey(bool Function(K key) test) => {
+    for (final entry in this)
+      if (test(entry.key)) entry.key: entry.value,
+  };
+}

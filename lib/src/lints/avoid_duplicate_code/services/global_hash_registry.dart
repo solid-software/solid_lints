@@ -12,6 +12,8 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/services/hash_cache_s
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/debouncer.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/path_utils.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
+import 'package:solid_lints/src/utils/iterable_utils.dart';
+import 'package:solid_lints/src/utils/set_dictionary.dart';
 
 /// A singleton registry that stores structural hashes for all analyzed files.
 ///
@@ -41,7 +43,7 @@ class GlobalHashRegistry {
   final _index = <String, FileCacheEntry>{};
 
   /// Auxiliary inverted index: hash → Set<DuplicateLocation>.
-  final _hashToLocations = <int, Set<DuplicateLocation>>{};
+  final _hashToLocations = SetDictionary<int, DuplicateLocation>();
 
   final _loadedRoots = <String, AvoidDuplicateCodeParameters>{};
   final _saveDebouncers = <String, Debouncer>{};
@@ -56,14 +58,13 @@ class GlobalHashRegistry {
 
   void _addToInvertedIndex(String absoluteFilePath, List<HashEntry> entries) {
     for (final entry in entries) {
-      _hashToLocations
-          .putIfAbsent(entry.hash, () => {})
-          .add(
-            DuplicateLocation(
-              entry: entry,
-              filePath: absoluteFilePath,
-            ),
-          );
+      _hashToLocations.add(
+        entry.hash,
+        DuplicateLocation(
+          entry: entry,
+          filePath: absoluteFilePath,
+        ),
+      );
     }
   }
 
@@ -72,18 +73,13 @@ class GlobalHashRegistry {
     List<HashEntry> entries,
   ) {
     for (final entry in entries) {
-      final set = _hashToLocations[entry.hash];
-      if (set != null) {
-        set.remove(
-          DuplicateLocation(
-            entry: entry,
-            filePath: absoluteFilePath,
-          ),
-        );
-        if (set.isEmpty) {
-          _hashToLocations.remove(entry.hash);
-        }
-      }
+      _hashToLocations.remove(
+        entry.hash,
+        DuplicateLocation(
+          entry: entry,
+          filePath: absoluteFilePath,
+        ),
+      );
     }
   }
 
@@ -92,58 +88,39 @@ class GlobalHashRegistry {
     AvoidDuplicateCodeParameters? currentParams,
   ]) {
     final params = currentParams ?? AvoidDuplicateCodeParameters.empty();
-    final previousParams = _loadedRoots[packageRoot];
+    if (_loadedRoots[packageRoot] case final previousParams?) {
+      if (previousParams == params) return;
 
-    // If already loaded with the same parameters, skip.
-    if (previousParams != null && previousParams == params) return;
-
-    // If parameters changed, clear entries for this root first.
-    if (previousParams != null) {
       _clearEntriesForRoot(packageRoot);
     }
 
     _loadedRoots[packageRoot] = params;
+
     final cached = HashCacheStorage.load(packageRoot, params, resourceProvider);
-    if (cached != null) {
-      _index.addAll(cached);
+    if (cached == null) return;
 
-      // Clean up files that were physically deleted once upon loading cache
-      final deletedFiles = <String>{};
-      for (final path in cached.keys) {
-        if (enablePhysicalFileCleanup &&
-            !resourceProvider.getFile(path).exists) {
-          deletedFiles.add(path);
-        }
-      }
-      for (final file in deletedFiles) {
-        _index.remove(file);
-      }
+    final deletedFiles = !enablePhysicalFileCleanup
+        ? <String>{}
+        : cached.keys.where((p) => !resourceProvider.getFile(p).exists).toSet();
 
-      for (final MapEntry(:key, :value) in cached.entries) {
-        if (deletedFiles.contains(key)) continue;
-        _addToInvertedIndex(key, value.entries);
-      }
+    final hashes = cached.keys.toSet().difference(deletedFiles);
 
-      if (deletedFiles.isNotEmpty) {
-        _scheduleSave(packageRoot, params);
-      }
+    for (final k in hashes) {
+      _index[k] = cached[k]!;
+      _addToInvertedIndex(k, cached[k]!.entries);
     }
+
+    if (deletedFiles.isNotEmpty) _scheduleSave(packageRoot, params);
   }
 
   void _clearEntriesForRoot(String packageRoot) {
-    final keysToRemove = <String>[];
-    for (final key in _index.keys) {
+    _index.removeWhere((key, oldEntry) {
       if (PathUtils.isWithinOrEqual(packageRoot, key)) {
-        keysToRemove.add(key);
-      }
-    }
-    for (final key in keysToRemove) {
-      final oldEntry = _index[key];
-      if (oldEntry != null) {
         _removeFromInvertedIndex(key, oldEntry.entries);
+        return true;
       }
-      _index.remove(key);
-    }
+      return false;
+    });
   }
 
   String _resolveAndLoad(
@@ -162,20 +139,20 @@ class GlobalHashRegistry {
     String filePath, {
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
-  }) {
-    final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
-    return _index[absoluteFilePath]?.modificationStamp;
-  }
+  }) => _getCache(filePath, packageRoot, parameters)?.modificationStamp;
 
   /// Returns the cached entries for [filePath], or `null` if not indexed.
   List<HashEntry>? getFileEntries(
     String filePath, {
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
-  }) {
-    final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
-    return _index[absoluteFilePath]?.entries;
-  }
+  }) => _getCache(filePath, packageRoot, parameters)?.entries;
+
+  FileCacheEntry? _getCache(
+    String filePath,
+    String? packageRoot,
+    AvoidDuplicateCodeParameters? parameters,
+  ) => _index[_resolveAndLoad(filePath, packageRoot, parameters)];
 
   /// Updates the hash entries for [filePath], replacing any previous entries.
   void updateFile(
@@ -188,8 +165,7 @@ class GlobalHashRegistry {
     final root = _getRoot(packageRoot);
     final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
 
-    final oldEntry = _index[absoluteFilePath];
-    if (oldEntry != null) {
+    if (_index[absoluteFilePath] case final oldEntry?) {
       _removeFromInvertedIndex(absoluteFilePath, oldEntry.entries);
     }
 
@@ -225,34 +201,27 @@ class GlobalHashRegistry {
 
     for (final entry in currentEntries) {
       final duplicates = <DuplicateLocation>[];
-
       final locations = _hashToLocations[entry.hash];
-      if (locations != null) {
-        for (final loc in locations) {
-          final key = loc.filePath;
-          if (key == absoluteCurrentFilePath) continue;
 
-          // Check if deleted or excluded on demand only for matched locations
-          bool? isInvalid = fileStatusCache[key];
-          if (isInvalid == null) {
-            final isDeleted =
-                enablePhysicalFileCleanup &&
-                !resourceProvider.getFile(key).exists;
-            final isExcluded = isFileExcluded != null && isFileExcluded(key);
-            isInvalid = isDeleted || isExcluded;
-            fileStatusCache[key] = isInvalid;
-          }
+      if (locations == null) continue;
 
-          if (isInvalid) {
-            filesToRemove.add(key);
-            continue;
-          }
+      for (final loc in locations) {
+        final key = loc.filePath;
+        if (key == absoluteCurrentFilePath) continue;
 
-          if (!PathUtils.isWithinOrEqual(root, key)) continue;
+        final isInvalid = fileStatusCache.putIfAbsent(
+          key,
+          () =>
+              (enablePhysicalFileCleanup &&
+                  !resourceProvider.getFile(key).exists) ||
+              (isFileExcluded?.call(key) ?? false),
+        );
 
-          // Verify tokenCount to guard against hash collisions.
-          if (loc.entry.tokenCount != entry.tokenCount) continue;
-
+        if (isInvalid) {
+          filesToRemove.add(key);
+        } else if (PathUtils.isWithinOrEqual(root, key) &&
+            // guard against hash collisions
+            loc.entry.tokenCount == entry.tokenCount) {
           duplicates.add(loc);
         }
       }
@@ -267,16 +236,15 @@ class GlobalHashRegistry {
       }
     }
 
-    if (filesToRemove.isNotEmpty) {
-      for (final file in filesToRemove) {
-        final oldEntry = _index[file];
-        if (oldEntry != null) {
-          _removeFromInvertedIndex(file, oldEntry.entries);
-        }
-        _index.remove(file);
+    if (filesToRemove.isEmpty) return matches;
+
+    for (final file in filesToRemove) {
+      if (_index.remove(file) case final oldEntry?) {
+        _removeFromInvertedIndex(file, oldEntry.entries);
       }
-      _scheduleSave(root, parameters);
     }
+
+    _scheduleSave(root, parameters);
 
     return matches;
   }
@@ -289,11 +257,9 @@ class GlobalHashRegistry {
   }) {
     final root = _getRoot(packageRoot);
     final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
-    final oldEntry = _index[absoluteFilePath];
-    if (oldEntry != null) {
+    if (_index.remove(absoluteFilePath) case final oldEntry?) {
       _removeFromInvertedIndex(absoluteFilePath, oldEntry.entries);
     }
-    _index.remove(absoluteFilePath);
     _scheduleSave(root, parameters);
   }
 
@@ -311,19 +277,17 @@ class GlobalHashRegistry {
   void _performSave(
     String packageRoot, [
     AvoidDuplicateCodeParameters? parameters,
-  ]) {
+  ]) => HashCacheStorage.save(
+    packageRoot,
     // Filter _index for files belonging to this packageRoot
-    final subset = <String, FileCacheEntry>{
-      for (final MapEntry(:key, :value) in _index.entries)
-        if (PathUtils.isWithinOrEqual(packageRoot, key)) key: value,
-    };
-
-    final params =
-        parameters ??
+    _index.entries.whereKey(
+      (k) => PathUtils.isWithinOrEqual(packageRoot, k),
+    ),
+    parameters ??
         _loadedRoots[packageRoot] ??
-        AvoidDuplicateCodeParameters.empty();
-    HashCacheStorage.save(packageRoot, subset, params, resourceProvider);
-  }
+        AvoidDuplicateCodeParameters.empty(),
+    resourceProvider,
+  );
 
   /// Clears the entire index and deletes the persistent cache file.
   ///
