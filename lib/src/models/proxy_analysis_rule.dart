@@ -17,11 +17,11 @@ class ProxyAnalysisRule extends AnalysisRule {
 
   /// Creates a new instance of [ProxyAnalysisRule].
   ProxyAnalysisRule(this.delegate, this.loader)
-      : super(
-          name: delegate.name,
-          description: delegate.description,
-          state: delegate.state,
-        );
+    : super(
+        name: delegate.name,
+        description: delegate.description,
+        state: delegate.state,
+      );
 
   @override
   DiagnosticCode get diagnosticCode => delegate.diagnosticCode;

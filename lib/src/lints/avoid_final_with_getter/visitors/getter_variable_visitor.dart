@@ -10,23 +10,22 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
 
   /// Creates a new instance of [GetterVariableVisitor]
   GetterVariableVisitor(MethodDeclaration getter)
-      : _getterId = getter.getterReferenceId;
+    : _getterId = getter.getterReferenceId;
 
   /// Is there a variable associated with the getter
   VariableDeclaration? get variable => _variable;
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
-    if (node
-        case VariableDeclaration(
-          declaredFragment: VariableFragment(
-            element: VariableElement(
-              isPrivate: true,
-              isFinal: true,
-              :final id,
-            )
-          )
-        ) when id == _getterId) {
+    if (node case VariableDeclaration(
+      declaredFragment: VariableFragment(
+        element: VariableElement(
+          isPrivate: true,
+          isFinal: true,
+          :final id,
+        ),
+      ),
+    ) when id == _getterId) {
       _variable = node;
     }
 

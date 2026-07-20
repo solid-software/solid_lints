@@ -58,11 +58,11 @@ class AvoidLateKeywordRule extends SolidLintRule<AvoidLateKeywordParameters> {
 
   /// Creates an instance of [AvoidLateKeywordRule].
   AvoidLateKeywordRule({required super.analysisOptionsLoader})
-      : super.withParameters(
-          name: lintName,
-          description: 'Warns against using the late keyword.',
-          parametersParser: AvoidLateKeywordParameters.fromJson,
-        );
+    : super.withParameters(
+        name: lintName,
+        description: 'Warns against using the late keyword.',
+        parametersParser: AvoidLateKeywordParameters.fromJson,
+      );
 
   @override
   LintCode get diagnosticCode => _code;

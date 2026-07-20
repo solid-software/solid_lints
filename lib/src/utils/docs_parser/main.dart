@@ -5,8 +5,9 @@ import 'package:solid_lints/src/utils/docs_parser/output_formatters/markdown_for
 import 'package:solid_lints/src/utils/docs_parser/parsers/docs_parser.dart';
 
 void main() async {
-  final dir =
-      Directory(normalize(join(Directory.current.path, 'lib', 'src', 'lints')));
+  final dir = Directory(
+    normalize(join(Directory.current.path, 'lib', 'src', 'lints')),
+  );
 
   final parser = DocsParser(
     formatter: MarkdownFormatter(),

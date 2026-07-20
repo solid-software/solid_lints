@@ -55,5 +55,4 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
 
     return formattedString.toString();
   }
-
 }

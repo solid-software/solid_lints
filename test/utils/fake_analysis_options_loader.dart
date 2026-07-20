@@ -14,8 +14,7 @@ class FakeAnalysisOptionsLoader implements AnalysisOptionsLoader {
   Map<String, Object?>? getRuleOptionsForFile(
     String filePath,
     String ruleName,
-  ) =>
-      ruleOptions;
+  ) => ruleOptions;
 
   @override
   void loadRulesOptionsFromContext(RuleContext context) {}

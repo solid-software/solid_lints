@@ -21,9 +21,7 @@ extension CorrectionUtilsExtension on CorrectionUtils {
   }) {
     if (node.end >= nextOffset) return null;
 
-    final sameLine = getTextRange(node.end, nextOffset)
-        .split('\n')
-        .first;
+    final sameLine = getTextRange(node.end, nextOffset).split('\n').first;
 
     final commentIdx = sameLine.indexOf('//');
 
@@ -55,7 +53,8 @@ extension CorrectionUtilsExtension on CorrectionUtils {
     required Token? leadingComment,
     required int minOffset,
   }) {
-    final hasValidComment = leadingComment != null &&
+    final hasValidComment =
+        leadingComment != null &&
         leadingComment.offset >= minOffset &&
         leadingComment.offset < node.offset;
 

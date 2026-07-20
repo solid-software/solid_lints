@@ -9,8 +9,9 @@ SimpleFormalParameter? findClosestBuildContext(AstNode node) {
     if (current is FunctionExpression) {
       final functionParams = current.parameters?.parameters ?? [];
       for (final param in functionParams) {
-        final actualParam =
-            param is DefaultFormalParameter ? param.parameter : param;
+        final actualParam = param is DefaultFormalParameter
+            ? param.parameter
+            : param;
         if (actualParam is SimpleFormalParameter &&
             isBuildContext(actualParam.declaredFragment?.element.type)) {
           return actualParam;

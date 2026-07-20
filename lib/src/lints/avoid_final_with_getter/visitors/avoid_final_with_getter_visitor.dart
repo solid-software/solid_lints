@@ -19,17 +19,16 @@ class AvoidFinalWithGetterVisitor extends RecursiveAstVisitor<void> {
   void visitMethodDeclaration(MethodDeclaration node) {
     super.visitMethodDeclaration(node);
 
-    if (node
-        case MethodDeclaration(
-          isGetter: true,
-          declaredFragment: ExecutableFragment(
-            element: ExecutableElement(
-              isAbstract: false,
-              isPublic: true,
-            )
-          ),
-          getterReferenceId: final getterId?,
-        )) {
+    if (node case MethodDeclaration(
+      isGetter: true,
+      declaredFragment: ExecutableFragment(
+        element: ExecutableElement(
+          isAbstract: false,
+          isPublic: true,
+        ),
+      ),
+      getterReferenceId: final getterId?,
+    )) {
       _gettersPairLookup[getterId] = node;
 
       if (_fieldsPairLookup.containsKey(getterId)) {
@@ -42,16 +41,15 @@ class AvoidFinalWithGetterVisitor extends RecursiveAstVisitor<void> {
   void visitVariableDeclaration(VariableDeclaration node) {
     super.visitVariableDeclaration(node);
 
-    if (node
-        case VariableDeclaration(
-          declaredFragment: VariableFragment(
-            element: VariableElement(
-              isPrivate: true,
-              isFinal: true,
-              id: final variableId,
-            )
-          )
-        )) {
+    if (node case VariableDeclaration(
+      declaredFragment: VariableFragment(
+        element: VariableElement(
+          isPrivate: true,
+          isFinal: true,
+          id: final variableId,
+        ),
+      ),
+    )) {
       _fieldsPairLookup[variableId] = node;
 
       if (_gettersPairLookup[variableId] case final getter?) {

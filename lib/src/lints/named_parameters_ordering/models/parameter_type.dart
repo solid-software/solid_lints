@@ -61,8 +61,8 @@ enum ParameterType {
         return ParameterType.defaultValue;
 
       case FieldFormalParameter(:final isRequired) ||
-            FunctionTypedFormalParameter(:final isRequired) ||
-            SimpleFormalParameter(:final isRequired):
+          FunctionTypedFormalParameter(:final isRequired) ||
+          SimpleFormalParameter(:final isRequired):
         return isRequired ? ParameterType.required : ParameterType.nullable;
     }
   }

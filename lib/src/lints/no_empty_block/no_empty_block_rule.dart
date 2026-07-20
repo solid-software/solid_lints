@@ -81,10 +81,10 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
   NoEmptyBlockRule({
     required super.analysisOptionsLoader,
   }) : super.withParameters(
-          name: lintName,
-          description: _code.problemMessage,
-          parametersParser: NoEmptyBlockParameters.fromJson,
-        );
+         name: lintName,
+         description: _code.problemMessage,
+         parametersParser: NoEmptyBlockParameters.fromJson,
+       );
 
   @override
   void registerNodeProcessors(
