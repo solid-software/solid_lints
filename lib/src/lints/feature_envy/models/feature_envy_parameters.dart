@@ -43,28 +43,12 @@ class FeatureEnvyParameters {
   );
 
   /// Creates a [FeatureEnvyParameters] model from JSON data.
-  factory FeatureEnvyParameters.fromJson(Map<String, Object?> json) {
-    final atfdThreshold = switch (json['atfd_threshold']) {
-      final int value => value,
-      _ => _defaultAtfdThreshold,
-    };
-
-    final laaThreshold = switch (json['laa_threshold']) {
-      final double value => value,
-      final int value => value.toDouble(),
-      _ => _defaultLaaThreshold,
-    };
-
-    final fdpThreshold = switch (json['fdp_threshold']) {
-      final int value => value,
-      _ => _defaultFdpThreshold,
-    };
-
-    return FeatureEnvyParameters(
-      exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
-      atfdThreshold: atfdThreshold,
-      laaThreshold: laaThreshold,
-      fdpThreshold: fdpThreshold,
-    );
-  }
+  factory FeatureEnvyParameters.fromJson(Map<String, Object?> json) =>
+      FeatureEnvyParameters(
+        exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
+        atfdThreshold: json['atfd_threshold'] as int? ?? _defaultAtfdThreshold,
+        laaThreshold:
+            (json['laa_threshold'] as num?)?.toDouble() ?? _defaultLaaThreshold,
+        fdpThreshold: json['fdp_threshold'] as int? ?? _defaultFdpThreshold,
+      );
 }

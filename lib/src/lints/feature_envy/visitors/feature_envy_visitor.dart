@@ -19,15 +19,16 @@ class FeatureEnvyVisitor extends SimpleAstVisitor<void> {
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
-    if (node.isStatic) return; // ignore static methods
-    if (node.body case EmptyFunctionBody()) return;
-    if (_parameters.exclude.shouldIgnore(node)) return;
+    if (node.isStatic ||
+        node.body is EmptyFunctionBody ||
+        _parameters.exclude.shouldIgnore(node)) {
+      return;
+    }
 
     final interfaceElement = node.declaredFragment?.element.enclosingElement;
-    if (interfaceElement is! InterfaceElement) return;
-
-    final classType = interfaceElement.thisType;
-    if (isWidgetOrSubclass(classType) || isWidgetStateOrSubclass(classType)) {
+    if (interfaceElement is! InterfaceElement ||
+        isWidgetOrSubclass(interfaceElement.thisType) ||
+        isWidgetStateOrSubclass(interfaceElement.thisType)) {
       return;
     }
 
@@ -44,14 +45,14 @@ class FeatureEnvyVisitor extends SimpleAstVisitor<void> {
       externalAccessCounts: accessVisitor.externalAccessCounts,
     );
 
-    if (metrics.exceedsThresholds(_parameters)) {
-      _rule.reportAtToken(
-        node.name,
-        arguments: [
-          metrics.maxEnvyElement?.name ?? '',
-          interfaceElement.name ?? '',
-        ],
-      );
-    }
+    if (!metrics.exceedsThresholds(_parameters)) return;
+
+    _rule.reportAtToken(
+      node.name,
+      arguments: [
+        metrics.maxEnvyElement?.name ?? '',
+        interfaceElement.name ?? '',
+      ],
+    );
   }
 }

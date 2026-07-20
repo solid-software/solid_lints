@@ -25,18 +25,16 @@ class MemberAccessVisitor extends RecursiveAstVisitor<void> {
   void visitSimpleIdentifier(SimpleIdentifier node) {
     super.visitSimpleIdentifier(node);
 
-    final element = node.element;
-    if (element == null || element is SetterElement) return;
+    if (node.element case final element?
+        when element is! SetterElement && element.isInstanceMember) {
+      if (MemberAccessUtils.isTargetOfExternalAccess(
+        node,
+        currentClass: _currentClass,
+        projectClassCache: _projectClassCache,
+      )) {
+        return;
+      }
 
-    if (MemberAccessUtils.isTargetOfExternalAccess(
-      node,
-      currentClass: _currentClass,
-      projectClassCache: _projectClassCache,
-    )) {
-      return;
-    }
-
-    if (element.isInstanceMember) {
       _processElement(
         element: element,
         target: node.memberAccessTarget,

@@ -11,23 +11,19 @@ abstract final class MemberAccessUtils {
     Expression? target, {
     required bool isPatternField,
   }) {
-    final unwrapped = target?.unwrapTarget;
-    final baseElement = switch (unwrapped) {
-      _ when isPatternField => null,
-      ExtensionOverride(
-        argumentList: ArgumentList(arguments: [final firstArg, ...]),
-      ) =>
-        firstArg.staticType?.element,
-      final expr? => expr.staticType?.element,
-      _ => null,
+    if (isPatternField || target == null) return null;
+
+    final baseElement = switch (target.unwrapTarget) {
+      ExtensionOverride(:final argumentList) =>
+        argumentList.arguments.firstOrNull?.staticType?.element,
+      final expr => expr?.staticType?.element,
     };
 
-    var resolved = baseElement?.resolveTypeParameter;
-    if (resolved case ExtensionElement(:final extendedType)) {
-      resolved = extendedType.element?.resolveTypeParameter;
-    }
-
-    return resolved;
+    return switch (baseElement?.resolveTypeParameter) {
+      ExtensionElement(:final extendedType) =>
+        extendedType.element?.resolveTypeParameter,
+      final resolved => resolved,
+    };
   }
 
   /// Checks if the access to [c] is considered internal to [currentClass].
@@ -36,20 +32,15 @@ abstract final class MemberAccessUtils {
     InterfaceElement c, {
     required InterfaceElement currentClass,
     bool isPatternField = false,
-  }) {
-    if (!currentClass.isSameOrSubclassOf(c)) return false;
-    if (target == null && isPatternField) return false;
-
-    final unwrapped = target?.unwrapTarget;
-
-    return switch (unwrapped) {
-      ExtensionOverride(
-        argumentList: ArgumentList(arguments: [final firstArg, ...]),
-      ) =>
-        firstArg.unwrapTarget.isThisOrSuper,
-      _ => unwrapped.isThisOrSuperOrNull,
-    };
-  }
+  }) =>
+      currentClass.isSameOrSubclassOf(c) &&
+      (target != null || !isPatternField) &&
+      switch (target?.unwrapTarget) {
+        ExtensionOverride(:final argumentList) =>
+          argumentList.arguments.firstOrNull?.unwrapTarget.isThisOrSuper ??
+              false,
+        final expr => expr.isThisOrSuperOrNull,
+      };
 
   /// Finds the highest level access expression that starts with [node].
   static Expression getAccessExpression(SimpleIdentifier node) =>
@@ -72,49 +63,30 @@ abstract final class MemberAccessUtils {
     required InterfaceElement currentClass,
     required ProjectClassCache projectClassCache,
   }) {
-    if (node.parent == null) return false;
-
-    final element = node.element;
-    if (element == null) return false;
-
-    final enclosing = element.enclosingInterface;
+    final enclosing = node.element?.enclosingInterface;
     if (enclosing == null || !currentClass.isSameOrSubclassOf(enclosing)) {
       return false;
     }
 
     final expr = getAccessExpression(node);
-    final exprParent = expr.parent;
-    if (exprParent == null) return false;
 
-    return switch (exprParent) {
+    bool isExternal(Element? e) => isExternalMember(
+      e,
+      currentClass: currentClass,
+      projectClassCache: projectClassCache,
+    );
+
+    return switch (expr.parent) {
       MethodInvocation(:final target, :final methodName) when target == expr =>
-        isExternalMember(
-          methodName.element,
-          currentClass: currentClass,
-          projectClassCache: projectClassCache,
-        ),
+        isExternal(methodName.element),
       PrefixedIdentifier(:final prefix, :final identifier)
           when prefix == expr =>
-        isExternalMember(
-          identifier.element,
-          currentClass: currentClass,
-          projectClassCache: projectClassCache,
-        ),
+        isExternal(identifier.element),
       PropertyAccess(:final target, :final propertyName) when target == expr =>
-        isExternalMember(
-          propertyName.element,
-          currentClass: currentClass,
-          projectClassCache: projectClassCache,
-        ),
+        isExternal(propertyName.element),
       CascadeExpression(:final target, :final cascadeSections)
           when target == expr =>
-        cascadeSections.any(
-          (s) => isExternalMember(
-            s.memberElement,
-            currentClass: currentClass,
-            projectClassCache: projectClassCache,
-          ),
-        ),
+        cascadeSections.any((s) => isExternal(s.memberElement)),
       _ => false,
     };
   }
@@ -124,12 +96,11 @@ abstract final class MemberAccessUtils {
     Element? element, {
     required InterfaceElement currentClass,
     required ProjectClassCache projectClassCache,
-  }) {
-    final enclosing = element?.enclosingInterface;
-    if (enclosing == null) return false;
-
-    return !currentClass.isSameOrSubclassOf(enclosing) &&
-        projectClassCache.isProjectClass(enclosing) &&
-        !enclosing.isDataClass;
-  }
+  }) => switch (element?.enclosingInterface) {
+    final enclosing? =>
+      !currentClass.isSameOrSubclassOf(enclosing) &&
+          !enclosing.isDataClass &&
+          projectClassCache.isProjectClass(enclosing),
+    _ => false,
+  };
 }

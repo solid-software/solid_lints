@@ -41,27 +41,17 @@ class FeatureEnvyMetrics {
     final laa = totalAccesses == 0 ? 1.0 : internalAccesses / totalAccesses;
     final fdp = externalAccessCounts.length;
 
-    int maxExternalCount = 0;
-    InterfaceElement? maxElement;
-
-    for (final MapEntry(:key, :value) in externalAccessCounts.entries) {
-      final isLarger = value > maxExternalCount;
-      final isTieWithSmallerName =
-          value == maxExternalCount &&
-          maxElement != null &&
-          (key.name ?? '').compareTo(maxElement.name ?? '') < 0;
-
-      if (isLarger || isTieWithSmallerName) {
-        maxExternalCount = value;
-        maxElement = key;
-      }
-    }
+    final maxEntry = externalAccessCounts.entries
+        .sorted((a, b) => b.value != a.value
+            ? b.value.compareTo(a.value)
+            : (a.key.name ?? '').compareTo(b.key.name ?? ''))
+        .firstOrNull;
 
     return FeatureEnvyMetrics._(
       laa: laa,
       fdp: fdp,
-      atfd: maxExternalCount,
-      maxEnvyElement: maxElement,
+      atfd: maxEntry?.value ?? 0,
+      maxEnvyElement: maxEntry?.key,
     );
   }
 }
