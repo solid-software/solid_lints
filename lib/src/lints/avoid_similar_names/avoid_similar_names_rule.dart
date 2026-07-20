@@ -59,8 +59,9 @@ class AvoidSimilarNamesRule extends SolidLintRule<void> {
   ) {
     final visitor = AvoidSimilarNamesVisitor(this);
 
-    registry.addMethodDeclaration(this, visitor);
-    registry.addConstructorDeclaration(this, visitor);
-    registry.addFunctionDeclaration(this, visitor);
+    registry
+      ..addMethodDeclaration(this, visitor)
+      ..addConstructorDeclaration(this, visitor)
+      ..addFunctionDeclaration(this, visitor);
   }
 }
