@@ -14,12 +14,12 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/jenkins_hasher.
 /// are considered clones.
 class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
   static final _typeNameCache = <Type, String>{};
+  static const _pipeAscii = 0x7C; // '|'
 
-  final JenkinsHasher _hasher = JenkinsHasher();
-
+  final _hasher = JenkinsHasher();
+  final _localVariableIds = <Element, int>{};
   final bool _ignoreLiterals;
   final bool _ignoreIdentifiers;
-  final Map<Element, int> _localVariableIds = {};
 
   /// Creates a new [AstStructuralHashVisitor].
   AstStructuralHashVisitor({
@@ -39,15 +39,13 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
     return _hasher.hash;
   }
 
-  void _append(String value) {
-    _hasher.addString(value);
-    _hasher.add(0x7C); // ASCII code for '|'
-  }
+  void _append(String value) => _hasher
+    ..addString(value)
+    ..add(_pipeAscii);
 
-  void _appendHash(int hashCode) {
-    _hasher.add(hashCode);
-    _hasher.add(0x7C); // ASCII code for '|'
-  }
+  void _appendHash(int hashCode) => _hasher
+    ..add(hashCode)
+    ..add(_pipeAscii);
 
   @override
   void visitNode(AstNode node) {
@@ -58,21 +56,15 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
     //
     // The result is cached in a static map to avoid repeated toString()
     // reflection calls during tree traversal.
-    final typeName = _typeNameCache.putIfAbsent(
-      node.runtimeType,
-      () => node.runtimeType.toString(),
-    );
-    _append(typeName);
+    final type = node.runtimeType;
+    _append(_typeNameCache.putIfAbsent(type, type.toString));
     node.visitChildren(this);
     _append('^');
   }
 
   @override
   void visitVariableDeclarationStatement(VariableDeclarationStatement node) {
-    final keyword = node.variables.keyword;
-    if (keyword != null) {
-      _append(keyword.lexeme);
-    }
+    if (node.variables.keyword?.lexeme case final l?) _append(l);
     super.visitVariableDeclarationStatement(node);
   }
 
@@ -102,15 +94,15 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitPrefixExpression(PrefixExpression node) {
-    if (_ignoreLiterals &&
-        (node.operator.type == TokenType.MINUS ||
-            node.operator.type == TokenType.PLUS) &&
-        (node.operand is IntegerLiteral || node.operand is DoubleLiteral)) {
+    if (node case PrefixExpression(
+      operator: Token(type: TokenType.MINUS || TokenType.PLUS),
+      operand: IntegerLiteral() || DoubleLiteral(),
+    ) when _ignoreLiterals) {
       node.operand.accept(this);
-      return;
+    } else {
+      _append(node.operator.lexeme);
+      super.visitPrefixExpression(node);
     }
-    _append(node.operator.lexeme);
-    super.visitPrefixExpression(node);
   }
 
   @override
@@ -183,34 +175,26 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (!_ignoreIdentifiers) {
-      _append(node.name);
-    } else {
+    final element = node.element;
+
+    switch (element) {
       // Smart ignore: ignore ONLY local variables and parameters.
       // This preserves field names, getters, methods, class names, etc.
-      final element = node.element;
-      if (element != null) {
-        if (element is LocalVariableElement ||
-            element is FormalParameterElement) {
-          // It is a local variable or parameter.
-          // Assign it a local ID (De Bruijn Indexing) to distinguish clones
-          // that wire their variables differently.
-          final id = _localVariableIds.putIfAbsent(
-            element,
+      case LocalVariableElement() || FormalParameterElement()
+          when _ignoreIdentifiers:
+        // It is a local variable or parameter.
+        // Assign it a local ID (De Bruijn Indexing) to distinguish clones
+        // that wire their variables differently.
+        _appendHash(
+          _localVariableIds.putIfAbsent(
+            element!,
             () => _localVariableIds.length,
-          );
-          _appendHash(id);
-        } else {
-          _append(node.name);
-        }
-      } else {
-        // Fallback for unresolved ASTs:
-        // When the IDE first opens a file, it may send an unresolved AST where
-        // element is null. To ensure the hash doesn't change drastically,
-        // we append the identifier name.
+          ),
+        );
+      default:
         _append(node.name);
-      }
     }
+
     super.visitSimpleIdentifier(node);
   }
 
