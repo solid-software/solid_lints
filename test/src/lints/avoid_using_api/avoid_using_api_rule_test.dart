@@ -5,7 +5,7 @@ import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart'
 import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
