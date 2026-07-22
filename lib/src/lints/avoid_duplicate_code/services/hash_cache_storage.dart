@@ -23,13 +23,6 @@ class HashCacheStorage {
   /// The current configuration parameters.
   final AvoidDuplicateCodeParameters currentParams;
 
-  /// Constructor for [HashCacheStorage].
-  HashCacheStorage({
-    required this.packageRoot,
-    required this.resourceProvider,
-    AvoidDuplicateCodeParameters? currentParams,
-  }) : currentParams = currentParams ?? AvoidDuplicateCodeParameters.empty();
-
   File get _file => resourceProvider.getFile(
     resourceProvider.pathContext.join(
       packageRoot,
@@ -37,6 +30,13 @@ class HashCacheStorage {
       _cacheFileName,
     ),
   );
+
+  /// Constructor for [HashCacheStorage].
+  HashCacheStorage({
+    required this.packageRoot,
+    required this.resourceProvider,
+    AvoidDuplicateCodeParameters? currentParams,
+  }) : currentParams = currentParams ?? AvoidDuplicateCodeParameters.empty();
 
   /// Loads the cached index from disk for [packageRoot].
   ///

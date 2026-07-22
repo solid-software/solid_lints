@@ -20,17 +20,18 @@ void main() {
 
     setUp(() {
       memoryResourceProvider = MemoryResourceProvider();
-      registry = GlobalHashRegistry.instance;
-      registry.resourceProvider = memoryResourceProvider;
-      registry.clear();
-      registry.enablePhysicalFileCleanup = false;
+      registry = GlobalHashRegistry.instance
+        ..resourceProvider = memoryResourceProvider
+        ..clear()
+        ..enablePhysicalFileCleanup = false;
     });
 
-    tearDown(() {
-      registry.clear();
-      registry.resourceProvider = PhysicalResourceProvider.INSTANCE;
-      registry.enablePhysicalFileCleanup = true;
-    });
+    tearDown(
+      () => registry
+        ..clear()
+        ..resourceProvider = PhysicalResourceProvider.INSTANCE
+        ..enablePhysicalFileCleanup = true,
+    );
 
     test('updateFile stores entries', () {
       final entries = [
