@@ -10,6 +10,7 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/models/file_cache_ent
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/hash_cache_storage.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/debouncer.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/hash_entry_list_extension.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/path_utils.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
 import 'package:solid_lints/src/utils/iterable_utils.dart';
@@ -56,32 +57,15 @@ class GlobalHashRegistry {
   String _getRoot(String? packageRoot) =>
       packageRoot ?? io.Directory.current.path;
 
-  void _addToInvertedIndex(String absoluteFilePath, List<HashEntry> entries) {
-    for (final entry in entries) {
-      _hashToLocations.add(
-        entry.hash,
-        DuplicateLocation(
-          entry: entry,
-          filePath: absoluteFilePath,
-        ),
-      );
-    }
-  }
+  void _addToInvertedIndex(
+    String absoluteFilePath,
+    List<HashEntry> entries,
+  ) => _hashToLocations.addAll(entries.asIndexEntries(absoluteFilePath));
 
   void _removeFromInvertedIndex(
     String absoluteFilePath,
     List<HashEntry> entries,
-  ) {
-    for (final entry in entries) {
-      _hashToLocations.remove(
-        entry.hash,
-        DuplicateLocation(
-          entry: entry,
-          filePath: absoluteFilePath,
-        ),
-      );
-    }
-  }
+  ) => _hashToLocations.removeAll(entries.asIndexEntries(absoluteFilePath));
 
   void _ensureLoaded(
     String packageRoot, [

@@ -4,7 +4,14 @@ class SetDictionary<K, V> {
 
   /// Adds a [value] to the set associated with the [key].
   void add(K key, V value) {
-    _map.putIfAbsent(key, () => {}).add(value);
+    (_map[key] ??= {}).add(value);
+  }
+
+  /// Adds all [entries] (key-value pairs) to the dictionary.
+  void addAll(Iterable<(K, V)> entries) {
+    for (final (key, value) in entries) {
+      add(key, value);
+    }
   }
 
   /// Removes a [value] from the set associated with the [key].
@@ -18,6 +25,13 @@ class SetDictionary<K, V> {
     set.remove(value);
     if (set.isEmpty) {
       _map.remove(key);
+    }
+  }
+
+  /// Removes all [entries] (key-value pairs) from the dictionary.
+  void removeAll(Iterable<(K, V)> entries) {
+    for (final (key, value) in entries) {
+      remove(key, value);
     }
   }
 
