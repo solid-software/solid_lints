@@ -4,6 +4,8 @@ import 'package:solid_lints/src/common/parameters/excluded_identifier_parameter.
 
 /// A model representing "exclude" parameters for linting, defining
 /// identifiers (classes, methods, functions) to be ignored during analysis.
+///
+/// @docType String | Map | List<String | Map>
 class ExcludedIdentifiersListParameter {
   /// A list of identifiers (classes, methods, functions) that should be
   /// excluded from the lint.
@@ -88,4 +90,17 @@ class ExcludedIdentifiersListParameter {
           classDeclaration.namePart.typeName.lexeme == className;
     }
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExcludedIdentifiersListParameter &&
+          const ListEquality<ExcludedIdentifierParameter>().equals(
+            other.exclude,
+            exclude,
+          );
+
+  @override
+  int get hashCode =>
+      const ListEquality<ExcludedIdentifierParameter>().hash(exclude);
 }

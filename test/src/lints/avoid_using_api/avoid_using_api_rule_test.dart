@@ -5,7 +5,7 @@ import 'package:solid_lints/src/lints/avoid_using_api/avoid_using_api_rule.dart'
 import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -395,5 +395,22 @@ void fn() {
     expect(diagnostics[1].severity.name, 'error');
     expect(diagnostics[2].severity.name, 'info');
     expect(diagnostics[3].severity.name, 'warning');
+  }
+
+  Future<void> test_does_not_crash_on_invalid_entry_types() async {
+    _configureRule('''
+          - "not_a_map"
+          - 123
+          - class_name: BadClass
+            source: package:my_dep/my_dep.dart
+    ''');
+
+    return assertAutoDiagnostics('''
+import 'package:my_dep/my_dep.dart';
+
+void fn() {
+  final ${expectLint('a')} = ${expectLint('BadClass')}();
+}
+''');
   }
 }

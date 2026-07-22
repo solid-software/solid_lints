@@ -73,22 +73,22 @@ import 'package:solid_lints/src/lints/newline_before_return/visitors/newline_bef
 /// }
 /// ```
 class NewlineBeforeReturnRule extends AnalysisRule {
-  /// The name of the lint rule.
-  static const String _lintName = 'newline_before_return';
+  /// The lint rule name. Must be public to generate docs.
+  static const String lintName = 'newline_before_return';
 
   /// The message shown when the lint is triggered.
   static const String _lintMessage = 'Missing blank line before return.';
 
   /// Lint code for this rule.
   static const LintCode _code = LintCode(
-    _lintName,
+    lintName,
     _lintMessage,
   );
 
   /// Creates a new instance of [NewlineBeforeReturnRule].
   NewlineBeforeReturnRule()
     : super(
-        name: _lintName,
+        name: lintName,
         description: _lintMessage,
       );
 

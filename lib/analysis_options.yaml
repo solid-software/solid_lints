@@ -1,6 +1,4 @@
 analyzer:
-  plugins:
-    - custom_lint
   exclude:
     # General generated files
     - "**/*.g.dart"
@@ -38,6 +36,12 @@ analyzer:
 solid_lints:
   diagnostics:
     avoid_global_state: true
+    avoid_duplicate_code:
+      min_tokens: 30
+      check_blocks: true
+      exclude:
+        - method_name: initState
+        - method_name: dispose
 
     avoid_late_keyword:
       allow_initialized: true
@@ -48,6 +52,7 @@ solid_lints:
         - IMap
         - BuiltMap
     avoid_returning_widgets: true
+    avoid_similar_names: true
     avoid_unnecessary_return_variable: true
     avoid_unnecessary_setstate: true
     avoid_unnecessary_type_assertions: true
@@ -107,6 +112,7 @@ solid_lints:
     proper_super_calls: true
     named_parameters_ordering: true
     use_nearest_context: true
+    use_descriptive_names_for_type_parameters: true
 
 linter:
   rules:

@@ -83,7 +83,8 @@ class ProperSuperCallsVisitor extends SimpleAstVisitor<void> {
   }
 
   bool _isStateSubclass(InterfaceType supertype) {
-    final isStateSubclass = supertype.element.name == _flutterStateClass ||
+    final isStateSubclass =
+        supertype.element.name == _flutterStateClass ||
         supertype.allSupertypes.any(
           (t) => t.element.name == _flutterStateClass,
         );

@@ -61,11 +61,11 @@ class ProperSuperCallsRule extends AnalysisRule {
 
   /// Creates an instance of [ProperSuperCallsRule].
   ProperSuperCallsRule()
-      : super(
-          name: lintName,
-          description:
-              'Ensures proper ordering of Flutter lifecycle super calls.',
-        );
+    : super(
+        name: lintName,
+        description:
+            'Ensures proper ordering of Flutter lifecycle super calls.',
+      );
 
   @override
   LintCode get diagnosticCode => superInitStateCode;

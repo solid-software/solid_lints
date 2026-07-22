@@ -43,10 +43,10 @@ class PreferEarlyReturnRule extends AnalysisRule {
 
   /// Creates an instance of [PreferEarlyReturnRule]
   PreferEarlyReturnRule()
-      : super(
-          name: lintName,
-          description: 'Use reverse if to reduce nesting',
-        );
+    : super(
+        name: lintName,
+        description: 'Use reverse if to reduce nesting',
+      );
 
   @override
   LintCode get diagnosticCode => _code;

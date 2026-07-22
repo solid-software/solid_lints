@@ -51,3 +51,6 @@ solid_lints:
     avoid_late_keyword: false
 # It's acceptable to include stubs or other helper classes into the test file.
     prefer_match_file_name: false
+# Test files inherently contain a lot of duplicated setups, teardowns, and mock structures.
+# Running duplicate code detection on them usually produces a lot of noise.
+    avoid_duplicate_code: false

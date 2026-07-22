@@ -1,51 +1,59 @@
 import 'dart:io';
 
-import 'package:analyzer/dart/analysis/features.dart';
-import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:collection/collection.dart';
 import 'package:solid_lints/src/utils/docs_parser/models/rule_doc.dart';
-import 'package:solid_lints/src/utils/docs_parser/parsers/base_parser.dart';
 import 'package:solid_lints/src/utils/docs_parser/parsers/parameters_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_extensions.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
-///
-class RuleParser extends BaseParser {
-  static const _lintNameVariable = 'lintName';
-
+/// RuleParser class to parse lint rules
+class RuleParser {
   /// Path to the rule file
   final String rulePath;
 
+  /// Global map of custom types to their primitives
+  final Map<String, String> customTypes;
+
+  /// Global map of template definitions
+  final Map<String, String> templates;
+
   /// [RuleParser] constructor
-  const RuleParser(this.rulePath);
+  const RuleParser({
+    required this.rulePath,
+    required this.customTypes,
+    required this.templates,
+  });
 
   ///
   RuleDoc parse() {
-    final ast = parseFile(
-      path: rulePath,
-      featureSet: FeatureSet.latestLanguageVersion(),
-    );
-    final declaration =
-        ast.unit.declarations.whereType<ClassDeclaration>().firstWhereOrNull(
-              (declaration) =>
-                  declaration.documentationComment?.childEntities.isNotEmpty ??
-                  false,
-            );
+    final ast = ParserUtils.parseAst(rulePath);
 
-    if (declaration == null) {
+    ClassDeclaration? ruleClass;
+    String? name;
+
+    for (final declaration in ast.declarations.whereType<ClassDeclaration>()) {
+      final parsedName = ParserUtils.getLintName(declaration);
+      if (parsedName != null) {
+        ruleClass = declaration;
+        name = parsedName;
+        break;
+      }
+    }
+
+    if (ruleClass == null || name == null) {
+      throw 'Rule class with "lintName" not found in "$rulePath".';
+    }
+
+    var doc = ruleClass.documentationComment.formatted;
+    if (doc == null) {
       throw 'Rule at the path "$rulePath" does not have documentation string';
     }
 
-    final name = _parseClassName(declaration);
-    final doc = formatDocumentationComment(
-      declaration.documentationComment,
-    );
-
-    if (name == null || doc == null) {
-      throw 'Rule at the path "$rulePath" has invalid format.';
-    }
+    doc = ParserUtils.expandMacros(doc, templates, source: rulePath);
 
     final parameters = ParametersParser(
       ruleDirectory: File(rulePath).parent,
+      customTypes: customTypes,
     ).parse();
 
     return RuleDoc(
@@ -53,21 +61,5 @@ class RuleParser extends BaseParser {
       doc: doc,
       parameters: parameters,
     );
-  }
-
-  String? _parseClassName(ClassDeclaration classDeclaration) {
-    for (final member in classDeclaration.members) {
-      if (member is FieldDeclaration &&
-          member.isStatic &&
-          member.fields.variables.first.name.lexeme == _lintNameVariable) {
-        final variableName = member.fields.variables.first.initializer;
-
-        if (variableName is StringLiteral) {
-          return variableName.stringValue;
-        }
-      }
-    }
-
-    return null;
   }
 }

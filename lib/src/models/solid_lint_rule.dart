@@ -15,8 +15,8 @@ abstract class SolidLintRule<T extends Object?> extends AnalysisRule {
     required super.name,
     required super.description,
     super.state,
-  })  : _analysisOptionsLoader = null,
-        _parametersParser = null;
+  }) : _analysisOptionsLoader = null,
+       _parametersParser = null;
 
   /// Constructor for [SolidLintRule] model with parameters.
   SolidLintRule.withParameters({
@@ -25,15 +25,17 @@ abstract class SolidLintRule<T extends Object?> extends AnalysisRule {
     required super.name,
     required super.description,
     super.state,
-  })  : _analysisOptionsLoader = analysisOptionsLoader,
-        _parametersParser = parametersParser;
+  }) : _analysisOptionsLoader = analysisOptionsLoader,
+       _parametersParser = parametersParser;
 
   /// Reads the rule parameters from analysis options and parses them to [T]
   T? getParametersForContext(RuleContext context) {
     _analysisOptionsLoader?.loadRulesOptionsFromContext(context);
 
-    final unparsedParameters =
-        _analysisOptionsLoader?.getRuleOptions(context, name);
+    final unparsedParameters = _analysisOptionsLoader?.getRuleOptions(
+      context,
+      name,
+    );
     if (unparsedParameters == null) return null;
 
     return _parametersParser?.call(unparsedParameters);
