@@ -29,16 +29,15 @@ class AvoidFinalWithGetterFix extends ResolvedCorrectionProducer {
   @override
   Future<void> compute(ChangeBuilder builder) async {
     final getterNode = node;
-    if (getterNode
-        case MethodDeclaration(
-          isGetter: true,
-          declaredFragment: ExecutableFragment(
-            element: GetterElement(
-              isAbstract: false,
-              isPublic: true,
-            ),
-          ),
-        )) {
+    if (getterNode case MethodDeclaration(
+      isGetter: true,
+      declaredFragment: ExecutableFragment(
+        element: GetterElement(
+          isAbstract: false,
+          isPublic: true,
+        ),
+      ),
+    )) {
       final compilationUnit = node.thisOrAncestorOfType<CompilationUnit>();
       if (compilationUnit == null) return;
 

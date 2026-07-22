@@ -47,3 +47,20 @@ extension MapEntryIterableExtension<K, V> on Iterable<MapEntry<K, V>> {
       if (test(entry.key)) entry.key: entry.value,
   };
 }
+
+/// Extension on [Iterable] to zip elements with another iterable.
+extension IterableZip<T> on Iterable<T> {
+  /// Zips this iterable with [other].
+  Iterable<(T, U)> zipWith<U>(Iterable<U> other) sync* {
+    for (var i = 0; i < length && i < other.length; i++) {
+      yield (elementAt(i), other.elementAt(i));
+    }
+  }
+
+  /// Zips this iterable with [other] and includes the index.
+  Iterable<(int, T, U)> zipWithIndexed<U>(Iterable<U> other) sync* {
+    for (var i = 0; i < length && i < other.length; i++) {
+      yield (i, elementAt(i), other.elementAt(i));
+    }
+  }
+}

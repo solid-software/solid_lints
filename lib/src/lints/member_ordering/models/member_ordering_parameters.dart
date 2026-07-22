@@ -56,11 +56,11 @@ class MemberOrderingParameters {
 
   /// Factory for creating empty/default parameters.
   factory MemberOrderingParameters.empty() => MemberOrderingParameters(
-        groupsOrder: MemberOrderingConfigParser.parseOrder(null),
-        widgetsGroupsOrder: MemberOrderingConfigParser.parseWidgetsOrder(null),
-        alphabetize: false,
-        alphabetizeByType: false,
-      );
+    groupsOrder: MemberOrderingConfigParser.parseOrder(null),
+    widgetsGroupsOrder: MemberOrderingConfigParser.parseWidgetsOrder(null),
+    alphabetize: false,
+    alphabetizeByType: false,
+  );
 
   /// Method for creating from json data
   factory MemberOrderingParameters.fromJson(Map<String, Object?> json) =>

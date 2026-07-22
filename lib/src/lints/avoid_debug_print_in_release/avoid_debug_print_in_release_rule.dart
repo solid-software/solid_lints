@@ -43,7 +43,7 @@ class AvoidDebugPrintInReleaseRule extends AnalysisRule {
 
   /// Creates an instance of [AvoidDebugPrintInReleaseRule].
   AvoidDebugPrintInReleaseRule()
-      : super(name: lintName, description: 'Avoid debugPrint in release mode.');
+    : super(name: lintName, description: 'Avoid debugPrint in release mode.');
 
   @override
   LintCode get diagnosticCode => _code;

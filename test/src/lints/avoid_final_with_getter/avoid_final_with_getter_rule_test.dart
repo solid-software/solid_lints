@@ -2,7 +2,7 @@ import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/avoid_final_with_getter_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {

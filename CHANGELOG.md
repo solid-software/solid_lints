@@ -5,6 +5,7 @@
   `unnecessary_cast`
 - Added `use_nearest_context` rule.
 - Added `avoid_duplicate_code` rule.
+- Added `use_descriptive_names_for_type_parameters` rule.
 
 ## 0.3.3
 

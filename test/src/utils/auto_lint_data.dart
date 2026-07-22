@@ -1,5 +1,7 @@
 import 'package:analyzer_testing/src/analysis_rule/pub_package_resolution.dart';
 
+/// Holds data about a lint placeholder, including the original code
+/// and optional diagnostic assertions.
 class AutoLintData {
   final String code;
   final Pattern? correctionContains;

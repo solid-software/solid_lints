@@ -125,10 +125,10 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   NoMagicNumberRule({
     required super.analysisOptionsLoader,
   }) : super.withParameters(
-          name: lintName,
-          description: 'Forbids having numbers without variable.',
-          parametersParser: NoMagicNumberParameters.fromJson,
-        );
+         name: lintName,
+         description: 'Forbids having numbers without variable.',
+         parametersParser: NoMagicNumberParameters.fromJson,
+       );
 
   @override
   void registerNodeProcessors(

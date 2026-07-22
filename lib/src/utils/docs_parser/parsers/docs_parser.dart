@@ -1,12 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:solid_lints/src/utils/docs_parser/output_formatters/rules_documentation_formatter.dart';
-import 'package:solid_lints/src/utils/docs_parser/parsers/base_parser.dart';
 import 'package:solid_lints/src/utils/docs_parser/parsers/rule_parser.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_extensions.dart';
+import 'package:solid_lints/src/utils/docs_parser/utils/parser_utils.dart';
 
-///
-class DocsParser<T> extends BaseParser {
+/// DocsParser orchestration class
+class DocsParser<T> {
   ///
   final List<String> ruleFileSuffixes;
 
@@ -21,35 +23,48 @@ class DocsParser<T> extends BaseParser {
 
   ///
   T parse(Directory dir, {bool sortRulesAlphabetically = true}) {
-    final rulesDocs = _findRuleFiles(dir)
-        .map(RuleParser.new)
-        .map((parser) => parser.parse())
-        .toList(growable: false);
+    final files = dir
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where(
+          (f) => ruleFileSuffixes.contains(ParserUtils.fileNameSuffix(f.uri)),
+        )
+        .map((file) => file.path)
+        .toList();
 
-    if (rulesDocs.isEmpty) {
-      throw 'Found no rules in specified directory';
-    }
-    log('Parsed ${rulesDocs.length} rules');
+    if (files.isEmpty) throw 'Found no rules in specified directory';
+
+    final libDir = ParserUtils.findLibDir(dir);
+
+    final customTypes = {
+      'DiagnosticSeverity': 'String',
+      for (final entity in libDir.listSync(recursive: true))
+        if (entity case File(hasDocStrings: true, :final declarations?))
+          for (final declaration in declarations)
+            if (declaration case CompilationUnitMember(
+              :final name?,
+              :final type?,
+            ))
+              name: type.trim(),
+    };
+
+    final templates = ParserUtils.scanForTemplates(libDir);
+
+    final docs = [
+      for (final path in files)
+        RuleParser(
+          rulePath: path,
+          customTypes: customTypes,
+          templates: templates,
+        ).parse(),
+    ];
+
+    log('Parsed ${docs.length} rules');
 
     if (sortRulesAlphabetically) {
-      rulesDocs.sort((a, b) => a.name.compareTo(b.name));
+      docs.sort((a, b) => a.name.compareTo(b.name));
     }
 
-    return formatter.format(rulesDocs);
-  }
-
-  List<String> _findRuleFiles(Directory dir) {
-    final rulesPaths = <String>[];
-    for (final entity in dir.listSync()) {
-      if (entity is File) {
-        if (ruleFileSuffixes.contains(fileNameSuffix(entity.uri))) {
-          rulesPaths.add(entity.path);
-        }
-      } else if (entity is Directory) {
-        rulesPaths.addAll(_findRuleFiles(entity));
-      }
-    }
-
-    return rulesPaths;
+    return formatter.format(docs);
   }
 }

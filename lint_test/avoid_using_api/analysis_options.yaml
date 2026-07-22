@@ -1,7 +1,0 @@
-analyzer:
-  plugins:
-    - ../custom_lint
-
-custom_lint:
-  rules:
-    - avoid_using_api:

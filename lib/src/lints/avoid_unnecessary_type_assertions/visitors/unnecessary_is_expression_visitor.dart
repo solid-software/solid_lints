@@ -8,7 +8,9 @@ import 'package:solid_lints/src/utils/typecast_utils.dart';
 ///
 /// ### Example:
 /// {@template solid_lints.avoid_unnecessary_type_assertions.example_is}
-/// #### BAD:
+/// #### `is` operator
+///
+/// ##### BAD:
 /// ```dart
 /// final testList = [1.0, 2.0, 3.0];
 /// final result = testList is List<double>; // LINT
@@ -18,7 +20,7 @@ import 'package:solid_lints/src/utils/typecast_utils.dart';
 /// final casted = d is double; // LINT
 /// ```
 ///
-/// #### GOOD:
+/// ##### GOOD:
 /// ```dart
 /// final double? nullableD = 2.0;
 /// // casting `Type? is Type` is allowed

@@ -43,8 +43,8 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
     final returnType = switch (node) {
       Declaration(
         declaredFragment: ExecutableFragment(
-          element: ExecutableElement(type: FunctionType(:final returnType))
-        )
+          element: ExecutableElement(type: FunctionType(:final returnType)),
+        ),
       ) =>
         returnType,
       MethodDeclaration(returnType: TypeAnnotation(:final type)) => type,
@@ -70,8 +70,8 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
         declaredFragment: Fragment(
           element: Element(
             name: final String name,
-            enclosingElement: final InterfaceElement enclosingElement
-          )
+            enclosingElement: final InterfaceElement enclosingElement,
+          ),
         ),
       ) =>
         enclosingElement.getInheritedMember(

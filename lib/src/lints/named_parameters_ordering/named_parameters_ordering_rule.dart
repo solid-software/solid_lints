@@ -1,9 +1,11 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/named_parameters_ordering/fixes/named_parameters_ordering_fix.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/named_parameters_ordering_parameters.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/models/parameter_type.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/visitors/named_parameters_ordering_visitor.dart';
+import 'package:solid_lints/src/models/rule_with_fixes.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A lint which allows to enforce a particular named parameter ordering
@@ -102,7 +104,8 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 class NamedParametersOrderingRule
-    extends SolidLintRule<NamedParametersOrderingParameters> {
+    extends SolidLintRule<NamedParametersOrderingParameters>
+    implements RuleWithFixes {
   /// The name of this lint rule.
   static const lintName = 'named_parameters_ordering';
 
@@ -111,9 +114,6 @@ class NamedParametersOrderingRule
     lintName,
     '{0} named parameters should be before {1} named parameters.',
   );
-
-  @override
-  LintCode get diagnosticCode => code;
 
   /// Creates a new instance of [NamedParametersOrderingRule].
   NamedParametersOrderingRule({
@@ -125,6 +125,14 @@ class NamedParametersOrderingRule
              'ordering conventions.',
          parametersParser: NamedParametersOrderingParameters.fromJson,
        );
+
+  @override
+  LintCode get diagnosticCode => code;
+
+  @override
+  FixesForCodes get fixesForCodes => const [
+    MapEntry(code, NamedParametersOrderingFix.new),
+  ];
 
   @override
   void registerNodeProcessors(

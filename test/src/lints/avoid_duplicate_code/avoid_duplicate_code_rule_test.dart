@@ -9,7 +9,7 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {

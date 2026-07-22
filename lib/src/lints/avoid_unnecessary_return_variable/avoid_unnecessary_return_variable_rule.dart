@@ -30,8 +30,8 @@ import 'package:solid_lints/src/lints/avoid_unnecessary_return_variable/visitors
 /// ```
 ///
 class AvoidUnnecessaryReturnVariableRule extends AnalysisRule {
-  /// The name of the lint rule.
-  static const _lintName = 'avoid_unnecessary_return_variable';
+  /// The lint rule name. Must be public to generate docs.
+  static const lintName = 'avoid_unnecessary_return_variable';
 
   /// The message shown when the lint is triggered.
   static const String _lintMessage = """
@@ -40,14 +40,14 @@ Rewrite the variable evaluation into return statement instead.""";
 
   /// Lint code.
   static const LintCode _code = LintCode(
-    _lintName,
+    lintName,
     _lintMessage,
   );
 
   /// Creates a new instance of [AvoidUnnecessaryReturnVariableRule]
   AvoidUnnecessaryReturnVariableRule()
     : super(
-        name: _lintName,
+        name: lintName,
         description: _lintMessage,
       );
 

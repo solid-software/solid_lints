@@ -17,7 +17,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///       function_lines_of_code:
 ///         max_lines: 100
 ///         exclude:
-///           - "Build"
+///           - build
 /// ```
 class FunctionLinesOfCodeRule
     extends SolidLintRule<FunctionLinesOfCodeParameters> {

@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -24,17 +24,14 @@ jobs:
         run: dart format . --set-exit-if-changed
 
       - name: Run default analyzer
-        run: flutter analyze
-
-      - name: Run custom analyzer
-        run: dart run custom_lint
+        run: dart analyze
 
       - name: Run tests
         run: |
           # run tests if `test` folder exists
           if [ -d test ]
           then
-              flutter test -r expanded
+              dart test -r expanded
           else
               echo "Tests not found."
           fi
