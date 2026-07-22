@@ -75,6 +75,10 @@ extension Subtypes on DartType {
 
     return false;
   }
+
+  /// Compares this type with [other] ignoring nullability where applicable.
+  bool isDifferentIgnoringNullability(DartType? other) =>
+      other != null && (element ?? this) != (other.element ?? other);
 }
 
 extension TypeString on String {
