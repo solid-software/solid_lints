@@ -20,28 +20,18 @@ class AvoidSimilarNamesVisitor extends SimpleAstVisitor<void> {
   AvoidSimilarNamesVisitor(this._rule);
 
   @override
-  void visitMethodDeclaration(
-    MethodDeclaration node,
-  ) {
-    _checkScope(node.parameters, node.body);
-  }
+  void visitMethodDeclaration(MethodDeclaration node) =>
+      _checkScope(node.parameters, node.body);
 
   @override
-  void visitConstructorDeclaration(
-    ConstructorDeclaration node,
-  ) {
-    _checkScope(node.parameters, node.body);
-  }
+  void visitConstructorDeclaration(ConstructorDeclaration node) =>
+      _checkScope(node.parameters, node.body);
 
   @override
-  void visitFunctionDeclaration(
-    FunctionDeclaration node,
-  ) {
-    _checkScope(
-      node.functionExpression.parameters,
-      node.functionExpression.body,
-    );
-  }
+  void visitFunctionDeclaration(FunctionDeclaration node) => _checkScope(
+    node.functionExpression.parameters,
+    node.functionExpression.body,
+  );
 
   void _checkScope(
     FormalParameterList? parameters,
@@ -51,12 +41,10 @@ class AvoidSimilarNamesVisitor extends SimpleAstVisitor<void> {
     _collector.variables.clear();
     body.accept(_collector);
 
-    final variables = [
+    _compareVariables([
       ..._extractParameters(parameters),
       ..._collector.variables,
-    ];
-
-    _compareVariables(variables);
+    ]);
     _reportedNodes.clear();
   }
 
@@ -74,9 +62,7 @@ class AvoidSimilarNamesVisitor extends SimpleAstVisitor<void> {
           variable,
   ];
 
-  void _compareVariables(
-    List<ScopeVariable> variables,
-  ) {
+  void _compareVariables(List<ScopeVariable> variables) {
     for (var i = 0; i < variables.length; i++) {
       for (var j = i + 1; j < variables.length; j++) {
         _comparePair(variables[i], variables[j]);
