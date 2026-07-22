@@ -90,4 +90,17 @@ class ExcludedIdentifiersListParameter {
           classDeclaration.namePart.typeName.lexeme == className;
     }
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExcludedIdentifiersListParameter &&
+          const ListEquality<ExcludedIdentifierParameter>().equals(
+            other.exclude,
+            exclude,
+          );
+
+  @override
+  int get hashCode =>
+      const ListEquality<ExcludedIdentifierParameter>().hash(exclude);
 }

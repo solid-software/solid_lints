@@ -26,6 +26,28 @@ extension IterablePairwise<T> on Iterable<T> {
   }
 }
 
+/// Extension on [Iterable] that provides a [tryMap] method.
+extension IterableTryMap<T> on Iterable<T> {
+  /// Maps each element using [f], catching exceptions and returning null for
+  /// those elements.
+  Iterable<U?> tryMap<U>(U Function(T) f) => map((e) {
+    try {
+      return f(e);
+    } catch (_) {
+      return null;
+    }
+  });
+}
+
+/// Extension on [Iterable] of [MapEntry] to filter and convert to [Map].
+extension MapEntryIterableExtension<K, V> on Iterable<MapEntry<K, V>> {
+  /// Filters entries by key and returns a new [Map].
+  Map<K, V> whereKey(bool Function(K key) test) => {
+    for (final entry in this)
+      if (test(entry.key)) entry.key: entry.value,
+  };
+}
+
 /// Extension on [Iterable] to zip elements with another iterable.
 extension IterableZip<T> on Iterable<T> {
   /// Zips this iterable with [other].

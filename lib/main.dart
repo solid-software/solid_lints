@@ -4,6 +4,7 @@ import 'package:analyzer/analysis_rule/analysis_rule.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/common/solid_lints_constants.dart';
 import 'package:solid_lints/src/lints/avoid_debug_print_in_release/avoid_debug_print_in_release_rule.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/avoid_final_with_getter_rule.dart';
 import 'package:solid_lints/src/lints/avoid_global_state/avoid_global_state_rule.dart';
 import 'package:solid_lints/src/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
@@ -58,6 +59,7 @@ class SolidLintsPlugin extends Plugin {
 
     final lintRules = [
       AvoidDebugPrintInReleaseRule(),
+      AvoidDuplicateCodeRule(analysisOptionsLoader: analysisLoader),
       AvoidFinalWithGetterRule(),
       AvoidGlobalStateRule(),
       AvoidLateKeywordRule(analysisOptionsLoader: analysisLoader),
