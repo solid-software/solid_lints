@@ -52,6 +52,7 @@ solid_lints:
         - IMap
         - BuiltMap
     avoid_returning_widgets: true
+    avoid_similar_names: true
     avoid_unnecessary_return_variable: true
     avoid_unnecessary_setstate: true
     avoid_unnecessary_type_assertions: true
@@ -67,6 +68,10 @@ solid_lints:
       max_complexity: 10
 
     double_literal_format: true
+    feature_envy:
+      atfd_threshold: 4
+      laa_threshold: 0.33
+      fdp_threshold: 2
 
     function_lines_of_code:
       max_lines: 200

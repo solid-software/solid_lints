@@ -87,6 +87,63 @@ extension TypeString on String {
   String replaceGenericString() => replaceFirst(_genericRegex, '');
 }
 
+extension _PropertyAccessorElementExt on PropertyAccessorElement {
+  bool get isPublicInstanceOrigin =>
+      isPublic && !isStatic && isOriginDeclaration;
+}
+
+extension _PropertyAccessorsExt on Iterable<PropertyAccessorElement> {
+  Iterable<String> get publicInstanceMemberNames =>
+      where((e) => e.isPublicInstanceOrigin).map((e) => e.displayName);
+}
+
+extension InterfaceElementExt on InterfaceElement {
+  /// Checks whether this element is the same as or a subclass of [superType].
+  bool isSameOrSubclassOf(InterfaceElement superType) =>
+      this == superType ||
+      allSupertypes.any((type) => type.element == superType);
+
+  /// Checks if a class is a Data Class based on Weight of Class.
+  bool get isDataClass {
+    const dataClassWeightThreshold = 0.33;
+
+    final elements = [
+      this,
+      ...allSupertypes.where((s) => !s.isDartCoreObject).map((s) => s.element),
+    ];
+
+    final publicProperties = {
+      for (final el in elements) ...[
+        ...el.getters.publicInstanceMemberNames.toSet().difference({
+          'hashCode',
+          'runtimeType',
+        }),
+        ...el.setters.publicInstanceMemberNames,
+      ],
+    };
+
+    final publicMethods = elements
+        .expand((e) => e.methods)
+        .where((m) => m.isPublic && !m.isStatic)
+        .map((m) => m.name)
+        .nonNulls
+        .toSet()
+        .difference({
+          'toString',
+          '==',
+          'copyWith',
+          'toJson',
+          'noSuchMethod',
+        });
+
+    final totalMembers = publicProperties.length + publicMethods.length;
+    if (totalMembers == 0) return true;
+
+    final weightOfClass = publicMethods.length / totalMembers;
+    return weightOfClass < dataClassWeightThreshold;
+  }
+}
+
 bool hasWidgetType(DartType type) =>
     (isWidgetOrSubclass(type) ||
         _isIterable(type) ||

@@ -21,11 +21,21 @@ dev_dependencies:
 
 Enable the plugin and include `solid_lints` in your project's top-level `analysis_options.yaml`:
 
+### Option 1: Using the `plugins` block
+
 ```yaml
 include: package:solid_lints/analysis_options.yaml
 
 plugins:
   solid_lints:
+```
+
+### Option 2: Using the top-level `solid_lints` block
+
+```yaml
+include: package:solid_lints/analysis_options.yaml
+
+solid_lints:
 ```
 
 Also, you can use a specialized rule set designed for Dart tests.
@@ -43,9 +53,25 @@ dart analyze;
 
 # Configuration
 
-You can customize individual rule settings in your `analysis_options.yaml` under the `solid_lints` configuration block:
+You can customize individual rule settings in your `analysis_options.yaml`.
+
+### Option 1: Inside the `plugins` block (Recommended)
 
 ```yaml
+plugins:
+  solid_lints:
+    diagnostics:
+      cyclomatic_complexity:
+        max_complexity: 10
+      avoid_non_null_assertion: true
+```
+
+### Option 2: Separate top-level `solid_lints` block
+
+```yaml
+plugins:
+  solid_lints:
+
 solid_lints:
   diagnostics:
     cyclomatic_complexity:
