@@ -190,8 +190,8 @@ extension ElementExtension on Element {
 
   /// Checks whether this element is a non-static instance member.
   bool get isInstanceMember => switch (this) {
-    PropertyAccessorElement(:final isStatic) => !isStatic,
-    MethodElement(:final isStatic) => !isStatic,
+    PropertyAccessorElement(:final isStatic) ||
+    MethodElement(:final isStatic) ||
     FieldElement(:final isStatic) => !isStatic,
     _ => false,
   };
@@ -212,15 +212,14 @@ extension ElementExtension on Element {
 
   /// Returns the enclosing [InterfaceElement] of this element (recursively),
   /// or null if none.
-  InterfaceElement? get enclosingInterface {
-    Element? current = this;
-    while (current != null) {
-      if (current case InterfaceElement()) {
-        return current;
-      }
-      current = current.enclosingElement;
+  InterfaceElement? get enclosingInterface =>
+      enclosingElements.whereType<InterfaceElement>().firstOrNull;
+
+  /// Returns an iterable of this element and all its enclosing elements.
+  Iterable<Element> get enclosingElements sync* {
+    for (Element? e = this; e != null; e = e.enclosingElement) {
+      yield e;
     }
-    return null;
   }
 
   /// Resolves type parameters to their bounds recursively to prevent cycle
@@ -276,12 +275,12 @@ extension ExpressionExtension on Expression {
   Element? get memberElement => switch (this) {
     MethodInvocation(:final methodName) => methodName.element,
     PropertyAccess(:final propertyName) => propertyName.element,
-    AssignmentExpression(:final writeElement, :final readElement) =>
-      writeElement ?? readElement,
-    PrefixExpression(:final writeElement, :final readElement) =>
-      writeElement ?? readElement,
-    PostfixExpression(:final writeElement, :final readElement) =>
-      writeElement ?? readElement,
+    AssignmentExpression(:final writeElement, :final readElement) ||
+    PostfixExpression(:final writeElement, :final readElement) ||
+    PrefixExpression(
+      :final writeElement,
+      :final readElement,
+    ) => writeElement ?? readElement,
     IndexExpression(:final element) => element,
     BinaryExpression(:final element) => element,
     _ => null,
