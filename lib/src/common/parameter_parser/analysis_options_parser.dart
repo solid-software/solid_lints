@@ -64,8 +64,8 @@ class AnalysisOptionsParser {
 
   Map<String, Object?> _toStandardMap(Map<dynamic, dynamic> map) =>
       map.whereKeyType<String>().map(
-            (key, value) => MapEntry(key, _toStandardType(value)),
-          );
+        (key, value) => MapEntry(key, _toStandardType(value)),
+      );
 
   Object? _toStandardType(Object? value) => switch (value) {
     Map() => _toStandardMap(value),

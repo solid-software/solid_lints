@@ -49,9 +49,9 @@ class NoMagicNumberParameters {
 
   /// Creates an empty/default instance of [NoMagicNumberParameters]
   factory NoMagicNumberParameters.empty() => const NoMagicNumberParameters(
-        allowedNumbers: _defaultMagicNumbers,
-        allowedInWidgetParams: false,
-      );
+    allowedNumbers: _defaultMagicNumbers,
+    allowedInWidgetParams: false,
+  );
 
   /// Method for creating from json data
   factory NoMagicNumberParameters.fromJson(Map<String, Object?> json) {
@@ -62,8 +62,7 @@ class NoMagicNumberParameters {
 
     return NoMagicNumberParameters(
       allowedNumbers: allowedList,
-      allowedInWidgetParams:
-          json[_allowedInWidgetParamsConfigName] == true,
+      allowedInWidgetParams: json[_allowedInWidgetParamsConfigName] == true,
     );
   }
 }

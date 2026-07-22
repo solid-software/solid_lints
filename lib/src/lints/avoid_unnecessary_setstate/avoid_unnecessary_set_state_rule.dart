@@ -60,7 +60,8 @@ class AvoidUnnecessarySetStateRule extends AnalysisRule {
   static const lintName = 'avoid_unnecessary_setstate';
 
   /// The message shown when the lint rule is triggered.
-  static const _lintMessage = 'Avoid calling unnecessary setState. '
+  static const _lintMessage =
+      'Avoid calling unnecessary setState. '
       'Consider changing the state directly.';
 
   /// The lint code for this rule.
@@ -71,10 +72,10 @@ class AvoidUnnecessarySetStateRule extends AnalysisRule {
 
   /// Creates a new instance of [AvoidUnnecessarySetStateRule].
   AvoidUnnecessarySetStateRule()
-      : super(
-          name: lintName,
-          description: _lintMessage,
-        );
+    : super(
+        name: lintName,
+        description: _lintMessage,
+      );
 
   @override
   LintCode get diagnosticCode => _code;

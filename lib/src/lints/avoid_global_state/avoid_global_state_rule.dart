@@ -48,10 +48,10 @@ class AvoidGlobalStateRule extends AnalysisRule {
 
   /// Creates an instance of [AvoidGlobalStateRule].
   AvoidGlobalStateRule()
-      : super(
-          name: lintName,
-          description: 'Avoid top-level or static mutable variables ',
-        );
+    : super(
+        name: lintName,
+        description: 'Avoid top-level or static mutable variables ',
+      );
 
   @override
   LintCode get diagnosticCode => _code;

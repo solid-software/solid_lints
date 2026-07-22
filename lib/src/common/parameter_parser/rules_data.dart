@@ -10,7 +10,5 @@ class RulesData {
   const RulesData({required this.rules, required this.disabledRules});
 
   /// Creates a new empty instance of [RulesData].
-  const RulesData.empty()
-    : rules = const {},
-      disabledRules = const {};
+  const RulesData.empty() : rules = const {}, disabledRules = const {};
 }

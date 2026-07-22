@@ -1,7 +1,7 @@
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:test/test.dart' hide setUp;
 
-import '../../lints/auto_test_lint_offsets.dart';
+import 'auto_test_lint_offsets.dart';
 
 /// Result expected from a table-driven test case.
 enum ExpectedResult {
