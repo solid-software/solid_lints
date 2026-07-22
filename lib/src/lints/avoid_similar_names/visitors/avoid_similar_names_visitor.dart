@@ -84,43 +84,37 @@ class AvoidSimilarNamesVisitor extends SimpleAstVisitor<void> {
     }
   }
 
-  void _comparePair(ScopeVariable a, ScopeVariable b) =>
-      a.type?.isDifferentIgnoringNullability(b.type) ?? false
-      ? null
-      : switch ((a.tokens.length - b.tokens.length).abs()) {
-          0 => _checkSameLengthTokens(a, b),
-          1 => _checkSingleTokenLengthDifference(a, b),
-          _ => null,
-        };
+  void _comparePair(ScopeVariable a, ScopeVariable b) {
+    final lengthDiff = (a.tokens.length - b.tokens.length).abs();
+    final shouldReport =
+        a.type?.isDifferentIgnoringNullability(b.type) != true &&
+        ((lengthDiff == 0 && _checkSameLengthTokens(a, b)) ||
+            (lengthDiff == 1 && _checkSingleTokenLengthDifference(a, b)));
 
-  void _checkSameLengthTokens(
+    if (shouldReport) {
+      _report(a, b);
+    }
+  }
+
+  bool _checkSameLengthTokens(
     ScopeVariable a,
     ScopeVariable b,
   ) {
     final diff = a.tokens
         .zipWithIndexed(b.tokens)
         .where((e) => e.$2 != e.$3)
-        .singleOrNull;
+        .singleOrNull
+        ?.$1;
 
-    if (diff != null &&
-        NameTokenizer.isNonDescriptiveToken(a.tokens[diff.$1]) &&
-        NameTokenizer.isNonDescriptiveToken(b.tokens[diff.$1])) {
-      _report(a, b);
-    }
+    return diff != null &&
+        NameTokenizer.isNonDescriptiveToken(a.tokens[diff]) &&
+        NameTokenizer.isNonDescriptiveToken(b.tokens[diff]);
   }
 
-  void _checkSingleTokenLengthDifference(
-    ScopeVariable a,
-    ScopeVariable b,
-  ) {
+  bool _checkSingleTokenLengthDifference(ScopeVariable a, ScopeVariable b) {
     final [shorter, longer] = [a.tokens, b.tokens].sortedBy((e) => e.length);
 
-    if (NameTokenizer.isSubsetWithNonDescriptiveToken(
-      longer,
-      shorter,
-    )) {
-      _report(a, b);
-    }
+    return NameTokenizer.isSubsetWithNonDescriptiveToken(longer, shorter);
   }
 
   void _report(ScopeVariable a, ScopeVariable b) => [a, b]
