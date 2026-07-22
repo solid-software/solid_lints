@@ -172,18 +172,14 @@ void main() {
         ),
       };
 
-      HashCacheStorage.save(
-        io.Directory.current.path,
-        index,
-        AvoidDuplicateCodeParameters.empty(),
-        memoryResourceProvider,
+      final storage = HashCacheStorage(
+        packageRoot: io.Directory.current.path,
+        resourceProvider: memoryResourceProvider,
       );
 
-      final loaded = HashCacheStorage.load(
-        io.Directory.current.path,
-        AvoidDuplicateCodeParameters.empty(),
-        memoryResourceProvider,
-      );
+      storage.save(index);
+
+      final loaded = storage.load();
       expect(loaded, isNotNull);
       expect(loaded!.length, equals(1));
       expect(loaded[absoluteFilePath]!.entries, hasLength(1));
@@ -194,10 +190,7 @@ void main() {
       expect(entry.lineNumber, equals(10));
       expect(entry.tokenCount, equals(5));
 
-      HashCacheStorage.delete(
-        io.Directory.current.path,
-        memoryResourceProvider,
-      );
+      storage.delete();
     });
 
     test('findCrossFileMatches cleans up absolute paths of deleted files', () {
@@ -265,35 +258,30 @@ void main() {
         exclude: params1.exclude,
       );
 
-      // Save with params1
-      HashCacheStorage.save(
-        io.Directory.current.path,
-        index,
-        params1,
-        memoryResourceProvider,
+      final storage1 = HashCacheStorage(
+        packageRoot: io.Directory.current.path,
+        resourceProvider: memoryResourceProvider,
+        currentParams: params1,
       );
 
+      // Save with params1
+      storage1.save(index);
+
       // Loading with params1 should succeed
-      final loaded1 = HashCacheStorage.load(
-        io.Directory.current.path,
-        params1,
-        memoryResourceProvider,
-      );
+      final loaded1 = storage1.load();
       expect(loaded1, isNotNull);
 
       // Loading with params2 (different config) should return null
       // (invalidated)
-      final loaded2 = HashCacheStorage.load(
-        io.Directory.current.path,
-        params2,
-        memoryResourceProvider,
+      final storage2 = HashCacheStorage(
+        packageRoot: io.Directory.current.path,
+        resourceProvider: memoryResourceProvider,
+        currentParams: params2,
       );
+      final loaded2 = storage2.load();
       expect(loaded2, isNull);
 
-      HashCacheStorage.delete(
-        io.Directory.current.path,
-        memoryResourceProvider,
-      );
+      storage1.delete();
     });
 
     test('findCrossFileMatches processes multiple candidates correctly', () {
@@ -311,23 +299,26 @@ void main() {
     });
 
     test('HashCacheStorage.load returns null when cache file is missing', () {
-      // Ensure any existing cache is deleted
-      HashCacheStorage.delete(
-        io.Directory.current.path,
-        memoryResourceProvider,
+      final storage = HashCacheStorage(
+        packageRoot: io.Directory.current.path,
+        resourceProvider: memoryResourceProvider,
       );
 
-      final loaded = HashCacheStorage.load(
-        io.Directory.current.path,
-        AvoidDuplicateCodeParameters.empty(),
-        memoryResourceProvider,
-      );
+      // Ensure any existing cache is deleted
+      storage.delete();
+
+      final loaded = storage.load();
 
       expect(loaded, isNull);
     });
 
     test('HashCacheStorage.load returns null and does not throw when cache '
         'file is corrupted', () {
+      final storage = HashCacheStorage(
+        packageRoot: io.Directory.current.path,
+        resourceProvider: memoryResourceProvider,
+      );
+
       final cachePath = p.normalize(
         p.join(
           io.Directory.current.path,
@@ -341,17 +332,10 @@ void main() {
         '["invalid", "json", "structure", "not", "a", "map"]',
       );
 
-      final loaded = HashCacheStorage.load(
-        io.Directory.current.path,
-        AvoidDuplicateCodeParameters.empty(),
-        memoryResourceProvider,
-      );
+      final loaded = storage.load();
       expect(loaded, isNull);
 
-      HashCacheStorage.delete(
-        io.Directory.current.path,
-        memoryResourceProvider,
-      );
+      storage.delete();
     });
 
     test('AvoidDuplicateCodeParameters value equality', () {
@@ -478,16 +462,14 @@ void main() {
         await Future<void>.delayed(const Duration(milliseconds: 600));
 
         // Both caches should be saved on disk
-        final loaded1 = HashCacheStorage.load(
-          tempDir1,
-          AvoidDuplicateCodeParameters.empty(),
-          memoryResourceProvider,
-        );
-        final loaded2 = HashCacheStorage.load(
-          tempDir2,
-          AvoidDuplicateCodeParameters.empty(),
-          memoryResourceProvider,
-        );
+        final loaded1 = HashCacheStorage(
+          packageRoot: tempDir1,
+          resourceProvider: memoryResourceProvider,
+        ).load();
+        final loaded2 = HashCacheStorage(
+          packageRoot: tempDir2,
+          resourceProvider: memoryResourceProvider,
+        ).load();
 
         expect(loaded1, isNotNull);
         expect(loaded1!.keys.first, equals(file1));

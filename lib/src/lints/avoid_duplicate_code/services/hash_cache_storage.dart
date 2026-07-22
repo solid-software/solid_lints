@@ -10,14 +10,27 @@ import 'package:solid_lints/src/utils/resource_provider_utils.dart';
 
 /// Service responsible for persisting and loading the duplicate code hash
 /// cache.
-abstract final class HashCacheStorage {
+class HashCacheStorage {
   static const _cacheDirName = '.dart_tool/solid_lints';
   static const _cacheFileName = 'duplicate_index.json';
 
-  static File _getFile(
-    String packageRoot,
-    ResourceProvider resourceProvider,
-  ) => resourceProvider.getFile(
+  /// The root directory of the package being analyzed.
+  final String packageRoot;
+
+  /// The resource provider used for file system operations.
+  final ResourceProvider resourceProvider;
+
+  /// The current configuration parameters.
+  final AvoidDuplicateCodeParameters currentParams;
+
+  /// Constructor for [HashCacheStorage].
+  HashCacheStorage({
+    required this.packageRoot,
+    required this.resourceProvider,
+    AvoidDuplicateCodeParameters? currentParams,
+  }) : currentParams = currentParams ?? AvoidDuplicateCodeParameters.empty();
+
+  File get _file => resourceProvider.getFile(
     resourceProvider.pathContext.join(
       packageRoot,
       _cacheDirName,
@@ -25,32 +38,17 @@ abstract final class HashCacheStorage {
     ),
   );
 
-  /// Loads the cached index from disk for the given [packageRoot].
+  /// Loads the cached index from disk for [packageRoot].
   ///
   /// Returns `null` if the cache file does not exist, is corrupted, or fails
   /// to load.
-  static Map<String, FileCacheEntry>? load(
-    String packageRoot,
-    AvoidDuplicateCodeParameters currentParams,
-    ResourceProvider resourceProvider,
-  ) => FunctionUtils.tryOrNull(
-    () => _load(
-      packageRoot,
-      currentParams,
-      resourceProvider,
-    ),
-  );
+  Map<String, FileCacheEntry>? load() => FunctionUtils.tryOrNull(_load);
 
-  static Map<String, FileCacheEntry> _load(
-    String packageRoot,
-    AvoidDuplicateCodeParameters currentParams,
-    ResourceProvider resourceProvider,
-  ) {
-    if (jsonDecode(_getFile(packageRoot, resourceProvider).readAsStringSync())
-        case {
-          'config': final cachedConfig,
-          'files': final Map<String, Object?> filesMap,
-        }) {
+  Map<String, FileCacheEntry> _load() {
+    if (jsonDecode(_file.readAsStringSync()) case {
+      'config': final cachedConfig,
+      'files': final Map<String, Object?> filesMap,
+    }) {
       if (!const DeepCollectionEquality().equals(
         cachedConfig,
         currentParams.toJson(),
@@ -71,16 +69,11 @@ abstract final class HashCacheStorage {
     throw ArgumentError('Bad json');
   }
 
-  /// Saves the [index] to disk for the given [packageRoot].
-  static void save(
-    String packageRoot,
-    Map<String, FileCacheEntry> index,
-    AvoidDuplicateCodeParameters currentParams,
-    ResourceProvider resourceProvider,
-  ) => FunctionUtils.tryOrNull(
+  /// Saves the [index] to disk for [packageRoot].
+  void save(Map<String, FileCacheEntry> index) => FunctionUtils.tryOrNull(
     () {
       resourceProvider.ensureFolderExists(packageRoot, _cacheDirName);
-      _getFile(packageRoot, resourceProvider).writeAsStringSync(
+      _file.writeAsStringSync(
         jsonEncode({
           'version': 1,
           'config': currentParams.toJson(),
@@ -96,10 +89,5 @@ abstract final class HashCacheStorage {
   );
 
   /// Deletes the cache file for [packageRoot] if it exists.
-  static void delete(
-    String packageRoot,
-    ResourceProvider resourceProvider,
-  ) => FunctionUtils.tryOrNull(
-    () => _getFile(packageRoot, resourceProvider).delete(),
-  );
+  void delete() => FunctionUtils.tryOrNull(_file.delete);
 }

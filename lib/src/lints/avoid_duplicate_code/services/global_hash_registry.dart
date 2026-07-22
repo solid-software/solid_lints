@@ -96,7 +96,11 @@ class GlobalHashRegistry {
 
     _loadedRoots[packageRoot] = params;
 
-    final cached = HashCacheStorage.load(packageRoot, params, resourceProvider);
+    final cached = HashCacheStorage(
+      packageRoot: packageRoot,
+      resourceProvider: resourceProvider,
+      currentParams: params,
+    ).load();
     if (cached == null) return;
 
     final deletedFiles = !enablePhysicalFileCleanup
@@ -277,17 +281,20 @@ class GlobalHashRegistry {
   void _performSave(
     String packageRoot, [
     AvoidDuplicateCodeParameters? parameters,
-  ]) => HashCacheStorage.save(
-    packageRoot,
-    // Filter _index for files belonging to this packageRoot
-    _index.entries.whereKey(
-      (k) => PathUtils.isWithinOrEqual(packageRoot, k),
-    ),
-    parameters ??
-        _loadedRoots[packageRoot] ??
-        AvoidDuplicateCodeParameters.empty(),
-    resourceProvider,
-  );
+  ]) =>
+      HashCacheStorage(
+        packageRoot: packageRoot,
+        resourceProvider: resourceProvider,
+        currentParams:
+            parameters ??
+            _loadedRoots[packageRoot] ??
+            AvoidDuplicateCodeParameters.empty(),
+      ).save(
+        // Filter _index for files belonging to this packageRoot
+        _index.entries.whereKey(
+          (k) => PathUtils.isWithinOrEqual(packageRoot, k),
+        ),
+      );
 
   /// Clears the entire index and deletes the persistent cache file.
   ///
@@ -300,7 +307,10 @@ class GlobalHashRegistry {
     _loadedRoots.clear();
     _index.clear();
     _hashToLocations.clear();
-    HashCacheStorage.delete(io.Directory.current.path, resourceProvider);
+    HashCacheStorage(
+      packageRoot: io.Directory.current.path,
+      resourceProvider: resourceProvider,
+    ).delete();
     AvoidDuplicateCodeVisitor.clearPackageRootCache();
   }
 }
