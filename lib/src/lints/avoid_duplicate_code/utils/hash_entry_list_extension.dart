@@ -9,10 +9,7 @@ extension HashEntryListExtension on List<HashEntry> {
   ) => map(
     (e) => (
       e.hash,
-      DuplicateLocation(
-        entry: e,
-        filePath: absoluteFilePath,
-      ),
+      DuplicateLocation(entry: e, filePath: absoluteFilePath),
     ),
   );
 }
