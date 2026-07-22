@@ -33,15 +33,14 @@ class ExternalA {}
 
     final extA = _getClassElement(resolved, 'ExternalA');
 
-    final metrics = FeatureEnvyMetrics.calculate(
+    _expectMetrics(
       internalAccesses: 1,
       externalAccessCounts: {extA: 2},
+      laa: 1 / 3,
+      fdp: 1,
+      atfd: 2,
+      maxEnvyElement: extA,
     );
-
-    expect(metrics.laa, equals(1 / 3));
-    expect(metrics.fdp, equals(1));
-    expect(metrics.atfd, equals(2));
-    expect(metrics.maxEnvyElement, equals(extA));
   }
 
   Future<void> test_multiple_external_classes() async {
@@ -53,26 +52,43 @@ class ExternalB {}
     final extA = _getClassElement(resolved, 'ExternalA');
     final extB = _getClassElement(resolved, 'ExternalB');
 
-    final metrics = FeatureEnvyMetrics.calculate(
+    _expectMetrics(
       internalAccesses: 2,
       externalAccessCounts: {extA: 1, extB: 3},
+      laa: 2 / 6,
+      fdp: 2,
+      atfd: 3,
+      maxEnvyElement: extB,
     );
-
-    expect(metrics.laa, equals(2 / 6));
-    expect(metrics.fdp, equals(2));
-    expect(metrics.atfd, equals(3));
-    expect(metrics.maxEnvyElement, equals(extB));
   }
 
   Future<void> test_no_accesses_at_all() async {
-    final metrics = FeatureEnvyMetrics.calculate(
+    _expectMetrics(
       internalAccesses: 0,
       externalAccessCounts: const {},
+      laa: 1.0,
+      fdp: 0,
+      atfd: 0,
+      maxEnvyElement: null,
+    );
+  }
+
+  void _expectMetrics({
+    required int internalAccesses,
+    required Map<InterfaceElement, int> externalAccessCounts,
+    required double laa,
+    required int fdp,
+    required int atfd,
+    required InterfaceElement? maxEnvyElement,
+  }) {
+    final metrics = FeatureEnvyMetrics.calculate(
+      internalAccesses: internalAccesses,
+      externalAccessCounts: externalAccessCounts,
     );
 
-    expect(metrics.laa, equals(1.0));
-    expect(metrics.fdp, equals(0));
-    expect(metrics.atfd, equals(0));
-    expect(metrics.maxEnvyElement, isNull);
+    expect(metrics.laa, equals(laa));
+    expect(metrics.fdp, equals(fdp));
+    expect(metrics.atfd, equals(atfd));
+    expect(metrics.maxEnvyElement, equals(maxEnvyElement));
   }
 }
