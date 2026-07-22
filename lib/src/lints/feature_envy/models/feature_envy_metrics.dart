@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/feature_envy/models/feature_envy_parameters.dart';
+import 'package:solid_lints/src/utils/iterable_utils.dart';
 
 /// Calculated Feature Envy metrics for a method.
 class FeatureEnvyMetrics {
@@ -35,21 +36,15 @@ class FeatureEnvyMetrics {
     required int internalAccesses,
     required Map<InterfaceElement, int> externalAccessCounts,
   }) {
-    final totalExternalAccesses = externalAccessCounts.values.sum;
-    final totalAccesses = internalAccesses + totalExternalAccesses;
-
-    final laa = totalAccesses == 0 ? 1.0 : internalAccesses / totalAccesses;
-    final fdp = externalAccessCounts.length;
-
-    final maxEntry = externalAccessCounts.entries
-        .sorted((a, b) => b.value != a.value
-            ? b.value.compareTo(a.value)
-            : (a.key.name ?? '').compareTo(b.key.name ?? ''))
-        .firstOrNull;
+    final totalAccesses = internalAccesses + externalAccessCounts.values.sum;
+    final maxEntry = externalAccessCounts.entries.multiSortedBy([
+      (e) => -e.value,
+      (e) => e.key.name ?? '',
+    ]).firstOrNull;
 
     return FeatureEnvyMetrics._(
-      laa: laa,
-      fdp: fdp,
+      laa: totalAccesses == 0 ? 1.0 : internalAccesses / totalAccesses,
+      fdp: externalAccessCounts.length,
       atfd: maxEntry?.value ?? 0,
       maxEnvyElement: maxEntry?.key,
     );
