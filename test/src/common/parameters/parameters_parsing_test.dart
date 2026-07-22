@@ -9,7 +9,10 @@ void main() {
       final param = ExcludedAnnotationsListParameter.fromJson({
         'exclude_annotation': ['MyAnnotation1', 'MyAnnotation2'],
       });
-      expect(param.excludedAnnotations, containsAll(['MyAnnotation1', 'MyAnnotation2']));
+      expect(
+        param.excludedAnnotations,
+        containsAll(['MyAnnotation1', 'MyAnnotation2']),
+      );
     });
 
     test('parses single string', () {

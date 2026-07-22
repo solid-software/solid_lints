@@ -2,7 +2,7 @@ name: solid_lints
 description:
   Lints for Dart and Flutter based on software industry standards and best
   practices.
-version: 0.3.4
+version: 1.0.0
 homepage: https://github.com/solid-software/solid_lints/
 documentation: https://solid-software.github.io/solid_lints/docs/intro
 topics: [lints, linter, lint, analysis, analyzer]
@@ -27,3 +27,8 @@ dev_dependencies:
   args: ^2.6.0
   analyzer_testing: ^0.1.9
   test_reflective_loader: ^0.3.0
+
+plugin:
+  platforms:
+    dart:
+      pluginClass: SolidLintsPlugin

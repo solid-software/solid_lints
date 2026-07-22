@@ -1,8 +1,10 @@
 ## 1.0.0
 
 - feat!: migrate to analyzer_server_plugin
-- refactor: replace `avoid_unnecessary_type_casts` rule with dart analyzer's `unnecessary_cast`
+- refactor: replace `avoid_unnecessary_type_casts` rule with dart analyzer's
+  `unnecessary_cast`
 - Added `use_nearest_context` rule.
+- Added `use_descriptive_names_for_type_parameters` rule.
 
 ## 0.3.3
 
@@ -17,9 +19,9 @@
 
 - Added `allow_with_comments` parameter for `no_empty_block` lint.
 - Added extension support for `avoid_using_api`
-- Added `exclude_entity` parameter for `prefer_match_file_name` lint.
-  It is now possible to configure this lint to ignore `enum`,
-  `extension` and `mixin` declarations via `analysis_options.yaml`.
+- Added `exclude_entity` parameter for `prefer_match_file_name` lint. It is now
+  possible to configure this lint to ignore `enum`, `extension` and `mixin`
+  declarations via `analysis_options.yaml`.
 
 ## 0.3.0
 
@@ -30,7 +32,8 @@
   - `function_lines_of_code`
   - `no_empty_bloc`
   - `number_of_parameters`
-- BREAKING CHANGE: Renamed `excludeNames` parameter to `exclude` for `function_lines_of_code` lint.
+- BREAKING CHANGE: Renamed `excludeNames` parameter to `exclude` for
+  `function_lines_of_code` lint.
 - Fixed an issue with `prefer_early_retrun` for throw expression
 - `number_of_parameters` lint: added `copyWith` to the default exclude list.
 - Update dependencies:
@@ -53,28 +56,36 @@
 ## 0.2.0
 
 - Added `avoid_final_with_getter` rule
-- Improve `avoid_late_keyword` - `ignored_types` to support ignoring subtype of the node type (<https://github.com/solid-software/solid_lints/issues/157>)
-- Abstract methods should be omitted by `proper_super_calls` (<https://github.com/solid-software/solid_lints/issues/159>)
-- Add a rule prefer_guard_clause for reversing nested if statements (<https://github.com/solid-software/solid_lints/issues/91>)
-- add exclude params support to avoid_returning_widgets rule (<https://github.com/solid-software/solid_lints/issues/131>)
-- add quick fix to avoid_final_with_getter (<https://github.com/solid-software/solid_lints/pull/164>)
+- Improve `avoid_late_keyword` - `ignored_types` to support ignoring subtype of
+  the node type (<https://github.com/solid-software/solid_lints/issues/157>)
+- Abstract methods should be omitted by `proper_super_calls`
+  (<https://github.com/solid-software/solid_lints/issues/159>)
+- Add a rule prefer_guard_clause for reversing nested if statements
+  (<https://github.com/solid-software/solid_lints/issues/91>)
+- add exclude params support to avoid_returning_widgets rule
+  (<https://github.com/solid-software/solid_lints/issues/131>)
+- add quick fix to avoid_final_with_getter
+  (<https://github.com/solid-software/solid_lints/pull/164>)
 - Renamed `avoid_debug_print` to `avoid_debug_print_in_release`
-- The `avoid_debug_print_in_release` no longer reports a warning if the `debugPrint` call is wrapped in a `!kReleaseMode` check.
+- The `avoid_debug_print_in_release` no longer reports a warning if the
+  `debugPrint` call is wrapped in a `!kReleaseMode` check.
 - Update custom_lints to work with newer Flutter
 
 ## 0.1.5
 
 - Added `avoid_debug_print` rule
 - Fixed an issue with no_magic_number lint
-- Fixed `avoid_unused_parameters` to report positional parameters from typedef if their name are not underscores.
+- Fixed `avoid_unused_parameters` to report positional parameters from typedef
+  if their name are not underscores.
 - Improvement for `avoid_returning_widget` lint:
   - ignores methods that override ones that return widget (build() for example)
   - no longer allows returning widgets from methods/functions named build
 - Fixed unexpected avoid_unnecessary_type_assertions
 - Added `excludeNames` param for `function_lines_of_code` lint
 - Improved `avoid_unrelated_type_assertions` to support true and false results
-- Set default `cyclomatic_complexity` to 10 (<https://github.com/solid-software/solid_lints/issues/146>)
-  Credits: Arthur Miranda (<https://github.com/arthurbcd>)
+- Set default `cyclomatic_complexity` to 10
+  (<https://github.com/solid-software/solid_lints/issues/146>) Credits: Arthur
+  Miranda (<https://github.com/arthurbcd>)
 
 ## 0.1.4
 
@@ -108,8 +119,7 @@
   - avoid_unnecessary_type_casts
   - avoid_unrelated_type_assertions
   - avoid_unused_parameters
-  - avoid_using_api
-    Credits: getBoolean (<https://github.com/getBoolean>)
+  - avoid_using_api Credits: getBoolean (<https://github.com/getBoolean>)
   - cyclomatic_complexity
   - double_literal_format
   - function_lines_of_code
@@ -176,7 +186,8 @@
 
 ## 0.0.13
 
-- enable use_colored_box & use_decorated_box + add more comments about specific lints
+- enable use_colored_box & use_decorated_box + add more comments about specific
+  lints
 
 ## 0.0.12
 

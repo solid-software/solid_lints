@@ -3,6 +3,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 /// A parameter model representing excluded annotations for linting.
 /// It defines class-level annotations that indicate when class members
 /// should be ignored during analysis.
+///
+/// @docType String | List<String>
 class ExcludedAnnotationsListParameter {
   /// The set of excluded annotation names.
   final Set<String> excludedAnnotations;

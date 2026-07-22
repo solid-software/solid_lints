@@ -4,7 +4,7 @@ import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.
 import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-import '../../../lints/auto_test_lint_offsets.dart';
+import '../../utils/auto_test_lint_offsets.dart';
 
 void main() {
   defineReflectiveSuite(() {
@@ -202,7 +202,8 @@ final someVariable = 42;
 ''');
   }
 
-  void test_does_not_report_on_multiple_public_declarations_if_first_matches() async {
+  void
+  test_does_not_report_on_multiple_public_declarations_if_first_matches() async {
     await assertNoDiagnostics(r'''
 class Test {}
 class AnotherPublicClass {}

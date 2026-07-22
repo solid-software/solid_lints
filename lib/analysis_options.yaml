@@ -1,6 +1,4 @@
 analyzer:
-  plugins:
-    - custom_lint
   exclude:
     # General generated files
     - "**/*.g.dart"
@@ -103,6 +101,7 @@ solid_lints:
     proper_super_calls: true
     named_parameters_ordering: true
     use_nearest_context: true
+    use_descriptive_names_for_type_parameters: true
 
 linter:
   rules:

@@ -12,9 +12,8 @@ extension GetterReferenceId on MethodDeclaration {
           statements: [
             ReturnStatement(expression: final expr?),
           ],
-        )
-      ) =>
-        expr,
+        ),
+      ) => expr,
       _ => null,
     };
 

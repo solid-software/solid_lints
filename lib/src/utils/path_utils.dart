@@ -23,11 +23,13 @@ bool shouldSkipFile({
 
   final relative = relativePath(path, rootPath);
 
-  final matchesInclude = includes.isEmpty ||
+  final matchesInclude =
+      includes.isEmpty ||
       _matchesAny(includes, relative) ||
       _matchesAny(includes, path);
 
-  final matchesExclude = excludes.isNotEmpty &&
+  final matchesExclude =
+      excludes.isNotEmpty &&
       (_matchesAny(excludes, relative) || _matchesAny(excludes, path));
 
   return !matchesInclude || matchesExclude;
@@ -40,8 +42,9 @@ bool _matchesAny(List<Glob> globs, String path) =>
 /// replaces backslashes with forward slashes
 String relativePath(String path, [String? root]) {
   final uriNormalizedPath = p.toUri(path).normalizePath().path;
-  final uriNormalizedRoot =
-      root != null ? p.toUri(root).normalizePath().path : null;
+  final uriNormalizedRoot = root != null
+      ? p.toUri(root).normalizePath().path
+      : null;
 
   return p.posix.relative(uriNormalizedPath, from: uriNormalizedRoot);
 }

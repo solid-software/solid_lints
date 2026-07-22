@@ -45,11 +45,13 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// #### GOOD:
 /// ```dart
 /// int fn() {
+// ignore: todo
 ///  // TODO: complete this
 /// }
 ///
 /// Function getCallback() {
 ///   return () {
+// ignore: todo
 ///     // TODO: actually do something
 ///   };
 /// }
@@ -81,10 +83,10 @@ class NoEmptyBlockRule extends SolidLintRule<NoEmptyBlockParameters> {
   NoEmptyBlockRule({
     required super.analysisOptionsLoader,
   }) : super.withParameters(
-          name: lintName,
-          description: _code.problemMessage,
-          parametersParser: NoEmptyBlockParameters.fromJson,
-        );
+         name: lintName,
+         description: _code.problemMessage,
+         parametersParser: NoEmptyBlockParameters.fromJson,
+       );
 
   @override
   void registerNodeProcessors(
