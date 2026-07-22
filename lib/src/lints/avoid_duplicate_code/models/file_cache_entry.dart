@@ -23,16 +23,15 @@ class FileCacheEntry {
   };
 
   /// Parses a [FileCacheEntry] from a JSON map.
-  factory FileCacheEntry.fromJson(Map<String, Object?> json) => FileCacheEntry(
-    modificationStamp: (json['m'] as int?) ?? 0,
-    entries: switch (json['e']) {
-      final List<dynamic> eValue =>
-        eValue
-            .whereType<Map<String, Object?>>()
-            .tryMap(HashEntry.fromJson)
-            .nonNulls
-            .toList(),
-      _ => [],
-    },
-  );
+  FileCacheEntry.fromJson(Map<String, Object?> json)
+    : modificationStamp = (json['m'] as int?) ?? 0,
+      entries = switch (json['e']) {
+        final List<dynamic> eValue =>
+          eValue
+              .whereType<Map<String, Object?>>()
+              .tryMap(HashEntry.fromJson)
+              .nonNulls
+              .toList(),
+        _ => [],
+      };
 }
