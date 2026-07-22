@@ -25,74 +25,47 @@ class AvoidSimilarNamesRuleTest extends AnalysisRuleTest
     );
   }
 
-  Future<void> test_reports_on_similar_names_in_function() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_similar_names_in_function() => _assert('''
   int ${expectLint('someClass1')} = 1;
   int ${expectLint('someClass2')} = 2;
-}
 ''');
-  }
 
-  Future<void> test_does_not_report_on_different_types() async {
-    await assertNoDiagnostics('''
-void test() {
+  Future<void> test_does_not_report_on_different_types() => _assertNo('''
   String user1 = 'Alice';
   int user2 = 123;
-}
 ''');
-  }
 
-  Future<void>
-  test_reports_on_similar_names_with_different_nullability() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_similar_names_with_different_nullability() =>
+      _assert('''
   int ${expectLint('user1')} = 1;
   int? ${expectLint('user2')} = 2;
-}
 ''');
-  }
 
-  Future<void> test_reports_on_borderline_short_names() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_borderline_short_names() => _assert('''
   int ${expectLint('id1')} = 1;
   int ${expectLint('id2')} = 2;
-}
 ''');
-  }
 
-  Future<void> test_does_not_report_on_different_descriptive_tokens() async {
-    await assertNoDiagnostics('''
-void test() {
+  Future<void> test_does_not_report_on_different_descriptive_tokens() =>
+      _assertNo('''
   int minHeight = 10;
   int maxHeight = 20;
-}
 ''');
-  }
 
-  Future<void> test_does_not_report_on_short_names() async {
-    await assertNoDiagnostics('''
-void test() {
+  Future<void> test_does_not_report_on_short_names() => _assertNo('''
   int x1 = 1;
   int x2 = 2;
   int dx = 5;
   int dy = 10;
-}
 ''');
-  }
 
-  Future<void> test_does_not_report_on_allowed_coordinates() async {
-    await assertNoDiagnostics('''
-void test() {
+  Future<void> test_does_not_report_on_allowed_coordinates() => _assertNo('''
   double pointX = 1.0;
   double pointY = 2.0;
-}
 ''');
-  }
 
-  Future<void> test_reports_on_digits_in_parameters() async {
-    await assertAutoDiagnostics('''
+  Future<void> test_reports_on_digits_in_parameters() =>
+      assertAutoDiagnostics('''
 bool isEqual(
   int ${expectLint('someClass1')},
   int ${expectLint('someClass2')},
@@ -100,10 +73,9 @@ bool isEqual(
   return someClass1 == someClass2;
 }
 ''');
-  }
 
-  Future<void> test_reports_on_similar_names_in_method() async {
-    await assertAutoDiagnostics('''
+  Future<void> test_reports_on_similar_names_in_method() =>
+      assertAutoDiagnostics('''
 class A {
   void test() {
     String ${expectLint('tempA')} = "a";
@@ -111,111 +83,76 @@ class A {
   }
 }
 ''');
-  }
 
-  Future<void> test_reports_on_subset_with_extra_digit() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_subset_with_extra_digit() => _assert('''
   String ${expectLint('data')} = "a";
   String ${expectLint('data1')} = "b";
-}
 ''');
-  }
 
-  Future<void> test_reports_on_subset_with_multi_digit_number() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_subset_with_multi_digit_number() => _assert('''
   String ${expectLint('data')} = "a";
   String ${expectLint('data10')} = "b";
-}
 ''');
-  }
 
-  Future<void> test_reports_on_mixed_non_descriptive_suffixes() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_mixed_non_descriptive_suffixes() => _assert('''
   String ${expectLint('user1')} = "a";
   String ${expectLint('userA')} = "b";
-}
 ''');
-  }
 
-  Future<void> test_reports_on_subset_with_extra_letter() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_subset_with_extra_letter() => _assert('''
   String ${expectLint('user')} = "a";
   String ${expectLint('userA')} = "b";
-}
 ''');
-  }
 
-  Future<void> test_does_not_report_on_subset_with_descriptive_token() async {
-    await assertNoDiagnostics('''
-void test() {
+  Future<void> test_does_not_report_on_subset_with_descriptive_token() =>
+      _assertNo('''
   String user = "a";
   String userProfile = "b";
   String data = "c";
   String dataFetch = "d";
-}
 ''');
-  }
 
-  Future<void> test_reports_on_three_similar_names() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_three_similar_names() => _assert('''
   int ${expectLint('id1')} = 1;
   int ${expectLint('id2')} = 2;
   int ${expectLint('id3')} = 3;
-}
 ''');
-  }
 
-  Future<void> test_does_not_report_on_anonymous_lambda() async {
-    await assertNoDiagnostics('''
-void test() {
+  Future<void> test_does_not_report_on_anonymous_lambda() => _assertNo('''
   void process(int Function(int, int) callback) {}
   process((day1, day2) => day1 + day2);
-}
 ''');
-  }
 
-  Future<void> test_reports_on_acronym_and_camel_case_suffix() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_acronym_and_camel_case_suffix() => _assert('''
   int ${expectLint('APIRequest')} = 1;
   int ${expectLint('apiRequest1')} = 2;
-}
 ''');
-  }
 
-  Future<void> test_reports_on_similar_names_in_for_in_loops() async {
-    await assertAutoDiagnostics('''
-void test() {
+  Future<void> test_reports_on_similar_names_in_for_in_loops() => _assert('''
   final users = [1, 2];
   for (final ${expectLint('user1')} in users) {
     int ${expectLint('user2')} = user1;
   }
-}
 ''');
-  }
 
   Future<void>
-  test_reports_on_similar_names_in_pattern_variable_declarations() async {
-    await assertAutoDiagnostics('''
-void test() {
+  test_reports_on_similar_names_in_pattern_variable_declarations() =>
+      _assert('''
   final (${expectLint('user1')}, ${expectLint('user2')}) = (1, 2);
-}
 ''');
-  }
 
-  Future<void>
-  test_reports_on_similar_names_in_pattern_matching_if_case() async {
-    await assertAutoDiagnostics('''
+  Future<void> test_reports_on_similar_names_in_pattern_matching_if_case() =>
+      assertAutoDiagnostics('''
 void test(Object obj) {
   if (obj case [int ${expectLint('user1')}, int ${expectLint('user2')}]) {
     // ...
   }
 }
 ''');
-  }
+
+  Future<void> _assert(String body) =>
+      assertAutoDiagnostics('''void test() {$body}''');
+
+  Future<void> _assertNo(String body) =>
+      assertNoDiagnostics('''void test() {$body}''');
 }
