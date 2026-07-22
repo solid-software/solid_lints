@@ -88,6 +88,11 @@ extension _PropertyAccessorElementExt on PropertyAccessorElement {
       isPublic && !isStatic && isOriginDeclaration;
 }
 
+extension _PropertyAccessorsExt on Iterable<PropertyAccessorElement> {
+  Iterable<String> get publicInstanceMemberNames =>
+      where((e) => e.isPublicInstanceOrigin).map((e) => e.displayName);
+}
+
 extension InterfaceElementExt on InterfaceElement {
   /// Checks whether this element is the same as or a subclass of [superType].
   bool isSameOrSubclassOf(InterfaceElement superType) =>
@@ -103,34 +108,29 @@ extension InterfaceElementExt on InterfaceElement {
       ...allSupertypes.where((s) => !s.isDartCoreObject).map((s) => s.element),
     ];
 
-    final publicProperties = <String>{
+    final publicProperties = {
       for (final el in elements) ...[
-        ...el.getters
-            .where((g) => g.isPublicInstanceOrigin)
-            .map((g) => g.displayName)
-            .where((name) => !const {'hashCode', 'runtimeType'}.contains(name)),
-        ...el.setters
-            .where((s) => s.isPublicInstanceOrigin)
-            .map((s) => s.displayName),
+        ...el.getters.publicInstanceMemberNames.toSet().difference({
+          'hashCode',
+          'runtimeType',
+        }),
+        ...el.setters.publicInstanceMemberNames,
       ],
     };
 
-    final publicMethods = <String>{
-      for (final el in elements)
-        ...el.methods
-            .where((m) => m.isPublic && !m.isStatic)
-            .map((m) => m.name)
-            .nonNulls
-            .where(
-              (name) => !const {
-                'toString',
-                '==',
-                'copyWith',
-                'toJson',
-                'noSuchMethod',
-              }.contains(name),
-            ),
-    };
+    final publicMethods = elements
+        .expand((e) => e.methods)
+        .where((m) => m.isPublic && !m.isStatic)
+        .map((m) => m.name)
+        .nonNulls
+        .toSet()
+        .difference({
+          'toString',
+          '==',
+          'copyWith',
+          'toJson',
+          'noSuchMethod',
+        });
 
     final totalMembers = publicProperties.length + publicMethods.length;
     if (totalMembers == 0) return true;
