@@ -1,5 +1,7 @@
+import 'package:equatable/equatable.dart';
+
 /// Model class for ExcludeRule parameters
-class ExcludedIdentifierParameter {
+class ExcludedIdentifierParameter extends Equatable {
   /// The name of the method that should be excluded from the lint.
   final String? methodName;
 
@@ -35,17 +37,5 @@ class ExcludedIdentifierParameter {
   };
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ExcludedIdentifierParameter &&
-          other.methodName == methodName &&
-          other.className == className &&
-          other.declarationName == declarationName;
-
-  @override
-  int get hashCode => Object.hash(
-    methodName,
-    className,
-    declarationName,
-  );
+  List<Object?> get props => [methodName, className, declarationName];
 }
