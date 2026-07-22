@@ -28,19 +28,18 @@ class FeatureEnvyParameters {
 
   /// Constructor for [FeatureEnvyParameters] model.
   const FeatureEnvyParameters({
-    required this.atfdThreshold,
     required this.exclude,
+    required this.atfdThreshold,
     required this.laaThreshold,
     required this.fdpThreshold,
   });
 
   /// Empty [FeatureEnvyParameters] model with default values.
-  factory FeatureEnvyParameters.empty() => FeatureEnvyParameters(
-    atfdThreshold: _defaultAtfdThreshold,
-    exclude: ExcludedIdentifiersListParameter(exclude: []),
-    laaThreshold: _defaultLaaThreshold,
-    fdpThreshold: _defaultFdpThreshold,
-  );
+  FeatureEnvyParameters.empty()
+    : exclude = ExcludedIdentifiersListParameter(exclude: []),
+      atfdThreshold = _defaultAtfdThreshold,
+      laaThreshold = _defaultLaaThreshold,
+      fdpThreshold = _defaultFdpThreshold;
 
   /// Creates a [FeatureEnvyParameters] model from JSON data.
   FeatureEnvyParameters.fromJson(Map<String, Object?> json)
