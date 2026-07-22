@@ -38,11 +38,10 @@ class HashEntry {
   };
 
   /// Creates a [HashEntry] from a JSON map.
-  factory HashEntry.fromJson(Map<String, Object?> json) => HashEntry(
-    hash: json['h']! as int,
-    lineNumber: json['n']! as int,
-    offset: (json['o'] ?? 0) as int,
-    length: (json['l'] ?? 0) as int,
-    tokenCount: (json['t'] ?? json['s'] ?? 0) as int,
-  );
+  HashEntry.fromJson(Map<String, Object?> json)
+    : hash = json['h']! as int,
+      lineNumber = json['n']! as int,
+      offset = (json['o'] ?? 0) as int,
+      length = (json['l'] ?? 0) as int,
+      tokenCount = (json['t'] ?? json['s'] ?? 0) as int;
 }
