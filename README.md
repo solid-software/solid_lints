@@ -21,21 +21,11 @@ dev_dependencies:
 
 Enable the plugin and include `solid_lints` in your project's top-level `analysis_options.yaml`:
 
-### Option 1: Using the `plugins` block
-
 ```yaml
 include: package:solid_lints/analysis_options.yaml
 
 plugins:
   solid_lints:
-```
-
-### Option 2: Using the top-level `solid_lints` block
-
-```yaml
-include: package:solid_lints/analysis_options.yaml
-
-solid_lints:
 ```
 
 Also, you can use a specialized rule set designed for Dart tests.
