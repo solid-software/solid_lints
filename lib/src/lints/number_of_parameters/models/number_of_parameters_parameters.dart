@@ -17,6 +17,14 @@ class NumberOfParametersParameters {
     required this.exclude,
   });
 
+  /// Empty [NumberOfParametersParameters] model.
+  factory NumberOfParametersParameters.empty() {
+    return NumberOfParametersParameters(
+      maxParameters: _defaultMaxParameters,
+      exclude: ExcludedIdentifiersListParameter(exclude: []),
+    );
+  }
+
   /// Method for creating from json data
   factory NumberOfParametersParameters.fromJson(Map<String, Object?> json) =>
       NumberOfParametersParameters(

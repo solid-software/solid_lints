@@ -1,12 +1,10 @@
-import 'package:analyzer/diagnostic/diagnostic.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/avoid_final_with_getter/fixes/avoid_final_with_getter_fix.dart';
 import 'package:solid_lints/src/lints/avoid_final_with_getter/visitors/avoid_final_with_getter_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
-
-part 'fixes/avoid_final_with_getter_fix.dart';
+import 'package:solid_lints/src/models/rule_with_fixes.dart';
 
 /// Avoid using final private fields with getters.
 ///
@@ -34,45 +32,37 @@ part 'fixes/avoid_final_with_getter_fix.dart';
 /// }
 /// ```
 ///
-class AvoidFinalWithGetterRule extends SolidLintRule {
+class AvoidFinalWithGetterRule extends AnalysisRule implements RuleWithFixes {
   /// This lint rule represents
   /// the error whether we use final private fields with getters.
   static const lintName = 'avoid_final_with_getter';
 
-  final _diagnosticsInfoExpando = Expando<FinalWithGetterInfo>();
-
-  AvoidFinalWithGetterRule._(super.config);
+  /// The code to report for a violation
+  static const LintCode code = LintCode(
+    lintName,
+    'Avoid final private fields with getters.',
+    correctionMessage: 'Remove the getter and make the field public.',
+  );
 
   /// Creates a new instance of [AvoidFinalWithGetterRule]
-  /// based on the lint configuration.
-  factory AvoidFinalWithGetterRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (_) => 'Avoid final private fields with getters.',
-    );
-
-    return AvoidFinalWithGetterRule._(rule);
-  }
+  AvoidFinalWithGetterRule()
+    : super(name: lintName, description: code.problemMessage);
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => code;
+
+  @override
+  FixesForCodes get fixesForCodes => const [
+    MapEntry(code, AvoidFinalWithGetterFix.new),
+  ];
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addCompilationUnit((node) {
-      final visitor = AvoidFinalWithGetterVisitor();
-      node.accept(visitor);
+    final visitor = AvoidFinalWithGetterVisitor(this);
 
-      for (final element in visitor.getters) {
-        final diagnostic = reporter.atNode(element.getter, code);
-
-        _diagnosticsInfoExpando[diagnostic] = element;
-      }
-    });
+    registry.addCompilationUnit(this, visitor);
   }
-
-  @override
-  List<Fix> getFixes() => [_FinalWithGetterFix(_diagnosticsInfoExpando)];
 }

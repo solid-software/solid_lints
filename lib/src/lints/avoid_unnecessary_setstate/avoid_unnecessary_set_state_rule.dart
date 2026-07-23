@@ -1,8 +1,8 @@
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_unnecessary_setstate/visitors/avoid_unnecessary_set_state_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A rule which warns when setState is called inside initState, didUpdateWidget
 /// or build methods and when it's called from a sync method that is called
@@ -55,37 +55,37 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   if (mounted) setState(() => foo = 'bar');
 /// }
 /// ```
-class AvoidUnnecessarySetStateRule extends SolidLintRule {
-  /// The lint name of this lint rule that represents
-  /// the error whether we use setState in inappropriate way.
+class AvoidUnnecessarySetStateRule extends AnalysisRule {
+  /// The lint rule name. Must be public to generate docs.
   static const lintName = 'avoid_unnecessary_setstate';
 
-  AvoidUnnecessarySetStateRule._(super.config);
+  /// The message shown when the lint rule is triggered.
+  static const _lintMessage =
+      'Avoid calling unnecessary setState. '
+      'Consider changing the state directly.';
 
-  /// Creates a new instance of [AvoidUnnecessarySetStateRule]
-  /// based on the lint configuration.
-  factory AvoidUnnecessarySetStateRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      name: lintName,
-      configs: configs,
-      problemMessage: (_) => 'Avoid calling unnecessary setState. '
-          'Consider changing the state directly.',
-    );
-    return AvoidUnnecessarySetStateRule._(rule);
-  }
+  /// The lint code for this rule.
+  static const _code = LintCode(
+    lintName,
+    _lintMessage,
+  );
+
+  /// Creates a new instance of [AvoidUnnecessarySetStateRule].
+  AvoidUnnecessarySetStateRule()
+    : super(
+        name: lintName,
+        description: _lintMessage,
+      );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => _code;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
-      final visitor = AvoidUnnecessarySetStateVisitor();
-      visitor.visitClassDeclaration(node);
-      for (final element in visitor.setStateInvocations) {
-        reporter.atNode(element, code);
-      }
-    });
+    final visitor = AvoidUnnecessarySetStateVisitor(this);
+    registry.addClassDeclaration(this, visitor);
   }
 }

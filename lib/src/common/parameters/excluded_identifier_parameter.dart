@@ -1,5 +1,7 @@
+import 'package:equatable/equatable.dart';
+
 /// Model class for ExcludeRule parameters
-class ExcludedIdentifierParameter {
+class ExcludedIdentifierParameter extends Equatable {
   /// The name of the method that should be excluded from the lint.
   final String? methodName;
 
@@ -21,8 +23,19 @@ class ExcludedIdentifierParameter {
     Map<dynamic, dynamic> json,
   ) {
     return ExcludedIdentifierParameter(
-      methodName: json['method_name'] as String,
+      methodName: json['method_name'] as String?,
       className: json['class_name'] as String?,
+      declarationName: json['declaration_name'] as String?,
     );
   }
+
+  /// Method to convert parameter to JSON Map.
+  Map<String, Object?> toJson() => {
+    'method_name': ?methodName,
+    'class_name': ?className,
+    'declaration_name': ?declarationName,
+  };
+
+  @override
+  List<Object?> get props => [methodName, className, declarationName];
 }

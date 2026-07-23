@@ -1,49 +1,60 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
-import 'package:solid_lints/src/lints/avoid_final_with_getter/visitors/getter_variable_visitor.dart';
+import 'package:solid_lints/src/lints/avoid_final_with_getter/avoid_final_with_getter_rule.dart';
+import 'package:solid_lints/src/lints/avoid_final_with_getter/utils/getter_reference_id.dart';
 
 /// A visitor that checks for final private fields with getters.
 /// If a final private field has a getter, it is considered as a public field.
 class AvoidFinalWithGetterVisitor extends RecursiveAstVisitor<void> {
-  final _getters = <FinalWithGetterInfo>{};
+  final AvoidFinalWithGetterRule _rule;
 
-  /// List of getters
-  Set<FinalWithGetterInfo> get getters => _getters;
+  final _gettersPairLookup = <int, MethodDeclaration>{};
+  final _fieldsPairLookup = <int, VariableDeclaration>{};
+
+  /// Creates a new instance of [AvoidFinalWithGetterVisitor]
+  AvoidFinalWithGetterVisitor(this._rule);
 
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
-    if (node
-        case MethodDeclaration(
-          isGetter: true,
-          declaredFragment: ExecutableFragment(
-            element: ExecutableElement(
-              isAbstract: false,
-              isPublic: true,
-            )
-          )
-        )) {
-      final visitor = GetterVariableVisitor(node);
-      node.parent?.accept(visitor);
+    super.visitMethodDeclaration(node);
 
-      final variable = visitor.variable;
+    if (node case MethodDeclaration(
+      isGetter: true,
+      declaredFragment: ExecutableFragment(
+        element: ExecutableElement(
+          isAbstract: false,
+          isPublic: true,
+        ),
+      ),
+      getterReferenceId: final getterId?,
+    )) {
+      _gettersPairLookup[getterId] = node;
 
-      if (variable != null) {
-        _getters.add(FinalWithGetterInfo(node, variable));
+      if (_fieldsPairLookup.containsKey(getterId)) {
+        _rule.reportAtNode(node);
       }
     }
-    super.visitMethodDeclaration(node);
   }
-}
 
-/// Information about the final private field with a getter.
-class FinalWithGetterInfo {
-  /// The getter method declaration.
-  final MethodDeclaration getter;
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    super.visitVariableDeclaration(node);
 
-  /// The variable declaration.
-  final VariableDeclaration variable;
+    if (node case VariableDeclaration(
+      declaredFragment: VariableFragment(
+        element: VariableElement(
+          isPrivate: true,
+          isFinal: true,
+          id: final variableId,
+        ),
+      ),
+    )) {
+      _fieldsPairLookup[variableId] = node;
 
-  /// Creates a new instance of [FinalWithGetterInfo]
-  const FinalWithGetterInfo(this.getter, this.variable);
+      if (_gettersPairLookup[variableId] case final getter?) {
+        _rule.reportAtNode(getter);
+      }
+    }
+  }
 }

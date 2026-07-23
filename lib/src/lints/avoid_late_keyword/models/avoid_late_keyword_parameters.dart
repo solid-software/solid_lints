@@ -10,15 +10,15 @@ class AvoidLateKeywordParameters {
   final bool allowInitialized;
 
   /// Types that would be ignored by avoid-late rule
-  ///
   /// Example:
   ///
   /// ```yaml
-  /// custom_lint:
-  ///   rules:
-  ///     - avoid_late_keyword:
-  ///       ignored_types:
-  ///         - ColorTween
+  /// plugins:
+  ///   solid_lints:
+  ///     diagnostics:
+  ///       avoid_late_keyword:
+  ///         ignored_types:
+  ///           - ColorTween
   /// ```
   ///
   /// ```dart
@@ -37,7 +37,8 @@ class AvoidLateKeywordParameters {
   factory AvoidLateKeywordParameters.fromJson(Map<String, Object?> json) =>
       AvoidLateKeywordParameters(
         allowInitialized: json['allow_initialized'] as bool? ?? false,
-        ignoredTypes:
-            List<String>.from(json['ignored_types'] as Iterable? ?? []),
+        ignoredTypes: List<String>.from(
+          json['ignored_types'] as Iterable? ?? [],
+        ),
       );
 }

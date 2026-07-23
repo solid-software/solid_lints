@@ -54,7 +54,6 @@ class MemberOrderingConfigParser {
     'final_fields',
     'init_state_method',
     'var_fields',
-    'init_state_method',
     'private_methods',
     'overridden_public_methods',
     'build_method',

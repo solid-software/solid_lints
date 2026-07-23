@@ -75,12 +75,73 @@ extension Subtypes on DartType {
 
     return false;
   }
+
+  /// Compares this type with [other] ignoring nullability where applicable.
+  bool isDifferentIgnoringNullability(DartType? other) =>
+      other != null && (element ?? this) != (other.element ?? other);
 }
 
 extension TypeString on String {
   static final _genericRegex = RegExp('<.*>');
 
   String replaceGenericString() => replaceFirst(_genericRegex, '');
+}
+
+extension _PropertyAccessorElementExt on PropertyAccessorElement {
+  bool get isPublicInstanceOrigin =>
+      isPublic && !isStatic && isOriginDeclaration;
+}
+
+extension _PropertyAccessorsExt on Iterable<PropertyAccessorElement> {
+  Iterable<String> get publicInstanceMemberNames =>
+      where((e) => e.isPublicInstanceOrigin).map((e) => e.displayName);
+}
+
+extension InterfaceElementExt on InterfaceElement {
+  /// Checks whether this element is the same as or a subclass of [superType].
+  bool isSameOrSubclassOf(InterfaceElement superType) =>
+      this == superType ||
+      allSupertypes.any((type) => type.element == superType);
+
+  /// Checks if a class is a Data Class based on Weight of Class.
+  bool get isDataClass {
+    const dataClassWeightThreshold = 0.33;
+
+    final elements = [
+      this,
+      ...allSupertypes.where((s) => !s.isDartCoreObject).map((s) => s.element),
+    ];
+
+    final publicProperties = {
+      for (final el in elements) ...[
+        ...el.getters.publicInstanceMemberNames.toSet().difference({
+          'hashCode',
+          'runtimeType',
+        }),
+        ...el.setters.publicInstanceMemberNames,
+      ],
+    };
+
+    final publicMethods = elements
+        .expand((e) => e.methods)
+        .where((m) => m.isPublic && !m.isStatic)
+        .map((m) => m.name)
+        .nonNulls
+        .toSet()
+        .difference({
+          'toString',
+          '==',
+          'copyWith',
+          'toJson',
+          'noSuchMethod',
+        });
+
+    final totalMembers = publicProperties.length + publicMethods.length;
+    if (totalMembers == 0) return true;
+
+    final weightOfClass = publicMethods.length / totalMembers;
+    return weightOfClass < dataClassWeightThreshold;
+  }
 }
 
 bool hasWidgetType(DartType type) =>
@@ -129,8 +190,11 @@ bool isRowWidget(DartType? type) => type?.getDisplayString() == 'Row';
 
 bool isPaddingWidget(DartType? type) => type?.getDisplayString() == 'Padding';
 
-bool isBuildContext(DartType? type) =>
-    type?.getDisplayString() == 'BuildContext';
+bool isBuildContext(DartType? type) {
+  if (type == null) return false;
+  final displayString = type.getDisplayString();
+  return displayString == 'BuildContext' || displayString == 'BuildContext?';
+}
 
 bool isGameWidget(DartType? type) => type?.getDisplayString() == 'GameWidget';
 

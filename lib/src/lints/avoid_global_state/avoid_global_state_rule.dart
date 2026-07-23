@@ -1,8 +1,8 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
+import 'package:solid_lints/src/lints/avoid_global_state/visitors/avoid_global_state_visitor.dart';
 
 /// Avoid top-level and static mutable variables.
 ///
@@ -23,7 +23,6 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// ```
 ///
-///
 /// #### GOOD:
 ///
 /// ```dart
@@ -35,49 +34,36 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   static final int globalFinal = 1;
 /// }
 /// ```
-class AvoidGlobalStateRule extends SolidLintRule {
-  /// This lint rule represents
-  /// the error whether we use global state.
-  static const lintName = 'avoid_global_state';
+class AvoidGlobalStateRule extends AnalysisRule {
+  /// Lint name used for suppression and reporting.
+  static const String lintName = 'avoid_global_state';
 
-  AvoidGlobalStateRule._(super.config);
+  /// Lint code used for suppression and reporting.
+  static const LintCode _code = LintCode(
+    lintName,
+    'Avoid variables that can be globally mutated.',
+    correctionMessage:
+        'Prefer using final/const or a state management solution.',
+  );
 
-  /// Creates a new instance of [AvoidGlobalStateRule]
-  /// based on the lint configuration.
-  factory AvoidGlobalStateRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (_) => 'Avoid variables that can be globally mutated.',
-    );
-
-    return AvoidGlobalStateRule._(rule);
-  }
+  /// Creates an instance of [AvoidGlobalStateRule].
+  AvoidGlobalStateRule()
+    : super(
+        name: lintName,
+        description: 'Avoid top-level or static mutable variables ',
+      );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  LintCode get diagnosticCode => _code;
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addTopLevelVariableDeclaration(
-      (node) => node.variables.variables
-          .where((variable) => variable.isPublicMutable)
-          .forEach((node) => reporter.atNode(node, code)),
-    );
-    context.registry.addFieldDeclaration((node) {
-      if (!node.isStatic) return;
-      node.fields.variables
-          .where((variable) => variable.isPublicMutable)
-          .forEach((node) => reporter.atNode(node, code));
-    });
+    final visitor = AvoidGlobalStateVisitor(this);
+
+    registry.addTopLevelVariableDeclaration(this, visitor);
+    registry.addFieldDeclaration(this, visitor);
   }
-}
-
-extension on VariableDeclaration {
-  bool get isMutable => !isFinal && !isConst;
-
-  bool get isPrivate => declaredFragment?.element.isPrivate ?? false;
-
-  bool get isPublicMutable => isMutable && !isPrivate;
 }

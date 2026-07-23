@@ -1,30 +1,33 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// The AST visitor that will collect all Iterable access expressions
 /// which can be replaced with .last
 class PreferLastVisitor extends RecursiveAstVisitor<void> {
-  final _expressions = <Expression>[];
+  static const _lengthGetterName = 'length';
 
-  /// List of all Iterable access expressions
-  Iterable<Expression> get expressions => _expressions;
+  final PreferLastRule _rule;
+
+  /// Creates a new instance of [PreferLastVisitor]
+  PreferLastVisitor(this._rule);
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     super.visitMethodInvocation(node);
 
     final target = node.realTarget;
+    final isIterable = isIterableOrSubclass(target?.staticType);
+    final isElementAt = node.methodName.name == 'elementAt';
 
-    if (isIterableOrSubclass(target?.staticType) &&
-        node.methodName.name == 'elementAt') {
-      final arg = node.argumentList.arguments.first;
+    if (!isIterable || !isElementAt) return;
 
-      if (arg is BinaryExpression &&
-          _isLastElementAccess(arg, target.toString())) {
-        _expressions.add(node);
-      }
+    final arg = node.argumentList.arguments.firstOrNull;
+
+    if (arg is BinaryExpression && _isLastElementAccess(arg, target)) {
+      _rule.reportAtNode(node);
     }
   }
 
@@ -34,41 +37,76 @@ class PreferLastVisitor extends RecursiveAstVisitor<void> {
 
     final target = node.realTarget;
 
-    if (isListOrSubclass(target.staticType)) {
-      final index = node.index;
+    if (!isListOrSubclass(target.staticType)) return;
 
-      if (index is BinaryExpression &&
-          _isLastElementAccess(index, target.toString())) {
-        _expressions.add(node);
-      }
+    final index = node.index;
+
+    if (index is BinaryExpression && _isLastElementAccess(index, target)) {
+      _rule.reportAtNode(node);
     }
   }
 
-  bool _isLastElementAccess(BinaryExpression expression, String targetName) {
-    final left = expression.leftOperand;
+  bool _isLastElementAccess(BinaryExpression expression, Expression? target) {
     final right = expression.rightOperand;
-    final leftName = _getLeftOperandName(left);
+    if (right is! IntegerLiteral || right.value != 1) return false;
 
-    if (right is! IntegerLiteral) return false;
-    if (right.value != 1) return false;
     if (expression.operator.type != TokenType.MINUS) return false;
+    if (target == null) return false;
 
-    return leftName == '$targetName.length';
+    return _isLengthOfTarget(expression.leftOperand, target);
   }
 
-  String? _getLeftOperandName(Expression expression) {
-    if (expression is PrefixedIdentifier) {
-      return expression.name;
+  bool _isLengthOfTarget(Expression expression, Expression target) {
+    final lengthReceiver = switch (expression) {
+      PropertyAccess(
+        propertyName: SimpleIdentifier(name: _lengthGetterName),
+        operator: Token(type: TokenType.PERIOD),
+        :final target,
+      ) =>
+        target,
+      PrefixedIdentifier(
+        prefix: final prefix,
+        identifier: SimpleIdentifier(name: _lengthGetterName),
+      ) =>
+        prefix,
+      _ => null,
+    };
+
+    if (lengthReceiver == null) return false;
+
+    return _referencesSameTarget(lengthReceiver, target);
+  }
+
+  bool _referencesSameTarget(
+    Expression lengthReceiver,
+    Expression accessTarget,
+  ) {
+    final normalizedLengthReceiver = _unwrapExpression(lengthReceiver);
+    final normalizedAccessTarget = _unwrapExpression(accessTarget);
+
+    if (normalizedLengthReceiver is Identifier &&
+        normalizedAccessTarget is Identifier) {
+      return normalizedLengthReceiver.element?.id ==
+          normalizedAccessTarget.element?.id;
     }
 
-    /// Access target like map.keys.length is being reported as PropertyAccess
-    /// expression this case will handle such cases
-    if (expression is PropertyAccess) {
-      if (expression.operator.type != TokenType.PERIOD) return null;
+    return normalizedLengthReceiver.toString() ==
+        normalizedAccessTarget.toString();
+  }
 
-      return expression.toString();
-    }
+  Expression _unwrapExpression(Expression expression) {
+    return switch (expression) {
+      PostfixExpression(
+        :final operand,
+        operator: Token(type: TokenType.BANG),
+      ) =>
+        _unwrapExpression(operand),
 
-    return null;
+      ParenthesizedExpression(:final expression) => _unwrapExpression(
+        expression,
+      ),
+
+      _ => expression,
+    };
   }
 }

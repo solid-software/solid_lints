@@ -1,11 +1,9 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_returning_widgets/models/avoid_returning_widgets_parameters.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
+import 'package:solid_lints/src/lints/avoid_returning_widgets/visitors/avoid_returning_widgets_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
-import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// A rule which warns about returning widgets from functions and methods.
 ///
@@ -16,6 +14,18 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 ///   - overriden methods
 ///
 /// More details: https://github.com/flutter/flutter/issues/19269
+///
+/// ### Example config:
+///
+/// ```yaml
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       avoid_returning_widgets:
+///         exclude:
+///           - class_name: MyWidget
+///             method_name: buildCustomButton
+/// ```
 ///
 /// ### Example
 ///
@@ -54,64 +64,39 @@ class AvoidReturningWidgetsRule
   /// This lint rule represents
   /// the error whether we return a widget.
   static const lintName = 'avoid_returning_widgets';
-  static const _override = 'override';
 
-  AvoidReturningWidgetsRule._(super.config);
-
-  /// Creates a new instance of [AvoidReturningWidgetsRule]
-  /// based on the lint configuration.
-  factory AvoidReturningWidgetsRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      paramsParser: AvoidReturningWidgetsParameters.fromJson,
-      problemMessage: (_) =>
-          'Returning a widget from a function is considered an anti-pattern. '
-          'Unless you are overriding an existing method, '
-          'consider extracting your widget to a separate class.',
-    );
-
-    return AvoidReturningWidgetsRule._(rule);
-  }
+  static const _code = LintCode(
+    lintName,
+    'Returning a widget from a function is considered an anti-pattern. '
+    'Unless you are overriding an existing method, '
+    'consider extracting your widget to a separate class.',
+  );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  DiagnosticCode get diagnosticCode => _code;
+
+  /// Creates a new instance of [AvoidReturningWidgetsRule]
+  AvoidReturningWidgetsRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+         name: _code.lowerCaseName,
+         description: _code.problemMessage,
+         parametersParser: AvoidReturningWidgetsParameters.fromJson,
+       );
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addDeclaration((node) {
-      // Check if declaration is function or method,
-      // simultaneously checks if return type is [DartType]
-      final DartType? returnType = switch (node) {
-        FunctionDeclaration(returnType: TypeAnnotation(:final type?)) ||
-        MethodDeclaration(returnType: TypeAnnotation(:final type?)) =>
-          type,
-        _ => null,
-      };
+    super.registerNodeProcessors(registry, context);
 
-      if (returnType == null) {
-        return;
-      }
+    final parameters =
+        getParametersForContext(context) ??
+        AvoidReturningWidgetsParameters.empty();
 
-      final isWidgetReturned = hasWidgetType(returnType);
+    final visitor = AvoidReturningWidgetsVisitor(this, parameters);
 
-      final isIgnored = config.parameters.exclude.shouldIgnore(node);
-
-      final isOverriden = switch (node) {
-        FunctionDeclaration(:final functionExpression) =>
-          functionExpression.parent is MethodDeclaration &&
-              (functionExpression.parent! as MethodDeclaration)
-                  .metadata
-                  .any((m) => m.name.name == _override),
-        MethodDeclaration(:final metadata) =>
-          metadata.any((m) => m.name.name == _override),
-        _ => false,
-      };
-
-      if (isWidgetReturned && !isOverriden && !isIgnored) {
-        reporter.atNode(node, code);
-      }
-    });
+    registry.addCompilationUnit(this, visitor);
   }
 }

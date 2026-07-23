@@ -26,6 +26,8 @@ import 'package:solid_lints/src/lints/member_ordering/models/member_type.dart';
 import 'package:solid_lints/src/lints/member_ordering/models/modifier.dart';
 
 /// Abstract class representing class member group
+///
+/// @docType String
 abstract class MemberGroup {
   /// Member annotation (e.g. override, protected)
   final Annotation annotation;
@@ -49,4 +51,8 @@ abstract class MemberGroup {
 
   /// Method to get sorting coefficient of the member group
   int getSortingCoefficient();
+
+  /// Logical implication operation.
+  bool implies(MemberGroup other) =>
+      modifier.implies(other.modifier) && annotation.implies(other.annotation);
 }

@@ -11,6 +11,13 @@ class PreferMatchFileNameParameters {
     required this.excludeEntity,
   });
 
+  /// Empty [PreferMatchFileNameParameters] model.
+  factory PreferMatchFileNameParameters.empty() {
+    return PreferMatchFileNameParameters(
+      excludeEntity: ExcludedEntitiesListParameter(excludedEntityNames: {}),
+    );
+  }
+
   /// Method for creating from json data
   factory PreferMatchFileNameParameters.fromJson(Map<String, Object?> json) =>
       PreferMatchFileNameParameters(

@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import 'package:solid_lints/src/utils/implies.dart';
+
 /// A data model enum represents class member access modifier
 enum Modifier {
   /// Indicates public access modifier
@@ -39,6 +41,14 @@ enum Modifier {
   const Modifier(this.type);
 
   /// Parses a String access modifier and returns instance of [Modifier]
-  static Modifier parse(String? name) => values
-      .firstWhere((type) => type.type == name, orElse: () => Modifier.unset);
+  static Modifier parse(String? name) => values.firstWhere(
+    (type) => type.type == name,
+    orElse: () => Modifier.unset,
+  );
+}
+
+/// Logical implication operation for access modifier
+extension ModifierImplies on Modifier {
+  /// Logical implication operation.
+  bool implies(Modifier other) => objectImplies(this, other, Modifier.unset);
 }

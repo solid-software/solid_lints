@@ -1,34 +1,8 @@
-// MIT License
-//
-// Copyright (c) 2020-2021 Dart Code Checker team
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:collection/collection.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/no_magic_number/models/no_magic_number_parameters.dart';
-import 'package:solid_lints/src/lints/no_magic_number/visitors/no_magic_number_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
+import 'package:solid_lints/src/lints/no_magic_number/visitors/no_magic_number_rule_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A `no_magic_number` rule which forbids having numbers without variable
@@ -43,11 +17,12 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// custom_lint:
-///   rules:
-///     - no_magic_number:
-///       allowed: [12, 42]
-///       allowed_in_widget_params: true
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       no_magic_number:
+///         allowed: [12, 42]
+///         allowed_in_widget_params: true
 /// ```
 ///
 /// ### Example
@@ -88,7 +63,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   const Circle({required this.r});
 /// }
 /// const Circle(r: 5);
-/// const circle = Circle(r: 10)
+/// const circle = Circle(r: 10);
 /// ```
 ///
 /// ### Allowed
@@ -138,139 +113,36 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
   /// the error when having magic number.
   static const String lintName = 'no_magic_number';
 
-  NoMagicNumberRule._(super.config);
-
-  /// Creates a new instance of [NoMagicNumberRule]
-  /// based on the lint configuration.
-  factory NoMagicNumberRule.createRule(CustomLintConfigs configs) {
-    final config = RuleConfig<NoMagicNumberParameters>(
-      configs: configs,
-      name: lintName,
-      paramsParser: NoMagicNumberParameters.fromJson,
-      problemMessage: (_) => 'Avoid using magic numbers.'
-          'Extract them to named constants or variables.',
-    );
-
-    return NoMagicNumberRule._(config);
-  }
+  static const _code = LintCode(
+    lintName,
+    'Avoid using magic numbers. Extract them to named constants or variables.',
+  );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
+  DiagnosticCode get diagnosticCode => _code;
+
+  /// Creates a new instance of [NoMagicNumberRule]
+  NoMagicNumberRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+         name: lintName,
+         description: 'Forbids having numbers without variable.',
+         parametersParser: NoMagicNumberParameters.fromJson,
+       );
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
   ) {
-    context.registry.addCompilationUnit((node) {
-      final visitor = NoMagicNumberVisitor();
-      node.accept(visitor);
+    super.registerNodeProcessors(registry, context);
 
-      final magicNumbers = visitor.literals
-          .where(_isMagicNumber)
-          .where(_isNotInsideVariable)
-          .where(_isNotInsideCollectionLiteral)
-          .where(_isNotInsideConstMap)
-          .where(_isNotInsideConstConstructor)
-          .where(_isNotInDateTime)
-          .where(_isNotInsideIndexExpression)
-          .where(_isNotInsideEnumConstantArguments)
-          .where(_isNotDefaultValue)
-          .where(_isNotInConstructorInitializer)
-          .where(_isNotWidgetParameter);
+    final parameters =
+        getParametersForContext(context) ?? NoMagicNumberParameters.empty();
 
-      for (final magicNumber in magicNumbers) {
-        reporter.atNode(magicNumber, code);
-      }
-    });
-  }
+    final visitor = NoMagicNumberRuleVisitor(this, parameters);
 
-  bool _isMagicNumber(Literal l) =>
-      (l is DoubleLiteral &&
-          !config.parameters.allowedNumbers.contains(l.value)) ||
-      (l is IntegerLiteral &&
-          !config.parameters.allowedNumbers.contains(l.value));
-
-  bool _isNotInsideVariable(Literal l) {
-    // Whether we encountered such node,
-    // This is tracked because [InstanceCreationExpression] can be
-    // inside [VariableDeclaration] removing unwanted literals
-
-    bool isInstanceCreationExpression = false;
-    return l.thisOrAncestorMatching((ancestor) {
-          if (ancestor is InstanceCreationExpression) {
-            isInstanceCreationExpression = true;
-          }
-          if (isInstanceCreationExpression) {
-            return false;
-          } else {
-            return ancestor is VariableDeclaration;
-          }
-        }) ==
-        null;
-  }
-
-  bool _isNotInDateTime(Literal l) =>
-      l.thisOrAncestorMatching(
-        (a) =>
-            a is InstanceCreationExpression &&
-            a.staticType?.getDisplayString() == 'DateTime',
-      ) ==
-      null;
-
-  bool _isNotInsideEnumConstantArguments(Literal l) {
-    final node = l.thisOrAncestorMatching(
-      (ancestor) => ancestor is EnumConstantArguments,
-    );
-
-    return node == null;
-  }
-
-  bool _isNotInsideCollectionLiteral(Literal l) => l.parent is! TypedLiteral;
-
-  bool _isNotInsideConstMap(Literal l) {
-    final grandParent = l.parent?.parent;
-
-    return !(grandParent is SetOrMapLiteral && grandParent.isConst);
-  }
-
-  bool _isNotInsideConstConstructor(Literal l) =>
-      l.thisOrAncestorMatching((ancestor) {
-        return ancestor is InstanceCreationExpression && ancestor.isConst;
-      }) ==
-      null;
-
-  bool _isNotInsideIndexExpression(Literal l) => l.parent is! IndexExpression;
-
-  bool _isNotDefaultValue(Literal literal) {
-    return literal.thisOrAncestorOfType<DefaultFormalParameter>() == null;
-  }
-
-  bool _isNotInConstructorInitializer(Literal literal) {
-    return literal.thisOrAncestorOfType<ConstructorInitializer>() == null;
-  }
-
-  bool _isNotWidgetParameter(Literal literal) {
-    if (!config.parameters.allowedInWidgetParams) return true;
-
-    final widgetCreationExpression = literal.thisOrAncestorMatching(
-      _isWidgetCreationExpression,
-    );
-
-    return widgetCreationExpression == null;
-  }
-
-  bool _isWidgetCreationExpression(
-    AstNode node,
-  ) {
-    if (node is! InstanceCreationExpression) return false;
-
-    final staticType = node.staticType;
-
-    if (staticType is! InterfaceType) return false;
-
-    final widgetSupertype = staticType.allSupertypes.firstWhereOrNull(
-      (supertype) => supertype.getDisplayString() == 'Widget',
-    );
-
-    return widgetSupertype != null;
+    registry.addDoubleLiteral(this, visitor);
+    registry.addIntegerLiteral(this, visitor);
   }
 }

@@ -1,8 +1,8 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/number_of_parameters/models/number_of_parameters_parameters.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
+import 'package:solid_lints/src/lints/number_of_parameters/visitors/number_of_parameters_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A number of parameters metric which checks whether we didn't exceed
@@ -14,10 +14,11 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// Assuming config:
 ///
 /// ```yaml
-/// custom_lint:
-///   rules:
-///     - number_of_parameters:
-///       max_parameters: 2
+/// plugins:
+///   solid_lints:
+///     diagnostics:
+///       number_of_parameters:
+///         max_parameters: 2
 /// ```
 ///
 /// #### BAD:
@@ -37,50 +38,44 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```
 class NumberOfParametersRule
     extends SolidLintRule<NumberOfParametersParameters> {
-  /// This lint rule represents the error if number of
-  /// parameters reaches the maximum value.
+  /// The name of this lint rule.
   static const lintName = 'number_of_parameters';
 
-  NumberOfParametersRule._(super.rule);
-
-  /// Creates a new instance of [NumberOfParametersRule]
-  /// based on the lint configuration.
-  factory NumberOfParametersRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      paramsParser: NumberOfParametersParameters.fromJson,
-      problemMessage: (value) =>
-          'The maximum allowed number of parameters is ${value.maxParameters}. '
-          'Try reducing the number of parameters.',
-    );
-
-    return NumberOfParametersRule._(rule);
-  }
+  static const _code = LintCode(
+    lintName,
+    'The maximum allowed number of parameters is {0}. '
+    'Try reducing the number of parameters.',
+  );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addDeclaration((node) {
-      final isIgnored = config.parameters.exclude.shouldIgnore(node);
-      final parameters = switch (node) {
-        (final MethodDeclaration node) =>
-          node.parameters?.parameters.length ?? 0,
-        (final FunctionDeclaration node) =>
-          node.functionExpression.parameters?.parameters.length ?? 0,
-        _ => 0,
-      };
+  DiagnosticCode get diagnosticCode => _code;
 
-      if (!isIgnored && parameters > config.parameters.maxParameters) {
-        reporter.atOffset(
-          offset: node.firstTokenAfterCommentAndMetadata.offset,
-          length: node.end,
-          diagnosticCode: code,
-        );
-      }
-    });
+  /// Creates a new instance of [NumberOfParametersRule].
+  NumberOfParametersRule({
+    required super.analysisOptionsLoader,
+  }) : super.withParameters(
+         name: lintName,
+         description:
+             "Checks whether we didn't exceed the maximum allowed number "
+             'of parameters for a function, method or constructor.',
+         parametersParser: NumberOfParametersParameters.fromJson,
+       );
+
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  ) {
+    super.registerNodeProcessors(registry, context);
+
+    final parameters =
+        getParametersForContext(context) ??
+        NumberOfParametersParameters.empty();
+
+    final visitor = NumberOfParametersVisitor(this, parameters);
+
+    registry.addFunctionDeclaration(this, visitor);
+    registry.addMethodDeclaration(this, visitor);
+    registry.addConstructorDeclaration(this, visitor);
   }
 }

@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import 'package:analyzer/error/listener.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:analyzer/analysis_rule/analysis_rule.dart';
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/newline_before_return/visitors/newline_before_return_visitor.dart';
-import 'package:solid_lints/src/models/rule_config.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 // Inspired by ESLint (https://eslint.org/docs/rules/newline-before-return)
 
@@ -72,38 +72,35 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   }
 /// }
 /// ```
-class NewlineBeforeReturnRule extends SolidLintRule {
-  /// This lint rule represents the error if
-  /// newline is missing before return statement
+class NewlineBeforeReturnRule extends AnalysisRule {
+  /// The lint rule name. Must be public to generate docs.
   static const String lintName = 'newline_before_return';
 
-  NewlineBeforeReturnRule._(super.config);
+  /// The message shown when the lint is triggered.
+  static const String _lintMessage = 'Missing blank line before return.';
 
-  /// Creates a new instance of [NewlineBeforeReturnRule]
-  /// based on the lint configuration.
-  factory NewlineBeforeReturnRule.createRule(CustomLintConfigs configs) {
-    final rule = RuleConfig(
-      configs: configs,
-      name: lintName,
-      problemMessage: (value) => "Missing blank line before return.",
-    );
+  /// Lint code for this rule.
+  static const LintCode _code = LintCode(
+    lintName,
+    _lintMessage,
+  );
 
-    return NewlineBeforeReturnRule._(rule);
-  }
+  /// Creates a new instance of [NewlineBeforeReturnRule].
+  NewlineBeforeReturnRule()
+    : super(
+        name: lintName,
+        description: _lintMessage,
+      );
 
   @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addReturnStatement((node) {
-      final visitor = NewLineBeforeReturnVisitor(resolver.lineInfo);
-      visitor.visitReturnStatement(node);
+  LintCode get diagnosticCode => _code;
 
-      for (final element in visitor.statements) {
-        reporter.atNode(element, code);
-      }
-    });
+  @override
+  void registerNodeProcessors(
+    RuleVisitorRegistry registry,
+    RuleContext context,
+  ) {
+    final visitor = NewLineBeforeReturnVisitor(this);
+    registry.addReturnStatement(this, visitor);
   }
 }

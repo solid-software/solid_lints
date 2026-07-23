@@ -23,136 +23,40 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/models/statement_info.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/prefer_conditional_expressions_rule.dart';
+import 'package:solid_lints/src/lints/prefer_conditional_expressions/visitors/conditionals_visitor.dart';
 
 /// The AST visitor that will collect all if statements that can be simplified
 /// into conditional expressions.
 class PreferConditionalExpressionsVisitor extends RecursiveAstVisitor<void> {
-  final _statementsInfo = <StatementInfo>[];
-
+  final PreferConditionalExpressionsRule _rule;
   final bool _ignoreNested;
-
-  /// List of statement info that represents all simple if statements
-  Iterable<StatementInfo> get statementsInfo => _statementsInfo;
 
   /// Creates instance of [PreferConditionalExpressionsVisitor]
   PreferConditionalExpressionsVisitor({
+    required PreferConditionalExpressionsRule rule,
     required bool ignoreNested,
-  }) : _ignoreNested = ignoreNested;
+  }) : _rule = rule,
+       _ignoreNested = ignoreNested;
 
   @override
   void visitIfStatement(IfStatement node) {
     super.visitIfStatement(node);
 
     if (_ignoreNested) {
-      final visitor = _ConditionalsVisitor();
-      node.visitChildren(visitor);
+      final visitor = ConditionalsVisitor();
+      node.thenStatement.accept(visitor);
+      node.elseStatement?.accept(visitor);
 
       if (visitor.hasInnerConditionals) {
         return;
       }
     }
 
-    if (node.parent is! IfStatement &&
-        node.elseStatement != null &&
-        node.elseStatement is! IfStatement) {
-      _checkBothAssignment(node);
-      _checkBothReturn(node);
+    final info = StatementInfo.fromIfStatement(node);
+    if (info != null) {
+      _rule.reportAtNode(node);
     }
   }
-
-  void _checkBothAssignment(IfStatement statement) {
-    final thenAssignment = _getAssignmentExpression(statement.thenStatement);
-    final elseAssignment = _getAssignmentExpression(statement.elseStatement);
-
-    if (thenAssignment != null &&
-        elseAssignment != null &&
-        _haveEqualNames(thenAssignment, elseAssignment)) {
-      _statementsInfo.add(
-        StatementInfo(
-          statement: statement,
-          unwrappedThenStatement: thenAssignment,
-          unwrappedElseStatement: elseAssignment,
-        ),
-      );
-    }
-  }
-
-  AssignmentExpression? _getAssignmentExpression(Statement? statement) {
-    if (statement is ExpressionStatement &&
-        statement.expression is AssignmentExpression) {
-      return statement.expression as AssignmentExpression;
-    }
-
-    if (statement is Block && statement.statements.length == 1) {
-      return _getAssignmentExpression(statement.statements.first);
-    }
-
-    return null;
-  }
-
-  bool _haveEqualNames(
-    AssignmentExpression thenAssignment,
-    AssignmentExpression elseAssignment,
-  ) =>
-      thenAssignment.leftHandSide is Identifier &&
-      elseAssignment.leftHandSide is Identifier &&
-      (thenAssignment.leftHandSide as Identifier).name ==
-          (elseAssignment.leftHandSide as Identifier).name;
-
-  void _checkBothReturn(IfStatement statement) {
-    final thenReturn = _getReturnStatement(statement.thenStatement);
-    final elseReturn = _getReturnStatement(statement.elseStatement);
-
-    if (thenReturn != null && elseReturn != null) {
-      _statementsInfo.add(
-        StatementInfo(
-          statement: statement,
-          unwrappedThenStatement: thenReturn,
-          unwrappedElseStatement: elseReturn,
-        ),
-      );
-    }
-  }
-
-  ReturnStatement? _getReturnStatement(Statement? statement) {
-    if (statement is ReturnStatement) {
-      return statement;
-    }
-
-    if (statement is Block && statement.statements.length == 1) {
-      return _getReturnStatement(statement.statements.first);
-    }
-
-    return null;
-  }
-}
-
-class _ConditionalsVisitor extends RecursiveAstVisitor<void> {
-  bool hasInnerConditionals = false;
-
-  @override
-  void visitConditionalExpression(ConditionalExpression node) {
-    hasInnerConditionals = true;
-
-    super.visitConditionalExpression(node);
-  }
-}
-
-/// Data class contains info required for fix
-class StatementInfo {
-  /// If statement node
-  final IfStatement statement;
-
-  /// Contents of if block
-  final AstNode unwrappedThenStatement;
-
-  /// Contents of else block
-  final AstNode unwrappedElseStatement;
-
-  /// Creates instance of an [StatementInfo]
-  const StatementInfo({
-    required this.statement,
-    required this.unwrappedThenStatement,
-    required this.unwrappedElseStatement,
-  });
 }
