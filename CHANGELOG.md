@@ -1,4 +1,4 @@
-## 1.0.0
+## 1.0.0-dev.1
 
 - feat!: migrate to analyzer_server_plugin
 - refactor: replace `avoid_unnecessary_type_casts` rule with dart analyzer's
