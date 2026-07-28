@@ -17,16 +17,6 @@ class AvoidDuplicateCodeParameters {
   /// code). This automatically filters out trivial single-line expressions and
   /// focuses exclusively on substantial logic blocks.
   ///
-  /// :::info Comparison of Duplicate Thresholds Across Tools
-  ///
-  /// | Tool / Analyzer | Language | Default Threshold | Typical Scope |
-  /// | :--- | :--- | :--- | :--- |
-  /// | **solid_lints** | Dart 3+ | **30 tokens** | ~4-6 lines |
-  /// | **DCM** (Dart Metrics) | Dart | **50 tokens** / 10 lines | ~10 lines |
-  /// | **PMD CPD** | Java, C# | 100 tokens | ~10-15 lines |
-  /// | **SonarQube** | Java, JS, C# | 100 tokens / 10 lines | ~10 lines |
-  /// :::
-  ///
   /// ##### Example 1: Less than 30 tokens (Ignored): 26 tokens
   /// A concise switch expression in Dart 3 syntax contains **26 tokens** and
   /// is ignored:
@@ -111,7 +101,10 @@ class AvoidDuplicateCodeParameters {
   ///   print('Starting user process...');
   ///   if (user.isActive) {
   ///     logger.log('Processing user');
+  ///     user.lastActive = DateTime.now();
+  ///     user.status = UserStatus.active;
   ///     repository.save(user);
+  ///     analytics.track('user_processed', user.id);
   ///   }
   /// }
   ///
@@ -120,14 +113,17 @@ class AvoidDuplicateCodeParameters {
   ///   validateAdmin(user);
   ///   if (user.isActive) {
   ///     logger.log('Processing user');
+  ///     user.lastActive = DateTime.now();
+  ///     user.status = UserStatus.active;
   ///     repository.save(user);
+  ///     analytics.track('user_processed', user.id);
   ///   }
   /// }
   /// ```
   /// * **When `check_blocks: true` (default):** **Reported as duplicate**
   ///   for the inner `if` block.
   /// * **When `check_blocks: false`:** **NOT reported as duplicate**
-  ///   because only top-level function bodies are checked.
+  ///   because nested `{ ... }` block nodes are skipped.
   final bool checkBlocks;
 
   /// A list of methods/functions that should be excluded from clone detection.
