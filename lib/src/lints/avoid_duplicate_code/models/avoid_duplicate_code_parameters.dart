@@ -31,14 +31,11 @@ class AvoidDuplicateCodeParameters {
   /// A function with record destructuring and pattern matching in Dart 3 syntax
   /// contains **34 tokens** and is checked for duplicates:
   /// ```dart
-  /// String processUser(Object user) {                 // 1 token
-  ///   if (user case User(:final name, :final age)     // 14 tokens
-  ///       when age >= 18) {                           // 6 tokens
-  ///     final status = 'Adult';                       // 5 tokens
-  ///     return '$status: $name ($age)';               // 3 tokens
-  ///   }                                               // 1 token
-  ///   return 'Guest';                                 // 3 tokens
-  /// }                                                 // 1 token
+  /// String formatUserRole(Object user) => switch (user) {   // 6 tokens
+  ///       User(isAdmin: true, isVerified: true) => 'Admin', // 13 tokens
+  ///       User(isVerified: true) => 'User',                 // 9 tokens
+  ///       _ => 'Guest User',                                // 4 tokens
+  ///     };                                                  // 2 tokens
   /// ```
   final int minTokens;
 
