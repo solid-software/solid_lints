@@ -6,7 +6,7 @@ import 'package:solid_lints/src/utils/docs_parser/output_formatters/docusaurus_f
 import 'package:solid_lints/src/utils/docs_parser/parsers/docs_parser.dart';
 
 void main(List<String> rawArgs) async {
-  final projectRoot = Directory.current.parent.path;
+  final projectRoot = File.fromUri(Platform.script).parent.parent.path;
 
   final readmeDefaultPath = join(projectRoot, 'README.md');
   final pubspecDefaultPath = join(projectRoot, 'pubspec.yaml');
