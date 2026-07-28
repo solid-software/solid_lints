@@ -73,10 +73,12 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// * **Coincidental Duplication:** Not all duplication is harmful. If two
 ///   identical code blocks serve completely distinct business purposes, merging
 ///   them creates a forced dependency. This can lead to
-///   [premature abstraction](https://medium.com/@ricrivero3/premature-abstraction-is-the-root-of-all-evil-7309762c0635)
-///   and [tight coupling](https://en.wikipedia.org/wiki/Coupling_(computer_programming)).
+///   [hasty abstractions][aha] and [tight coupling][coupling].
 ///
 /// :::
+///
+/// [aha]: https://en.wikipedia.org/wiki/Don't_repeat_yourself#AHA
+/// [coupling]: https://en.wikipedia.org/wiki/Coupling_(computer_programming)
 ///
 /// In such justified cases, rather than forcing an unnatural abstraction,
 /// we encourage you to consider the following solutions:
