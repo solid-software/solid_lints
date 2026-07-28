@@ -67,10 +67,10 @@ class UserDto {
 ''');
   }
 
-  Future<void> test_reports_on_constructors_exceeding_max_parameters() async {
-    await assertAutoDiagnostics('''
+  Future<void> test_does_not_report_on_constructors() async {
+    await assertNoDiagnostics(r'''
 class Test {
-  Test${expectLint(r'(int a, int b, int c)')};
+  Test(int a, int b, int c);
 }
 ''');
   }
