@@ -83,6 +83,9 @@ solid_lints:
         - constructors
         - methods
       widgets_order:
+        - fields
+        - getters_setters
+        - constructors
         - init_state_method
         - build_method
         - did_change_dependencies_method
