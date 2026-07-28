@@ -24,5 +24,7 @@ plugins:
           - class_name: Future
             identifier: wait
             source: dart:async
-            reason: "Future.wait should be avoided because it looses type safety for the results. Use a Record's `wait` method instead."
+            reason: >-
+              Future.wait should be avoided because it loses type safety for
+              the results. Use a Record's `wait` method instead.
             severity: warning
