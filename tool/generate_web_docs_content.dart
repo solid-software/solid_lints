@@ -6,13 +6,16 @@ import 'package:solid_lints/src/utils/docs_parser/output_formatters/docusaurus_f
 import 'package:solid_lints/src/utils/docs_parser/parsers/docs_parser.dart';
 
 void main(List<String> rawArgs) async {
-  final readmeDefaultPath = join(Directory.current.parent.path, 'README.md');
+  final projectRoot = File.fromUri(Platform.script).parent.parent.path;
+
+  final readmeDefaultPath = join(projectRoot, 'README.md');
+  final pubspecDefaultPath = join(projectRoot, 'pubspec.yaml');
   final docusaurusDefaultPath = join(
-    Directory.current.parent.path,
+    projectRoot,
     'doc',
     'docusaurus',
     'docs',
-    'Lints Documentation',
+    '2_custom_lints',
   );
 
   final argsParser = ArgParser()
@@ -38,6 +41,11 @@ void main(List<String> rawArgs) async {
           ' copied as docusaurus intro.md',
       defaultsTo: readmeDefaultPath,
     )
+    ..addOption(
+      'pubspec',
+      help: 'Path to the pubspec.yaml file',
+      defaultsTo: pubspecDefaultPath,
+    )
     ..addMultiOption(
       'suffixes',
       help: 'Filename suffixes that should be parsed',
@@ -55,6 +63,7 @@ void main(List<String> rawArgs) async {
     formatter: DocusaurusFormatter(
       docusaurusDocsDirPath: args['docs-dir'],
       readmePath: args['readme'],
+      pubspecPath: args['pubspec'],
     ),
     ruleFileSuffixes: args['suffixes'],
   ).parse(Directory(path));
