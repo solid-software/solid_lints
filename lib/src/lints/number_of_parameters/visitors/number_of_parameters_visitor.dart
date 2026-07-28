@@ -4,8 +4,7 @@ import 'package:solid_lints/src/lints/number_of_parameters/models/number_of_para
 import 'package:solid_lints/src/lints/number_of_parameters/number_of_parameters_rule.dart';
 import 'package:solid_lints/src/utils/node_utils.dart';
 
-/// A visitor that checks the number of parameters for functions, methods, and
-/// constructors.
+/// A visitor that checks the number of parameters for functions and methods.
 class NumberOfParametersVisitor extends SimpleAstVisitor<void> {
   final NumberOfParametersRule _rule;
   final NumberOfParametersParameters _parameters;
@@ -36,11 +35,6 @@ class NumberOfParametersVisitor extends SimpleAstVisitor<void> {
   @override
   void visitMethodDeclaration(MethodDeclaration node) {
     if (isOverride(node.metadata)) return;
-    _check(node, node.parameters);
-  }
-
-  @override
-  void visitConstructorDeclaration(ConstructorDeclaration node) {
     _check(node, node.parameters);
   }
 }

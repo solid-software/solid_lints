@@ -6,8 +6,7 @@ import 'package:solid_lints/src/lints/number_of_parameters/visitors/number_of_pa
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// A number of parameters metric which checks whether we didn't exceed
-/// the maximum allowed number of parameters for a function, method or
-/// constructor.
+/// the maximum allowed number of parameters for a function or method.
 ///
 /// ### Example:
 ///
@@ -57,7 +56,7 @@ class NumberOfParametersRule
          name: lintName,
          description:
              "Checks whether we didn't exceed the maximum allowed number "
-             'of parameters for a function, method or constructor.',
+             'of parameters for a function or method.',
          parametersParser: NumberOfParametersParameters.fromJson,
        );
 
@@ -76,6 +75,5 @@ class NumberOfParametersRule
 
     registry.addFunctionDeclaration(this, visitor);
     registry.addMethodDeclaration(this, visitor);
-    registry.addConstructorDeclaration(this, visitor);
   }
 }
