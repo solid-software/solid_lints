@@ -2,25 +2,135 @@ import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_para
 
 /// Configuration parameters for the avoid_duplicate_code rule.
 class AvoidDuplicateCodeParameters {
-  /// Minimum number of tokens in a function body or block to be considered
-  /// for clone detection. Bodies/blocks shorter than this are ignored.
+  /// Minimum number of tokens in a function body or block required for it to
+  /// be included in clone detection. Shorter bodies/blocks are ignored.
+  ///
+  /// :::note What is a Token?
+  /// The smallest indivisible syntactic unit of code emitted by the compiler's
+  /// lexer (keywords `final`, `if`, `switch`; identifiers; operators `=`, `=>`;
+  /// punctuation `{`, `}`, `;` and literals).
+  /// :::
+  ///
+  /// Considering the modern and concise syntax of Dart 3+ (switch expressions,
+  /// pattern matching, record destructuring), the optimal default threshold
+  /// was determined to be **30 tokens** (approximately 4-6 lines of meaningful
+  /// code). This automatically filters out trivial single-line expressions and
+  /// focuses exclusively on substantial logic blocks.
+  ///
+  /// :::info Comparison of Duplicate Thresholds Across Tools
+  ///
+  /// | Tool / Analyzer | Language | Default Threshold | Typical Scope |
+  /// | :--- | :--- | :--- | :--- |
+  /// | **solid_lints** | Dart 3+ | **30 tokens** | ~4-6 lines |
+  /// | **DCM** (Dart Metrics) | Dart | **50 tokens** / 10 lines | ~10 lines |
+  /// | **PMD CPD** | Java, C# | 100 tokens | ~10-15 lines |
+  /// | **SonarQube** | Java, JS, C# | 100 tokens / 10 lines | ~10 lines |
+  /// :::
+  ///
+  /// ##### Example 1: Less than 30 tokens (Ignored): 26 tokens
+  /// A concise switch expression in Dart 3 syntax contains **26 tokens** and
+  /// is ignored:
+  /// ```dart
+  /// Color getShapeColor(Shape shape) => switch (shape) { // 6 tokens
+  ///       Circle(:final color) => color,                 // 9 tokens
+  ///       Square(:final color) => color,                 // 9 tokens
+  ///     };                                               // 2 tokens
+  /// ```
+  ///
+  /// ##### Example 2: 30+ tokens (Checked for duplicates): 34 tokens
+  /// A function with record destructuring and pattern matching in Dart 3 syntax
+  /// contains **34 tokens** and is checked for duplicates:
+  /// ```dart
+  /// String processUser(Object user) {                 // 1 token
+  ///   if (user case User(:final name, :final age)     // 14 tokens
+  ///       when age >= 18) {                           // 6 tokens
+  ///     final status = 'Adult';                       // 5 tokens
+  ///     return '$status: $name ($age)';               // 3 tokens
+  ///   }                                               // 1 token
+  ///   return 'Guest';                                 // 3 tokens
+  /// }                                                 // 1 token
+  /// ```
   final int minTokens;
 
   /// When `true`, literal values (strings, numbers, booleans) are excluded
-  /// from the structural hash, making the check ignore literal differences.
+  /// from the structural hash, ignoring literal differences during duplicate
+  /// search.
+  ///
+  /// ##### Example:
+  /// ```dart
+  /// // Function A
+  /// double calculateTax(double amount) {
+  ///   final tax = amount * 0.20;
+  ///   return amount + tax;
+  /// }
+  ///
+  /// // Function B (differs only by literal 0.15 vs 0.20)
+  /// double calculateDiscount(double amount) {
+  ///   final tax = amount * 0.15;
+  ///   return amount + tax;
+  /// }
+  /// ```
+  /// * **When `ignore_literals: false` (default):** **NOT reported**
+  ///   because numbers `0.20` and `0.15` differ.
+  /// * **When `ignore_literals: true`:** **Reported as duplicate**
+  ///   because literal values are ignored.
   final bool ignoreLiterals;
 
-  /// When `true`, local variable and parameter names are excluded
-  /// from the structural hash, allowing detection of renamed variables
-  /// (Type 2). Note that method, class, and field names are NOT ignored
-  /// to prevent excessive false positives.
+  /// When `true`, local variable and parameter names are excluded from the
+  /// structural hash (using Sequential Variable Indexing). This enables
+  /// detection of renamed variable clones (Type 2). Note that method, class,
+  /// and field names are NOT ignored to prevent excessive false positives.
+  ///
+  /// ##### Example:
+  /// ```dart
+  /// // Function A
+  /// double calcTotal(double price, int count) {
+  ///   final subtotal = price * count;
+  ///   return subtotal > 100 ? subtotal * 0.9 : subtotal;
+  /// }
+  ///
+  /// // Function B (renamed: price->amount, count->qty, subtotal->total)
+  /// double calcTotal(double amount, int qty) {
+  ///   final total = amount * qty;
+  ///   return total > 100 ? total * 0.9 : total;
+  /// }
+  /// ```
+  /// * **When `ignore_identifiers: true` (default):** **Reported as**
+  ///   **duplicate** (Type 2 Clone).
+  /// * **When `ignore_identifiers: false`:** **NOT reported as duplicate**
+  ///   because local names differ.
   final bool ignoreIdentifiers;
 
-  /// When `true`, statement blocks (like if-blocks or loops) inside functions
-  /// are also checked for duplication.
+  /// When `true`, statement blocks (such as `if` blocks or loops) inside
+  /// functions are also checked for duplication.
+  ///
+  /// ##### Example:
+  /// ```dart
+  /// // Function A
+  /// void processUser(User user) {
+  ///   print('Starting user process...');
+  ///   if (user.isActive) {
+  ///     logger.log('Processing user');
+  ///     repository.save(user);
+  ///   }
+  /// }
+  ///
+  /// // Function B (different function, same inner if block)
+  /// void processAdmin(User user) {
+  ///   validateAdmin(user);
+  ///   if (user.isActive) {
+  ///     logger.log('Processing user');
+  ///     repository.save(user);
+  ///   }
+  /// }
+  /// ```
+  /// * **When `check_blocks: true` (default):** **Reported as duplicate**
+  ///   for the inner `if` block.
+  /// * **When `check_blocks: false`:** **NOT reported as duplicate**
+  ///   because only top-level function bodies are checked.
   final bool checkBlocks;
 
-  /// A list of methods/functions that should be excluded from the lint.
+  /// A list of methods/functions that should be excluded from clone detection.
   final ExcludedIdentifiersListParameter exclude;
 
   static const _defaultMinTokens = 30;
