@@ -273,6 +273,7 @@ extension ExpressionExtension on Expression {
   /// Returns the member element referenced or operated on by this expression,
   /// or null if none.
   Element? get memberElement => switch (this) {
+    SimpleIdentifier(:final element) => element,
     MethodInvocation(:final methodName) => methodName.element,
     PropertyAccess(:final propertyName) => propertyName.element,
     AssignmentExpression(:final writeElement, :final readElement) ||
@@ -313,4 +314,18 @@ extension ExpressionNullableExtension on Expression? {
 
   /// Returns `true` if this expression is `this` or `super`.
   bool get isThisOrSuper => this is ThisExpression || this is SuperExpression;
+}
+
+/// Extension on [MethodDeclaration] to provide AST helper getters.
+extension MethodDeclarationExtension on MethodDeclaration {
+  /// Returns the single return expression of a method, or null if the
+  /// method body has multiple statements or no return expression.
+  Expression? get singleReturnExpression => switch (body) {
+    ExpressionFunctionBody(:final expression) => expression,
+    BlockFunctionBody(
+      block: Block(statements: [ReturnStatement(:final expression?)]),
+    ) =>
+      expression,
+    _ => null,
+  };
 }

@@ -62,6 +62,16 @@ class BoxDecoration extends Widget {
   Widget build(BuildContext context) => throw 'unimplemented';
 }
 
+abstract class State<T extends StatefulWidget> {
+  T get widget => throw 'unimplemented';
+}
+
+class Color {}
+
+abstract interface class WidgetStateProperty<T> {}
+
+class WidgetStateColor extends Color implements WidgetStateProperty<Color> {}
+
 class DecoratedBox extends Widget {
   const DecoratedBox({required this.decoration});
 
@@ -264,6 +274,86 @@ class NotExcludeWidget extends StatelessWidget {
   }
 
   ${expectLint('Widget excludeWidgetMethod() => const SizedBox();')}
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_collections() async {
+    await assertNoDiagnostics('''
+$_importFlutterWidgets
+
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  List<Widget> buildList() => [const SizedBox()];
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox();
+  }
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_non_widget_types() async {
+    await assertNoDiagnostics('''
+$_importFlutterWidgets
+
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  WidgetStateColor getColor() => WidgetStateColor();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox();
+  }
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_abstract_methods() async {
+    await assertNoDiagnostics('''
+$_importFlutterWidgets
+
+abstract class BaseStrategy {
+  Widget buildHeader(BuildContext context);
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_state_widget_getters() async {
+    await assertNoDiagnostics('''
+$_importFlutterWidgets
+
+class TargetWidget extends StatefulWidget {
+  const TargetWidget({super.key});
+}
+
+class _TargetWidgetState extends State<StatefulWidget> {
+  TargetWidget get widget => super.widget as TargetWidget;
+  TargetWidget get parenthesizedWidget => ((super.widget as TargetWidget));
+  TargetWidget get blockWidget {
+    return super.widget as TargetWidget;
+  }
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_inline_builder_callbacks() async {
+    await assertNoDiagnostics('''
+$_importFlutterWidgets
+
+void acceptBuilder(Widget Function(BuildContext) builder) {}
+
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    acceptBuilder((ctx) => const SizedBox());
+    return const SizedBox();
+  }
 }
 ''');
   }
