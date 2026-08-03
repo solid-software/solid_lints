@@ -74,7 +74,12 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
       return false;
     }
 
-    final element = node.singleReturnExpression.unwrapTarget?.memberElement;
+    final unwrapped = node.singleReturnExpression.unwrapTarget;
+    if (unwrapped?.targetExpression.isThisOrSuperOrNull != true) {
+      return false;
+    }
+
+    final element = unwrapped?.memberElement;
     final enclosing = element?.enclosingElement;
 
     return element is PropertyAccessorElement &&
