@@ -78,6 +78,7 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
     final enclosing = element?.enclosingElement;
 
     return element is PropertyAccessorElement &&
+        element.name == 'widget' &&
         enclosing is InterfaceElement &&
         isWidgetStateOrSubclass(enclosing.thisType);
   }

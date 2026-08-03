@@ -357,4 +357,30 @@ class MyWidget extends StatelessWidget {
 }
 ''');
   }
+
+  Future<void> test_reports_on_non_widget_state_accessors() async {
+    await assertAutoDiagnostics('''
+$_importFlutterWidgets
+
+class OtherState extends State<StatefulWidget> {
+  ${expectLint('Widget get someWidget => const SizedBox();')}
+}
+
+class _TargetWidgetState extends State<StatefulWidget> {
+  late final OtherState otherState;
+
+  ${expectLint('Widget get customWidget => otherState.someWidget;')}
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_local_non_flutter_widget_class() async {
+    await assertNoDiagnostics('''
+class Widget {}
+
+class CustomService {
+  Widget createCustomWidget() => Widget();
+}
+''');
+  }
 }

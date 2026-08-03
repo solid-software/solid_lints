@@ -197,38 +197,42 @@ bool _checkSelfOrSupertypes(
     predicate(type) ||
     (type is InterfaceType && type.allSupertypes.any(predicate));
 
-bool _isWidget(DartType? type) =>
-    type is InterfaceType && type.element.name == 'Widget';
+bool _isWidget(DartType? type) => _isFlutterType(type, 'Widget');
 
 bool _isSubclassOfWidget(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isWidget);
 
-bool _isWidgetState(DartType? type) =>
-    type is InterfaceType && type.element.name == 'State';
+bool _isWidgetState(DartType? type) => _isFlutterType(type, 'State');
 
 bool _isSubclassOfWidgetState(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isWidgetState);
 
-bool _isListenable(DartType type) =>
-    type is InterfaceType && type.element.name == 'Listenable';
+bool _isListenable(DartType? type) => _isFlutterType(type, 'Listenable');
 
-bool _isRenderObject(DartType? type) =>
-    type is InterfaceType && type.element.name == 'RenderObject';
+bool _isRenderObject(DartType? type) => _isFlutterType(type, 'RenderObject');
 
 bool _isSubclassOfRenderObject(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isRenderObject);
 
 bool _isRenderObjectWidget(DartType? type) =>
-    type is InterfaceType && type.element.name == 'RenderObjectWidget';
+    _isFlutterType(type, 'RenderObjectWidget');
 
 bool _isSubclassOfRenderObjectWidget(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isRenderObjectWidget);
 
 bool _isRenderObjectElement(DartType? type) =>
-    type is InterfaceType && type.element.name == 'RenderObjectElement';
+    _isFlutterType(type, 'RenderObjectElement');
 
 bool _isSubclassOfRenderObjectElement(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isRenderObjectElement);
+
+bool _isFlutterType(DartType? type, String name) =>
+    type is InterfaceType &&
+    type.element.name == name &&
+    _isFlutterLibrary(type.element.library);
+
+bool _isFlutterLibrary(LibraryElement library) =>
+    library.uri.scheme == 'package' && library.uri.path.startsWith('flutter/');
 
 bool _isMultiProvider(DartType? type) =>
     type?.getDisplayString() == 'MultiProvider';
