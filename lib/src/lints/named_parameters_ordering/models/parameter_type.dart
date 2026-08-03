@@ -23,8 +23,8 @@ enum ParameterType {
   /// The default ordering of parameter types.
   static const defaultOrder = [
     ParameterType.requiredInherited,
-    ParameterType.inherited,
     ParameterType.required,
+    ParameterType.inherited,
     ParameterType.nullable,
     ParameterType.defaultValue,
   ];

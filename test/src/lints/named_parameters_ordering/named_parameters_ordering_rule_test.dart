@@ -67,9 +67,9 @@ class User extends Base {
 
   User({
     required super.accountType,
-    super.userId,
     required this.name,
     required this.email,
+    super.userId,
     this.age,
     this.country,
     this.isActive = true,
@@ -113,8 +113,8 @@ class User extends Base {
   User({
     required super.accountType,
     this.age,
-    ${expectLint('super.userId')},
-    required this.name,
+    ${expectLint('required this.name')},
+    super.userId,
     this.isActive = true,
     ${expectLint('required this.email')},
   });
