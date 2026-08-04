@@ -26,7 +26,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:collection/collection.dart';
 import 'package:solid_lints/src/utils/named_type_utils.dart';
 
 extension Subtypes on DartType {
@@ -144,16 +143,9 @@ extension InterfaceElementExt on InterfaceElement {
   }
 }
 
-bool hasWidgetType(DartType type) =>
-    (isWidgetOrSubclass(type) ||
-        _isIterable(type) ||
-        _isList(type) ||
-        _isFuture(type)) &&
-    !(_isMultiProvider(type) ||
-        _isSubclassOfInheritedProvider(type) ||
-        _isIterableInheritedProvider(type) ||
-        _isListInheritedProvider(type) ||
-        _isFutureInheritedProvider(type));
+bool isWidgetType(DartType type) =>
+    isWidgetOrSubclass(type) &&
+    !(_isMultiProvider(type) || _isSubclassOfInheritedProvider(type));
 
 bool isIterable(DartType? type) =>
     _checkSelfOrSupertypes(type, (t) => t?.isDartCoreIterable ?? false);
@@ -205,51 +197,42 @@ bool _checkSelfOrSupertypes(
     predicate(type) ||
     (type is InterfaceType && type.allSupertypes.any(predicate));
 
-bool _isWidget(DartType? type) => type?.getDisplayString() == 'Widget';
+bool _isWidget(DartType? type) => _isFlutterType(type, 'Widget');
 
 bool _isSubclassOfWidget(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isWidget);
 
-// ignore: deprecated_member_use
-bool _isWidgetState(DartType? type) => type?.element?.displayName == 'State';
+bool _isWidgetState(DartType? type) => _isFlutterType(type, 'State');
 
 bool _isSubclassOfWidgetState(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isWidgetState);
 
-bool _isIterable(DartType type) =>
-    type.isDartCoreIterable &&
-    type is InterfaceType &&
-    isWidgetOrSubclass(type.typeArguments.firstOrNull);
+bool _isListenable(DartType? type) => _isFlutterType(type, 'Listenable');
 
-bool _isList(DartType type) =>
-    type.isDartCoreList &&
-    type is InterfaceType &&
-    isWidgetOrSubclass(type.typeArguments.firstOrNull);
-
-bool _isFuture(DartType type) =>
-    type.isDartAsyncFuture &&
-    type is InterfaceType &&
-    isWidgetOrSubclass(type.typeArguments.firstOrNull);
-
-bool _isListenable(DartType type) => type.getDisplayString() == 'Listenable';
-
-bool _isRenderObject(DartType? type) =>
-    type?.getDisplayString() == 'RenderObject';
+bool _isRenderObject(DartType? type) => _isFlutterType(type, 'RenderObject');
 
 bool _isSubclassOfRenderObject(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isRenderObject);
 
 bool _isRenderObjectWidget(DartType? type) =>
-    type?.getDisplayString() == 'RenderObjectWidget';
+    _isFlutterType(type, 'RenderObjectWidget');
 
 bool _isSubclassOfRenderObjectWidget(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isRenderObjectWidget);
 
 bool _isRenderObjectElement(DartType? type) =>
-    type?.getDisplayString() == 'RenderObjectElement';
+    _isFlutterType(type, 'RenderObjectElement');
 
 bool _isSubclassOfRenderObjectElement(DartType? type) =>
     type is InterfaceType && type.allSupertypes.any(_isRenderObjectElement);
+
+bool _isFlutterType(DartType? type, String name) =>
+    type is InterfaceType &&
+    type.element.name == name &&
+    _isFlutterLibrary(type.element.library);
+
+bool _isFlutterLibrary(LibraryElement library) =>
+    library.uri.scheme == 'package' && library.uri.path.startsWith('flutter/');
 
 bool _isMultiProvider(DartType? type) =>
     type?.getDisplayString() == 'MultiProvider';
@@ -259,21 +242,6 @@ bool _isSubclassOfInheritedProvider(DartType? type) =>
 
 bool _isInheritedProvider(DartType? type) =>
     type != null && type.getDisplayString().startsWith('InheritedProvider<');
-
-bool _isIterableInheritedProvider(DartType type) =>
-    type.isDartCoreIterable &&
-    type is InterfaceType &&
-    _isSubclassOfInheritedProvider(type.typeArguments.firstOrNull);
-
-bool _isListInheritedProvider(DartType type) =>
-    type.isDartCoreList &&
-    type is InterfaceType &&
-    _isSubclassOfInheritedProvider(type.typeArguments.firstOrNull);
-
-bool _isFutureInheritedProvider(DartType type) =>
-    type.isDartAsyncFuture &&
-    type is InterfaceType &&
-    _isSubclassOfInheritedProvider(type.typeArguments.firstOrNull);
 
 bool isIterableOrSubclass(DartType? type) =>
     _checkSelfOrSupertypes(type, (t) => t?.isDartCoreIterable ?? false);
