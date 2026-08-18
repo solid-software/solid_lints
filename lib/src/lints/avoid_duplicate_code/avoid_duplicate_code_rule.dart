@@ -154,6 +154,7 @@ class AvoidDuplicateCodeRule
       modificationStamp: context.definingUnit.file.modificationStamp,
       contextRoot: context.libraryElement?.session.analysisContext.contextRoot,
       resourceProvider: context.definingUnit.file.provider,
+      analysisOptionsLoader: analysisOptionsLoader,
     );
 
     registry.addCompilationUnit(this, visitor);

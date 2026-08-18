@@ -36,6 +36,7 @@ class AnalysisOptionsParser {
 
     final mergedRules = <String, Map<String, Object?>>{};
     final disabledRules = <String>{};
+    final excludedPatterns = <String>{};
 
     final nextSeenPaths = {...seenPaths, path};
     _resolveAndMergeIncludes(
@@ -44,11 +45,17 @@ class AnalysisOptionsParser {
       nextSeenPaths,
       mergedRules,
       disabledRules,
+      excludedPatterns,
     );
     _parseRuleOptions(yaml, mergedRules, disabledRules);
     _parseSuppressedErrors(yaml, mergedRules, disabledRules);
+    _parseExcludedPatterns(yaml, excludedPatterns);
 
-    return RulesData(rules: mergedRules, disabledRules: disabledRules);
+    return RulesData(
+      rules: mergedRules,
+      disabledRules: disabledRules,
+      excludedPatterns: excludedPatterns,
+    );
   }
 
   Map<String, Object?>? _parseYaml(File file) {
@@ -79,6 +86,7 @@ class AnalysisOptionsParser {
     Set<String> seenPaths,
     Map<String, Map<String, Object?>> mergedRules,
     Set<String> disabledRules,
+    Set<String> excludedPatterns,
   ) {
     final includeOption = yaml['include'];
     switch (includeOption) {
@@ -89,6 +97,7 @@ class AnalysisOptionsParser {
           seenPaths,
           mergedRules,
           disabledRules,
+          excludedPatterns,
         );
       case List():
         for (final include in includeOption) {
@@ -99,6 +108,7 @@ class AnalysisOptionsParser {
               seenPaths,
               mergedRules,
               disabledRules,
+              excludedPatterns,
             );
           }
         }
@@ -111,6 +121,7 @@ class AnalysisOptionsParser {
     Set<String> seenPaths,
     Map<String, Map<String, Object?>> mergedRules,
     Set<String> disabledRules,
+    Set<String> excludedPatterns,
   ) {
     final includedFile = _resolveIncludedFile(baseFile, includePath);
     if (includedFile == null) return;
@@ -124,6 +135,7 @@ class AnalysisOptionsParser {
       };
     }
     disabledRules.addAll(includedData.disabledRules);
+    excludedPatterns.addAll(includedData.excludedPatterns);
   }
 
   File? _resolveIncludedFile(File baseFile, String includePath) {
@@ -226,6 +238,27 @@ class AnalysisOptionsParser {
       } else {
         disabledRules.remove(ruleName);
       }
+    }
+  }
+
+  /// Parses file exclusion patterns configured under `analyzer: exclude:`.
+  void _parseExcludedPatterns(
+    Map<String, Object?> yaml,
+    Set<String> excludedPatterns,
+  ) {
+    final analyzer = yaml['analyzer'];
+    if (analyzer is! Map) return;
+
+    final exclude = analyzer['exclude'];
+    switch (exclude) {
+      case String():
+        excludedPatterns.add(exclude);
+      case Iterable():
+        for (final item in exclude) {
+          if (item is String) {
+            excludedPatterns.add(item);
+          }
+        }
     }
   }
 }

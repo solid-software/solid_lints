@@ -5,6 +5,7 @@ import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:collection/collection.dart';
+import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/body_candidate.dart';
@@ -12,7 +13,7 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_mat
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/duplicate_location.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
-import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/context_root_extensions.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/ignore_matcher.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/range_extension.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/token_utils.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/ast_structural_hash_visitor.dart';
@@ -32,6 +33,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
   final int _modificationStamp;
   final ContextRoot? _contextRoot;
   final ResourceProvider _resourceProvider;
+  final AnalysisOptionsLoader? _analysisOptionsLoader;
 
   /// Creates a new instance of [AvoidDuplicateCodeVisitor].
   AvoidDuplicateCodeVisitor(
@@ -41,20 +43,35 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     required int modificationStamp,
     ContextRoot? contextRoot,
     ResourceProvider? resourceProvider,
+    AnalysisOptionsLoader? analysisOptionsLoader,
   }) : _filePath = filePath,
        _modificationStamp = modificationStamp,
        _contextRoot = contextRoot,
        _resourceProvider =
-           resourceProvider ?? PhysicalResourceProvider.INSTANCE;
+           resourceProvider ?? PhysicalResourceProvider.INSTANCE,
+       _analysisOptionsLoader = analysisOptionsLoader;
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
-    if (_filePath.isEmpty) return;
+    final filePath = switch (node) {
+      CompilationUnit(:final declaredFragment?) =>
+        declaredFragment.source.fullName,
+      _ => _filePath,
+    };
+    if (filePath.isEmpty) return;
+
+    if (_analysisOptionsLoader?.isFileExcludedForFile(filePath) ?? false) {
+      return;
+    }
+
+    if (IgnoreMatcher.isFileIgnored(node)) {
+      return;
+    }
+
     GlobalHashRegistry.instance.resourceProvider = _resourceProvider;
-    if (_tryReportFromCache(
-      _filePath,
-      _contextRoot?.root.path ?? _findPackageRoot(_filePath) ?? '',
-    )) {
+    final packageRoot =
+        _contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
+    if (_tryReportFromCache(filePath, packageRoot)) {
       return;
     }
     final hasher = AstStructuralHashVisitor(
@@ -67,7 +84,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
         node: hasher.computeHash(node),
     };
     final crossFileDuplicatesByHash = _findAndSaveCrossFileMatches(
-      _filePath,
+      filePath,
       candidates
           .map(
             (c) => HashEntry(
@@ -79,15 +96,28 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
             ),
           )
           .toList(),
-      _contextRoot?.root.path ?? _findPackageRoot(_filePath) ?? '',
+      packageRoot,
     );
     _groupAndReportDuplicates(
-      _filePath,
+      filePath,
       candidates,
       candidateHashes,
       hasher,
       crossFileDuplicatesByHash,
     );
+  }
+
+  List<BodyCandidate> _collectCandidates(CompilationUnit node) {
+    final collector = CandidateVisitor(_parameters);
+    node.accept(collector);
+    return collector.candidates
+        .where(
+          (c) => !IgnoreMatcher.isCandidateIgnored(
+            c.node,
+            c.enclosingDeclaration,
+          ),
+        )
+        .toList();
   }
 
   bool _tryReportFromCache(String filePath, String packageRoot) {
@@ -114,7 +144,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       cachedEntries,
       parameters: _parameters,
       packageRoot: packageRoot,
-      isFileExcluded: (p) => _contextRoot?.isFileExcluded(p) ?? false,
+      isFileExcluded: _isFileExcluded,
     );
 
     final hashGroups = groupBy(cachedEntries, (entry) => entry.hash);
@@ -170,11 +200,8 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     return true; // Cache hit and handled
   }
 
-  List<BodyCandidate> _collectCandidates(CompilationUnit node) {
-    final collector = CandidateVisitor(_parameters);
-    node.accept(collector);
-    return collector.candidates;
-  }
+  bool _isFileExcluded(String path) =>
+      _analysisOptionsLoader?.isFileExcludedForFile(path) ?? false;
 
   Map<int, List<DuplicateLocation>> _findAndSaveCrossFileMatches(
     String filePath,
@@ -189,8 +216,9 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       hashEntries,
       parameters: _parameters,
       packageRoot: packageRoot,
-      isFileExcluded: (p) => _contextRoot?.isFileExcluded(p) ?? false,
+      isFileExcluded: _isFileExcluded,
     );
+
     registry.updateFile(
       filePath,
       hashEntries,

@@ -5,6 +5,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
+import 'package:solid_lints/src/models/filtering_diagnostic_reporter.dart';
 
 /// A proxy wrapper for [MultiAnalysisRule] that checks if the rule is disabled
 /// before registering its node processors.
@@ -38,7 +39,7 @@ class ProxyMultiAnalysisRule extends MultiAnalysisRule {
   @override
   set reporter(DiagnosticReporter value) {
     super.reporter = value;
-    delegate.reporter = value;
+    delegate.reporter = FilteringDiagnosticReporter(value, loader);
   }
 
   @override
@@ -47,6 +48,9 @@ class ProxyMultiAnalysisRule extends MultiAnalysisRule {
     RuleContext context,
   ) {
     if (loader.isRuleDisabled(context, name)) {
+      return;
+    }
+    if (loader.isFileExcluded(context)) {
       return;
     }
     delegate.registerNodeProcessors(registry, context);
