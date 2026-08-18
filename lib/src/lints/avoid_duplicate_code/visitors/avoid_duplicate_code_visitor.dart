@@ -53,24 +53,31 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
-    final filePath = switch (node) {
-      CompilationUnit(:final declaredFragment?) =>
-        declaredFragment.source.fullName,
-      _ => _filePath,
-    };
-    if (filePath.isEmpty) return;
-
-    if (_analysisOptionsLoader?.isFileExcludedForFile(filePath) ?? false) {
-      return;
-    }
-
-    if (IgnoreMatcher.isFileIgnored(node)) {
-      return;
-    }
+    if (_filePath.isEmpty) return;
+    final filePath = _filePath;
 
     GlobalHashRegistry.instance.resourceProvider = _resourceProvider;
     final packageRoot =
         _contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
+
+    if (_analysisOptionsLoader?.isFileExcludedForFile(filePath) ?? false) {
+      GlobalHashRegistry.instance.removeFile(
+        filePath,
+        parameters: _parameters,
+        packageRoot: packageRoot,
+      );
+      return;
+    }
+
+    if (IgnoreMatcher.isFileIgnored(node)) {
+      GlobalHashRegistry.instance.removeFile(
+        filePath,
+        parameters: _parameters,
+        packageRoot: packageRoot,
+      );
+      return;
+    }
+
     if (_tryReportFromCache(filePath, packageRoot)) {
       return;
     }

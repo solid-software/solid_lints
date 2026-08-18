@@ -18,6 +18,8 @@ abstract final class IgnoreMatcher {
   static bool isFileIgnored(CompilationUnit unit) => [
     unit.beginToken,
     for (final directive in unit.directives) directive.beginToken,
+    for (final declaration in unit.declarations) declaration.beginToken,
+    unit.endToken,
   ].any((t) => t.comments.any((c) => _fileIgnoreRegex.hasMatch(c.lexeme)));
 
   /// Checks if a candidate [node] or its enclosing [declaration] is ignored.

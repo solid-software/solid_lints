@@ -146,13 +146,14 @@ class AvoidDuplicateCodeRule
         getParametersForContext(context) ??
         AvoidDuplicateCodeParameters.empty();
 
+    final currentUnit = context.currentUnit ?? context.definingUnit;
     final visitor = AvoidDuplicateCodeVisitor(
       this,
       parameters,
-      filePath: context.definingUnit.file.path,
-      modificationStamp: context.definingUnit.file.modificationStamp,
+      filePath: currentUnit.file.path,
+      modificationStamp: currentUnit.file.modificationStamp,
       contextRoot: context.libraryElement?.session.analysisContext.contextRoot,
-      resourceProvider: context.definingUnit.file.provider,
+      resourceProvider: currentUnit.file.provider,
       analysisOptionsLoader: analysisOptionsLoader,
     );
 

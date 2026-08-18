@@ -60,6 +60,34 @@ void foo() {}
         expect(IgnoreMatcher.isFileIgnored(result.unit), isTrue);
       });
 
+      test(
+        'returns true when placed after directives and before declarations',
+        () {
+          final result = parseString(
+            content: '''
+import 'dart:async';
+
+// ignore_for_file: avoid_duplicate_code
+void foo() {}
+''',
+          );
+
+          expect(IgnoreMatcher.isFileIgnored(result.unit), isTrue);
+        },
+      );
+
+      test('returns true when placed at the end of the file', () {
+        final result = parseString(
+          content: '''
+void foo() {}
+
+// ignore_for_file: avoid_duplicate_code
+''',
+        );
+
+        expect(IgnoreMatcher.isFileIgnored(result.unit), isTrue);
+      });
+
       test('returns false when no ignore comments present', () {
         final result = parseString(
           content: '''

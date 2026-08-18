@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/analysis/utilities.dart' show parseString;
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
@@ -8,6 +9,7 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
+import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../../utils/auto_test_lint_offsets.dart';
@@ -469,6 +471,21 @@ void second() {
 
   Future<void>
   test_duplicate_code_with_three_files_and_excluded_part_file() async {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+linter:
+  rules:
+    - ${rule.name}
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+$_mockAnalysisOptionsContent
+''');
+    rule = AvoidDuplicateCodeRule(
+      analysisOptionsLoader: AnalysisOptionsLoader(
+        resourceProvider: resourceProvider,
+      ),
+    );
+
     // 1. First file: other.dart (separate file with identical code)
     final otherFile = newFile('$testPackageLibPath/other.dart', '''
 void otherMethod() {
@@ -571,6 +588,45 @@ void mainMethod() {
   print('done');
 }
 ''');
+  }
+
+  Future<void> test_visiting_ignored_file_removes_it_from_registry() async {
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+    await _indexFile(otherFile);
+    expect(GlobalHashRegistry.instance.fileCount, 1);
+
+    final result = parseString(
+      content: '''
+// ignore_for_file: avoid_duplicate_code
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''',
+    );
+    final avoidRule = rule as AvoidDuplicateCodeRule;
+    final visitor = AvoidDuplicateCodeVisitor(
+      avoidRule,
+      AvoidDuplicateCodeParameters.empty(),
+      filePath: otherFile.path,
+      modificationStamp: 2,
+      resourceProvider: resourceProvider,
+      analysisOptionsLoader: avoidRule.analysisOptionsLoader,
+    );
+    result.unit.accept(visitor);
+
+    expect(GlobalHashRegistry.instance.fileCount, 0);
   }
 
   Future<void> _indexFile(
