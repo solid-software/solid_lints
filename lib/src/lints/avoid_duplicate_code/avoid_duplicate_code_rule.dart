@@ -99,17 +99,16 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       avoid_duplicate_code:
-///         min_tokens: 30
-///         ignore_literals: false
-///         ignore_identifiers: true
-///         check_blocks: true
-///         exclude:
-///           - method_name: initState
-///           - method_name: dispose
+/// solid_lints:
+///   diagnostics:
+///     avoid_duplicate_code:
+///       min_tokens: 30
+///       ignore_literals: false
+///       ignore_identifiers: true
+///       check_blocks: true
+///       exclude:
+///         - method_name: initState
+///         - method_name: dispose
 /// ```
 class AvoidDuplicateCodeRule
     extends SolidLintRule<AvoidDuplicateCodeParameters> {

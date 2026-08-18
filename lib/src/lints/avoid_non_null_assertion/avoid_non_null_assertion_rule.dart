@@ -14,13 +14,12 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       avoid_non_null_assertion:
-///         ignored_types:
-///           - IMap
-///           - BuiltMap
+/// solid_lints:
+///   diagnostics:
+///     avoid_non_null_assertion:
+///       ignored_types:
+///         - IMap
+///         - BuiltMap
 /// ```
 ///
 /// ### Example

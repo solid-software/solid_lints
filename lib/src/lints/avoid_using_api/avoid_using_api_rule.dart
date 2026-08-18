@@ -13,20 +13,18 @@ import 'package:solid_lints/src/models/solid_multi_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       avoid_using_api:
-///         avoid_using_api: true
-///         severity: warning
-///         entries:
-///           - class_name: LegacyClient
-///             source: package:legacy_api/legacy_api.dart
-///             reason: 'Use ModernClient instead.'
-///             severity: error
-///           - identifier: print
-///             source: dart:core
-///             reason: 'Use logging framework instead.'
+/// solid_lints:
+///   diagnostics:
+///     avoid_using_api:
+///       severity: warning
+///       entries:
+///         - class_name: LegacyClient
+///           source: package:legacy_api/legacy_api.dart
+///           reason: 'Use ModernClient instead.'
+///           severity: error
+///         - identifier: print
+///           source: dart:core
+///           reason: 'Use logging framework instead.'
 /// ```
 class AvoidUsingApiRule extends SolidMultiLintRule<AvoidUsingApiParameters> {
   /// This lint name.

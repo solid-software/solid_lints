@@ -17,12 +17,11 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       no_magic_number:
-///         allowed: [12, 42]
-///         allowed_in_widget_params: true
+/// solid_lints:
+///   diagnostics:
+///     no_magic_number:
+///       allowed: [12, 42]
+///       allowed_in_widget_params: true
 /// ```
 ///
 /// ### Example

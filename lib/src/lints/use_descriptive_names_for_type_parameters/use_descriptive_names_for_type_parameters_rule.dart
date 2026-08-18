@@ -14,11 +14,10 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// Assuming config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       use_descriptive_names_for_type_parameters:
-///         min_type_parameters: 3
+/// solid_lints:
+///   diagnostics:
+///     use_descriptive_names_for_type_parameters:
+///       min_type_parameters: 3
 /// ```
 ///
 /// #### BAD:

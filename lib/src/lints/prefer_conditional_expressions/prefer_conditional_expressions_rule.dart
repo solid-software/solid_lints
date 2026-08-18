@@ -15,11 +15,10 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       prefer_conditional_expressions:
-///         ignore_nested: true
+/// solid_lints:
+///   diagnostics:
+///     prefer_conditional_expressions:
+///       ignore_nested: true
 /// ```
 ///
 /// ### Example
