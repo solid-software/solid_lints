@@ -751,6 +751,28 @@ analyzer:
     );
   }
 
+  void test_isFileExcluded_ignores_malformed_glob_patterns() {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+analyzer:
+  exclude:
+    - ""
+    - "[abc"
+    - "{foo,bar"
+    - "invalid(glob"
+    - "**/*.g.dart"
+''');
+
+    final gDartContext = _createMockContextForFile(
+      '$testPackageLibPath/models/user.g.dart',
+    );
+    final dartContext = _createMockContextForFile(
+      '$testPackageLibPath/models/user.dart',
+    );
+
+    expect(analysisOptionsLoader.isFileExcluded(gDartContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(dartContext), isFalse);
+  }
+
   RuleContext _createMockContextForFile(
     String filePath, {
     String? packageRootPath,

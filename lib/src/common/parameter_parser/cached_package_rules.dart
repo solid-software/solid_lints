@@ -24,10 +24,19 @@ class CachedPackageRules {
     required this.rules,
     required this.disabledRules,
     required this.excludedPatterns,
-  }) : _compiledGlobs = [
-         for (final pattern in excludedPatterns)
-           Glob(pattern, context: p.posix),
-       ];
+  }) : _compiledGlobs = _compileGlobs(excludedPatterns);
+
+  static List<Glob> _compileGlobs(Set<String> patterns) {
+    final globs = <Glob>[];
+    for (final pattern in patterns) {
+      try {
+        globs.add(Glob(pattern, context: p.posix));
+      } on FormatException {
+        // Ignore malformed glob patterns.
+      }
+    }
+    return globs;
+  }
 
   /// Checks if [filePath] matches any of the excluded patterns.
   bool isPathExcluded(
