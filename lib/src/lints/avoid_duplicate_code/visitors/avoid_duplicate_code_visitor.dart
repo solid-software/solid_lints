@@ -13,13 +13,13 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_mat
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/duplicate_location.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
-import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/ignore_matcher.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/range_extension.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/token_utils.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/ast_structural_hash_visitor.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/candidate_visitor.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/descendant_visitor.dart';
 import 'package:solid_lints/src/models/solid_diagnostic_message.dart';
+import 'package:solid_lints/src/utils/ignore_matcher.dart';
 
 /// A visitor that detects duplicate code blocks (at the function level and/or
 /// statement block level) within a single compilation unit and across files.
@@ -34,6 +34,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
   final ContextRoot? _contextRoot;
   final ResourceProvider _resourceProvider;
   final AnalysisOptionsLoader? _analysisOptionsLoader;
+  final IgnoreMatcher _ignoreMatcher;
 
   /// Creates a new instance of [AvoidDuplicateCodeVisitor].
   AvoidDuplicateCodeVisitor(
@@ -41,6 +42,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     this._parameters, {
     required String filePath,
     required int modificationStamp,
+    required IgnoreMatcher ignoreMatcher,
     ContextRoot? contextRoot,
     ResourceProvider? resourceProvider,
     AnalysisOptionsLoader? analysisOptionsLoader,
@@ -49,7 +51,8 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
        _contextRoot = contextRoot,
        _resourceProvider =
            resourceProvider ?? PhysicalResourceProvider.INSTANCE,
-       _analysisOptionsLoader = analysisOptionsLoader;
+       _analysisOptionsLoader = analysisOptionsLoader,
+       _ignoreMatcher = ignoreMatcher;
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
@@ -69,7 +72,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    if (IgnoreMatcher.isFileIgnored(node)) {
+    if (_ignoreMatcher.isFileIgnored(node)) {
       GlobalHashRegistry.instance.removeFile(
         filePath,
         parameters: _parameters,
@@ -119,7 +122,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     node.accept(collector);
     return collector.candidates
         .where(
-          (c) => !IgnoreMatcher.isCandidateIgnored(
+          (c) => !_ignoreMatcher.isCandidateIgnored(
             c.node,
             c.enclosingDeclaration,
           ),

@@ -4,6 +4,7 @@ import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
+import 'package:solid_lints/src/utils/ignore_matcher.dart';
 
 /// A lint rule that detects duplicated code blocks (clones) across the project.
 ///
@@ -135,6 +136,9 @@ class AvoidDuplicateCodeRule
          parametersParser: AvoidDuplicateCodeParameters.fromJson,
        );
 
+  /// The ignore matcher instance for this rule.
+  final ignoreMatcher = IgnoreMatcher(lintName);
+
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
@@ -155,6 +159,7 @@ class AvoidDuplicateCodeRule
       contextRoot: context.libraryElement?.session.analysisContext.contextRoot,
       resourceProvider: currentUnit.file.provider,
       analysisOptionsLoader: analysisOptionsLoader,
+      ignoreMatcher: ignoreMatcher,
     );
 
     registry.addCompilationUnit(this, visitor);

@@ -621,6 +621,7 @@ void otherMethod() {
       AvoidDuplicateCodeParameters.empty(),
       filePath: otherFile.path,
       modificationStamp: 2,
+      ignoreMatcher: avoidRule.ignoreMatcher,
       resourceProvider: resourceProvider,
       analysisOptionsLoader: avoidRule.analysisOptionsLoader,
     );
@@ -649,6 +650,7 @@ void otherMethod() {
           ),
       filePath: file.path,
       modificationStamp: 1,
+      ignoreMatcher: avoidRule.ignoreMatcher,
       contextRoot: resolved.session.analysisContext.contextRoot,
       resourceProvider: resourceProvider,
       analysisOptionsLoader: avoidRule.analysisOptionsLoader,
