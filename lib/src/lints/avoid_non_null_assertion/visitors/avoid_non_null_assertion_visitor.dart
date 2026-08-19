@@ -27,20 +27,12 @@ class AvoidNonNullAssertionVisitor extends SimpleAstVisitor<void> {
     if (operand is IndexExpression) {
       final type = operand.target?.staticType;
 
-      if (_isMap(type) || _hasIgnoredType(type)) {
+      if (_hasIgnoredType(type)) {
         return;
       }
     }
 
     rule.reportAtNode(node);
-  }
-
-  bool _isMap(DartType? type) {
-    if (type is! InterfaceType) {
-      return false;
-    }
-
-    return type.isDartCoreMap || type.allSupertypes.any((v) => v.isDartCoreMap);
   }
 
   bool _hasIgnoredType(DartType? type) {

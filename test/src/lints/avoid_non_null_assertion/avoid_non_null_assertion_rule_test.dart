@@ -21,6 +21,7 @@ plugins:
     diagnostics:
       avoid_non_null_assertion:
         ignored_types:
+          - Map
           - IMap
           - BuiltMap
   ''';
@@ -57,11 +58,46 @@ void m(Object? object) {
 ''');
   }
 
+  Future<void> test_reports_map_access_when_not_ignored() async {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      analysisOptionsContent(rules: [rule.name]),
+    );
+    await assertAutoDiagnostics('''
+void m() {
+  final map = {'key': 'value'};
+  ${expectLint("map['key']!")};
+}
+''');
+  }
+
+  Future<void> test_reports_parenthesized_map_access_when_not_ignored() async {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      analysisOptionsContent(rules: [rule.name]),
+    );
+    await assertAutoDiagnostics('''
+void m() {
+  final map = {'key': 'value'};
+  ${expectLint("(map['key'])!")};
+}
+''');
+  }
+
   Future<void> test_does_not_report_map_access() async {
     await assertNoDiagnostics(r'''
 void m() {
   final map = {'key': 'value'};
   map['key']!;
+}
+''');
+  }
+
+  Future<void> test_does_not_report_parenthesized_map_access() async {
+    await assertNoDiagnostics(r'''
+void m() {
+  final map = {'key': 'value'};
+  (map['key'])!;
 }
 ''');
   }
@@ -84,15 +120,6 @@ class IMap<K, V> {
 
 void m(IMap<String, String> map) {
   map['key']!;
-}
-''');
-  }
-
-  Future<void> test_does_not_report_parenthesized_map_access() async {
-    await assertNoDiagnostics(r'''
-void m() {
-  final map = {'key': 'value'};
-  (map['key'])!;
 }
 ''');
   }
