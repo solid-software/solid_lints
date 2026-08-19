@@ -63,7 +63,10 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     final packageRoot =
         _contextRoot?.root.path ?? _findPackageRoot(filePath) ?? '';
 
-    if (_analysisOptionsLoader?.isFileExcludedForFile(filePath) ?? false) {
+    final isExcluded =
+        _analysisOptionsLoader?.isFileExcludedForFile(filePath) ?? false;
+
+    if (isExcluded || _ignoreMatcher.isFileIgnored(node)) {
       GlobalHashRegistry.instance.removeFile(
         filePath,
         parameters: _parameters,
@@ -72,18 +75,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    if (_ignoreMatcher.isFileIgnored(node)) {
-      GlobalHashRegistry.instance.removeFile(
-        filePath,
-        parameters: _parameters,
-        packageRoot: packageRoot,
-      );
-      return;
-    }
-
-    if (_tryReportFromCache(filePath, packageRoot)) {
-      return;
-    }
+    if (_tryReportFromCache(filePath, packageRoot)) return;
     final hasher = AstStructuralHashVisitor(
       ignoreLiterals: _parameters.ignoreLiterals,
       ignoreIdentifiers: _parameters.ignoreIdentifiers,
@@ -121,8 +113,8 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     final collector = CandidateVisitor(_parameters);
     node.accept(collector);
     return collector.candidates
-        .where(
-          (c) => !_ignoreMatcher.isCandidateIgnored(
+        .whereNot(
+          (c) => _ignoreMatcher.isCandidateIgnored(
             c.node,
             c.enclosingDeclaration,
           ),
