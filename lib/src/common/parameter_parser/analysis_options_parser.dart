@@ -254,11 +254,7 @@ class AnalysisOptionsParser {
       case String():
         excludedPatterns.add(exclude);
       case Iterable():
-        for (final item in exclude) {
-          if (item is String) {
-            excludedPatterns.add(item);
-          }
-        }
+        excludedPatterns.addAll(exclude.whereType<String>());
     }
   }
 }
