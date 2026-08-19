@@ -22,17 +22,15 @@ final class IgnoreMatcher {
   /// Checks if the entire [unit] is ignored for [ruleName].
   bool isFileIgnored(CompilationUnit unit) => [
     unit.beginToken,
-    for (final directive in unit.directives) directive.beginToken,
-    for (final declaration in unit.declarations) declaration.beginToken,
+    ...unit.directives.map((d) => d.beginToken),
+    ...unit.declarations.map((d) => d.beginToken),
     unit.endToken,
-  ].any((t) => t.comments.any((c) => _fileIgnoreRegex.hasMatch(c.lexeme)));
+  ].commentLexemes.any(_fileIgnoreRegex.hasMatch);
 
   /// Checks if a candidate [node] or its enclosing [declaration] is ignored.
   bool isCandidateIgnored(AstNode node, [Declaration? declaration]) => [
-    if (declaration != null) ...[
-      declaration.beginToken,
-      declaration.firstTokenAfterCommentAndMetadata,
-    ],
+    ?declaration?.beginToken,
+    ?declaration?.firstTokenAfterCommentAndMetadata,
     node.beginToken,
-  ].any((t) => t.comments.any((c) => _lineIgnoreRegex.hasMatch(c.lexeme)));
+  ].commentLexemes.any(_lineIgnoreRegex.hasMatch);
 }

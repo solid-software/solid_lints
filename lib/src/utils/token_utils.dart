@@ -10,3 +10,10 @@ extension TokenUtils on Token {
     }
   }
 }
+
+/// Extension methods for [Iterable<Token>] manipulation.
+extension TokenIterableUtils on Iterable<Token> {
+  /// Returns all comment lexemes from the tokens in this iterable.
+  Iterable<String> get commentLexemes =>
+      expand((t) => t.comments).map((c) => c.lexeme);
+}
