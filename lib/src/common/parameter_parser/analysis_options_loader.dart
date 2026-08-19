@@ -74,8 +74,7 @@ class AnalysisOptionsLoader {
 
   /// Checks if a file is excluded by the analysis options configuration.
   bool isFileExcluded(RuleContext context) {
-    final targetPath =
-        context.currentUnit?.file.path ?? context.definingUnit.file.path;
+    final targetPath = (context.currentUnit ?? context.definingUnit).file.path;
 
     return isFileExcludedForFile(targetPath);
   }
@@ -113,8 +112,7 @@ class AnalysisOptionsLoader {
     RuleContext context,
     T Function(String) f,
   ) {
-    final filePath =
-        context.currentUnit?.file.path ?? context.definingUnit.file.path;
+    final filePath = (context.currentUnit ?? context.definingUnit).file.path;
     final pathContext = _resourceProvider.pathContext;
     if (!pathContext.isAbsolute(filePath)) return null;
 
