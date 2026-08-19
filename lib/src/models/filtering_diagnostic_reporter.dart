@@ -23,10 +23,9 @@ class FilteringDiagnosticReporter extends DiagnosticReporter {
     List<DiagnosticMessage>? contextMessages,
   }) {
     final filePath = switch (node.root) {
-      CompilationUnit(:final declaredFragment?) =>
-        declaredFragment.source.fullName,
-      _ => _delegate.source.fullName,
-    };
+      CompilationUnit(:final declaredFragment?) => declaredFragment.source,
+      _ => _delegate.source,
+    }.fullName;
 
     if (_loader.isFileExcludedForFile(filePath)) {
       return _suppressedDiagnostic(diagnosticCode, node.offset, node.length);
