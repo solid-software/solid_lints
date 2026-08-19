@@ -1,5 +1,6 @@
 import 'package:glob/glob.dart';
 import 'package:path/path.dart' as p;
+import 'package:solid_lints/src/utils/function_utils.dart';
 
 /// Cached rules for a dart package
 class CachedPackageRules {
@@ -26,17 +27,14 @@ class CachedPackageRules {
     required this.excludedPatterns,
   }) : _compiledGlobs = _compileGlobs(excludedPatterns);
 
-  static List<Glob> _compileGlobs(Set<String> patterns) {
-    final globs = <Glob>[];
-    for (final pattern in patterns) {
-      try {
-        globs.add(Glob(pattern, context: p.posix));
-      } on FormatException {
-        // Ignore malformed glob patterns.
-      }
-    }
-    return globs;
-  }
+  static List<Glob> _compileGlobs(Set<String> patterns) => patterns
+      .map(
+        (pattern) => FunctionUtils.tryOrNull(
+          () => Glob(pattern, context: p.posix),
+        ),
+      )
+      .nonNulls
+      .toList();
 
   /// Checks if [filePath] matches any of the excluded patterns.
   bool isPathExcluded(
@@ -52,13 +50,7 @@ class CachedPackageRules {
           : filePath;
       final normalizedPath = p.posix.joinAll(pathContext.split(relativePath));
 
-      for (final glob in _compiledGlobs) {
-        if (glob.matches(normalizedPath)) {
-          return true;
-        }
-      }
-
-      return false;
+      return _compiledGlobs.any((glob) => glob.matches(normalizedPath));
     });
   }
 }
