@@ -17,11 +17,10 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// triggering a warning.
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       cyclomatic_complexity:
-///         max_complexity: 10
+/// solid_lints:
+///   diagnostics:
+///     cyclomatic_complexity:
+///       max_complexity: 10
 /// ```
 class CyclomaticComplexityRule
     extends SolidLintRule<CyclomaticComplexityParameters> {

@@ -50,12 +50,13 @@ You can customize individual rule settings in your `analysis_options.yaml`:
 
 ```yaml
 plugins:
-  solid_lints:
-    version: <INSERT LATEST VERSION>
-    diagnostics:
-      cyclomatic_complexity:
-        max_complexity: 10
-      avoid_non_null_assertion: true
+  solid_lints: <INSERT LATEST VERSION>
+
+solid_lints:
+  diagnostics:
+    cyclomatic_complexity:
+      max_complexity: 10
+    avoid_non_null_assertion: true
 ```
 
 # Badge

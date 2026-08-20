@@ -6,13 +6,12 @@ class AvoidNonNullAssertionParameters {
   /// Example:
   ///
   /// ```yaml
-  /// plugins:
-  ///   solid_lints:
-  ///     diagnostics:
-  ///       avoid_non_null_assertion:
-  ///         ignored_types:
-  ///           - Map
-  ///           - IMap
+  /// solid_lints:
+  ///   diagnostics:
+  ///     avoid_non_null_assertion:
+  ///       ignored_types:
+  ///         - Map
+  ///         - IMap
   /// ```
   ///
   /// ```dart
