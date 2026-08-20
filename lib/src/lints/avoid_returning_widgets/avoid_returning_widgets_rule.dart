@@ -18,13 +18,12 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       avoid_returning_widgets:
-///         exclude:
-///           - class_name: MyWidget
-///             method_name: buildCustomButton
+/// solid_lints:
+///   diagnostics:
+///     avoid_returning_widgets:
+///       exclude:
+///         - class_name: MyWidget
+///           method_name: buildCustomButton
 /// ```
 ///
 /// ### Example

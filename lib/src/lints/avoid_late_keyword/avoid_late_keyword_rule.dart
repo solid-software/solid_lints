@@ -14,14 +14,13 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       avoid_late_keyword:
-///         allow_initialized: false
-///         ignored_types:
-///           - AnimationController
-///           - ColorTween
+/// solid_lints:
+///   diagnostics:
+///     avoid_late_keyword:
+///       allow_initialized: false
+///       ignored_types:
+///         - AnimationController
+///         - ColorTween
 /// ```
 ///
 /// ### Example

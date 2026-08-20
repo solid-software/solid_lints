@@ -551,9 +551,246 @@ solid_lints:
     });
   }
 
+  void test_isFileExcluded_when_matching_glob_pattern() {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+''');
+
+    final gDartContext = _createMockContextForFile(
+      '$testPackageLibPath/models/user.g.dart',
+    );
+    final freezedContext = _createMockContextForFile(
+      '$testPackageLibPath/models/user.freezed.dart',
+    );
+    final dartContext = _createMockContextForFile(
+      '$testPackageLibPath/models/user.dart',
+    );
+
+    expect(analysisOptionsLoader.isFileExcluded(gDartContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(freezedContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(dartContext), isFalse);
+  }
+
+  void test_isFileExcluded_for_part_file_when_defining_unit_is_not_excluded() {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+''');
+
+    final parentFile = getFile('$testPackageLibPath/models/user.dart');
+    final partFile = getFile('$testPackageLibPath/models/user.g.dart');
+    final rootFolder = getFolder(testPackageRootPath);
+
+    final partContext = _TestRuleContext(
+      _TestWorkspacePackage(rootFolder),
+      definingUnit: _TestRuleContextUnit(parentFile),
+      currentUnit: _TestRuleContextUnit(partFile),
+    );
+
+    final parentContext = _TestRuleContext(
+      _TestWorkspacePackage(rootFolder),
+      definingUnit: _TestRuleContextUnit(parentFile),
+      currentUnit: _TestRuleContextUnit(parentFile),
+    );
+
+    expect(analysisOptionsLoader.isFileExcluded(partContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(parentContext), isFalse);
+  }
+
+  void test_isFileExcluded_when_matching_exact_path() {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+analyzer:
+  exclude:
+    - "lib/generated_plugin_registrant.dart"
+''');
+
+    final registrantContext = _createMockContextForFile(
+      '$testPackageLibPath/generated_plugin_registrant.dart',
+    );
+    final otherContext = _createMockContextForFile(
+      '$testPackageLibPath/other.dart',
+    );
+
+    expect(analysisOptionsLoader.isFileExcluded(registrantContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(otherContext), isFalse);
+  }
+
+  void test_isFileExcluded_inherited_from_included_options() {
+    final includedOptionsPath = '$testPackageRootPath/included_options.yaml';
+    newFile(includedOptionsPath, '''
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+''');
+
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+include: included_options.yaml
+''');
+
+    final gDartContext = _createMockContextForFile(
+      '$testPackageLibPath/user.g.dart',
+    );
+    final dartContext = _createMockContextForFile(
+      '$testPackageLibPath/user.dart',
+    );
+
+    expect(analysisOptionsLoader.isFileExcluded(gDartContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(dartContext), isFalse);
+  }
+
+  void test_isFileExcluded_merged_with_local_options() {
+    final includedOptionsPath = '$testPackageRootPath/included_options.yaml';
+    newFile(includedOptionsPath, '''
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+''');
+
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+include: included_options.yaml
+analyzer:
+  exclude:
+    - "**/*.freezed.dart"
+''');
+
+    final gDartContext = _createMockContextForFile(
+      '$testPackageLibPath/user.g.dart',
+    );
+    final freezedContext = _createMockContextForFile(
+      '$testPackageLibPath/user.freezed.dart',
+    );
+    final dartContext = _createMockContextForFile(
+      '$testPackageLibPath/user.dart',
+    );
+
+    expect(analysisOptionsLoader.isFileExcluded(gDartContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(freezedContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(dartContext), isFalse);
+  }
+
+  void test_isFileExcluded_resolves_nearest_nested_analysis_options() {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+analyzer:
+  exclude:
+    - "**/*.root_gen.dart"
+''');
+
+    final nestedDirPath = '$testPackageRootPath/nested_pkg';
+    newFolder(nestedDirPath);
+    newAnalysisOptionsYamlFile(nestedDirPath, '''
+analyzer:
+  exclude:
+    - "**/*.nested_gen.dart"
+''');
+
+    final rootGenInRoot = _createMockContextForFile(
+      '$testPackageLibPath/a.root_gen.dart',
+    );
+    final nestedGenInRoot = _createMockContextForFile(
+      '$testPackageLibPath/a.nested_gen.dart',
+    );
+    final nestedGenInNested = _createMockContextForFile(
+      '$nestedDirPath/lib/b.nested_gen.dart',
+      packageRootPath: nestedDirPath,
+    );
+    final rootGenInNested = _createMockContextForFile(
+      '$nestedDirPath/lib/b.root_gen.dart',
+      packageRootPath: nestedDirPath,
+    );
+
+    expect(analysisOptionsLoader.isFileExcluded(rootGenInRoot), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(nestedGenInRoot), isFalse);
+    expect(analysisOptionsLoader.isFileExcluded(nestedGenInNested), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(rootGenInNested), isFalse);
+  }
+
+  void test_isFileExcludedForFile_matches_path_without_context() {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+''');
+
+    expect(
+      analysisOptionsLoader.isFileExcludedForFile(
+        '$testPackageLibPath/user.g.dart',
+      ),
+      isTrue,
+    );
+    expect(
+      analysisOptionsLoader.isFileExcludedForFile(
+        '$testPackageLibPath/user.dart',
+      ),
+      isFalse,
+    );
+  }
+
+  void test_isFileExcludedForFile_returns_false_for_relative_path() {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+''');
+
+    expect(
+      analysisOptionsLoader.isFileExcludedForFile('lib/user.g.dart'),
+      isFalse,
+    );
+  }
+
+  void test_isFileExcludedForFile_returns_false_when_no_analysis_options() {
+    expect(
+      analysisOptionsLoader.isFileExcludedForFile(
+        '/some/unrelated/path/user.g.dart',
+      ),
+      isFalse,
+    );
+  }
+
+  void test_isFileExcluded_ignores_malformed_glob_patterns() {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+analyzer:
+  exclude:
+    - ""
+    - "[abc"
+    - "{foo,bar"
+    - "invalid(glob"
+    - "**/*.g.dart"
+''');
+
+    final gDartContext = _createMockContextForFile(
+      '$testPackageLibPath/models/user.g.dart',
+    );
+    final dartContext = _createMockContextForFile(
+      '$testPackageLibPath/models/user.dart',
+    );
+
+    expect(analysisOptionsLoader.isFileExcluded(gDartContext), isTrue);
+    expect(analysisOptionsLoader.isFileExcluded(dartContext), isFalse);
+  }
+
+  RuleContext _createMockContextForFile(
+    String filePath, {
+    String? packageRootPath,
+  }) {
+    final file = getFile(filePath);
+    final rootFolder = getFolder(packageRootPath ?? testPackageRootPath);
+    final unit = _TestRuleContextUnit(file);
+    return _TestRuleContext(
+      _TestWorkspacePackage(rootFolder),
+      definingUnit: unit,
+      currentUnit: unit,
+    );
+  }
+
   RuleContext _createMockContextForPackage(
     String packageRootPath, {
     RuleContextUnit? definingUnit,
+    RuleContextUnit? currentUnit,
   }) {
     final rootFolder = getFolder(packageRootPath);
     return _TestRuleContext(
@@ -563,6 +800,7 @@ solid_lints:
           _TestRuleContextUnit(
             rootFolder.getChildAssumingFile('lib/dummy.dart'),
           ),
+      currentUnit: currentUnit,
     );
   }
 }
@@ -574,7 +812,14 @@ class _TestRuleContext implements RuleContext {
   @override
   final RuleContextUnit definingUnit;
 
-  _TestRuleContext(this.package, {required this.definingUnit});
+  @override
+  final RuleContextUnit? currentUnit;
+
+  _TestRuleContext(
+    this.package, {
+    required this.definingUnit,
+    this.currentUnit,
+  });
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
