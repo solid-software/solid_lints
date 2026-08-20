@@ -48,6 +48,22 @@ void foo() {}
         expect(matcher.isFileIgnored(result.unit), isTrue);
       });
 
+      test(
+        'returns true when combined with other rules and package prefix',
+        () {
+          final result = parseString(
+            content:
+                '''
+// ignore_for_file: other_rule, solid_lints/$ruleName, another_rule
+
+void foo() {}
+''',
+          );
+
+          expect(matcher.isFileIgnored(result.unit), isTrue);
+        },
+      );
+
       test('returns true when placed between directives', () {
         final result = parseString(
           content:
@@ -155,6 +171,37 @@ void foo() {
 
         expect(matcher.isCandidateIgnored(body, decl), isTrue);
       });
+
+      test(
+        'returns true when combined with other rules and package prefix',
+        () {
+          final (body, decl) = _parseFunction('''
+// ignore: other_rule, solid_lints/$ruleName, another_rule
+void foo() {
+  final x = 1;
+}
+''');
+
+          expect(matcher.isCandidateIgnored(body, decl), isTrue);
+        },
+      );
+
+      test(
+        'returns true when comments explain ignores across multiple lines',
+        () {
+          final (body, decl) = _parseFunction('''
+// $ruleName is ignored because reasons
+// ignore: $ruleName
+// other_rule is ignored because reasons
+// ignore: other_rule
+void foo() {
+  final x = 1;
+}
+''');
+
+          expect(matcher.isCandidateIgnored(body, decl), isTrue);
+        },
+      );
 
       test(
         'returns true when inline ignore is placed after metadata annotation',
