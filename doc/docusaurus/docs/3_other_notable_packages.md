@@ -24,7 +24,7 @@ dart run undead@
 ```
 
 - **Links**: [pub.dev](https://pub.dev/packages/undead) ·
-  [GitHub](https://github.com/kevmoo/undead)
+  [GitHub](https://github.com/kevmoo/analytica.dart/tree/main/packages/undead)
 
 ---
 
