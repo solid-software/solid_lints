@@ -1,3 +1,10 @@
+## 1.0.0-dev.2
+
+- Resolved false positives in `avoid_returning_widgets` rule.
+- Resolved false positives on constructors in `number_of_parameters` rule.
+- Improved `member_ordering` configuration.
+- Improved `avoid_duplicate_code` rule and parameter documentation.
+
 ## 1.0.0-dev.1
 
 - feat!: migrate to analyzer_server_plugin

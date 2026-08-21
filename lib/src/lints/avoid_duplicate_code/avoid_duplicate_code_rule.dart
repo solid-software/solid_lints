@@ -4,6 +4,7 @@ import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
 import 'package:solid_lints/src/models/solid_multi_lint_rule.dart';
+import 'package:solid_lints/src/utils/ignore_matcher.dart';
 
 /// A lint rule that detects duplicated code blocks (clones) across the project.
 ///
@@ -103,14 +104,13 @@ import 'package:solid_lints/src/models/solid_multi_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       avoid_duplicate_code:
-///         min_tokens: 30
-///         exclude:
-///           - method_name: initState
-///           - method_name: dispose
+/// solid_lints:
+///   diagnostics:
+///     avoid_duplicate_code:
+///       min_tokens: 30
+///       exclude:
+///         - method_name: initState
+///         - method_name: dispose
 /// ```
 class AvoidDuplicateCodeRule
     extends SolidMultiLintRule<AvoidDuplicateCodeParameters> {
@@ -154,6 +154,9 @@ class AvoidDuplicateCodeRule
          parametersParser: AvoidDuplicateCodeParameters.fromJson,
        );
 
+  /// The ignore matcher instance for this rule.
+  final ignoreMatcher = IgnoreMatcher(lintName);
+
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
@@ -165,13 +168,16 @@ class AvoidDuplicateCodeRule
         getParametersForContext(context) ??
         AvoidDuplicateCodeParameters.empty();
 
+    final currentUnit = context.currentUnit ?? context.definingUnit;
     final visitor = AvoidDuplicateCodeVisitor(
       this,
       parameters,
-      filePath: context.definingUnit.file.path,
-      modificationStamp: context.definingUnit.file.modificationStamp,
+      filePath: currentUnit.file.path,
+      modificationStamp: currentUnit.file.modificationStamp,
       contextRoot: context.libraryElement?.session.analysisContext.contextRoot,
-      resourceProvider: context.definingUnit.file.provider,
+      resourceProvider: currentUnit.file.provider,
+      analysisOptionsLoader: analysisOptionsLoader,
+      ignoreMatcher: ignoreMatcher,
     );
 
     registry.addCompilationUnit(this, visitor);

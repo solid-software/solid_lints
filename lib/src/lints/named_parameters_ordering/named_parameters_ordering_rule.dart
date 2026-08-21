@@ -30,16 +30,15 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// Assuming config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       named_parameters_ordering:
-///         order:
-///           - required
-///           - required_super
-///           - default
-///           - nullable
-///           - super
+/// solid_lints:
+///   diagnostics:
+///     named_parameters_ordering:
+///       order:
+///         - required
+///         - required_super
+///         - default
+///         - nullable
+///         - super
 /// ```
 ///
 /// #### BAD:

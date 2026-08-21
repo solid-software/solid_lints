@@ -1,3 +1,5 @@
+import 'package:analyzer/dart/analysis/utilities.dart' show parseString;
+import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
@@ -7,6 +9,7 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
+import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../../utils/auto_test_lint_offsets.dart';
@@ -404,21 +407,7 @@ void otherMethod() {
 }
 ''');
 
-    final resolvedOther = await resolveFile(otherFile.path);
-    final visitor = AvoidDuplicateCodeVisitor(
-      rule as AvoidDuplicateCodeRule,
-      AvoidDuplicateCodeParameters(
-        minTokens: 15,
-        exclude: ExcludedIdentifiersListParameter(
-          exclude: [ExcludedIdentifierParameter(methodName: 'excluded')],
-        ),
-      ),
-      filePath: otherFile.path,
-      modificationStamp: 1,
-      contextRoot: resolvedOther.session.analysisContext.contextRoot,
-      resourceProvider: resourceProvider,
-    );
-    resolvedOther.unit.accept(visitor);
+    await _indexFile(otherFile);
 
     await assertAutoDiagnostics('''
 void mainMethod() ${expectLint(r'''{
@@ -480,21 +469,7 @@ void otherMethod() {
 }
 ''');
 
-    final resolvedOther = await resolveFile(otherFile.path);
-    final visitor = AvoidDuplicateCodeVisitor(
-      rule as AvoidDuplicateCodeRule,
-      AvoidDuplicateCodeParameters(
-        minTokens: 15,
-        exclude: ExcludedIdentifiersListParameter(
-          exclude: [ExcludedIdentifierParameter(methodName: 'excluded')],
-        ),
-      ),
-      filePath: otherFile.path,
-      modificationStamp: 1,
-      contextRoot: resolvedOther.session.analysisContext.contextRoot,
-      resourceProvider: resourceProvider,
-    );
-    resolvedOther.unit.accept(visitor);
+    await _indexFile(otherFile);
 
     await assertAutoDiagnostics('''
 void mainMethod() ${expectLint(r'''{
@@ -610,5 +585,290 @@ void moveRight() ${expectLint(r'''{
   print('done');
 }''', messageContainsAll: ['differs in literal values', '[10, -10]'])}
 ''');
+  }
+
+  Future<void>
+  test_duplicate_code_with_three_files_and_excluded_part_file() async {
+    newAnalysisOptionsYamlFile(testPackageRootPath, '''
+linter:
+  rules:
+    - ${rule.name}
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+$_mockAnalysisOptionsContent
+''');
+    rule = AvoidDuplicateCodeRule(
+      analysisOptionsLoader: AnalysisOptionsLoader(
+        resourceProvider: resourceProvider,
+      ),
+    );
+
+    // 1. First file: other.dart (separate file with identical code)
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+
+    // 2. Second file: part.g.dart (part file with identical code)
+    newFile('$testPackageLibPath/part.g.dart', '''
+part of 'test.dart';
+
+void partMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+
+    // Populate registry with other.dart
+    await _indexFile(otherFile);
+
+    // 3. Third file: test.dart (main library, not excluded)
+    // Expect: mainMethod in test.dart is flagged as duplicate of other.dart.
+    // part.g.dart will NOT trigger diagnostics because .g.dart is excluded.
+    await assertAutoDiagnostics('''
+part 'part.g.dart';
+
+void mainMethod() ${expectLint(r'''{
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}''')}
+''');
+  }
+
+  Future<void>
+  test_ignored_method_with_comment_does_not_trigger_cross_file_duplicates() async {
+    // 1. Create other.dart where the method is marked with ignore comment
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+// ignore: solid_lints/avoid_duplicate_code
+void ignoredMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+
+    // Populate registry with other.dart
+    await _indexFile(otherFile);
+
+    // 2. test.dart has identical code, but other.dart's method was ignored.
+    // Therefore, test.dart should have NO duplicates reported!
+    await assertNoDiagnostics('''
+void mainMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+  }
+
+  Future<void>
+  test_ignored_method_with_comment_inside_parameters_suppresses_warning() async {
+    await assertNoDiagnostics('''
+void first(
+  int a,
+  int b,
+  // ignore: avoid_duplicate_code
+) {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+
+void second(int a, int b) {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+  }
+
+  Future<void>
+  test_ignored_method_with_package_prefixed_comment_inside_parameters_suppresses_warning() async {
+    await assertNoDiagnostics('''
+abstract final class Foo {
+  static void first(
+    int a,
+    int b,
+    // ignore: solid_lints/avoid_duplicate_code
+  ) {
+    final x = 1;
+    if (x > 0) {
+      print(x);
+    }
+    print('done');
+  }
+
+  static void second(int a, int b) {
+    final x = 1;
+    if (x > 0) {
+      print(x);
+    }
+    print('done');
+  }
+}
+''');
+  }
+
+  Future<void>
+  test_ignored_file_with_ignore_for_file_does_not_trigger_cross_file_duplicates() async {
+    // 1. Create other.dart with ignore_for_file comment
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+// ignore_for_file: avoid_duplicate_code
+
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+
+    // Populate registry with other.dart
+    await _indexFile(otherFile);
+
+    // 2. test.dart has identical code, but other.dart was ignored for file.
+    // Therefore, test.dart should have NO duplicates reported!
+    await assertNoDiagnostics('''
+void mainMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+  }
+
+  Future<void> test_visiting_ignored_file_removes_it_from_registry() async {
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+    await _indexFile(otherFile);
+    expect(GlobalHashRegistry.instance.fileCount, 1);
+
+    final result = parseString(
+      content: '''
+// ignore_for_file: avoid_duplicate_code
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''',
+    );
+    final avoidRule = rule as AvoidDuplicateCodeRule;
+    final visitor = AvoidDuplicateCodeVisitor(
+      avoidRule,
+      AvoidDuplicateCodeParameters.empty(),
+      filePath: otherFile.path,
+      modificationStamp: 2,
+      ignoreMatcher: avoidRule.ignoreMatcher,
+      resourceProvider: resourceProvider,
+      analysisOptionsLoader: avoidRule.analysisOptionsLoader,
+    );
+    result.unit.accept(visitor);
+
+    expect(GlobalHashRegistry.instance.fileCount, 0);
+  }
+
+  Future<void>
+  test_visiting_file_with_inline_ignore_removes_it_from_registry() async {
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+    await _indexFile(otherFile);
+    expect(GlobalHashRegistry.instance.fileCount, 1);
+
+    final result = parseString(
+      content: '''
+// ignore: avoid_duplicate_code
+void otherMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''',
+    );
+    final avoidRule = rule as AvoidDuplicateCodeRule;
+    final visitor = AvoidDuplicateCodeVisitor(
+      avoidRule,
+      AvoidDuplicateCodeParameters(
+        minTokens: 15,
+        exclude: ExcludedIdentifiersListParameter(
+          exclude: [ExcludedIdentifierParameter(methodName: 'excluded')],
+        ),
+      ),
+      filePath: otherFile.path,
+      modificationStamp: 2,
+      ignoreMatcher: avoidRule.ignoreMatcher,
+      resourceProvider: resourceProvider,
+      analysisOptionsLoader: avoidRule.analysisOptionsLoader,
+    );
+    result.unit.accept(visitor);
+
+    expect(GlobalHashRegistry.instance.fileCount, 0);
+  }
+
+  Future<void> _indexFile(
+    File file, {
+    AvoidDuplicateCodeParameters? parameters,
+    int? modificationStamp,
+  }) async {
+    final resolved = await resolveFile(file.path);
+    final avoidRule = rule as AvoidDuplicateCodeRule;
+    final visitor = AvoidDuplicateCodeVisitor(
+      avoidRule,
+      parameters ??
+          AvoidDuplicateCodeParameters(
+            minTokens: 15,
+            exclude: ExcludedIdentifiersListParameter(
+              exclude: [ExcludedIdentifierParameter(methodName: 'excluded')],
+            ),
+          ),
+      filePath: file.path,
+      modificationStamp: modificationStamp ?? file.modificationStamp,
+      ignoreMatcher: avoidRule.ignoreMatcher,
+      contextRoot: resolved.session.analysisContext.contextRoot,
+      resourceProvider: resourceProvider,
+      analysisOptionsLoader: avoidRule.analysisOptionsLoader,
+    );
+    resolved.unit.accept(visitor);
   }
 }

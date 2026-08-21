@@ -175,6 +175,16 @@ class GlobalHashRegistry {
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
   }) {
+    if (entries.isEmpty) {
+      removeFile(
+        filePath,
+        resourceProvider: resourceProvider,
+        parameters: parameters,
+        packageRoot: packageRoot,
+      );
+      return;
+    }
+
     final root = _getRoot(packageRoot);
     final absoluteFilePath = _resolveAndLoad(
       filePath,

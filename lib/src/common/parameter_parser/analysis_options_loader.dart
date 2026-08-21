@@ -72,6 +72,34 @@ class AnalysisOptionsLoader {
       ) ??
       false;
 
+  /// Checks if a file is excluded by the analysis options configuration.
+  bool isFileExcluded(RuleContext context) {
+    final targetPath = (context.currentUnit ?? context.definingUnit).file.path;
+
+    return isFileExcludedForFile(targetPath);
+  }
+
+  /// Checks if a specific file at [filePath] is excluded by the nearest
+  /// analysis options file.
+  bool isFileExcludedForFile(String filePath) {
+    final pathContext = _resourceProvider.pathContext;
+    if (!pathContext.isAbsolute(filePath)) return false;
+
+    final dirPath = pathContext.dirname(filePath);
+    final yamlPath = _findNearestAnalysisOptionsFilePath(dirPath);
+    if (yamlPath == null) return false;
+
+    _loadRulesOptionsIfNewer(yamlPath);
+    final rootDir = pathContext.dirname(yamlPath);
+
+    return _rulesCache[yamlPath]?.isPathExcluded(
+          filePath,
+          pathContext,
+          rootDir,
+        ) ??
+        false;
+  }
+
   /// Loads lint rules from the analysis options file for all rules
   /// using the provided [RuleContext].
   void loadRulesOptionsFromContext(RuleContext context) =>
@@ -84,8 +112,11 @@ class AnalysisOptionsLoader {
     RuleContext context,
     T Function(String) f,
   ) {
-    final filePath = context.definingUnit.file.path;
-    final dirPath = _resourceProvider.pathContext.dirname(filePath);
+    final filePath = (context.currentUnit ?? context.definingUnit).file.path;
+    final pathContext = _resourceProvider.pathContext;
+    if (!pathContext.isAbsolute(filePath)) return null;
+
+    final dirPath = pathContext.dirname(filePath);
     final yamlPath = _findNearestAnalysisOptionsFilePath(dirPath);
 
     if (yamlPath == null) return null;
@@ -107,11 +138,14 @@ class AnalysisOptionsLoader {
       modificationStamp: modificationStamp,
       rules: rulesData.rules,
       disabledRules: rulesData.disabledRules,
+      excludedPatterns: rulesData.excludedPatterns,
     );
   }
 
   String? _findNearestAnalysisOptionsFilePath(String startDirectoryPath) {
     final pathContext = _resourceProvider.pathContext;
+    if (!pathContext.isAbsolute(startDirectoryPath)) return null;
+
     var currentDirectoryPath = startDirectoryPath;
 
     while (currentDirectoryPath.isNotEmpty) {

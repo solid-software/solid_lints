@@ -46,10 +46,7 @@ solid_lints:
       allow_initialized: true
       ignored_types:
         - AnimationController
-    avoid_non_null_assertion:
-      ignored_types:
-        - IMap
-        - BuiltMap
+    avoid_non_null_assertion: true
     avoid_returning_widgets: true
     avoid_similar_names: true
     avoid_unnecessary_return_variable: true
@@ -95,7 +92,8 @@ solid_lints:
     newline_before_return: true
     no_empty_block: true
     no_equal_then_else: true
-    prefer_early_return: true
+    # Disabled by default for now. Will be considered for future inclusion.
+    prefer_early_return: false 
 
     no_magic_number:
       allowed_in_widget_params: true
@@ -112,7 +110,9 @@ solid_lints:
     prefer_last: true
     prefer_match_file_name: true
     proper_super_calls: true
-    named_parameters_ordering: true
+    # Disabled for now due to conflict with
+    # `always_put_required_named_parameters_first`.
+    named_parameters_ordering: false
     use_nearest_context: true
     use_descriptive_names_for_type_parameters: true
 

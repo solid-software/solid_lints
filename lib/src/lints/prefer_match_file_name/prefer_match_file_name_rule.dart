@@ -12,15 +12,14 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ### Example config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       prefer_match_file_name:
-///         exclude_entity:
-///           - mixin
-///           - extension
-///           - extension_type
-///           - enum
+/// solid_lints:
+///   diagnostics:
+///     prefer_match_file_name:
+///       exclude_entity:
+///         - mixin
+///         - extension
+///         - extension_type
+///         - enum
 /// ```
 ///
 /// ## Tests

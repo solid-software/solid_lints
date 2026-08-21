@@ -45,15 +45,14 @@ import 'package:solid_lints/src/models/solid_multi_lint_rule.dart';
 /// Assuming config:
 ///
 /// ```yaml
-/// plugins:
-///   solid_lints:
-///     diagnostics:
-///       member_ordering:
-///         alphabetize: true
-///         order:
-///           - fields
-///           - getters_setters
-///           - methods
+/// solid_lints:
+///   diagnostics:
+///     member_ordering:
+///       alphabetize: true
+///       order:
+///         - fields
+///         - getters_setters
+///         - methods
 /// ```
 ///
 /// #### BAD:
