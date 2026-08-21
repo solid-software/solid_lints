@@ -9,8 +9,19 @@ extension ResourceProviderUtils on ResourceProvider {
 
   /// Reads file content at [path] if it exists, otherwise returns an empty
   /// string.
+  ///
+  /// Returns an empty string if the file does not exist or cannot be read.
+  /// Guards against a TOCTOU race where the file is deleted or becomes
+  /// unreadable between the existence check and the actual read (e.g. during
+  /// an active editor session).
   String readFileContent(String path) {
     final file = getFile(path);
-    return file.exists ? file.readAsStringSync() : '';
+    if (!file.exists) return '';
+
+    try {
+      return file.readAsStringSync();
+    } on FileSystemException {
+      return '';
+    }
   }
 }
