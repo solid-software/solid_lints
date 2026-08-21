@@ -47,10 +47,7 @@ solid_lints:
       allow_initialized: true
       ignored_types:
         - AnimationController
-    avoid_non_null_assertion:
-      ignored_types:
-        - IMap
-        - BuiltMap
+    avoid_non_null_assertion: true
     avoid_returning_widgets: true
     avoid_similar_names: true
     avoid_unnecessary_return_variable: true

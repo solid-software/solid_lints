@@ -10,11 +10,12 @@ class AvoidNonNullAssertionParameters {
   ///   diagnostics:
   ///     avoid_non_null_assertion:
   ///       ignored_types:
+  ///         - Map
   ///         - IMap
   /// ```
   ///
   /// ```dart
-  /// IMap<String, String> map;
+  /// Map<String, String> map;
   /// map['key']!; // OK
   /// ```
   final Set<String> ignoredTypes;

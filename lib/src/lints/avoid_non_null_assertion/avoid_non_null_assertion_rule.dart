@@ -8,8 +8,8 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// Rule which warns about usages of bang operator ("!")
 /// as it may result in unexpected runtime exceptions.
 ///
-/// "Bang" operator with Maps is allowed, as [Dart docs](https://dart.dev/null-safety/understanding-null-safety#the-map-index-operator-is-nullable)
-/// recommend using it for accessing Map values that are known to be present.
+/// Types with index operator (like [Map], `IMap`, `BuiltMap`) can be ignored
+/// using `ignored_types` config parameter.
 ///
 /// ### Example config:
 ///
@@ -18,6 +18,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///   diagnostics:
 ///     avoid_non_null_assertion:
 ///       ignored_types:
+///         - Map
 ///         - IMap
 ///         - BuiltMap
 /// ```
@@ -28,9 +29,11 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// ```dart
 /// Object? object;
 /// int? number;
+/// final map = {'key': 'value'};
 ///
 /// final int computed = 1 + number!; // LINT
 /// object!.method(); // LINT
+/// map['key']!; // LINT (unless Map is in ignored_types)
 /// ```
 ///
 /// #### GOOD:
@@ -43,7 +46,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// }
 /// object?.method();
 ///
-/// // No lint on maps
+/// // Allowed if Map is in ignored_types
 /// final map = {'key': 'value'};
 /// map['key']!;
 /// ```
@@ -62,8 +65,7 @@ class AvoidNonNullAssertionRule
   AvoidNonNullAssertionRule({required super.analysisOptionsLoader})
     : super.withParameters(
         name: lintName,
-        description:
-            'Warns about usages of bang operator (!) except valid Map access.',
+        description: 'Warns about usages of bang operator (!).',
         parametersParser: AvoidNonNullAssertionParameters.fromJson,
       );
 
