@@ -111,7 +111,9 @@ solid_lints:
     prefer_last: true
     prefer_match_file_name: true
     proper_super_calls: true
-    named_parameters_ordering: true
+    # Disabled for now due to conflict with
+    # `always_put_required_named_parameters_first`.
+    named_parameters_ordering: false
     use_nearest_context: true
     use_descriptive_names_for_type_parameters: true
 
