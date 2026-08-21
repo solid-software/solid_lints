@@ -3,7 +3,7 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
-import 'package:solid_lints/src/models/solid_lint_rule.dart';
+import 'package:solid_lints/src/models/solid_multi_lint_rule.dart';
 
 /// A lint rule that detects duplicated code blocks (clones) across the project.
 ///
@@ -17,13 +17,13 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// The rule is built upon the fundamental code clone classification by
 /// **Roy & Cordy (2007)** (*"A Survey on Software Clone Detection Research"*):
 ///
-/// :::note Type 2 Clones
-/// The rule focuses on **Type 2 clones** (syntactic clones): structurally
-/// identical AST subtrees where names of local variables, formal parameters,
-/// or literal values may differ (if configured via `ignore_identifiers` or
-/// `ignore_literals`). While plain text diff tools only catch exact
-/// copies (Type 1), this rule operates on the AST level to detect copy-pasted
-/// logic even after variable renaming or code formatting changes.
+/// :::note Type 2 & Type 3 Clones
+/// The rule focuses on **Type 2 clones** (syntactic clones with renamed
+/// variables) and **Type 3 clones with differing literals** (structurally
+/// identical AST subtrees where literal values differ). While plain text diff
+/// tools only catch exact copies (Type 1), this rule operates on the AST level
+/// to detect copy-pasted logic even after variable renaming, code formatting
+/// changes, or literal constant tweaks.
 /// :::
 /// :::info Sequential Variable Indexing
 /// Local variable and parameter names in the AST subtree are replaced with
@@ -33,9 +33,13 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// renamed (e.g., `x` to `item`).
 /// :::
 ///
-/// :::info Structural Hashing
-/// Builds an AST subtree fingerprint using **Bob Jenkins' One-at-a-time**
-/// **hash** algorithm (structural hashing).
+/// :::info Dual Structural & Exact Hashing
+/// Computes both a **structural hash** (ignoring literal values) and an
+/// **exact hash** (including literal values) in a single pass using **Bob
+/// Jenkins' One-at-a-time hash** algorithm. When duplicate candidates have
+/// identical structural hashes but differing exact hashes, the rule provides
+/// detailed context messages showing which literal slots differ (e.g., `[1, 2]`
+/// or `['hello', 'world']`).
 /// :::
 ///
 /// :::info Nested Clone Suppression
@@ -104,15 +108,12 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///     diagnostics:
 ///       avoid_duplicate_code:
 ///         min_tokens: 30
-///         ignore_literals: false
-///         ignore_identifiers: true
-///         check_blocks: true
 ///         exclude:
 ///           - method_name: initState
 ///           - method_name: dispose
 /// ```
 class AvoidDuplicateCodeRule
-    extends SolidLintRule<AvoidDuplicateCodeParameters> {
+    extends SolidMultiLintRule<AvoidDuplicateCodeParameters> {
   /// Name of the lint.
   static const lintName = 'avoid_duplicate_code';
 
@@ -122,13 +123,30 @@ class AvoidDuplicateCodeRule
     'Consider extracting the shared logic into a common function.',
   );
 
+  static const _differentLiteralsCode = LintCode(
+    lintName,
+    'This code has identical structure but differs in literal values{0}.\n'
+    'Extracting it directly will alter behavior — consider extracting a '
+    'shared function with parameters for the differing values.',
+    uniqueName: 'avoid_duplicate_code_different_literals',
+  );
+
+  /// Diagnostic code for exact duplicates.
+  DiagnosticCode get exactCode => _code;
+
+  /// Diagnostic code for structural duplicates with differing literal values.
+  DiagnosticCode get differentLiteralsCode => _differentLiteralsCode;
+
   @override
-  DiagnosticCode get diagnosticCode => _code;
+  List<DiagnosticCode> get diagnosticCodes => [
+    _code,
+    _differentLiteralsCode,
+  ];
 
   /// Creates a new instance of [AvoidDuplicateCodeRule].
   AvoidDuplicateCodeRule({
     required super.analysisOptionsLoader,
-  }) : super.withParameters(
+  }) : super(
          name: lintName,
          description:
              'Detects structurally identical function/method bodies '

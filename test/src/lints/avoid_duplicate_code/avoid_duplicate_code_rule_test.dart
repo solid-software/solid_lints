@@ -26,14 +26,13 @@ plugins:
     diagnostics:
       avoid_duplicate_code:
         min_tokens: 15
-        check_blocks: true
         exclude:
           - method_name: excluded
   ''';
 
   @override
   void setUp() {
-    GlobalHashRegistry.instance.clear();
+    GlobalHashRegistry.instance.clear(resourceProvider: resourceProvider);
     GlobalHashRegistry.instance.enablePhysicalFileCleanup = false;
     rule = AvoidDuplicateCodeRule(
       analysisOptionsLoader: AnalysisOptionsLoader(
@@ -51,11 +50,11 @@ $_mockAnalysisOptionsContent''',
 
   @override
   Future<void> tearDown() async {
-    GlobalHashRegistry.instance.clear();
+    GlobalHashRegistry.instance.clear(resourceProvider: resourceProvider);
     await super.tearDown();
   }
 
-  // --- Base Tests (min_tokens: 15, check_blocks: true, default) ---
+  // --- Base Tests (min_tokens: 15, default) ---
 
   Future<void> test_reports_when_two_functions_have_identical_bodies() async {
     await assertAutoDiagnostics('''
@@ -183,20 +182,9 @@ void third() ${expectLint(r'''{
 ''');
   }
 
-  // --- Ignore Literals Tests ---
+  // --- Literals Tests ---
 
   Future<void> test_reports_when_only_literal_values_differ() async {
-    newAnalysisOptionsYamlFile(
-      testPackageRootPath,
-      '''${analysisOptionsContent(rules: [rule.name])}
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_duplicate_code:
-        min_tokens: 15
-        ignore_literals: true
-''',
-    );
     await assertAutoDiagnostics('''
 void first() ${expectLint(r'''{
   final x = 1;
@@ -204,7 +192,7 @@ void first() ${expectLint(r'''{
     print('hello');
   }
   print('world');
-}''')}
+}''', messageContainsAll: ['differs in literal values', '[1, 2]', "['hello', 'foo']", "['world', 'bar']"])}
 
 void second() ${expectLint(r'''{
   final y = 2;
@@ -212,62 +200,124 @@ void second() ${expectLint(r'''{
     print('foo');
   }
   print('bar');
-}''')}
+}''', messageContainsAll: ['differs in literal values', '[2, 1]', "['foo', 'hello']", "['bar', 'world']"])}
 ''');
   }
 
-  Future<void>
-  test_does_not_report_when_literal_values_differ_without_flag() async {
-    await assertNoDiagnostics(r'''
-void first() {
+  Future<void> test_reports_differing_literals_across_three_clones() async {
+    await assertAutoDiagnostics('''
+void first() ${expectLint(r'''{
   final x = 1;
   if (x > 0) {
-    print('a');
+    print('hello');
   }
-  print('b');
-}
+  print('world');
+}''', messageContainsAll: ['differs in literal values', '[1, 2, 3]', "['hello', 'foo', 'baz']", "['world', 'bar', 'qux']"])}
 
-void second() {
-  final y = 99;
+void second() ${expectLint(r'''{
+  final y = 2;
   if (y > 0) {
-    print('c');
+    print('foo');
   }
-  print('d');
-}
+  print('bar');
+}''', messageContainsAll: ['differs in literal values', '[2, 1, 3]', "['foo', 'hello', 'baz']", "['bar', 'world', 'qux']"])}
+
+void third() ${expectLint(r'''{
+  final z = 3;
+  if (z > 0) {
+    print('baz');
+  }
+  print('qux');
+}''', messageContainsAll: ['differs in literal values', '[3, 1, 2]', "['baz', 'hello', 'foo']", "['qux', 'world', 'bar']"])}
 ''');
   }
 
-  // --- Ignore Identifiers Tests ---
-
   Future<void>
-  test_does_not_report_when_identifiers_differ_without_flag() async {
-    newAnalysisOptionsYamlFile(
-      testPackageRootPath,
-      '''${analysisOptionsContent(rules: [rule.name])}
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_duplicate_code:
-        min_tokens: 15
-        ignore_identifiers: false
-''',
-    );
-    await assertNoDiagnostics(r'''
-void first() {
+  test_reports_exact_and_different_literals_in_mixed_scenario() async {
+    await assertAutoDiagnostics('''
+void first() ${expectLint(r'''{
   final x = 1;
   if (x > 0) {
-    print(x);
+    print('hello');
   }
-  print('done');
-}
+  print('world');
+}''', messageContainsAll: ['Perhaps this code is a duplicate'])}
 
-void second() {
+void second() ${expectLint(r'''{
   final y = 1;
   if (y > 0) {
-    print(y);
+    print('hello');
   }
-  print('done');
-}
+  print('world');
+}''', messageContainsAll: ['Perhaps this code is a duplicate'])}
+
+void third() ${expectLint(r'''{
+  final z = 2;
+  if (z > 0) {
+    print('foo');
+  }
+  print('bar');
+}''', messageContainsAll: ['differs in literal values'])}
+''');
+  }
+
+  Future<void>
+  test_reports_differing_literals_truncates_slots_when_more_than_limit() async {
+    await assertAutoDiagnostics('''
+void first() ${expectLint(r'''{
+  final a = 1;
+  final b = 10;
+  if (a > 0) {
+    print('hello');
+  }
+  print('world');
+}''', messageContainsAll: ['differs in literal values', '[1, 2]', '[10, 20]', "['hello', 'foo']", '(+1 more)'])}
+
+void second() ${expectLint(r'''{
+  final a = 2;
+  final b = 20;
+  if (a > 0) {
+    print('foo');
+  }
+  print('bar');
+}''', messageContainsAll: ['differs in literal values', '[2, 1]', '[20, 10]', "['foo', 'hello']", '(+1 more)'])}
+''');
+  }
+
+  Future<void>
+  test_reports_differing_literals_truncates_values_when_more_than_limit() async {
+    await assertAutoDiagnostics('''
+void first() ${expectLint(r'''{
+  final x = 1;
+  if (x > 0) {
+    print('hello');
+  }
+  print('world');
+}''', messageContainsAll: ['differs in literal values', '[1, 2, 3, +1 more]'])}
+
+void second() ${expectLint(r'''{
+  final y = 2;
+  if (y > 0) {
+    print('foo');
+  }
+  print('bar');
+}''', messageContainsAll: ['differs in literal values', '[2, 1, 3, +1 more]'])}
+
+void third() ${expectLint(r'''{
+  final z = 3;
+  if (z > 0) {
+    print('baz');
+  }
+  print('qux');
+}''', messageContainsAll: ['differs in literal values', '[3, 1, 2, +1 more]'])}
+
+void fourth() ${expectLint(r'''{
+  final w = 4;
+  if (w > 0) {
+    print('quux');
+  }
+  print('corge');
+}''', messageContainsAll: ['differs in literal values', '[4, 1, 2, +1 more]'])}
 ''');
   }
 
@@ -359,9 +409,6 @@ void otherMethod() {
       rule as AvoidDuplicateCodeRule,
       AvoidDuplicateCodeParameters(
         minTokens: 15,
-        ignoreLiterals: false,
-        ignoreIdentifiers: true,
-        checkBlocks: true,
         exclude: ExcludedIdentifiersListParameter(
           exclude: [ExcludedIdentifierParameter(methodName: 'excluded')],
         ),
@@ -421,45 +468,48 @@ void second() ${expectLint(r'''{
 ''');
   }
 
-  Future<void> test_ignores_nested_blocks_when_check_blocks_false() async {
-    newAnalysisOptionsYamlFile(
-      testPackageRootPath,
-      '''${analysisOptionsContent(rules: [rule.name])}
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_duplicate_code:
-        min_tokens: 15
-        check_blocks: false
-''',
-    );
-
-    // The nested blocks are identical (>15 tokens), but check_blocks is false,
-    // and the outer function bodies differ significantly.
-    await assertNoDiagnostics(r'''
-void one() {
+  Future<void>
+  test_reports_cross_file_duplicate_when_literals_differ_in_registry() async {
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+void otherMethod() {
   final x = 1;
   if (x > 0) {
     print('hello');
-    print('world');
-    print('done');
   }
+  print('world');
 }
+''');
 
-void two() {
-  print('completely different start');
-  if (true) {
-    print('hello');
-    print('world');
-    print('done');
+    final resolvedOther = await resolveFile(otherFile.path);
+    final visitor = AvoidDuplicateCodeVisitor(
+      rule as AvoidDuplicateCodeRule,
+      AvoidDuplicateCodeParameters(
+        minTokens: 15,
+        exclude: ExcludedIdentifiersListParameter(
+          exclude: [ExcludedIdentifierParameter(methodName: 'excluded')],
+        ),
+      ),
+      filePath: otherFile.path,
+      modificationStamp: 1,
+      contextRoot: resolvedOther.session.analysisContext.contextRoot,
+      resourceProvider: resourceProvider,
+    );
+    resolvedOther.unit.accept(visitor);
+
+    await assertAutoDiagnostics('''
+void mainMethod() ${expectLint(r'''{
+  final y = 2;
+  if (y > 0) {
+    print('foo');
   }
-}
+  print('bar');
+}''', messageContainsAll: ['differs in literal values', '[2, 1]', "['foo', 'hello']", "['bar', 'world']"])}
 ''');
   }
 
   Future<void>
   test_does_not_report_when_identifiers_are_different_method_calls() async {
-    // Tests that ignore_identifiers=true still differentiates method calls.
+    // Tests that different method calls are differentiated.
     // Local variables are ignored, but external method names are preserved.
     await assertNoDiagnostics('''
 void doSomething(int x) {}
@@ -480,6 +530,85 @@ void second() {
   }
   print('done');
 }
+''');
+  }
+
+  Future<void> test_reports_when_only_symbol_literals_differ() async {
+    await assertAutoDiagnostics('''
+void first() ${expectLint(r'''{
+  final action = #foo;
+  if (action == #foo) {
+    print('hello');
+  }
+  print('done');
+}''', messageContainsAll: ['differs in literal values', '[#foo, #bar]'])}
+
+void second() ${expectLint(r'''{
+  final action = #bar;
+  if (action == #bar) {
+    print('hello');
+  }
+  print('done');
+}''', messageContainsAll: ['differs in literal values', '[#bar, #foo]'])}
+''');
+  }
+
+  Future<void>
+  test_reports_exact_duplicate_when_symbol_literals_are_identical() async {
+    await assertAutoDiagnostics('''
+void first() ${expectLint(r'''{
+  final action = #foo;
+  if (action == #foo) {
+    print('hello');
+  }
+  print('done');
+}''', messageContainsAll: ['Perhaps this code is a duplicate'])}
+
+void second() ${expectLint(r'''{
+  final action = #foo;
+  if (action == #foo) {
+    print('hello');
+  }
+  print('done');
+}''', messageContainsAll: ['Perhaps this code is a duplicate'])}
+''');
+  }
+
+  Future<void> test_does_not_report_when_named_argument_labels_differ() async {
+    await assertNoDiagnostics('''
+void callMe({int? width, int? height, int? count}) {}
+
+void first() {
+  final x = 1;
+  callMe(width: x, count: 10);
+  print('done');
+}
+
+void second() {
+  final y = 1;
+  callMe(height: y, count: 10);
+  print('done');
+}
+''');
+  }
+
+  Future<void> test_reports_when_numeric_literal_signs_differ() async {
+    await assertAutoDiagnostics('''
+void moveLeft() ${expectLint(r'''{
+  final dx = -10;
+  if (dx < 0) {
+    print('moving');
+  }
+  print('done');
+}''', messageContainsAll: ['differs in literal values', '[-10, 10]'])}
+
+void moveRight() ${expectLint(r'''{
+  final dx = 10;
+  if (dx < 0) {
+    print('moving');
+  }
+  print('done');
+}''', messageContainsAll: ['differs in literal values', '[10, -10]'])}
 ''');
   }
 }

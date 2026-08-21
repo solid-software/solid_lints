@@ -16,12 +16,7 @@ class CandidateVisitor extends RecursiveAstVisitor<void> {
   CandidateVisitor(this.parameters);
 
   @override
-  void visitBlock(Block node) =>
-      // If checkBlocks is false, only consider blocks that represent function
-      // bodies.
-      !parameters.checkBlocks && node.parent is! BlockFunctionBody
-      ? super.visitBlock(node)
-      : _visit(node, super.visitBlock);
+  void visitBlock(Block node) => _visit(node, super.visitBlock);
 
   @override
   void visitExpressionFunctionBody(ExpressionFunctionBody node) =>

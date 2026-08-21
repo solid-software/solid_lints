@@ -38,7 +38,6 @@ solid_lints:
     avoid_global_state: true
     avoid_duplicate_code:
       min_tokens: 30
-      check_blocks: true
       exclude:
         - method_name: initState
         - method_name: dispose
