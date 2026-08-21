@@ -28,9 +28,15 @@ final class IgnoreMatcher {
   ].commentLexemes.any(_fileIgnoreRegex.hasMatch);
 
   /// Checks if a candidate [node] or its enclosing [declaration] is ignored.
-  bool isCandidateIgnored(AstNode node, [Declaration? declaration]) => [
-    ?declaration?.beginToken,
-    ?declaration?.firstTokenAfterCommentAndMetadata,
-    node.beginToken,
-  ].commentLexemes.any(_lineIgnoreRegex.hasMatch);
+  bool isCandidateIgnored(AstNode node, [Declaration? declaration]) {
+    final tokens = [
+      if (declaration case final decl?) ...[
+        decl.beginToken,
+        ...decl.firstTokenAfterCommentAndMetadata.upTo(node.beginToken),
+      ],
+      node.beginToken,
+    ];
+
+    return tokens.commentLexemes.any(_lineIgnoreRegex.hasMatch);
+  }
 }

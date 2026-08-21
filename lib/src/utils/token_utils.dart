@@ -9,6 +9,19 @@ extension TokenUtils on Token {
       yield c;
     }
   }
+
+  /// Returns an iterable sequence of tokens starting from this token up to
+  /// (and including) [end].
+  Iterable<Token> upTo(Token end) sync* {
+    var current = this;
+    while (true) {
+      yield current;
+      if (current == end) break;
+      final next = current.next;
+      if (next == null || next == current) break;
+      current = next;
+    }
+  }
 }
 
 /// Extension methods for [Iterable<Token>] manipulation.
