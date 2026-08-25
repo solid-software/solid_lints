@@ -71,7 +71,7 @@ class NoMagicNumberRuleVisitor extends SimpleAstVisitor<void> {
     return p is TypedLiteral ||
         p is MapLiteralEntry ||
         p is RecordLiteral ||
-        p is RecordLiteralField;
+        p is RecordLiteralNamedField;
   }
 
   bool _isWidgetParameter(Literal literal) {
