@@ -45,13 +45,15 @@ class UnnecessaryWhereTypeVisitor extends SimpleAstVisitor<void> {
   }
 
   bool _isUnnecessaryWhereType(MethodInvocation node) {
-    if (node case MethodInvocation(
-      methodName: Identifier(
-        name: AvoidUnnecessaryTypeAssertionsRule.whereTypeMethodName,
-      ),
-      target: Expression(staticType: final InterfaceType targetType),
-      typeArguments: TypeArgumentList(:final arguments),
-    ) when arguments.isNotEmpty) {
+    if (node
+        case MethodInvocation(
+          methodName: Identifier(
+            name: AvoidUnnecessaryTypeAssertionsRule.whereTypeMethodName,
+          ),
+          target: Expression(staticType: final InterfaceType targetType),
+          typeArguments: TypeArgumentList(:final arguments),
+        )
+        when arguments.isNotEmpty) {
       final targetIterableType = switch (targetType) {
         InterfaceType(isDartCoreIterable: true) => targetType,
         InterfaceType(:final allSupertypes) => allSupertypes.firstWhereOrNull(

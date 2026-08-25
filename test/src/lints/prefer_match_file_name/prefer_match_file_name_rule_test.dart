@@ -202,8 +202,7 @@ final someVariable = 42;
 ''');
   }
 
-  void
-  test_does_not_report_on_multiple_public_declarations_if_first_matches() async {
+  void test_does_not_report_on_multiple_public_declarations_if_first_matches() async {
     await assertNoDiagnostics(r'''
 class Test {}
 class AnotherPublicClass {}
