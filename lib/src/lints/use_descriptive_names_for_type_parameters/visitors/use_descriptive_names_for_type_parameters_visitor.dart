@@ -15,11 +15,9 @@ class UseDescriptiveNamesForTypeParametersVisitor
   UseDescriptiveNamesForTypeParametersVisitor(this._rule, this._parameters);
 
   void _visit(TypeParameterList? types) {
-    if (types
-        case TypeParameterList(
-          typeParameters: final ps,
-        )
-        when ps.length >= _minParameters) {
+    if (types case TypeParameterList(
+      typeParameters: final ps,
+    ) when ps.length >= _minParameters) {
       ps.where(_hasInvalidShortName).forEach(_report);
     }
   }

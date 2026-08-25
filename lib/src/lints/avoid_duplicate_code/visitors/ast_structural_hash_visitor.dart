@@ -93,12 +93,10 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitPrefixExpression(PrefixExpression node) {
-    if (node
-        case PrefixExpression(
-          operator: Token(type: TokenType.MINUS || TokenType.PLUS),
-          operand: IntegerLiteral() || DoubleLiteral(),
-        )
-        when _ignoreLiterals) {
+    if (node case PrefixExpression(
+      operator: Token(type: TokenType.MINUS || TokenType.PLUS),
+      operand: IntegerLiteral() || DoubleLiteral(),
+    ) when _ignoreLiterals) {
       node.operand.accept(this);
     } else {
       _append(node.operator.lexeme);

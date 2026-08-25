@@ -17,17 +17,15 @@ class GetterVariableVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
-    if (node
-        case VariableDeclaration(
-          declaredFragment: VariableFragment(
-            element: VariableElement(
-              isPrivate: true,
-              isFinal: true,
-              :final id,
-            ),
-          ),
-        )
-        when id == _getterId) {
+    if (node case VariableDeclaration(
+      declaredFragment: VariableFragment(
+        element: VariableElement(
+          isPrivate: true,
+          isFinal: true,
+          :final id,
+        ),
+      ),
+    ) when id == _getterId) {
       _variable = node;
     }
 

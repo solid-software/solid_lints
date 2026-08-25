@@ -386,52 +386,55 @@ void main() {
       expect(params1, isNot(equals(paramsDifferentExclude)));
     });
 
-    test('does not match or clear files from sibling directories with prefixing names', () {
-      final currentRoot = io.Directory.current.path;
-      final siblingRoot = '${currentRoot}_sibling';
-      final siblingFilePath = p.normalize(p.join(siblingRoot, 'file.dart'));
-      final projectFilePath = p.normalize(p.join(currentRoot, 'file.dart'));
+    test(
+      'does not match or clear files from sibling directories with prefixing names',
+      () {
+        final currentRoot = io.Directory.current.path;
+        final siblingRoot = '${currentRoot}_sibling';
+        final siblingFilePath = p.normalize(p.join(siblingRoot, 'file.dart'));
+        final projectFilePath = p.normalize(p.join(currentRoot, 'file.dart'));
 
-      registry.updateFile(projectFilePath, [
-        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
-      ], modificationStamp: 1);
+        registry.updateFile(projectFilePath, [
+          const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
+        ], modificationStamp: 1);
 
-      registry.updateFile(siblingFilePath, [
-        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
-      ], modificationStamp: 1);
+        registry.updateFile(siblingFilePath, [
+          const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
+        ], modificationStamp: 1);
 
-      expect(registry.fileCount, equals(2));
+        expect(registry.fileCount, equals(2));
 
-      // 1. findCrossFileMatches should not find duplicate in siblingFilePath
-      // if limited to currentRoot.
-      final matches = registry.findCrossFileMatches(projectFilePath, [
-        const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
-      ], packageRoot: currentRoot);
-      expect(matches, isEmpty);
+        // 1. findCrossFileMatches should not find duplicate in siblingFilePath
+        // if limited to currentRoot.
+        final matches = registry.findCrossFileMatches(projectFilePath, [
+          const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5),
+        ], packageRoot: currentRoot);
+        expect(matches, isEmpty);
 
-      // 2. clearEntriesForRoot should not clear siblingFilePath when
-      // clearing currentRoot.
-      final newParams = AvoidDuplicateCodeParameters(
-        minTokens: 40,
-        ignoreLiterals: false,
-        ignoreIdentifiers: false,
-        checkBlocks: true,
-        exclude: AvoidDuplicateCodeParameters.empty().exclude,
-      );
+        // 2. clearEntriesForRoot should not clear siblingFilePath when
+        // clearing currentRoot.
+        final newParams = AvoidDuplicateCodeParameters(
+          minTokens: 40,
+          ignoreLiterals: false,
+          ignoreIdentifiers: false,
+          checkBlocks: true,
+          exclude: AvoidDuplicateCodeParameters.empty().exclude,
+        );
 
-      registry.updateFile(
-        projectFilePath,
-        [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
-        modificationStamp: 1,
-        parameters: newParams,
-        packageRoot: currentRoot,
-      );
+        registry.updateFile(
+          projectFilePath,
+          [const HashEntry(hash: 123, lineNumber: 10, tokenCount: 5)],
+          modificationStamp: 1,
+          parameters: newParams,
+          packageRoot: currentRoot,
+        );
 
-      expect(
-        registry.getFileEntries(siblingFilePath, packageRoot: siblingRoot),
-        isNotNull,
-      );
-    });
+        expect(
+          registry.getFileEntries(siblingFilePath, packageRoot: siblingRoot),
+          isNotNull,
+        );
+      },
+    );
 
     test(
       'debounces save operations independently for different package roots',

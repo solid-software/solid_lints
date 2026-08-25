@@ -308,12 +308,10 @@ extension ExpressionNullableExtension on Expression? {
     while (true) {
       if (current case AsExpression(:final expression)) {
         current = expression.unParenthesized;
-      } else if (current
-          case PostfixExpression(
-            :final operand,
-            :final operator,
-          )
-          when operator.type == TokenType.BANG) {
+      } else if (current case PostfixExpression(
+        :final operand,
+        :final operator,
+      ) when operator.type == TokenType.BANG) {
         current = operand.unParenthesized;
       } else {
         return current;

@@ -3,9 +3,10 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/error/error.dart';
 
 /// A function that creates a [CorrectionProducer] for a given context.
-typedef ProducerGenerator = CorrectionProducer<ParsedUnitResult> Function({
-  required CorrectionProducerContext context,
-});
+typedef ProducerGenerator =
+    CorrectionProducer<ParsedUnitResult> Function({
+      required CorrectionProducerContext context,
+    });
 
 /// A collection of diagnostic codes and their associated fix generators.
 typedef FixesForCodes = Iterable<MapEntry<DiagnosticCode, ProducerGenerator>>;
