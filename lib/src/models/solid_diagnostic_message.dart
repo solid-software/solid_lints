@@ -21,9 +21,9 @@ class SolidDiagnosticMessage implements DiagnosticMessage {
   SolidDiagnosticMessage({
     required this.filePath,
     required this.length,
-    required String message,
+    required this._message,
     required this.offset,
-  }) : _message = message;
+  });
 
   @override
   String messageText({required bool includeUrl}) {
