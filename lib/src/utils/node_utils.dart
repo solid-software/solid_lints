@@ -48,7 +48,7 @@ extension SimpleIdentifierExtension on SimpleIdentifier {
   /// Returns `true` if this identifier refers to a variable declared inside
   /// the body of the function that owns [as] (i.e. a local variable in the
   /// same scope).
-  bool isDeclaredInSameFunction({required SimpleFormalParameter as}) {
+  bool isDeclaredInSameFunction({required FormalParameter as}) {
     final element = this.element;
     if (element is! LocalVariableElement) return false;
 
@@ -83,10 +83,21 @@ extension SimpleIdentifierExtension on SimpleIdentifier {
 
 /// Extension on [AstNode] to provide generic context/traversal checks.
 extension AstNodeExtension on AstNode {
+  /// Returns an iterable of all parent nodes of this node up to the root.
+  Iterable<AstNode> get ancestors sync* {
+    for (var current = parent; current != null; current = current.parent) {
+      yield current;
+    }
+  }
+
   /// Returns `true` if the node is within the default value of a formal
   /// parameter.
   bool get isDefaultValue =>
-      thisOrAncestorOfType<DefaultFormalParameter>() != null;
+      thisOrAncestorMatching(
+        (ancestor) =>
+            ancestor is FormalParameter && ancestor.defaultClause != null,
+      ) !=
+      null;
 
   /// Returns `true` if the node is within a constructor initializer.
   bool get isInConstructorInitializer =>
@@ -162,7 +173,7 @@ extension ArgumentListExtension on ArgumentList {
   /// Returns `true` if this argument list contains a named parameter argument
   /// with the given [name].
   bool containsNamed(String name) => arguments.any(
-    (arg) => arg is NamedExpression && arg.name.label.name == name,
+    (arg) => arg is NamedArgument && arg.name.lexeme == name,
   );
 }
 
@@ -297,10 +308,12 @@ extension ExpressionNullableExtension on Expression? {
     while (true) {
       if (current case AsExpression(:final expression)) {
         current = expression.unParenthesized;
-      } else if (current case PostfixExpression(
-        :final operand,
-        :final operator,
-      ) when operator.type == TokenType.BANG) {
+      } else if (current
+          case PostfixExpression(
+            :final operand,
+            :final operator,
+          )
+          when operator.type == TokenType.BANG) {
         current = operand.unParenthesized;
       } else {
         return current;
