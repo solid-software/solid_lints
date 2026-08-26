@@ -1,5 +1,20 @@
 import 'package:collection/collection.dart';
 
+/// Utility methods for [Iterable] operations.
+abstract final class IterableUtils {
+  /// Generates a sequence starting with [seed] and producing subsequent
+  /// elements with [next] until [next] returns `null`.
+  static Iterable<T> iterate<T>(T seed, T? Function(T current) next) sync* {
+    var current = seed;
+    while (true) {
+      yield current;
+      final nextElement = next(current);
+      if (nextElement == null) break;
+      current = nextElement;
+    }
+  }
+}
+
 /// Extension on [Iterable] to sort by multiple keys.
 extension MultiSortedByIterable<T> on Iterable<T> {
   /// Sorts this iterable by multiple keys sequentially.
