@@ -26,8 +26,8 @@ class DifferingLiteralsAnalyzer {
 
   /// Creates a new [DifferingLiteralsAnalyzer].
   DifferingLiteralsAnalyzer({
-    required ResourceProvider resourceProvider,
-  }) : _resourceProvider = resourceProvider;
+    required this._resourceProvider,
+  });
 
   /// Loads literals for an external code clone location from the file system.
   List<LiteralInfo>? loadExternalLiterals(DuplicateLocation dup) {

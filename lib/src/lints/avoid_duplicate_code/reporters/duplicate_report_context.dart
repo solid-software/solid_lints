@@ -17,9 +17,8 @@ class DuplicateReportContext {
 
   DuplicateReportContext._({
     required this.entry,
-    required List<LiteralInfo> Function(DifferingLiteralsAnalyzer)
-    literalsProvider,
-  }) : _literalsProvider = literalsProvider;
+    required this._literalsProvider,
+  });
 
   /// Creates a list of contexts from analyzed AST [candidates].
   static List<DuplicateReportContext> fromAstCandidates(

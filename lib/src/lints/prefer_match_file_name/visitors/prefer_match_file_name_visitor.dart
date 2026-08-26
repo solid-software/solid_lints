@@ -42,7 +42,7 @@ class PreferMatchFileNameVisitor extends SimpleAstVisitor<void> {
               ExtensionDeclaration() => d.name,
               MixinDeclaration() => d.name,
               EnumDeclaration() => d.namePart.typeName,
-              ExtensionTypeDeclaration() => d.primaryConstructor.typeName,
+              ExtensionTypeDeclaration() => d.namePart.typeName,
               _ => null,
             };
 

@@ -137,10 +137,8 @@ linter:
     - avoid_implementing_value_types
     - avoid_init_to_null
     - avoid_multiple_declarations_per_line
-    - avoid_null_checks_in_equality_operators
     - avoid_positional_boolean_parameters
     - avoid_print
-    - avoid_private_typedef_functions
     - avoid_redundant_argument_values
     - avoid_relative_lib_imports
     - avoid_renaming_method_parameters
@@ -272,7 +270,6 @@ linter:
     - type_annotate_public_apis
     - type_init_formals
     - unawaited_futures
-    - unnecessary_await_in_return
     - unnecessary_brace_in_string_interps
     - unnecessary_breaks
     - unnecessary_const
@@ -297,7 +294,6 @@ linter:
     - use_decorated_box
     - use_full_hex_values_for_flutter_colors
     - use_function_type_syntax_for_parameters
-    - use_if_null_to_convert_nulls_to_bools
     - use_is_even_rather_than_modulo
     - use_named_constants
     - use_raw_strings

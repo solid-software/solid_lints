@@ -21,10 +21,9 @@ class AvoidDuplicateCodeReporter {
 
   /// Creates a new [AvoidDuplicateCodeReporter].
   const AvoidDuplicateCodeReporter({
-    required AvoidDuplicateCodeRule rule,
-    required DifferingLiteralsAnalyzer literalsAnalyzer,
-  }) : _rule = rule,
-       _literalsAnalyzer = literalsAnalyzer;
+    required this._rule,
+    required this._literalsAnalyzer,
+  });
 
   /// Reports duplicate lint diagnostics for duplicate contexts of a file.
   void report({

@@ -150,9 +150,9 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
   }
 
   @override
-  void visitNamedExpression(NamedExpression node) {
-    _append(node.name.label.name);
-    super.visitNamedExpression(node);
+  void visitNamedArgument(NamedArgument node) {
+    _append(node.name.lexeme);
+    super.visitNamedArgument(node);
   }
 
   // --- Literals ---
@@ -197,11 +197,6 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    // If this identifier is the label of a named argument in a call expression
-    // (e.g. `foo(param: value)`), it is a reference to the callee's parameter
-    // rather than a local variable of the method being analyzed.
-    if (node.parent case Label(parent: NamedExpression())) return;
-
     final element = node.element;
 
     switch (element) {

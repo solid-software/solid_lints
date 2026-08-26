@@ -302,7 +302,17 @@ void fn() {}
     await assertNoDiagnostics(r'''
 void fn() {
   var point = (10, 20);
+  var negativePoint = (-10, -20);
   var named = (x: 100, y: 200);
+  var negativeNamed = (x: -100, y: -200);
+}
+''');
+  }
+
+  Future<void> test_reports_magic_number_in_record_expressions() async {
+    await assertAutoDiagnostics('''
+void fn() {
+  var point = (${expectLint('10')} + ${expectLint('42')}, x: ${expectLint('100')} * ${expectLint('5')});
 }
 ''');
   }

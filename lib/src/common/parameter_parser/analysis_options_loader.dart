@@ -33,10 +33,9 @@ class AnalysisOptionsLoader {
   }
 
   AnalysisOptionsLoader._({
-    required ResourceProvider resourceProvider,
-    required AnalysisOptionsParser parser,
-  }) : _resourceProvider = resourceProvider,
-       _parser = parser;
+    required this._resourceProvider,
+    required this._parser,
+  });
 
   /// Gets the options for a specific rule by its name.
   Map<String, Object?>? getRuleOptions(RuleContext context, String ruleName) =>

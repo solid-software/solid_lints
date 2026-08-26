@@ -69,5 +69,5 @@ class UseDescriptiveNamesForTypeParametersVisitor
 
   @override
   void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) =>
-      _visit(node.primaryConstructor.typeParameters);
+      _visit(node.namePart.typeParameters);
 }

@@ -1,5 +1,7 @@
 ## 1.0.0-dev.2
 
+- Upgraded minimum Dart SDK constraint to `>=3.12.0`.
+- Upgraded `analyzer` to `^14.1.0` and `analysis_server_plugin` to `^0.3.20`.
 - Resolved false positives in `avoid_returning_widgets` rule.
 - Resolved false positives on constructors in `number_of_parameters` rule.
 - Improved `member_ordering` configuration.

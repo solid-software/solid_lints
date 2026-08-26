@@ -23,11 +23,11 @@ abstract class SolidLintRule<T extends Object?> extends AnalysisRule {
   /// Constructor for [SolidLintRule] model with parameters.
   SolidLintRule.withParameters({
     required this.analysisOptionsLoader,
-    required RuleParametersParser<T> parametersParser,
+    required this._parametersParser,
     required super.name,
     required super.description,
     super.state,
-  }) : _parametersParser = parametersParser;
+  });
 
   /// Reads the rule parameters from analysis options and parses them to [T]
   T? getParametersForContext(RuleContext context) {

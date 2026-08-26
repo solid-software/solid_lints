@@ -339,7 +339,7 @@ class GlobalHashRegistry {
           .getFolder(dirPath)
           .withAncestors
           .firstWhereOrNull(
-            (dir) => dir.getChildAssumingFile('pubspec.yaml').exists,
+            (dir) => dir.getFile('pubspec.yaml').exists,
           )
           ?.path,
     );

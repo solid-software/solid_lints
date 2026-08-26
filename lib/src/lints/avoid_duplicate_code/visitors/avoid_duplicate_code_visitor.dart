@@ -68,22 +68,15 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
   }
 
   AvoidDuplicateCodeVisitor._({
-    required AvoidDuplicateCodeParameters parameters,
-    required String filePath,
-    required int modificationStamp,
-    required ContextRoot? contextRoot,
-    required ResourceProvider resourceProvider,
-    required AvoidDuplicateCodeReporter reporter,
-    required AnalysisOptionsLoader? analysisOptionsLoader,
-    required IgnoreMatcher ignoreMatcher,
-  }) : _parameters = parameters,
-       _filePath = filePath,
-       _modificationStamp = modificationStamp,
-       _contextRoot = contextRoot,
-       _resourceProvider = resourceProvider,
-       _reporter = reporter,
-       _analysisOptionsLoader = analysisOptionsLoader,
-       _ignoreMatcher = ignoreMatcher;
+    required this._parameters,
+    required this._filePath,
+    required this._modificationStamp,
+    required this._contextRoot,
+    required this._resourceProvider,
+    required this._reporter,
+    required this._analysisOptionsLoader,
+    required this._ignoreMatcher,
+  });
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
