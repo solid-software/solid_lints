@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/duplicate_location.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/hash_entry.dart';
 
@@ -20,13 +19,16 @@ class CrossFileMatch {
 
 /// Extension on an iterable of [CrossFileMatch] to group duplicates by hash.
 extension CrossFileMatchIterableExtension on Iterable<CrossFileMatch> {
-  /// Converts this iterable of cross-file matches to a map of duplicates
-  /// grouped by hash.
-  Map<int, List<DuplicateLocation>> toDuplicatesByHash() =>
-      groupBy(this, (m) => m.currentEntry.hash).map(
-        (hash, matches) => MapEntry(
-          hash,
-          matches.expand((m) => m.duplicates).toSet().toList(),
-        ),
-      );
+  /// Converts this iterable of cross-file matches to a map of unique duplicates
+  /// grouped by entry hash.
+  Map<int, List<DuplicateLocation>> toDuplicatesByHash() {
+    final result = <int, List<DuplicateLocation>>{};
+
+    for (final CrossFileMatch(:currentEntry, :duplicates) in this) {
+      final locations = result[currentEntry.hash] ??= [];
+      locations.addAll(duplicates.where((loc) => !locations.contains(loc)));
+    }
+
+    return result;
+  }
 }
