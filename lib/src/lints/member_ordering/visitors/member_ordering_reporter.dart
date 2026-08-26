@@ -33,10 +33,9 @@ class MemberOrderingReporter {
 
   /// Creates instance of [MemberOrderingReporter].
   const MemberOrderingReporter({
-    required List<MemberInfo> membersInfo,
-    required MemberOrderingRule rule,
-  }) : _membersInfo = membersInfo,
-       _rule = rule;
+    required this._membersInfo,
+    required this._rule,
+  });
 
   /// Generates diagnostic reports based on the configuration parameters.
   void report({

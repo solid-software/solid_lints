@@ -38,12 +38,10 @@ class NoEmptyBlockVisitor extends RecursiveAstVisitor<void> {
 
   /// Constructor for [NoEmptyBlockVisitor]
   NoEmptyBlockVisitor({
-    required AnalysisRule rule,
-    required bool allowWithComments,
-    required ExcludedIdentifiersListParameter exclude,
-  }) : _rule = rule,
-       _allowWithComments = allowWithComments,
-       _exclude = exclude;
+    required this._rule,
+    required this._allowWithComments,
+    required this._exclude,
+  });
 
   @override
   void visitBlock(Block node) {

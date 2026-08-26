@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:solid_lints/src/common/parameter_parser/cached_package_config.dart';
 

@@ -35,36 +35,15 @@ enum ParameterType {
   }
 
   /// Classifies a [FormalParameter] into a [ParameterType].
-  ///
-  /// Recursively unwraps [DefaultFormalParameter] wrappers to determine
-  /// the underlying parameter kind.
-  static ParameterType fromParameter(
-    FormalParameter parameter, {
-    bool hasDefaultValue = false,
-  }) {
-    if (parameter is DefaultFormalParameter &&
-        parameter.parameter is! DefaultFormalParameter) {
-      return fromParameter(
-        parameter.parameter,
-        hasDefaultValue: parameter.defaultValue != null,
-      );
-    }
-
-    switch (parameter) {
-      case SuperFormalParameter(:final isRequired):
-        return isRequired
-            ? ParameterType.requiredInherited
-            : ParameterType.inherited;
-
-      case DefaultFormalParameter():
-      case _ when hasDefaultValue:
-        return ParameterType.defaultValue;
-
-      case FieldFormalParameter(:final isRequired) ||
-          FunctionTypedFormalParameter(:final isRequired) ||
-          SimpleFormalParameter(:final isRequired):
-        return isRequired ? ParameterType.required : ParameterType.nullable;
-    }
+  static ParameterType fromParameter(FormalParameter parameter) {
+    return switch (parameter) {
+      SuperFormalParameter(:final isRequired) =>
+        isRequired ? ParameterType.requiredInherited : ParameterType.inherited,
+      FormalParameter(defaultClause: _?) => ParameterType.defaultValue,
+      FormalParameter(:final isRequired) when isRequired =>
+        ParameterType.required,
+      _ => ParameterType.nullable,
+    };
   }
 
   /// String representation of the parameter type

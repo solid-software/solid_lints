@@ -23,10 +23,9 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   /// Creates a new [AstStructuralHashVisitor].
   AstStructuralHashVisitor({
-    required bool ignoreLiterals,
-    required bool ignoreIdentifiers,
-  }) : _ignoreLiterals = ignoreLiterals,
-       _ignoreIdentifiers = ignoreIdentifiers;
+    required this._ignoreLiterals,
+    required this._ignoreIdentifiers,
+  });
 
   /// Computes the structural hash for the given [node].
   ///
@@ -124,9 +123,9 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
   }
 
   @override
-  void visitNamedExpression(NamedExpression node) {
-    _append(node.name.label.name);
-    super.visitNamedExpression(node);
+  void visitNamedArgument(NamedArgument node) {
+    _append(node.name.lexeme);
+    super.visitNamedArgument(node);
   }
 
   // --- Literals ---

@@ -3,7 +3,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/diagnostic/diagnostic.dart';
 import 'package:analyzer/file_system/file_system.dart';
-import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/avoid_duplicate_code_rule.dart';
@@ -40,19 +39,13 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
   AvoidDuplicateCodeVisitor(
     this._rule,
     this._parameters, {
-    required String filePath,
-    required int modificationStamp,
-    required IgnoreMatcher ignoreMatcher,
-    ContextRoot? contextRoot,
-    ResourceProvider? resourceProvider,
-    AnalysisOptionsLoader? analysisOptionsLoader,
-  }) : _filePath = filePath,
-       _modificationStamp = modificationStamp,
-       _contextRoot = contextRoot,
-       _resourceProvider =
-           resourceProvider ?? PhysicalResourceProvider.INSTANCE,
-       _analysisOptionsLoader = analysisOptionsLoader,
-       _ignoreMatcher = ignoreMatcher;
+    required this._filePath,
+    required this._modificationStamp,
+    required this._ignoreMatcher,
+    required this._resourceProvider,
+    this._contextRoot,
+    this._analysisOptionsLoader,
+  });
 
   @override
   void visitCompilationUnit(CompilationUnit node) {
@@ -317,7 +310,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
     return _packageRootCache.putIfAbsent(dirPath, () {
       var dir = _resourceProvider.getFolder(dirPath);
       while (true) {
-        final pubspec = dir.getChildAssumingFile('pubspec.yaml');
+        final pubspec = dir.getFile('pubspec.yaml');
         if (pubspec.exists) {
           return dir.path;
         }

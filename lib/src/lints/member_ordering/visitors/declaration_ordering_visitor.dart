@@ -44,10 +44,9 @@ class DeclarationOrderingVisitor {
 
   /// Creates instance of [DeclarationOrderingVisitor].
   DeclarationOrderingVisitor({
-    required MemberOrderingParameters parameters,
-    required bool isFlutterWidget,
-  }) : _parameters = parameters,
-       _isFlutterWidget = isFlutterWidget;
+    required this._parameters,
+    required this._isFlutterWidget,
+  });
 
   /// Visits a [ClassMember].
   void visit(ClassMember member) => switch (member) {

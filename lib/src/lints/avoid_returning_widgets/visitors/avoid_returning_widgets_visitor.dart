@@ -41,7 +41,7 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (node is MethodDeclaration &&
-        (node.isAbstract ||
+        (!node.isComplete ||
             node.body is EmptyFunctionBody ||
             (node.isGetter && _isStateWidgetCastingGetter(node)))) {
       return;

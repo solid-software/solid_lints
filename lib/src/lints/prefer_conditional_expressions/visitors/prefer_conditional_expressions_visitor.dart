@@ -35,10 +35,9 @@ class PreferConditionalExpressionsVisitor extends RecursiveAstVisitor<void> {
 
   /// Creates instance of [PreferConditionalExpressionsVisitor]
   PreferConditionalExpressionsVisitor({
-    required PreferConditionalExpressionsRule rule,
-    required bool ignoreNested,
-  }) : _rule = rule,
-       _ignoreNested = ignoreNested;
+    required this._rule,
+    required this._ignoreNested,
+  });
 
   @override
   void visitIfStatement(IfStatement node) {
