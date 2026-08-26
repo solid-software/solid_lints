@@ -37,23 +37,22 @@ class AvoidDuplicateCodeReporter {
     final reportedOffsets = <int>{};
 
     for (final context in contexts) {
-      final entry = context.entry;
-      final group = hashGroups[entry.hash];
+      final HashEntry(:hash, :offset, :range) = context.entry;
+      final group = hashGroups[hash];
       if (group == null ||
-          reportedOffsets.contains(entry.offset) ||
-          suppressedRanges.anyContainsStrictly(entry.range)) {
+          reportedOffsets.contains(offset) ||
+          suppressedRanges.anyContainsStrictly(range)) {
         continue;
       }
 
       final internalPartners = group
           .where(
             (c) =>
-                c.entry.offset != entry.offset &&
+                c.entry.offset != offset &&
                 !suppressedRanges.anyContainsStrictly(c.entry.range),
           )
           .toList();
-      final externalPartners =
-          crossFileDuplicatesByHash[entry.hash] ?? const [];
+      final externalPartners = crossFileDuplicatesByHash[hash] ?? const [];
 
       if (internalPartners.isEmpty && externalPartners.isEmpty) continue;
 
@@ -64,8 +63,8 @@ class AvoidDuplicateCodeReporter {
         externalPartners: externalPartners,
       );
 
-      reportedOffsets.add(entry.offset);
-      suppressedRanges.add(entry.range);
+      reportedOffsets.add(offset);
+      suppressedRanges.add(range);
     }
   }
 
@@ -75,37 +74,34 @@ class AvoidDuplicateCodeReporter {
     required List<DuplicateReportContext> internalPartners,
     required List<DuplicateLocation> externalPartners,
   }) {
-    final currentEntry = target.entry;
+    final currentExactHash = target.entry.exactHash;
     final internalEntries = internalPartners.map((p) => p.entry).toList();
 
-    final hasExactPartner = _hasExactPartner(
-      currentExactHash: currentEntry.exactHash,
-      internalPartners: internalEntries,
-      externalPartners: externalPartners,
-    );
+    final hasExactPartner = internalEntries
+        .followedBy(externalPartners.map((p) => p.entry))
+        .map((p) => p.exactHash)
+        .contains(currentExactHash);
 
-    final diagnosticCode = hasExactPartner
-        ? _rule.exactCode
-        : _rule.differentLiteralsCode;
-    final isDifferentLiterals = diagnosticCode == _rule.differentLiteralsCode;
-
-    final arguments = isDifferentLiterals
-        ? [
-            _computeLiteralsSummary(
-              currentLiterals: target.collectLiterals(_literalsAnalyzer),
-              partnerLiterals: [
-                ...internalPartners.map(
-                  (p) => p.collectLiterals(_literalsAnalyzer),
-                ),
-                ..._loadExternalLiterals(externalPartners),
-              ],
-            ),
-          ]
-        : const <String>[];
+    final (diagnosticCode, arguments) = switch (hasExactPartner) {
+      true => (_rule.exactCode, const <String>[]),
+      false => (
+        _rule.differentLiteralsCode,
+        [
+          _computeLiteralsSummary(
+            currentLiterals: target.collectLiterals(_literalsAnalyzer),
+            partnerLiterals: [
+              for (final p in internalPartners)
+                p.collectLiterals(_literalsAnalyzer),
+              ..._loadExternalLiterals(externalPartners),
+            ],
+          ),
+        ],
+      ),
+    };
 
     final contextMessages = _buildContextMessages(
       currentFilePath: filePath,
-      currentExactHash: currentEntry.exactHash,
+      currentExactHash: currentExactHash,
       externalPartners: externalPartners,
       internalPartners: internalEntries,
     );
@@ -118,20 +114,12 @@ class AvoidDuplicateCodeReporter {
     );
   }
 
-  bool _hasExactPartner({
-    required int currentExactHash,
-    required Iterable<HashEntry> internalPartners,
-    required List<DuplicateLocation> externalPartners,
-  }) =>
-      internalPartners.any((p) => p.exactHash == currentExactHash) ||
-      externalPartners.any((p) => p.entry.exactHash == currentExactHash);
-
   Iterable<List<LiteralInfo>> _loadExternalLiterals(
     List<DuplicateLocation> locations,
   ) => locations
       .map(_literalsAnalyzer.loadExternalLiterals)
       .nonNulls
-      .where((lits) => lits.isNotEmpty);
+      .where((list) => list.isNotEmpty);
 
   String _computeLiteralsSummary({
     required List<LiteralInfo> currentLiterals,
