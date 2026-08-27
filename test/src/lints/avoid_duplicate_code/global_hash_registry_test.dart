@@ -346,8 +346,10 @@ void main() {
         final expectedPathB = p.normalize(
           p.join(io.Directory.current.path, 'file_b.dart'),
         );
-        expect(matches.first.duplicates[0].filePath, equals(expectedPathA));
-        expect(matches.first.duplicates[1].filePath, equals(expectedPathB));
+        expect(
+          matches.first.duplicates.map((d) => d.filePath),
+          containsAll([expectedPathA, expectedPathB]),
+        );
       });
 
       test('findCrossFileMatches processes multiple candidates correctly', () {

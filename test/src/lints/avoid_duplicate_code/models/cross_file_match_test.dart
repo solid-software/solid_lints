@@ -6,63 +6,61 @@ import 'package:test/test.dart';
 void main() {
   group('CrossFileMatchIterableExtension', () {
     test('toDuplicatesByHash groups matches by entry hash', () {
+      final locA = DuplicateLocation(
+        filePath: 'lib/a.dart',
+        entry: _TestFactory.entry(hash: 100, offset: 10),
+      );
+      final locB = DuplicateLocation(
+        filePath: 'lib/b.dart',
+        entry: _TestFactory.entry(hash: 200, offset: 20),
+      );
       final match1 = CrossFileMatch(
         currentEntry: _TestFactory.entry(hash: 100, offset: 0),
-        duplicates: [
-          DuplicateLocation(
-            filePath: 'lib/a.dart',
-            entry: _TestFactory.entry(hash: 100, offset: 10),
-          ),
-        ],
+        duplicates: {locA},
       );
       final match2 = CrossFileMatch(
         currentEntry: _TestFactory.entry(hash: 200, offset: 50),
-        duplicates: [
-          DuplicateLocation(
-            filePath: 'lib/b.dart',
-            entry: _TestFactory.entry(hash: 200, offset: 20),
-          ),
-        ],
+        duplicates: {locB},
       );
 
       final result = [match1, match2].toDuplicatesByHash();
 
-      expect(result.keys, containsAll([100, 200]));
-      expect(result[100], hasLength(1));
-      expect(result[100]!.first.filePath, 'lib/a.dart');
-      expect(result[200], hasLength(1));
-      expect(result[200]!.first.filePath, 'lib/b.dart');
+      expect(
+        result,
+        equals({
+          100: {locA},
+          200: {locB},
+        }),
+      );
     });
 
     test(
       'toDuplicatesByHash aggregates duplicates when matches share same hash',
       () {
+        final locA = DuplicateLocation(
+          filePath: 'lib/a.dart',
+          entry: _TestFactory.entry(hash: 100, offset: 10),
+        );
+        final locB = DuplicateLocation(
+          filePath: 'lib/b.dart',
+          entry: _TestFactory.entry(hash: 100, offset: 20),
+        );
         final match1 = CrossFileMatch(
           currentEntry: _TestFactory.entry(hash: 100, offset: 0),
-          duplicates: [
-            DuplicateLocation(
-              filePath: 'lib/a.dart',
-              entry: _TestFactory.entry(hash: 100, offset: 10),
-            ),
-          ],
+          duplicates: {locA},
         );
         final match2 = CrossFileMatch(
           currentEntry: _TestFactory.entry(hash: 100, offset: 100),
-          duplicates: [
-            DuplicateLocation(
-              filePath: 'lib/b.dart',
-              entry: _TestFactory.entry(hash: 100, offset: 20),
-            ),
-          ],
+          duplicates: {locB},
         );
 
         final result = [match1, match2].toDuplicatesByHash();
 
-        expect(result.keys, equals([100]));
-        expect(result[100], hasLength(2));
         expect(
-          result[100]!.map((d) => d.filePath),
-          containsAll(['lib/a.dart', 'lib/b.dart']),
+          result,
+          equals({
+            100: {locA, locB},
+          }),
         );
       },
     );
@@ -74,18 +72,21 @@ void main() {
       );
       final match1 = CrossFileMatch(
         currentEntry: _TestFactory.entry(hash: 100, offset: 0),
-        duplicates: [loc],
+        duplicates: {loc},
       );
       final match2 = CrossFileMatch(
         currentEntry: _TestFactory.entry(hash: 100, offset: 50),
-        duplicates: [loc],
+        duplicates: {loc},
       );
 
       final result = [match1, match2].toDuplicatesByHash();
 
-      expect(result.keys, equals([100]));
-      expect(result[100], hasLength(1));
-      expect(result[100]!.first.filePath, 'lib/a.dart');
+      expect(
+        result,
+        equals({
+          100: {loc},
+        }),
+      );
     });
   });
 }

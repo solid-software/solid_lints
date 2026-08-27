@@ -29,7 +29,7 @@ class AvoidDuplicateCodeReporter {
   void report({
     required String filePath,
     required List<DuplicateReportContext> contexts,
-    required Map<int, List<DuplicateLocation>> crossFileDuplicatesByHash,
+    required Map<int, Set<DuplicateLocation>> crossFileDuplicatesByHash,
   }) {
     final hashGroups = groupBy(contexts, (c) => c.entry.hash);
     final suppressedRanges = <(int, int)>[];
@@ -51,7 +51,7 @@ class AvoidDuplicateCodeReporter {
                 !suppressedRanges.anyContainsStrictly(c.entry.range),
           )
           .toList();
-      final externalPartners = crossFileDuplicatesByHash[hash] ?? const [];
+      final externalPartners = crossFileDuplicatesByHash[hash] ?? const {};
 
       if (internalPartners.isEmpty && externalPartners.isEmpty) continue;
 
@@ -71,7 +71,7 @@ class AvoidDuplicateCodeReporter {
     required String filePath,
     required DuplicateReportContext target,
     required List<DuplicateReportContext> internalPartners,
-    required List<DuplicateLocation> externalPartners,
+    required Set<DuplicateLocation> externalPartners,
   }) {
     final currentExactHash = target.entry.exactHash;
     final internalEntries = internalPartners.map((p) => p.entry).toList();
@@ -114,7 +114,7 @@ class AvoidDuplicateCodeReporter {
   }
 
   Iterable<List<LiteralInfo>> _loadExternalLiterals(
-    List<DuplicateLocation> locations,
+    Set<DuplicateLocation> locations,
   ) => locations
       .map(_literalsAnalyzer.loadExternalLiterals)
       .nonNulls
@@ -135,7 +135,7 @@ class AvoidDuplicateCodeReporter {
   List<DiagnosticMessage> _buildContextMessages({
     required String currentFilePath,
     required int currentExactHash,
-    required List<DuplicateLocation> externalPartners,
+    required Set<DuplicateLocation> externalPartners,
     required Iterable<HashEntry> internalPartners,
   }) {
     String messageFor(int exactHash) => exactHash == currentExactHash

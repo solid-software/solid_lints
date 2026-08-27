@@ -230,7 +230,7 @@ class GlobalHashRegistry {
     final fileStatusCache = <String, bool>{};
 
     for (final entry in currentEntries) {
-      final duplicates = <DuplicateLocation>[];
+      final duplicates = <DuplicateLocation>{};
       final locations = _hashToLocations[entry.hash];
 
       if (locations == null) continue;

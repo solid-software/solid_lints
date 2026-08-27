@@ -208,7 +208,7 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
   bool _isFileExcluded(String path) =>
       _analysisOptionsLoader?.isFileExcludedForFile(path) ?? false;
 
-  Map<int, List<DuplicateLocation>> _findAndSaveCrossFileMatches(
+  Map<int, Set<DuplicateLocation>> _findAndSaveCrossFileMatches(
     String filePath,
     List<HashEntry> hashEntries,
     String packageRoot,
