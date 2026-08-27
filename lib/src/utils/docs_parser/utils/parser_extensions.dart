@@ -16,6 +16,7 @@ extension FileDocsExtension on File {
 }
 
 /// Extension on [CompilationUnitMember] to help with docs parsing.
+// undead:ignore
 extension CompilationUnitMemberDocsExtension on CompilationUnitMember {
   /// The name of the declaration.
   String? get name =>
