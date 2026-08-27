@@ -85,7 +85,7 @@ class SolidLintsPlugin extends Plugin {
       NoMagicNumberRule(analysisOptionsLoader: analysisLoader),
       NumberOfParametersRule(analysisOptionsLoader: analysisLoader),
       PreferConditionalExpressionsRule(analysisOptionsLoader: analysisLoader),
-      PreferEarlyReturnRule(),
+      PreferEarlyReturnRule(analysisOptionsLoader: analysisLoader),
       PreferFirstRule(),
       PreferLastRule(),
       PreferMatchFileNameRule(analysisOptionsLoader: analysisLoader),

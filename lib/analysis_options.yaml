@@ -93,8 +93,9 @@ solid_lints:
     newline_before_return: true
     no_empty_block: true
     no_equal_then_else: true
-    # Disabled by default for now. Will be considered for future inclusion.
-    prefer_early_return: false 
+    prefer_early_return:
+      maximum_statements: 1
+      ignore_if_case: true
 
     no_magic_number:
       allowed_in_widget_params: true
