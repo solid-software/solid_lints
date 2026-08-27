@@ -1,7 +1,7 @@
 import 'dart:io' as io;
 
 import 'package:analyzer/file_system/file_system.dart';
-import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:collection/collection.dart';
 
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/avoid_duplicate_code_parameters.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/models/cross_file_match.dart';
@@ -12,7 +12,6 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/services/hash_cache_s
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/debouncer.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/hash_entry_list_extension.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/path_utils.dart';
-import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/avoid_duplicate_code_visitor.dart';
 import 'package:solid_lints/src/utils/iterable_utils.dart';
 import 'package:solid_lints/src/utils/set_dictionary.dart';
 
@@ -37,9 +36,6 @@ class GlobalHashRegistry {
   /// Set to `false` in tests using a virtual resource provider.
   bool enablePhysicalFileCleanup = true;
 
-  /// The resource provider used for file system operations.
-  ResourceProvider resourceProvider = PhysicalResourceProvider.INSTANCE;
-
   /// Internal index: filePath → FileCacheEntry.
   final _index = <String, FileCacheEntry>{};
 
@@ -48,6 +44,7 @@ class GlobalHashRegistry {
 
   final _loadedRoots = <String, AvoidDuplicateCodeParameters>{};
   final _saveDebouncers = <String, Debouncer>{};
+  final _packageRootCache = <String, String?>{};
 
   GlobalHashRegistry._();
 
@@ -68,9 +65,14 @@ class GlobalHashRegistry {
   ) => _hashToLocations.removeAll(entries.asIndexEntries(absoluteFilePath));
 
   void _ensureLoaded(
-    String packageRoot, [
+    String packageRoot,
+    ResourceProvider resourceProvider, [
     AvoidDuplicateCodeParameters? currentParams,
   ]) {
+    if (currentParams == null && _loadedRoots.containsKey(packageRoot)) {
+      return;
+    }
+
     final params = currentParams ?? AvoidDuplicateCodeParameters.empty();
     if (_loadedRoots[packageRoot] case final previousParams?) {
       if (previousParams == params) return;
@@ -98,7 +100,9 @@ class GlobalHashRegistry {
       _addToInvertedIndex(k, cached[k]!.entries);
     }
 
-    if (deletedFiles.isNotEmpty) _scheduleSave(packageRoot, params);
+    if (deletedFiles.isNotEmpty) {
+      _scheduleSave(packageRoot, resourceProvider);
+    }
   }
 
   void _clearEntriesForRoot(String packageRoot) {
@@ -114,44 +118,80 @@ class GlobalHashRegistry {
   String _resolveAndLoad(
     String filePath,
     String? packageRoot,
+    ResourceProvider resourceProvider,
     AvoidDuplicateCodeParameters? parameters,
   ) {
     final root = _getRoot(packageRoot);
-    _ensureLoaded(root, parameters);
+    _ensureLoaded(root, resourceProvider, parameters);
     return PathUtils.normalizePath(filePath, root);
   }
 
-  /// Returns the cached modification stamp for [filePath], or `null` if no
+  /// Returns the cached modification stamp for [filePath], or `null` if not
   /// indexed.
   int? getModificationStamp(
     String filePath, {
+    required ResourceProvider resourceProvider,
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
-  }) => _getCache(filePath, packageRoot, parameters)?.modificationStamp;
+  }) => _getCache(
+    filePath,
+    packageRoot,
+    parameters,
+    resourceProvider,
+  )?.modificationStamp;
 
   /// Returns the cached entries for [filePath], or `null` if not indexed.
   List<HashEntry>? getFileEntries(
     String filePath, {
+    required ResourceProvider resourceProvider,
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
-  }) => _getCache(filePath, packageRoot, parameters)?.entries;
+  }) => _getCache(
+    filePath,
+    packageRoot,
+    parameters,
+    resourceProvider,
+  )?.entries;
 
   FileCacheEntry? _getCache(
     String filePath,
     String? packageRoot,
     AvoidDuplicateCodeParameters? parameters,
-  ) => _index[_resolveAndLoad(filePath, packageRoot, parameters)];
+    ResourceProvider resourceProvider,
+  ) =>
+      _index[_resolveAndLoad(
+        filePath,
+        packageRoot,
+        resourceProvider,
+        parameters,
+      )];
 
   /// Updates the hash entries for [filePath], replacing any previous entries.
   void updateFile(
     String filePath,
     List<HashEntry> entries, {
     required int modificationStamp,
+    required ResourceProvider resourceProvider,
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
   }) {
+    if (entries.isEmpty) {
+      removeFile(
+        filePath,
+        resourceProvider: resourceProvider,
+        parameters: parameters,
+        packageRoot: packageRoot,
+      );
+      return;
+    }
+
     final root = _getRoot(packageRoot);
-    final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
+    final absoluteFilePath = _resolveAndLoad(
+      filePath,
+      packageRoot,
+      resourceProvider,
+      parameters,
+    );
 
     if (_index[absoluteFilePath] case final oldEntry?) {
       _removeFromInvertedIndex(absoluteFilePath, oldEntry.entries);
@@ -162,7 +202,7 @@ class GlobalHashRegistry {
       entries: entries,
     );
     _addToInvertedIndex(absoluteFilePath, entries);
-    _scheduleSave(root, parameters);
+    _scheduleSave(root, resourceProvider);
   }
 
   /// Finds cross-file duplicates for [currentEntries] against all other
@@ -172,6 +212,7 @@ class GlobalHashRegistry {
   List<CrossFileMatch> findCrossFileMatches(
     String currentFilePath,
     List<HashEntry> currentEntries, {
+    required ResourceProvider resourceProvider,
     AvoidDuplicateCodeParameters? parameters,
     bool Function(String filePath)? isFileExcluded,
     String? packageRoot,
@@ -180,6 +221,7 @@ class GlobalHashRegistry {
     final absoluteCurrentFilePath = _resolveAndLoad(
       currentFilePath,
       packageRoot,
+      resourceProvider,
       parameters,
     );
 
@@ -188,7 +230,7 @@ class GlobalHashRegistry {
     final fileStatusCache = <String, bool>{};
 
     for (final entry in currentEntries) {
-      final duplicates = <DuplicateLocation>[];
+      final duplicates = <DuplicateLocation>{};
       final locations = _hashToLocations[entry.hash];
 
       if (locations == null) continue;
@@ -207,9 +249,7 @@ class GlobalHashRegistry {
 
         if (isInvalid) {
           filesToRemove.add(key);
-        } else if (PathUtils.isWithinOrEqual(root, key) &&
-            // guard against hash collisions
-            loc.entry.tokenCount == entry.tokenCount) {
+        } else if (PathUtils.isWithinOrEqual(root, key)) {
           duplicates.add(loc);
         }
       }
@@ -232,7 +272,7 @@ class GlobalHashRegistry {
       }
     }
 
-    _scheduleSave(root, parameters);
+    _scheduleSave(root, resourceProvider);
 
     return matches;
   }
@@ -240,39 +280,43 @@ class GlobalHashRegistry {
   /// Removes [filePath] from the index.
   void removeFile(
     String filePath, {
+    required ResourceProvider resourceProvider,
     AvoidDuplicateCodeParameters? parameters,
     String? packageRoot,
   }) {
     final root = _getRoot(packageRoot);
-    final absoluteFilePath = _resolveAndLoad(filePath, packageRoot, parameters);
+    final absoluteFilePath = _resolveAndLoad(
+      filePath,
+      packageRoot,
+      resourceProvider,
+      parameters,
+    );
     if (_index.remove(absoluteFilePath) case final oldEntry?) {
       _removeFromInvertedIndex(absoluteFilePath, oldEntry.entries);
     }
-    _scheduleSave(root, parameters);
+    _scheduleSave(root, resourceProvider);
   }
 
   void _scheduleSave(
-    String packageRoot, [
-    AvoidDuplicateCodeParameters? parameters,
-  ]) {
+    String packageRoot,
+    ResourceProvider resourceProvider,
+  ) {
     _saveDebouncers
         .putIfAbsent(packageRoot, () => Debouncer(_saveDebounceDuration))
         .run(() {
-          _performSave(packageRoot, parameters);
+          _performSave(packageRoot, resourceProvider);
         });
   }
 
   void _performSave(
-    String packageRoot, [
-    AvoidDuplicateCodeParameters? parameters,
-  ]) =>
+    String packageRoot,
+    ResourceProvider resourceProvider,
+  ) =>
       HashCacheStorage(
         packageRoot: packageRoot,
         resourceProvider: resourceProvider,
         currentParams:
-            parameters ??
-            _loadedRoots[packageRoot] ??
-            AvoidDuplicateCodeParameters.empty(),
+            _loadedRoots[packageRoot] ?? AvoidDuplicateCodeParameters.empty(),
       ).save(
         // Filter _index for files belonging to this packageRoot
         _index.entries.whereKey(
@@ -280,21 +324,44 @@ class GlobalHashRegistry {
         ),
       );
 
+  /// Finds the package root directory containing `pubspec.yaml` for [filePath].
+  String? findPackageRoot(
+    String filePath, {
+    required ResourceProvider resourceProvider,
+  }) {
+    if (filePath.isEmpty) return null;
+    final dirPath = resourceProvider.pathContext.dirname(filePath);
+    return _packageRootCache.putIfAbsent(
+      dirPath,
+      () => resourceProvider
+          .getFolder(dirPath)
+          .withAncestors
+          .firstWhereOrNull(
+            (dir) => dir.getFile('pubspec.yaml').exists,
+          )
+          ?.path,
+    );
+  }
+
   /// Clears the entire index and deletes the persistent cache file.
   ///
   /// Primarily used in tests to ensure test isolation.
-  void clear() {
+  void clear({required ResourceProvider resourceProvider}) {
     for (final debouncer in _saveDebouncers.values) {
       debouncer.cancel();
     }
     _saveDebouncers.clear();
+
+    for (final root in {..._loadedRoots.keys, io.Directory.current.path}) {
+      HashCacheStorage(
+        packageRoot: root,
+        resourceProvider: resourceProvider,
+      ).delete();
+    }
+
     _loadedRoots.clear();
     _index.clear();
     _hashToLocations.clear();
-    HashCacheStorage(
-      packageRoot: io.Directory.current.path,
-      resourceProvider: resourceProvider,
-    ).delete();
-    AvoidDuplicateCodeVisitor.clearPackageRootCache();
+    _packageRootCache.clear();
   }
 }

@@ -252,6 +252,85 @@ void foo() {
         expect(matcher.isCandidateIgnored(innerBlock, null), isTrue);
       });
 
+      test(
+        'returns true when inline ignore is placed inside parameter list',
+        () {
+          final (body, decl) = _parseFunction('''
+void foo(
+  int a,
+  // ignore: $ruleName
+  int b,
+) {
+  final x = 1;
+}
+''');
+
+          expect(matcher.isCandidateIgnored(body, decl), isTrue);
+        },
+      );
+
+      test(
+        'returns true when inline ignore is placed before closing parenthesis',
+        () {
+          final (body, decl) = _parseFunction('''
+void foo(
+  int a,
+  int b,
+  // ignore: $ruleName
+) {
+  final x = 1;
+}
+''');
+
+          expect(matcher.isCandidateIgnored(body, decl), isTrue);
+        },
+      );
+
+      test(
+        'returns true when package-prefixed inline ignore is placed before closing parenthesis',
+        () {
+          final (body, decl) = _parseFunction('''
+void foo(
+  int a,
+  int b,
+  // ignore: solid_lints/$ruleName
+) {
+  final x = 1;
+}
+''');
+
+          expect(matcher.isCandidateIgnored(body, decl), isTrue);
+        },
+      );
+
+      test(
+        'returns true for method inside class with ignore in parameters',
+        () {
+          final result = parseString(
+            content:
+                '''
+abstract class Foo {
+  static void bar(
+    int a,
+    int b,
+    // ignore: solid_lints/$ruleName
+  ) {
+    final x = 1;
+  }
+}
+''',
+          );
+          final classDecl = result.unit.declarations.first as ClassDeclaration;
+          final methodDecl = switch (classDecl.body) {
+            BlockClassBody(:final members) =>
+              members.first as MethodDeclaration,
+            _ => throw StateError('Expected BlockClassBody'),
+          };
+          final body = (methodDecl.body as BlockFunctionBody).block;
+          expect(matcher.isCandidateIgnored(body, methodDecl), isTrue);
+        },
+      );
+
       test('returns false when declaration is not ignored', () {
         final (body, decl) = _parseFunction('''
 void foo() {

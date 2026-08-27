@@ -30,7 +30,7 @@ final class IgnoreMatcher {
   /// Checks if a candidate [node] or its enclosing [declaration] is ignored.
   bool isCandidateIgnored(AstNode node, [Declaration? declaration]) => [
     ?declaration?.beginToken,
-    ?declaration?.firstTokenAfterCommentAndMetadata,
+    ...?declaration?.firstTokenAfterCommentAndMetadata.upTo(node.beginToken),
     node.beginToken,
   ].commentLexemes.any(_lineIgnoreRegex.hasMatch);
 }

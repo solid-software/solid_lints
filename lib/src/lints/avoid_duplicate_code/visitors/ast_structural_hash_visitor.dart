@@ -4,47 +4,71 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/jenkins_hasher.dart';
 
-/// A [UnifyingAstVisitor] that builds a structural fingerprint of an AST
-/// subtree for clone detection.
+/// A [UnifyingAstVisitor] that builds structural and exact fingerprints of an
+/// AST subtree for clone detection.
 ///
-/// The fingerprint captures the structure of the code (node types, operators,
-/// and optionally literal values) while ignoring identifier names (like local
-/// variables), whitespace, and comments. This enables Type 2 clone detection
-/// where two code blocks with identical structure but different variable names
-/// are considered clones.
+/// The structural fingerprint captures the structure of the code (node types,
+/// operators, and type annotations) while ignoring identifier names (like
+/// local variables), literal values, whitespace, and comments. The exact
+/// fingerprint also incorporates literal values. This enables Type 2 and Type 3
+/// clone detection where code blocks with identical structure are identified
+/// as clones and compared for differing literals.
 class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
   static final _typeNameCache = <Type, String>{};
   static const _pipeAscii = 0x7C; // '|'
 
-  final _hasher = JenkinsHasher();
+  final _structuralHasher = JenkinsHasher();
+  final _exactHasher = JenkinsHasher();
   final _localVariableIds = <Element, int>{};
-  final bool _ignoreLiterals;
-  final bool _ignoreIdentifiers;
 
   /// Creates a new [AstStructuralHashVisitor].
-  AstStructuralHashVisitor({
-    required this._ignoreLiterals,
-    required this._ignoreIdentifiers,
-  });
+  AstStructuralHashVisitor();
 
-  /// Computes the structural hash for the given [node].
-  ///
-  /// Visits the entire subtree of [node] and returns an integer hash
-  /// of the accumulated structural fingerprint.
-  int computeHash(AstNode node) {
-    _hasher.reset();
+  /// Computes both the structural hash (ignoring literal values) and the exact
+  /// hash (including literal values) for the given [node].
+  ({int structuralHash, int exactHash}) computeHashes(AstNode node) {
+    _structuralHasher.reset();
+    _exactHasher.reset();
     _localVariableIds.clear();
     node.accept(this);
-    return _hasher.hash;
+    return (
+      structuralHash: _structuralHasher.hash,
+      exactHash: _exactHasher.hash,
+    );
   }
 
-  void _append(String value) => _hasher
+  /// Computes the structural hash for the given [node].
+  int computeHash(AstNode node) => computeHashes(node).structuralHash;
+
+  void _append(String value) {
+    _appendStructural(value);
+    _appendExact(value);
+  }
+
+  void _appendHash(int hashCode) {
+    _appendStructuralHash(hashCode);
+    _appendExactHash(hashCode);
+  }
+
+  void _appendBool(bool value) => _appendHash(value ? 1 : 0);
+
+  void _appendStructural(String value) => _structuralHasher
     ..addString(value)
     ..add(_pipeAscii);
 
-  void _appendHash(int hashCode) => _hasher
+  void _appendStructuralHash(int hashCode) => _structuralHasher
     ..add(hashCode)
     ..add(_pipeAscii);
+
+  void _appendExact(String value) => _exactHasher
+    ..addString(value)
+    ..add(_pipeAscii);
+
+  void _appendExactHash(int hashCode) => _exactHasher
+    ..add(hashCode)
+    ..add(_pipeAscii);
+
+  void _appendExactBool(bool value) => _appendExactHash(value ? 1 : 0);
 
   @override
   void visitNode(AstNode node) {
@@ -69,19 +93,19 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitIfStatement(IfStatement node) {
-    _appendHash(node.elseKeyword != null ? 1 : 0);
+    _appendBool(node.elseKeyword != null);
     super.visitIfStatement(node);
   }
 
   @override
   void visitTryStatement(TryStatement node) {
-    _appendHash(node.finallyBlock != null ? 1 : 0);
+    _appendBool(node.finallyBlock != null);
     super.visitTryStatement(node);
   }
 
   @override
   void visitYieldStatement(YieldStatement node) {
-    _appendHash(node.star != null ? 1 : 0);
+    _appendBool(node.star != null);
     super.visitYieldStatement(node);
   }
 
@@ -94,14 +118,17 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
   @override
   void visitPrefixExpression(PrefixExpression node) {
     if (node case PrefixExpression(
-      operator: Token(type: TokenType.MINUS || TokenType.PLUS),
+      operator: Token(type: TokenType.MINUS || TokenType.PLUS, :final lexeme),
       operand: IntegerLiteral() || DoubleLiteral(),
-    ) when _ignoreLiterals) {
+    )) {
+      _appendExact(lexeme);
       node.operand.accept(this);
-    } else {
-      _append(node.operator.lexeme);
-      super.visitPrefixExpression(node);
+
+      return;
     }
+
+    _append(node.operator.lexeme);
+    super.visitPrefixExpression(node);
   }
 
   @override
@@ -118,7 +145,7 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitIsExpression(IsExpression node) {
-    _appendHash(node.notOperator != null ? 1 : 0);
+    _appendBool(node.notOperator != null);
     super.visitIsExpression(node);
   }
 
@@ -132,42 +159,38 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
 
   @override
   void visitIntegerLiteral(IntegerLiteral node) {
-    if (!_ignoreLiterals) {
-      _append(node.literal.lexeme);
-    }
+    _appendExact(node.literal.lexeme);
     super.visitIntegerLiteral(node);
   }
 
   @override
   void visitDoubleLiteral(DoubleLiteral node) {
-    if (!_ignoreLiterals) {
-      _append(node.literal.lexeme);
-    }
+    _appendExact(node.literal.lexeme);
     super.visitDoubleLiteral(node);
   }
 
   @override
   void visitSimpleStringLiteral(SimpleStringLiteral node) {
-    if (!_ignoreLiterals) {
-      _append(node.value);
-    }
+    _appendExact(node.value);
     super.visitSimpleStringLiteral(node);
   }
 
   @override
   void visitInterpolationString(InterpolationString node) {
-    if (!_ignoreLiterals) {
-      _append(node.value);
-    }
+    _appendExact(node.value);
     super.visitInterpolationString(node);
   }
 
   @override
   void visitBooleanLiteral(BooleanLiteral node) {
-    if (!_ignoreLiterals) {
-      _appendHash(node.value ? 1 : 0);
-    }
+    _appendExactBool(node.value);
     super.visitBooleanLiteral(node);
+  }
+
+  @override
+  void visitSymbolLiteral(SymbolLiteral node) {
+    _appendExact(node.components.map((t) => t.lexeme).join('.'));
+    super.visitSymbolLiteral(node);
   }
 
   // --- Identifiers ---
@@ -179,8 +202,9 @@ class AstStructuralHashVisitor extends UnifyingAstVisitor<void> {
     switch (element) {
       // Smart ignore: ignore ONLY local variables and parameters.
       // This preserves field names, getters, methods, class names, etc.
-      case LocalVariableElement() || FormalParameterElement()
-          when _ignoreIdentifiers:
+      case LocalVariableElement() ||
+          FormalParameterElement() ||
+          PatternVariableElement():
         // It is a local variable or parameter.
         // Assign it a local ID (De Bruijn Indexing) to distinguish clones
         // that wire their variables differently.

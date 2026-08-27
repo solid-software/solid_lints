@@ -4,6 +4,9 @@ class HashEntry {
   /// The structural hash of the AST subtree.
   final int hash;
 
+  /// The exact hash of the AST subtree (including literal values).
+  final int exactHash;
+
   /// The line number where this candidate starts.
   final int lineNumber;
 
@@ -22,15 +25,17 @@ class HashEntry {
   /// Creates a new [HashEntry].
   const HashEntry({
     required this.hash,
+    required this.exactHash,
     required this.lineNumber,
+    required this.offset,
+    required this.length,
     required this.tokenCount,
-    this.offset = 0,
-    this.length = 0,
   });
 
   /// Converts this [HashEntry] to a JSON-compatible map using shortened keys.
   Map<String, Object?> toJson() => {
     'h': hash,
+    'e': exactHash,
     'n': lineNumber,
     'o': offset,
     'l': length,
@@ -40,8 +45,9 @@ class HashEntry {
   /// Creates a [HashEntry] from a JSON map.
   HashEntry.fromJson(Map<String, Object?> json)
     : hash = json['h']! as int,
+      exactHash = json['e']! as int,
       lineNumber = json['n']! as int,
       offset = (json['o'] ?? 0) as int,
       length = (json['l'] ?? 0) as int,
-      tokenCount = (json['t'] ?? json['s'] ?? 0) as int;
+      tokenCount = (json['t'] ?? 0) as int;
 }
