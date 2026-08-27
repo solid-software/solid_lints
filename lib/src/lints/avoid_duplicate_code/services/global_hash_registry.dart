@@ -249,9 +249,7 @@ class GlobalHashRegistry {
 
         if (isInvalid) {
           filesToRemove.add(key);
-        } else if (PathUtils.isWithinOrEqual(root, key) &&
-            // guard against hash collisions
-            loc.entry.tokenCount == entry.tokenCount) {
+        } else if (PathUtils.isWithinOrEqual(root, key)) {
           duplicates.add(loc);
         }
       }

@@ -588,6 +588,31 @@ void moveRight() ${expectLint(r'''{
   }
 
   Future<void>
+  test_reports_cross_file_duplicate_when_numeric_literal_signs_differ() async {
+    final otherFile = newFile('$testPackageLibPath/other.dart', '''
+void moveLeft() {
+  final dx = -10;
+  if (dx < 0) {
+    print('moving');
+  }
+  print('done');
+}
+''');
+
+    await _indexFile(otherFile);
+
+    await assertAutoDiagnostics('''
+void moveRight() ${expectLint(r'''{
+  final dx = 10;
+  if (dx < 0) {
+    print('moving');
+  }
+  print('done');
+}''', messageContainsAll: ['differs in literal values', '[10, -10]'])}
+''');
+  }
+
+  Future<void>
   test_duplicate_code_with_three_files_and_excluded_part_file() async {
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 linter:
