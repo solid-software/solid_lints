@@ -81,22 +81,19 @@ class AvoidDuplicateCodeReporter {
         .map((p) => p.exactHash)
         .contains(currentExactHash);
 
-    final (diagnosticCode, arguments) = switch (hasExactPartner) {
-      true => (_rule.exactCode, const <String>[]),
-      false => (
-        _rule.differentLiteralsCode,
-        [
-          _computeLiteralsSummary(
-            currentLiterals: target.collectLiterals(_literalsAnalyzer),
-            partnerLiterals: [
-              for (final p in internalPartners)
-                p.collectLiterals(_literalsAnalyzer),
-              ..._loadExternalLiterals(externalPartners),
-            ],
-          ),
-        ],
-      ),
-    };
+    final (diagnosticCode, argument) = hasExactPartner
+        ? (_rule.exactCode, null)
+        : (
+            _rule.differentLiteralsCode,
+            _computeLiteralsSummary(
+              currentLiterals: target.collectLiterals(_literalsAnalyzer),
+              partnerLiterals: [
+                for (final p in internalPartners)
+                  p.collectLiterals(_literalsAnalyzer),
+                ..._loadExternalLiterals(externalPartners),
+              ],
+            ),
+          );
 
     final contextMessages = _buildContextMessages(
       currentFilePath: filePath,
@@ -108,7 +105,7 @@ class AvoidDuplicateCodeReporter {
     target.report(
       _rule,
       diagnosticCode: diagnosticCode,
-      arguments: arguments,
+      arguments: [?argument],
       contextMessages: contextMessages,
     );
   }
