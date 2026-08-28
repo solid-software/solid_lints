@@ -6,7 +6,7 @@ import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_ru
 import 'package:solid_lints/src/lints/prefer_early_return/visitors/early_return_exit_visitor.dart';
 
 /// Visitor for [PreferEarlyReturnRule].
-class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
+class PreferEarlyReturnVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with the visitor.
   final PreferEarlyReturnRule rule;
 
@@ -25,29 +25,21 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitBlockFunctionBody(BlockFunctionBody node) {
-    super.visitBlockFunctionBody(node);
-
     _checkStatements(node.block.statements, isLoop: false);
   }
 
   @override
   void visitForStatement(ForStatement node) {
-    super.visitForStatement(node);
-
     _checkLoopBody(node.body);
   }
 
   @override
   void visitWhileStatement(WhileStatement node) {
-    super.visitWhileStatement(node);
-
     _checkLoopBody(node.body);
   }
 
   @override
   void visitDoStatement(DoStatement node) {
-    super.visitDoStatement(node);
-
     _checkLoopBody(node.body);
   }
 

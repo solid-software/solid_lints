@@ -96,9 +96,10 @@ class PreferEarlyReturnRule extends SolidLintRule<PreferEarlyReturnParameters> {
       parameters: parameters,
     );
 
-    registry.addBlockFunctionBody(this, visitor);
-    registry.addForStatement(this, visitor);
-    registry.addWhileStatement(this, visitor);
-    registry.addDoStatement(this, visitor);
+    registry
+      ..addBlockFunctionBody(this, visitor)
+      ..addForStatement(this, visitor)
+      ..addWhileStatement(this, visitor)
+      ..addDoStatement(this, visitor);
   }
 }
