@@ -1,47 +1,70 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/models/prefer_early_return_parameters.dart';
 import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_rule.dart';
-import 'package:solid_lints/src/lints/prefer_early_return/visitors/return_statement_visitor.dart';
-import 'package:solid_lints/src/lints/prefer_early_return/visitors/throw_expression_visitor.dart';
+import 'package:solid_lints/src/lints/prefer_early_return/visitors/early_return_exit_visitor.dart';
 
 /// Visitor for [PreferEarlyReturnRule].
-class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
+class PreferEarlyReturnVisitor extends SimpleAstVisitor<void> {
   /// The rule associated with the visitor.
   final PreferEarlyReturnRule rule;
 
   /// The context associated with the visitor.
   final RuleContext context;
 
+  /// The parameters associated with the rule.
+  final PreferEarlyReturnParameters parameters;
+
   /// Constructor for [PreferEarlyReturnVisitor].
   PreferEarlyReturnVisitor({
     required this.rule,
     required this.context,
+    required this.parameters,
   });
 
   @override
-  void visitBlockFunctionBody(BlockFunctionBody node) {
-    super.visitBlockFunctionBody(node);
+  void visitBlockFunctionBody(BlockFunctionBody node) =>
+      _checkStatements(node.block.statements, isLoop: false);
 
-    if (node.block.statements.isEmpty) return;
+  @override
+  void visitForStatement(ForStatement node) => _checkLoopBody(node.body);
 
-    final (ifStatements, nextStatement) = _getIfStatementsAndNextStatement(
-      node,
-    );
-    if (ifStatements.isEmpty) return;
+  @override
+  void visitWhileStatement(WhileStatement node) => _checkLoopBody(node.body);
 
-    // limit visitor to only work with functions
-    // that don't have a return statement or the return statement is empty
-    final nextStatementIsEmptyReturn =
-        nextStatement is ReturnStatement && nextStatement.expression == null;
-    final nextStatementIsNull = nextStatement == null;
+  @override
+  void visitDoStatement(DoStatement node) => _checkLoopBody(node.body);
 
-    if (!nextStatementIsEmptyReturn && !nextStatementIsNull) return;
+  void _checkLoopBody(Statement body) {
+    final List<Statement> statements = switch (body) {
+      Block(:final statements) => statements,
+      IfStatement() => [body],
+      _ => const [],
+    };
 
-    final lastIf = ifStatements.last;
+    if (statements.isNotEmpty) {
+      _checkStatements(statements, isLoop: true);
+    }
+  }
 
-    if (lastIf case IfStatement(elseStatement: Statement())) return;
-    if (_hasReturnStatement(lastIf) || _hasThrowExpression(lastIf)) return;
+  void _checkStatements(
+    List<Statement> statements, {
+    required bool isLoop,
+  }) {
+    final (leading, lastIf) = switch (statements) {
+      [...final leading, IfStatement lastIf] => (leading, lastIf),
+      [...final leading, IfStatement lastIf, ContinueStatement(label: null)]
+          when isLoop =>
+        (leading, lastIf),
+      [...final leading, IfStatement lastIf, ReturnStatement(expression: null)]
+          when !isLoop =>
+        (leading, lastIf),
+      _ => (null, null),
+    };
+
+    if (lastIf == null || !leading!.every((s) => s is IfStatement)) return;
+    if (!_shouldReport(lastIf)) return;
 
     context.currentUnit?.diagnosticReporter.atNode(
       lastIf,
@@ -49,36 +72,21 @@ class PreferEarlyReturnVisitor extends RecursiveAstVisitor<void> {
     );
   }
 
-  // returns a list of if statements at the start of the function
-  // and the next statement after it
-  // examples:
-  // [if, if, if, return] -> ([if, if, if], return)
-  // [if, if, if, _doSomething, return] -> ([if, if, if], _doSomething)
-  // [if, if, if] -> ([if, if, if], null)
-  (List<IfStatement>, Statement?) _getIfStatementsAndNextStatement(
-    BlockFunctionBody body,
-  ) {
-    final List<IfStatement> ifStatements = [];
-    for (final statement in body.block.statements) {
-      if (statement is IfStatement) {
-        ifStatements.add(statement);
-      } else {
-        return (ifStatements, statement);
-      }
+  bool _shouldReport(IfStatement ifStatement) {
+    final IfStatement(:thenStatement, :elseStatement, :caseClause) =
+        ifStatement;
+
+    if (elseStatement != null ||
+        (parameters.ignoreIfCase && caseClause != null)) {
+      return false;
     }
 
-    return (ifStatements, null);
-  }
+    final statementsCount = switch (thenStatement) {
+      Block(:final statements) => statements.length,
+      _ => 1,
+    };
 
-  bool _hasReturnStatement(Statement node) {
-    final visitor = ReturnStatementVisitor();
-    node.accept(visitor);
-    return visitor.nodes.isNotEmpty;
-  }
-
-  bool _hasThrowExpression(Statement node) {
-    final visitor = ThrowExpressionVisitor();
-    node.accept(visitor);
-    return visitor.nodes.isNotEmpty;
+    return statementsCount > parameters.maximumStatements &&
+        !EarlyReturnExitVisitor.hasExitIn(thenStatement);
   }
 }
