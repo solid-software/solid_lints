@@ -24,24 +24,17 @@ class PreferEarlyReturnVisitor extends SimpleAstVisitor<void> {
   });
 
   @override
-  void visitBlockFunctionBody(BlockFunctionBody node) {
-    _checkStatements(node.block.statements, isLoop: false);
-  }
+  void visitBlockFunctionBody(BlockFunctionBody node) =>
+      _checkStatements(node.block.statements, isLoop: false);
 
   @override
-  void visitForStatement(ForStatement node) {
-    _checkLoopBody(node.body);
-  }
+  void visitForStatement(ForStatement node) => _checkLoopBody(node.body);
 
   @override
-  void visitWhileStatement(WhileStatement node) {
-    _checkLoopBody(node.body);
-  }
+  void visitWhileStatement(WhileStatement node) => _checkLoopBody(node.body);
 
   @override
-  void visitDoStatement(DoStatement node) {
-    _checkLoopBody(node.body);
-  }
+  void visitDoStatement(DoStatement node) => _checkLoopBody(node.body);
 
   void _checkLoopBody(Statement body) {
     final List<Statement> statements = switch (body) {
@@ -50,9 +43,9 @@ class PreferEarlyReturnVisitor extends SimpleAstVisitor<void> {
       _ => const [],
     };
 
-    if (statements.isEmpty) return;
-
-    _checkStatements(statements, isLoop: true);
+    if (statements.isNotEmpty) {
+      _checkStatements(statements, isLoop: true);
+    }
   }
 
   void _checkStatements(
@@ -71,7 +64,7 @@ class PreferEarlyReturnVisitor extends SimpleAstVisitor<void> {
     };
 
     if (lastIf == null || !leading!.every((s) => s is IfStatement)) return;
-    if (!_shouldReport(lastIf, isLoop: isLoop)) return;
+    if (!_shouldReport(lastIf)) return;
 
     context.currentUnit?.diagnosticReporter.atNode(
       lastIf,
@@ -79,7 +72,7 @@ class PreferEarlyReturnVisitor extends SimpleAstVisitor<void> {
     );
   }
 
-  bool _shouldReport(IfStatement ifStatement, {required bool isLoop}) {
+  bool _shouldReport(IfStatement ifStatement) {
     final IfStatement(:thenStatement, :elseStatement, :caseClause) =
         ifStatement;
 
@@ -94,9 +87,6 @@ class PreferEarlyReturnVisitor extends SimpleAstVisitor<void> {
     };
 
     return statementsCount > parameters.maximumStatements &&
-        !EarlyReturnExitVisitor.hasExitIn(
-          thenStatement,
-          isLoop: isLoop,
-        );
+        !EarlyReturnExitVisitor.hasExitIn(thenStatement);
   }
 }

@@ -375,6 +375,22 @@ void test(bool a) {
 ''');
   }
 
+  Future<void> test_does_not_report_if_rethrow_with_return() async {
+    await assertNoDiagnostics(r'''
+void test(bool a) {
+  try {
+    print('hello');
+  } catch (_) {
+    if (a) {
+      rethrow;
+    }
+
+    return;
+  }
+}
+''');
+  }
+
   Future<void> test_does_not_report_if_else_throw() async {
     await assertNoDiagnostics(r'''
 void test(bool a) {
@@ -645,6 +661,23 @@ void test(List<String> items) {
 ''');
   }
 
+  Future<void> test_does_not_report_loop_with_rethrow_in_if() async {
+    await assertNoDiagnostics(r'''
+void test(List<String> items) {
+  for (final item in items) {
+    try {
+      print('hello');
+    } catch (_) {
+      if (item.isNotEmpty) {
+        print(item);
+        rethrow;
+      }
+    }
+  }
+}
+''');
+  }
+
   Future<void> test_reports_if_with_closure_containing_return() async {
     await assertAutoDiagnostics('''
 void test(bool a, List<int> items) {
@@ -739,6 +772,80 @@ void test(bool a) {
     helper();
     print('done');
   }''')}
+}
+''');
+  }
+
+  // --- Labeled break/continue edge cases ---
+
+  Future<void>
+  test_reports_loop_with_switch_containing_continue_to_case() async {
+    await assertAutoDiagnostics('''
+void test(List<int> items) {
+  for (final item in items) {
+    ${expectLint('''if (item > 0) {
+      switch (item) {
+        case 1:
+          continue target;
+        target:
+        case 2:
+          print('two');
+      }
+      print(item);
+    }''')}
+  }
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_loop_with_nested_loop_containing_continue_outer() async {
+    await assertNoDiagnostics(r'''
+void test(List<String> items, List<int> numbers) {
+  outer:
+  for (final item in items) {
+    if (item.isNotEmpty) {
+      for (final n in numbers) {
+        continue outer;
+      }
+      print(item);
+    }
+  }
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_loop_with_nested_loop_containing_break_outer() async {
+    await assertNoDiagnostics(r'''
+void test(List<String> items, List<int> numbers) {
+  outer:
+  for (final item in items) {
+    if (item.isNotEmpty) {
+      for (final n in numbers) {
+        break outer;
+      }
+      print(item);
+    }
+  }
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_loop_with_switch_containing_break_outer() async {
+    await assertNoDiagnostics(r'''
+void test(List<int> items) {
+  outer:
+  for (final item in items) {
+    if (item > 0) {
+      switch (item) {
+        case 1:
+          break outer;
+      }
+      print(item);
+    }
+  }
 }
 ''');
   }
