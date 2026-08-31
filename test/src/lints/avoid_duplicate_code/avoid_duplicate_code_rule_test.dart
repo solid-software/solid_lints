@@ -871,6 +871,42 @@ void otherMethod() {
     expect(GlobalHashRegistry.instance.fileCount, 0);
   }
 
+  Future<void> test_does_not_index_or_report_file_outside_context_root() async {
+    final outsideFile = newFile('/other_package/lib/outside.dart', '''
+void outsideMethod() {
+  final x = 1;
+  if (x > 0) {
+    print(x);
+  }
+  print('done');
+}
+''');
+
+    final avoidRule = rule as AvoidDuplicateCodeRule;
+    final resolved = await resolveFile(testFile.path);
+    final contextRoot = resolved.session.analysisContext.contextRoot;
+
+    final parsed = parseString(content: outsideFile.readAsStringSync());
+
+    final visitor = AvoidDuplicateCodeVisitor(
+      avoidRule,
+      AvoidDuplicateCodeParameters(
+        minTokens: 10,
+        exclude: ExcludedIdentifiersListParameter(exclude: []),
+      ),
+      filePath: outsideFile.path,
+      modificationStamp: 1,
+      ignoreMatcher: avoidRule.ignoreMatcher,
+      contextRoot: contextRoot,
+      resourceProvider: resourceProvider,
+      analysisOptionsLoader: avoidRule.analysisOptionsLoader,
+    );
+
+    parsed.unit.accept(visitor);
+
+    expect(GlobalHashRegistry.instance.fileCount, 0);
+  }
+
   Future<void> _indexFile(
     File file, {
     AvoidDuplicateCodeParameters? parameters,
