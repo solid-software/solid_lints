@@ -72,6 +72,42 @@ abstract interface class WidgetStateProperty<T> {}
 
 class WidgetStateColor extends Color implements WidgetStateProperty<Color> {}
 
+abstract class InheritedWidget extends Widget {
+  const InheritedWidget({super.key = ''});
+}
+
+abstract class InheritedTheme extends InheritedWidget {
+  const InheritedTheme({super.key = ''});
+}
+
+class InputDecorationTheme extends InheritedTheme {
+  const InputDecorationTheme({super.key = ''});
+
+  @override
+  Widget build(BuildContext context) => throw 'unimplemented';
+}
+
+class AppBarTheme extends InheritedTheme {
+  const AppBarTheme({super.key = ''});
+
+  @override
+  Widget build(BuildContext context) => throw 'unimplemented';
+}
+
+class MultiProvider extends InheritedWidget {
+  const MultiProvider({super.key = ''});
+
+  @override
+  Widget build(BuildContext context) => throw 'unimplemented';
+}
+
+class InheritedProvider<T> extends InheritedWidget {
+  const InheritedProvider({super.key = ''});
+
+  @override
+  Widget build(BuildContext context) => throw 'unimplemented';
+}
+
 class DecoratedBox extends Widget {
   const DecoratedBox({required this.decoration});
 
@@ -86,6 +122,10 @@ plugins:
   solid_lints:
     diagnostics:
       avoid_returning_widgets:
+        ignored_types:
+          - MultiProvider
+          - InheritedProvider
+          - InheritedTheme
         exclude:
           - class_name: ExcludeWidget 
             method_name: excludeWidgetMethod
@@ -380,6 +420,70 @@ class Widget {}
 
 class CustomService {
   Widget createCustomWidget() => Widget();
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_ignored_types_from_config() async {
+    await assertNoDiagnostics('''
+$_importFlutterWidgets
+
+class MyTheme {
+  InputDecorationTheme get inputDecorationTheme =>
+      const InputDecorationTheme();
+  AppBarTheme get appBarTheme => const AppBarTheme();
+  InheritedTheme get inheritedTheme => const InputDecorationTheme();
+  MultiProvider providers() => const MultiProvider();
+  InheritedProvider<String> provider() => const InheritedProvider<String>();
+}
+''');
+  }
+
+  Future<void> test_reports_when_not_in_ignored_types() async {
+    newAnalysisOptionsYamlFile(
+      testPackageRootPath,
+      analysisOptionsContent(rules: [rule.name]),
+    );
+
+    await assertAutoDiagnostics('''
+$_importFlutterWidgets
+
+class MyTheme {
+  ${expectLint('InputDecorationTheme get inputDecorationTheme => const InputDecorationTheme();')}
+  ${expectLint('MultiProvider providers() => const MultiProvider();')}
+}
+''');
+  }
+
+  Future<void>
+  test_does_not_report_on_function_returning_ignored_type_as_widget() async {
+    await assertNoDiagnostics('''
+$_importFlutterWidgets
+
+Widget providers(Widget child) => const MultiProvider();
+
+class MyClass {
+  Widget buildTheme() {
+    return const InputDecorationTheme();
+  }
+
+  Widget get themeGetter => const AppBarTheme();
+}
+''');
+  }
+
+  Future<void>
+  test_reports_on_function_returning_mixed_ignored_and_non_ignored() async {
+    await assertAutoDiagnostics('''
+$_importFlutterWidgets
+
+class MyClass {
+  ${expectLint('''Widget buildWidget(bool condition) {
+    if (condition) {
+      return const MultiProvider();
+    }
+    return const SizedBox();
+  }''')}
 }
 ''');
   }

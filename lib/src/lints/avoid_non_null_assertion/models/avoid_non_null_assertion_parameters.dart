@@ -1,3 +1,5 @@
+import 'package:solid_lints/src/common/parameters/ignored_types_list_parameter.dart';
+
 /// A data model class that represents the "avoid non null assertion" input
 /// parameters.
 class AvoidNonNullAssertionParameters {
@@ -18,7 +20,7 @@ class AvoidNonNullAssertionParameters {
   /// Map<String, String> map;
   /// map['key']!; // OK
   /// ```
-  final Set<String> ignoredTypes;
+  final IgnoredTypesListParameter ignoredTypes;
 
   /// Constructor for [AvoidNonNullAssertionParameters] model
   const AvoidNonNullAssertionParameters({
@@ -27,23 +29,14 @@ class AvoidNonNullAssertionParameters {
 
   /// Empty [AvoidNonNullAssertionParameters] model, ignores nothing.
   factory AvoidNonNullAssertionParameters.empty() =>
-      const AvoidNonNullAssertionParameters(
-        ignoredTypes: {},
+      AvoidNonNullAssertionParameters(
+        ignoredTypes: IgnoredTypesListParameter.empty(),
       );
 
   /// Method for creating from json data
-  factory AvoidNonNullAssertionParameters.fromJson(Map<String, Object?> json) {
-    final raw = json['ignored_types'];
-    final excludeList = switch (raw) {
-      final Iterable<Object?> rawList => rawList.whereType<String>().toSet(),
-      final Map<Object?, Object?> rawMap =>
-        rawMap.keys.whereType<String>().toSet(),
-      final String rawString => {rawString},
-      _ => const <String>{},
-    };
-
-    return AvoidNonNullAssertionParameters(
-      ignoredTypes: excludeList,
-    );
-  }
+  factory AvoidNonNullAssertionParameters.fromJson(
+    Map<String, Object?> json,
+  ) => AvoidNonNullAssertionParameters(
+    ignoredTypes: IgnoredTypesListParameter.fromJson(json),
+  );
 }

@@ -36,10 +36,6 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
   }
 
   void _visitDeclaration(Declaration node) {
-    if (node is! FunctionDeclaration && node is! MethodDeclaration) {
-      return;
-    }
-
     if (node is MethodDeclaration &&
         (!node.isComplete ||
             node.body is EmptyFunctionBody ||
@@ -56,10 +52,17 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
     };
     if (returnType == null) return;
 
-    final isWidgetReturned = isWidgetType(returnType);
-    if (!isWidgetReturned) return;
+    if (!isWidgetType(returnType)) return;
 
-    final isIgnored = _parameters.exclude.shouldIgnore(node);
+    // Only single-expression returns are checked against ignored types.
+    // Functions with multiple returns/branches must explicitly specify the
+    // ignored return type in their signature or be refactored into widgets.
+    final isIgnored =
+        _parameters.ignoredTypes.shouldIgnore(returnType) ||
+        _parameters.ignoredTypes.shouldIgnore(
+          node.singleReturnExpression?.staticType,
+        ) ||
+        _parameters.exclude.shouldIgnore(node);
     if (isIgnored) return;
 
     if (_isOverridden(node)) return;
@@ -89,8 +92,7 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
   }
 
   bool _isOverridden(Declaration node) {
-    if (node is MethodDeclaration &&
-        node.metadata.any((m) => m.name.name == 'override')) {
+    if (node is MethodDeclaration && isOverride(node.metadata)) {
       return true;
     }
 

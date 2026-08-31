@@ -47,7 +47,11 @@ solid_lints:
       ignored_types:
         - AnimationController
     avoid_non_null_assertion: true
-    avoid_returning_widgets: true
+    avoid_returning_widgets:
+      ignored_types:
+        - MultiProvider
+        - InheritedProvider
+        - InheritedTheme
     avoid_similar_names: true
     avoid_unnecessary_return_variable: true
     avoid_unnecessary_setstate: true

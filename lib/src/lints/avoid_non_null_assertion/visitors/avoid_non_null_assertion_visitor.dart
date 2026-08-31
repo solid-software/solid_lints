@@ -1,10 +1,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/avoid_non_null_assertion_rule.dart';
 import 'package:solid_lints/src/lints/avoid_non_null_assertion/models/avoid_non_null_assertion_parameters.dart';
-import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// visitor for [AvoidNonNullAssertionRule]
 class AvoidNonNullAssertionVisitor extends SimpleAstVisitor<void> {
@@ -27,21 +25,11 @@ class AvoidNonNullAssertionVisitor extends SimpleAstVisitor<void> {
     if (operand is IndexExpression) {
       final type = operand.target?.staticType;
 
-      if (_hasIgnoredType(type)) {
+      if (_parameters.ignoredTypes.shouldIgnore(type)) {
         return;
       }
     }
 
     rule.reportAtNode(node);
-  }
-
-  bool _hasIgnoredType(DartType? type) {
-    if (type == null) {
-      return false;
-    }
-
-    return type.hasIgnoredType(
-      ignoredTypes: _parameters.ignoredTypes,
-    );
   }
 }

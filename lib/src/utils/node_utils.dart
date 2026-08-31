@@ -327,16 +327,29 @@ extension ExpressionNullableExtension on Expression? {
   bool get isThisOrSuper => this is ThisExpression || this is SuperExpression;
 }
 
-/// Extension on [MethodDeclaration] to provide AST helper getters.
-extension MethodDeclarationExtension on MethodDeclaration {
-  /// Returns the single return expression of a method, or null if the
-  /// method body has multiple statements or no return expression.
-  Expression? get singleReturnExpression => switch (body) {
+/// Extension on [FunctionBody] to provide AST helper getters.
+extension FunctionBodyExtension on FunctionBody {
+  /// Returns the single return expression of a function body, or null if the
+  /// body has multiple statements or no return expression.
+  Expression? get singleReturnExpression => switch (this) {
     ExpressionFunctionBody(:final expression) => expression,
     BlockFunctionBody(
       block: Block(statements: [ReturnStatement(:final expression?)]),
     ) =>
       expression,
+    _ => null,
+  };
+}
+
+/// Extension on [Declaration] to provide AST helper getters.
+extension DeclarationExtension on Declaration {
+  /// Returns the single return expression of a declaration (method or
+  /// function), or null if the body has multiple statements or no return
+  /// expression.
+  Expression? get singleReturnExpression => switch (this) {
+    MethodDeclaration(:final body) => body.singleReturnExpression,
+    FunctionDeclaration(:final functionExpression) =>
+      functionExpression.body.singleReturnExpression,
     _ => null,
   };
 }
