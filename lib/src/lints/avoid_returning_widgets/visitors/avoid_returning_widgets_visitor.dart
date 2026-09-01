@@ -50,9 +50,8 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
         declaredFragment.element.returnType,
       _ => null,
     };
-    if (returnType == null) return;
 
-    if (!isWidgetType(returnType)) return;
+    if (!isWidgetOrSubclass(returnType)) return;
 
     // Only single-expression returns are checked against ignored types.
     // Functions with multiple returns/branches must explicitly specify the

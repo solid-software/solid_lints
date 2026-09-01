@@ -144,8 +144,6 @@ extension InterfaceElementExt on InterfaceElement {
   }
 }
 
-bool isWidgetType(DartType type) => isWidgetOrSubclass(type);
-
 bool isIterable(DartType? type) =>
     _checkSelfOrSupertypes(type, (t) => t?.isDartCoreIterable ?? false);
 
