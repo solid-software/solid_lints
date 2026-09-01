@@ -16,6 +16,7 @@ import 'package:solid_lints/src/lints/avoid_duplicate_code/reporters/avoid_dupli
 import 'package:solid_lints/src/lints/avoid_duplicate_code/reporters/duplicate_report_context.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/differing_literals_analyzer.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/services/global_hash_registry.dart';
+import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/path_utils.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/utils/token_utils.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/ast_structural_hash_visitor.dart';
 import 'package:solid_lints/src/lints/avoid_duplicate_code/visitors/candidate_visitor.dart';
@@ -82,6 +83,11 @@ class AvoidDuplicateCodeVisitor extends RecursiveAstVisitor<void> {
   void visitCompilationUnit(CompilationUnit node) {
     if (_filePath.isEmpty) return;
     final filePath = _filePath;
+
+    if (_contextRoot != null &&
+        !PathUtils.isWithinOrEqual(_contextRoot.root.path, filePath)) {
+      return;
+    }
 
     final packageRoot =
         _contextRoot?.root.path ??
