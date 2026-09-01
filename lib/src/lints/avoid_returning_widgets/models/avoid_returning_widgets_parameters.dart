@@ -1,5 +1,7 @@
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
 import 'package:solid_lints/src/common/parameters/ignored_types_list_parameter.dart';
+import 'package:solid_lints/src/utils/node_utils.dart';
 
 /// A data model class that represents the "avoid returning widgets" input
 /// parameters.
@@ -45,4 +47,13 @@ class AvoidReturningWidgetsParameters {
     exclude: ExcludedIdentifiersListParameter.defaultFromJson(json),
     ignoredTypes: IgnoredTypesListParameter.fromJson(json),
   );
+
+  /// Returns `true` if the given [node] should be ignored by the lint rule.
+  bool shouldIgnore(Declaration node) {
+    return ignoredTypes.shouldIgnoreAny([
+          node.returnType,
+          node.singleReturnExpression?.staticType,
+        ]) ||
+        exclude.shouldIgnore(node);
+  }
 }

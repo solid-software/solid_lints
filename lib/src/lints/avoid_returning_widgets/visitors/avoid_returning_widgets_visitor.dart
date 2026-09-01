@@ -43,28 +43,11 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    final returnType = switch (node) {
-      MethodDeclaration(:final declaredFragment?) =>
-        declaredFragment.element.returnType,
-      FunctionDeclaration(:final declaredFragment?) =>
-        declaredFragment.element.returnType,
-      _ => null,
-    };
-
-    if (!isWidgetOrSubclass(returnType)) return;
-
-    // Only single-expression returns are checked against ignored types.
-    // Functions with multiple returns/branches must explicitly specify the
-    // ignored return type in their signature or be refactored into widgets.
-    final isIgnored =
-        _parameters.ignoredTypes.shouldIgnore(returnType) ||
-        _parameters.ignoredTypes.shouldIgnore(
-          node.singleReturnExpression?.staticType,
-        ) ||
-        _parameters.exclude.shouldIgnore(node);
-    if (isIgnored) return;
-
-    if (_isOverridden(node)) return;
+    if (!isWidgetOrSubclass(node.returnType) ||
+        _parameters.shouldIgnore(node) ||
+        _isOverridden(node)) {
+      return;
+    }
 
     _rule.reportAtNode(node);
   }
@@ -91,11 +74,8 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
   }
 
   bool _isOverridden(Declaration node) {
-    if (node is MethodDeclaration && isOverride(node.metadata)) {
-      return true;
-    }
-
     return switch (node) {
+      MethodDeclaration(:final metadata) when isOverride(metadata) => true,
       Declaration(
         declaredFragment: Fragment(
           element: Element(

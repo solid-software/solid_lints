@@ -352,4 +352,14 @@ extension DeclarationExtension on Declaration {
       functionExpression.body.singleReturnExpression,
     _ => null,
   };
+
+  /// Returns the declared return type of a declaration (method or
+  /// function), or null if none.
+  DartType? get returnType => switch (this) {
+    MethodDeclaration(:final declaredFragment?) =>
+      declaredFragment.element.returnType,
+    FunctionDeclaration(:final declaredFragment?) =>
+      declaredFragment.element.returnType,
+    _ => null,
+  };
 }

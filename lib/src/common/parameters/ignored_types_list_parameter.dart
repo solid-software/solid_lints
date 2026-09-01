@@ -44,6 +44,9 @@ class IgnoredTypesListParameter extends Equatable {
     return type.hasIgnoredType(ignoredTypes: ignoredTypes);
   }
 
+  /// Returns `true` if any of the target [types] should be ignored.
+  bool shouldIgnoreAny(Iterable<DartType?> types) => types.any(shouldIgnore);
+
   @override
   List<Object?> get props => [ignoredTypes];
 }
