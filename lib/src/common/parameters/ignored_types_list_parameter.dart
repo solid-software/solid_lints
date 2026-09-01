@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/element/type.dart';
-import 'package:collection/collection.dart';
+
+import 'package:equatable/equatable.dart';
 import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// A parameter model representing ignored types for linting.
@@ -7,7 +8,7 @@ import 'package:solid_lints/src/utils/types_utils.dart';
 /// should be ignored during analysis.
 ///
 /// @docType String | List<String> | Map<String, Object?>
-class IgnoredTypesListParameter {
+class IgnoredTypesListParameter extends Equatable {
   /// The set of ignored type names.
   final Set<String> ignoredTypes;
 
@@ -44,14 +45,5 @@ class IgnoredTypesListParameter {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is IgnoredTypesListParameter &&
-          const SetEquality<String>().equals(
-            other.ignoredTypes,
-            ignoredTypes,
-          );
-
-  @override
-  int get hashCode => const SetEquality<String>().hash(ignoredTypes);
+  List<Object?> get props => [ignoredTypes];
 }
