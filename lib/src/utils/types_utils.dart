@@ -144,10 +144,6 @@ extension InterfaceElementExt on InterfaceElement {
   }
 }
 
-bool isWidgetType(DartType type) =>
-    isWidgetOrSubclass(type) &&
-    !(_isMultiProvider(type) || _isSubclassOfInheritedProvider(type));
-
 bool isIterable(DartType? type) =>
     _checkSelfOrSupertypes(type, (t) => t?.isDartCoreIterable ?? false);
 
@@ -234,15 +230,6 @@ bool _isFlutterType(DartType? type, String name) =>
 
 bool _isFlutterLibrary(LibraryElement library) =>
     library.uri.scheme == 'package' && library.uri.path.startsWith('flutter/');
-
-bool _isMultiProvider(DartType? type) =>
-    type?.getDisplayString() == 'MultiProvider';
-
-bool _isSubclassOfInheritedProvider(DartType? type) =>
-    type is InterfaceType && type.allSupertypes.any(_isInheritedProvider);
-
-bool _isInheritedProvider(DartType? type) =>
-    type != null && type.getDisplayString().startsWith('InheritedProvider<');
 
 bool isIterableOrSubclass(DartType? type) =>
     _checkSelfOrSupertypes(type, (t) => t?.isDartCoreIterable ?? false);

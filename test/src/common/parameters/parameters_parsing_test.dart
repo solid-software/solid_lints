@@ -1,6 +1,7 @@
 import 'package:solid_lints/src/common/parameters/excluded_annotations_list_parameter.dart';
 import 'package:solid_lints/src/common/parameters/excluded_entities_list_parameter.dart';
 import 'package:solid_lints/src/common/parameters/excluded_identifiers_list_parameter.dart';
+import 'package:solid_lints/src/common/parameters/ignored_types_list_parameter.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -85,6 +86,35 @@ void main() {
     test('parses empty or invalid input', () {
       final param = ExcludedIdentifiersListParameter.defaultFromJson({});
       expect(param.exclude, isEmpty);
+    });
+  });
+
+  group('IgnoredTypesListParameter', () {
+    test('parses list of strings', () {
+      final param = IgnoredTypesListParameter.fromJson({
+        'ignored_types': ['Map', 'List'],
+      });
+      expect(param.ignoredTypes, containsAll(['Map', 'List']));
+    });
+
+    test('parses single string', () {
+      final param = IgnoredTypesListParameter.fromJson({
+        'ignored_types': 'Map',
+      });
+      expect(param.ignoredTypes, contains('Map'));
+      expect(param.ignoredTypes.length, 1);
+    });
+
+    test('parses map of keys', () {
+      final param = IgnoredTypesListParameter.fromJson({
+        'ignored_types': {'Map': true, 'List': false},
+      });
+      expect(param.ignoredTypes, containsAll(['Map', 'List']));
+    });
+
+    test('parses empty or invalid input', () {
+      final param = IgnoredTypesListParameter.fromJson({});
+      expect(param.ignoredTypes, isEmpty);
     });
   });
 }

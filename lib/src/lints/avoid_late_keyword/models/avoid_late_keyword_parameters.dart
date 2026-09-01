@@ -1,3 +1,5 @@
+import 'package:solid_lints/src/common/parameters/ignored_types_list_parameter.dart';
+
 /// A data model class that represents the "avoid late keyword" input
 /// parameters.
 class AvoidLateKeywordParameters {
@@ -24,20 +26,18 @@ class AvoidLateKeywordParameters {
   /// late ColorTween tween; // OK
   /// late int colorValue; // LINT
   /// ```
-  final Iterable<String> ignoredTypes;
+  final IgnoredTypesListParameter ignoredTypes;
 
   /// Constructor for [AvoidLateKeywordParameters] model
   const AvoidLateKeywordParameters({
     this.allowInitialized = false,
-    this.ignoredTypes = const [],
+    this.ignoredTypes = const IgnoredTypesListParameter(ignoredTypes: {}),
   });
 
   /// Method for creating from json data
   factory AvoidLateKeywordParameters.fromJson(Map<String, Object?> json) =>
       AvoidLateKeywordParameters(
         allowInitialized: json['allow_initialized'] as bool? ?? false,
-        ignoredTypes: List<String>.from(
-          json['ignored_types'] as Iterable? ?? [],
-        ),
+        ignoredTypes: IgnoredTypesListParameter.fromJson(json),
       );
 }

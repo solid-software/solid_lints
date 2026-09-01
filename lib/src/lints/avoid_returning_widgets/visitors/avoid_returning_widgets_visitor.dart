@@ -36,10 +36,6 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
   }
 
   void _visitDeclaration(Declaration node) {
-    if (node is! FunctionDeclaration && node is! MethodDeclaration) {
-      return;
-    }
-
     if (node is MethodDeclaration &&
         (!node.isComplete ||
             node.body is EmptyFunctionBody ||
@@ -47,22 +43,11 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    final returnType = switch (node) {
-      MethodDeclaration(:final declaredFragment?) =>
-        declaredFragment.element.returnType,
-      FunctionDeclaration(:final declaredFragment?) =>
-        declaredFragment.element.returnType,
-      _ => null,
-    };
-    if (returnType == null) return;
-
-    final isWidgetReturned = isWidgetType(returnType);
-    if (!isWidgetReturned) return;
-
-    final isIgnored = _parameters.exclude.shouldIgnore(node);
-    if (isIgnored) return;
-
-    if (_isOverridden(node)) return;
+    if (!isWidgetOrSubclass(node.returnType) ||
+        _parameters.shouldIgnore(node) ||
+        _isOverridden(node)) {
+      return;
+    }
 
     _rule.reportAtNode(node);
   }
@@ -89,12 +74,8 @@ class AvoidReturningWidgetsVisitor extends RecursiveAstVisitor<void> {
   }
 
   bool _isOverridden(Declaration node) {
-    if (node is MethodDeclaration &&
-        node.metadata.any((m) => m.name.name == 'override')) {
-      return true;
-    }
-
     return switch (node) {
+      MethodDeclaration(:final metadata) when isOverride(metadata) => true,
       Declaration(
         declaredFragment: Fragment(
           element: Element(

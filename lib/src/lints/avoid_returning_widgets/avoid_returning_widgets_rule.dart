@@ -21,6 +21,10 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// solid_lints:
 ///   diagnostics:
 ///     avoid_returning_widgets:
+///       ignored_types:
+///         - MultiProvider
+///         - InheritedProvider
+///         - InheritedTheme
 ///       exclude:
 ///         - class_name: MyWidget
 ///           method_name: buildCustomButton
@@ -57,6 +61,13 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///     return const SizedBox();
 ///   }
 /// }
+///
+/// // Allowed if MultiProvider / InheritedTheme is in ignored_types:
+/// MultiProvider buildProviders(Widget child) => MultiProvider(
+///   providers: [],
+///   child: child,
+/// );
+/// InputDecorationTheme get inputTheme => const InputDecorationTheme();
 /// ```
 class AvoidReturningWidgetsRule
     extends SolidLintRule<AvoidReturningWidgetsParameters> {

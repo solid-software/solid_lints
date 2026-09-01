@@ -2,7 +2,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:solid_lints/src/lints/avoid_late_keyword/avoid_late_keyword_rule.dart';
 import 'package:solid_lints/src/lints/avoid_late_keyword/models/avoid_late_keyword_parameters.dart';
-import 'package:solid_lints/src/utils/types_utils.dart';
 
 /// Visitor for [AvoidLateKeywordRule].
 class AvoidLateKeywordVisitor extends SimpleAstVisitor<void> {
@@ -26,8 +25,7 @@ class AvoidLateKeywordVisitor extends SimpleAstVisitor<void> {
       !(_parameters.allowInitialized && node.initializer != null);
 
   bool _hasIgnoredType(VariableDeclaration node) =>
-      node.declaredFragment?.element.type.hasIgnoredType(
-        ignoredTypes: _parameters.ignoredTypes.toSet(),
-      ) ??
-      false;
+      _parameters.ignoredTypes.shouldIgnore(
+        node.declaredFragment?.element.type,
+      );
 }
