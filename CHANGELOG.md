@@ -1,3 +1,12 @@
+## 1.0.0
+
+- Enhanced `prefer_early_return` rule to support loops and added `max_depth`
+  configuration parameter.
+- Improved `avoid_duplicate_code` rule accuracy and resolved false positives.
+- Added `ignored_types` configuration parameter support to
+  `avoid_returning_widgets` rule.
+- Added documentation for recommended third-party packages.
+
 ## 1.0.0-dev.2
 
 - Upgraded minimum Dart SDK constraint to `>=3.12.0`.
