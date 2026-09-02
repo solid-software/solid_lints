@@ -46,23 +46,28 @@ providing an objective way to find and fix overly complex logic and routines.
 High-performance code duplication and clone detection engine and CLI tool for
 Dart and Flutter.
 
-It uses a polynomial rolling hash engine with maximal bidirectional expansion to
-detect token-level, structural, and parameterized code clones across packages.
+It scans codebases to detect token-level, structural, and near-miss code clones
+across files and packages with fast incremental analysis.
 
 - **Links**: [pub.dev](https://pub.dev/packages/dedupe) ·
   [GitHub](https://github.com/kevmoo/analytica.dart/tree/main/packages/dedupe)
 
-### Comparison: `avoid_duplicate_code` vs `dedupe`
+### Comparison: [`avoid_duplicate_code`](2_custom_lints/avoid_duplicate_code.md) vs `dedupe`
 
-| Feature | `avoid_duplicate_code` | `dedupe` |
+| Feature / Scenario | `avoid_duplicate_code` | `dedupe` |
 | :--- | :--- | :--- |
 | **Tool type** | Dart Analyzer / Linter plugin rule | Standalone CLI tool & Dart library/API |
 | **Primary workflow** | Real-time in-IDE feedback and `dart analyze` | Repository auditing, CI/CD checks, PR gating, batch analysis |
-| **Core engine** | **AST Subtree Fingerprinting:** AST traversal and Jenkins One-at-a-time hashing | **Hybrid AST & Token Rolling Hash:** Rabin-Karp k-gram indexing and MinHash for gapped matches |
-| **Code scope** | Syntactic blocks (functions, methods, closures, control-flow bodies) | Arbitrary token/line sequences (can detect clones across expression boundaries) |
-| **Supported clone types** | • **Type 1** (exact copies)<br/>• **Type 2** (syntactic: renamed variables, differing literals) | • **Type 1** (exact copies)<br/>• **Type 2** (syntactic: renamed variables, differing literals)<br/>• **Type 3** (near-miss: copies with insertions, deletions, or statement changes) |
-| **Differing literals diffing** | ✅ Detailed diff analysis reporting specific differing literal values | ❌ None (literals are normalized during extraction without per-value diffing) |
-| **Git / PR delta integration** | ❌ None (analyzes the current state of workspace files) | ✅ Built-in for PR delta and modified lines scanning |
-| **Report formats** | Dart Analysis Server diagnostics (IDE Problems, Related Locations) | Markdown, JSON, GitHub Actions step annotations, plain text |
-| **Metrics & statistics** | Duplicate locations and differing literal values | Duplication percentages per file/package, cluster inventories, estimated lines saved |
+| **Detection approach** | **Block-level (AST):** Analyzes complete syntactic structures (functions, methods, closures, `if`/`for` bodies) | **Sequence-level (Tokens):** Analyzes continuous sequences of code anywhere across files |
+| **Whole functions & blocks**<br/>*(e.g., duplicated methods with renamed variables)* | ✅ **Detected** | ✅ **Detected** |
+| **Sub-method fragments**<br/>*(e.g., 5–10 copied lines inside a 50-line method)* | ❌ **Skipped** (only evaluates complete blocks/methods) | ✅ **Detected** (flags duplicate snippets regardless of block boundaries) |
+| **Near-miss / modified clones**<br/>*(e.g., copy-paste with an extra line or minor edit)* | ❌ **Skipped** (requires matching syntactic block structure) | ✅ **Detected** (fuzzy matching detects clones with insertions/deletions) |
+| **Differing literals diffing** | ✅ **Detailed in-IDE diff** (pinpoints exact differing values, e.g. `'email'` vs `'sms'`) | ❌ **No per-value diff** (flags clone locations without a detailed literal breakdown) |
+| **Reporting & diagnostics** | IDE Problems & Related Locations | Markdown, JSON, GitHub Actions annotations, % duplication metrics |
 | **Disk cache usage** | ✅ | ✅ |
+
+> **💡 Best Together:** Use `avoid_duplicate_code` for instant IDE feedback,
+> and `dedupe` for CI/CD quality gates and repository-wide code clone audits.
+
+
+
