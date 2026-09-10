@@ -8,7 +8,7 @@ const darkCodeTheme = themes.oneDark;
 const config = {
   title: 'solid_lints',
   tagline: 'An opinionated set of lint rules based on industry standards.',
-  url: 'https://solid-software.github.io/',
+  url: 'https://lints.solid.software',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -36,6 +36,9 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl: 'https://github.com/solid-software/solid_lints/tree/master/doc/docusaurus',
+        },
+        googleTagManager: {
+          containerId: 'GTM-N84NG6SJ',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
