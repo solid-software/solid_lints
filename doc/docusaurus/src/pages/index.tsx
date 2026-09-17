@@ -26,8 +26,8 @@ export default function Home(): JSX.Element {
     <Layout
       title={`${siteConfig.title}`}
       description={
-        'Dart and Flutter lint rules and AI code guardrails based on ' +
-        'industry standards, developed and maintained by Solid Software, ' +
+        'Dart and Flutter lint rules based on software industry ' +
+        'standards, developed and maintained by Solid Software, ' +
         'a top Flutter agency.'
       }>
       <BrowserOnly>

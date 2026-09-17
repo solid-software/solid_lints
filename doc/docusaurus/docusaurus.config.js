@@ -20,6 +20,42 @@ const config = {
   deploymentBranch: 'web-docs-deployment',
   trailingSlash: false,
   staticDirectories: ['static'],
+  headTags: [
+    {
+      tagName: 'script',
+      attributes: {
+        type: 'application/ld+json',
+      },
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'solid_lints',
+        url: 'https://lints.solid.software',
+        description:
+          'Dart and Flutter lint rules based on software industry ' +
+          'standards, maintained by Solid Software, a top Flutter agency.',
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Windows, macOS, Linux',
+        license:
+          'https://github.com/solid-software/solid_lints/blob/master/LICENSE',
+        codeRepository: 'https://github.com/solid-software/solid_lints',
+        sameAs: [
+          'https://github.com/solid-software/solid_lints',
+          'https://pub.dev/packages/solid_lints',
+        ],
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+        author: {
+          '@type': 'Organization',
+          name: 'Solid Software',
+          url: 'https://solid.software',
+        },
+      }),
+    },
+  ],
    plugins: [
     [
       require.resolve("@easyops-cn/docusaurus-search-local"),
@@ -65,9 +101,8 @@ const config = {
         {
           property: 'og:description',
           content:
-            'Dart and Flutter lint rules and AI code guardrails based on ' +
-            'industry standards, maintained by Solid Software, ' +
-            'a top Flutter agency.',
+            'Dart and Flutter lint rules based on software industry ' +
+            'standards, maintained by Solid Software, a top Flutter agency.',
         },
       ],
       tableOfContents: {
