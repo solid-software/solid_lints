@@ -7,7 +7,9 @@ const darkCodeTheme = themes.oneDark;
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'solid_lints',
-  tagline: 'An opinionated set of lint rules based on industry standards.',
+  tagline:
+    'An opinionated set of lint rules based on industry standards, ' +
+    'maintained by Solid Software, a top Flutter agency.',
   url: 'https://lints.solid.software',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -50,6 +52,24 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      metadata: [
+        {
+          name: 'keywords',
+          content:
+            'solid lints, dart linter, flutter lint rules, static analysis, ' +
+            'code quality, AI code quality, AI guardrails, solid software, ' +
+            'top flutter agency, flutter consultants',
+        },
+        {name: 'author', content: 'Solid Software'},
+        {property: 'og:type', content: 'website'},
+        {
+          property: 'og:description',
+          content:
+            'Dart and Flutter lint rules and AI code guardrails based on ' +
+            'industry standards, maintained by Solid Software, ' +
+            'a top Flutter agency.',
+        },
+      ],
       tableOfContents: {
         minHeadingLevel: 2,
         maxHeadingLevel: 6,
@@ -68,6 +88,11 @@ const config = {
             label: 'Docs',
           },
           {
+            href: 'https://solid.software',
+            label: 'Solid Software',
+            position: 'right',
+          },
+          {
             href: 'https://github.com/solid-software/solid_lints',
             label: 'GitHub',
             position: 'right',
@@ -80,6 +105,14 @@ const config = {
           {
             label: 'Docs',
             to: '/docs/intro',
+          },
+          {
+            label: 'Solid Software',
+            href: 'https://solid.software',
+          },
+          {
+            label: 'pub.dev',
+            href: 'https://pub.dev/packages/solid_lints',
           },
           {
             label: 'GitHub',
