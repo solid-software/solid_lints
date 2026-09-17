@@ -20,6 +20,10 @@ const config = {
   deploymentBranch: 'web-docs-deployment',
   trailingSlash: false,
   staticDirectories: ['static'],
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en'],
+  },
   headTags: [
     {
       tagName: 'script',
