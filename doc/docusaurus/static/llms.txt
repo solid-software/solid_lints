@@ -1,6 +1,6 @@
 # solid_lints
 
-> An opinionated set of lint rules and metrics for Dart and Flutter based on software engineering industry standards and best practices, developed and maintained by [Solid Software](https://solid.software).
+> An opinionated set of lint rules and metrics for Dart and Flutter based on software engineering industry standards and best practices, developed and maintained by [Solid Software](https://solid.software), a top Flutter agency.
 
 Quickstart setup:
 
