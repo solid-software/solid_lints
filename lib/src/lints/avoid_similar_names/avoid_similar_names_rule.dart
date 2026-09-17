@@ -4,8 +4,6 @@ import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_similar_names/visitors/avoid_similar_names_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-/// Avoid similar names
-///
 /// Warns about variables or parameters that have confusingly similar names
 /// within the same function scope (e.g., using numeric suffixes or
 /// single-letter modifiers like `someClass1` and `someClass2`).

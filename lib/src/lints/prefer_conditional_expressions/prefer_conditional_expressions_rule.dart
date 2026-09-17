@@ -10,7 +10,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 // Inspired by TSLint (https://palantir.github.io/tslint/rules/prefer-conditional-expression/)
 
 /// Highlights simple "if" statements that can be replaced with conditional
-/// expressions
+/// expressions.
 ///
 /// ### Example config:
 ///
