@@ -71,7 +71,7 @@ To indicate that your project is using Solid Lints, you can use the following ba
 
 ## Maintained by Solid Software
 
-Developed and maintained by **[Solid Software](https://solid.software)** – a top Flutter agency and official Flutter consultants focused on high-standard software engineering.
+Developed and maintained by **[Solid Software](https://solid.software)** – a top Flutter agency and official Flutter consultants focused on best engineering practices.
 
 ### Why Solid Software?
 
