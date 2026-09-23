@@ -71,19 +71,27 @@ To indicate that your project is using Solid Lints, you can use the following ba
 
 ## Maintained by Solid Software
 
-Developed and maintained by **[Solid Software](https://solid.software)** – a top Flutter agency and official Flutter consultants focused on best engineering practices.
+<div align="center">
+  <a href="https://solid.software">
+    <img
+      src="https://cdn.prod.website-files.com/5d2846ce4f9c9d7eaa10af6f/6ab224b7413668876044fe2b_b2a4a0df6b23cbc8297c7581e979fb22_solid_software_logo_dark.png"
+      alt="Solid Software"
+      width="250"
+    />
+  </a>
+</div>
+
+Developed and maintained by **[Solid Software](https://solid.software)** - a top Flutter agency and official Flutter consultants focused on high-quality software engineering.
 
 ### Why Solid Software?
 
-- **Creators of [Solid Lints](https://lints.solid.software)** – Flutter and Dart lint rules based on software industry standards (ISO/IEC, NIST).
-- **Guardrails for AI Development** – Solid Lints keeps AI-assisted Flutter and Dart code clean, consistent, and strictly compliant with engineering standards.
-- **Full-Cycle Engineering** – from architecture and development to launch, scaling, and long-term support.
+- Working with Flutter since 2018 - early adopters and experts.
+- AI Development and Integration: modern AI-driven development workflows that accelerate time-to-market while ensuring clean, reliable code.
+- Full-cycle delivery & team augmentation.
 
 <div align="center">
   <br />
 
-  **Planning to launch a startup with Flutter?**
-
-  [🚀 Hire our Flutter team](https://solid.software/#solid-footer) &nbsp;&nbsp;•&nbsp;&nbsp; [Explore our open-source tools](https://pub.dev/publishers/solid.software/packages)
+  [💬 Hire Us](https://solid.software/#solid-footer) &nbsp;&nbsp;•&nbsp;&nbsp; [Other packages](https://pub.dev/publishers/solid.software/packages)
 
 </div>
