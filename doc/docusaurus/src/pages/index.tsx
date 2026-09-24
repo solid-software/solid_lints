@@ -25,7 +25,11 @@ export default function Home(): JSX.Element {
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description="solid_lints documentation">
+      description={
+        'Dart and Flutter lint rules based on software industry ' +
+        'standards, developed and maintained by Solid Software, ' +
+        'a top Flutter agency.'
+      }>
       <BrowserOnly>
         {() => <script>{window.location.href = introPageHref}</script>}
       </BrowserOnly>

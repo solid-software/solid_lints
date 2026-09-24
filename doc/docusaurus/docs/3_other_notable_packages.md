@@ -1,4 +1,12 @@
 ---
+title: Other Notable Packages
+description: 'Recommended Dart and Flutter packages that complement solid_lints for dead code detection, cognitive complexity, and architectural quality.'
+keywords:
+  - dart packages
+  - undead
+  - cognitive_complexity
+  - code quality
+  - solid_lints
 sidebar_label: Other notable packages
 sidebar_position: 3
 ---

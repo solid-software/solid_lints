@@ -5,7 +5,7 @@ import 'package:solid_lints/src/lints/no_magic_number/models/no_magic_number_par
 import 'package:solid_lints/src/lints/no_magic_number/visitors/no_magic_number_rule_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
-/// A `no_magic_number` rule which forbids having numbers without variable
+/// A `no_magic_number` rule which forbids having numbers without variable.
 ///
 /// There is a number of exceptions, where number literals are allowed:
 /// - Collection literals;

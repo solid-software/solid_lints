@@ -29,7 +29,7 @@ import 'package:solid_lints/src/lints/newline_before_return/visitors/newline_bef
 
 // Inspired by ESLint (https://eslint.org/docs/rules/newline-before-return)
 
-/// Warns about missing newline before return in a code block
+/// Warns about missing newline before return in a code block.
 ///
 /// ### Example
 ///
