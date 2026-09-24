@@ -1,4 +1,8 @@
 {
   "label": "Custom lints",
-  "position": 2
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Custom lint rules provided by solid_lints."
+  }
 }

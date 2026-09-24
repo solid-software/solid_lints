@@ -1,51 +1,20 @@
 ---
-title: Other Notable Packages
-description: 'Recommended Dart and Flutter packages that complement solid_lints for dead code detection, cognitive complexity, and architectural quality.'
+title: Code Duplication
+description: Detect duplicate code clones.
 keywords:
-  - dart packages
-  - undead
-  - cognitive_complexity
-  - code quality
-  - solid_lints
-sidebar_label: Other notable packages
-sidebar_position: 3
+  - code duplication
+  - dedupe
+  - avoid_duplicate_code
+  - clone detection
+  - dart duplicate code
+sidebar_label: Code duplication
+sidebar_position: 2
 ---
 
-# Other Notable Packages
+# Code Duplication
 
-Notable third-party tools that complement `solid_lints` in keeping Dart and
-Flutter codebases clean, robust, and maintainable.
-
-## [undead](https://pub.dev/packages/undead)
-
-[![pub package](https://img.shields.io/pub/v/undead.svg)](https://pub.dev/packages/undead)
-
-Deterministic reachability and dead/unused declaration analysis for Dart and
-Flutter packages.
-
-It performs whole-package AST analysis using `package:analyzer` to build a
-reachability graph from known entrypoints to all internal declarations,
-identifying unused top-level declarations, classes, functions, and variables.
-
-- **Links**: [pub.dev](https://pub.dev/packages/undead) ·
-  [GitHub](https://github.com/kevmoo/analytica.dart/tree/main/packages/undead)
-
----
-
-## [cognitive_complexity](https://pub.dev/packages/cognitive_complexity)
-
-[![pub package](https://img.shields.io/pub/v/cognitive_complexity.svg)](https://pub.dev/packages/cognitive_complexity)
-
-Algorithmic Cognitive Complexity calculation and Data-Flow analysis library and
-CLI tools for Dart and Flutter.
-
-It implements the Cognitive Complexity principles articulated by SonarSource,
-providing an objective way to find and fix overly complex logic and routines.
-
-- **Links**: [pub.dev](https://pub.dev/packages/cognitive_complexity) ·
-  [GitHub](https://github.com/kevmoo/analytica.dart/tree/main/packages/cognitive_complexity)
-
----
+Tools and engines for detecting copy-pasted fragments and structural clones
+across Dart and Flutter codebases.
 
 ## [dedupe](https://pub.dev/packages/dedupe)
 
@@ -60,9 +29,9 @@ across files and packages with fast incremental analysis.
 - **Links**: [pub.dev](https://pub.dev/packages/dedupe) ·
   [GitHub](https://github.com/kevmoo/analytica.dart/tree/main/packages/dedupe)
 
-### Comparison: [`avoid_duplicate_code`](2_custom_lints/avoid_duplicate_code.md) vs `dedupe`
+## Comparison: [`avoid_duplicate_code`](../2_custom_lints/avoid_duplicate_code.md) vs `dedupe`
 
-| Feature / Scenario | `avoid_duplicate_code` | `dedupe` |
+| | `avoid_duplicate_code` | `dedupe` |
 | :--- | :--- | :--- |
 | **Tool type** | Dart Analyzer / Linter plugin rule | Standalone CLI tool & Dart library/API |
 | **Primary workflow** | Real-time in-IDE feedback and `dart analyze` | Repository auditing, CI/CD checks, PR gating, batch analysis |
@@ -76,6 +45,3 @@ across files and packages with fast incremental analysis.
 
 > **💡 Best Together:** Use `avoid_duplicate_code` for instant IDE feedback,
 > and `dedupe` for CI/CD quality gates and repository-wide code clone audits.
-
-
-

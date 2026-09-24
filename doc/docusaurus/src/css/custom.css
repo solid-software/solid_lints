@@ -52,3 +52,18 @@
 .footer__links {
     margin: 0;
 }
+
+/* Custom Lints cards compact layout */
+a[href*='/custom_lints/'].theme-doc-card-container {
+  flex-direction: row !important;
+  padding: 12px 16px !important;
+
+  .theme-doc-card-heading {
+    margin: 0 !important;
+  }
+
+  .theme-doc-card-description,
+  .theme-doc-card-icon {
+    display: none !important;
+  }
+}

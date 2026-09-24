@@ -1,6 +1,5 @@
 ---
 title: Test Rule Set
-description: 'Pre-configured Dart and Flutter lint rules tailored specifically for unit and automated test suites.'
 keywords:
   - test ruleset
   - solid_lints
@@ -9,6 +8,7 @@ keywords:
   - unit testing
 sidebar_label: Test
 sidebar_position: 2
+description: Static analysis for autotests.
 ---
 
 # Test

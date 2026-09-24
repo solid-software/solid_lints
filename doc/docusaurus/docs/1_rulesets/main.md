@@ -1,6 +1,5 @@
 ---
 title: Main Rule Set
-description: 'Pre-configured Dart and Flutter lint rules for static analysis of application code based on NIST and Code Complete standards.'
 keywords:
   - main ruleset
   - solid_lints
@@ -9,6 +8,7 @@ keywords:
   - static analysis
 sidebar_label: Main
 sidebar_position: 1
+description: Static analysis for application code.
 ---
 
 # Main
