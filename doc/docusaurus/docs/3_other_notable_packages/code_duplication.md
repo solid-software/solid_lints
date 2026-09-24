@@ -1,7 +1,14 @@
 ---
+title: Code Duplication
+description: Detect duplicate code clones.
+keywords:
+  - code duplication
+  - dedupe
+  - avoid_duplicate_code
+  - clone detection
+  - dart duplicate code
 sidebar_label: Code duplication
 sidebar_position: 2
-description: Detect duplicate code clones.
 ---
 
 # Code Duplication

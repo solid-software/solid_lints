@@ -1,4 +1,11 @@
 ---
+title: Main Rule Set
+keywords:
+  - main ruleset
+  - solid_lints
+  - dart analysis
+  - flutter lint rules
+  - static analysis
 sidebar_label: Main
 sidebar_position: 1
 description: Static analysis for application code.

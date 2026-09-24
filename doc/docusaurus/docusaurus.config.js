@@ -7,8 +7,10 @@ const darkCodeTheme = themes.oneDark;
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'solid_lints',
-  tagline: 'An opinionated set of lint rules based on industry standards.',
-  url: 'https://solid-software.github.io/',
+  tagline:
+    'An opinionated set of lint rules based on industry standards, ' +
+    'maintained by Solid Software, a top Flutter agency.',
+  url: 'https://lints.solid.software',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -18,6 +20,46 @@ const config = {
   deploymentBranch: 'web-docs-deployment',
   trailingSlash: false,
   staticDirectories: ['static'],
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en'],
+  },
+  headTags: [
+    {
+      tagName: 'script',
+      attributes: {
+        type: 'application/ld+json',
+      },
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'solid_lints',
+        url: 'https://lints.solid.software',
+        description:
+          'Dart and Flutter lint rules based on software industry ' +
+          'standards, maintained by Solid Software, a top Flutter agency.',
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Windows, macOS, Linux',
+        license:
+          'https://github.com/solid-software/solid_lints/blob/master/LICENSE',
+        codeRepository: 'https://github.com/solid-software/solid_lints',
+        sameAs: [
+          'https://github.com/solid-software/solid_lints',
+          'https://pub.dev/packages/solid_lints',
+        ],
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+        author: {
+          '@type': 'Organization',
+          name: 'Solid Software',
+          url: 'https://solid.software',
+        },
+      }),
+    },
+  ],
    plugins: [
     [
       require.resolve("@easyops-cn/docusaurus-search-local"),
@@ -37,6 +79,9 @@ const config = {
           // Please change this to your repo.
           editUrl: 'https://github.com/solid-software/solid_lints/tree/master/doc/docusaurus',
         },
+        googleTagManager: {
+          containerId: 'GTM-N84NG6SJ',
+        },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
@@ -47,6 +92,23 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      metadata: [
+        {
+          name: 'keywords',
+          content:
+            'solid lints, dart linter, flutter lint rules, static analysis, ' +
+            'code quality, AI code quality, AI guardrails, solid software, ' +
+            'top flutter agency, flutter consultants',
+        },
+        {name: 'author', content: 'Solid Software'},
+        {property: 'og:type', content: 'website'},
+        {
+          property: 'og:description',
+          content:
+            'Dart and Flutter lint rules based on software industry ' +
+            'standards, maintained by Solid Software, a top Flutter agency.',
+        },
+      ],
       tableOfContents: {
         minHeadingLevel: 2,
         maxHeadingLevel: 6,
@@ -65,6 +127,11 @@ const config = {
             label: 'Docs',
           },
           {
+            href: 'https://solid.software',
+            label: 'Solid Software',
+            position: 'right',
+          },
+          {
             href: 'https://github.com/solid-software/solid_lints',
             label: 'GitHub',
             position: 'right',
@@ -77,6 +144,14 @@ const config = {
           {
             label: 'Docs',
             to: '/docs/intro',
+          },
+          {
+            label: 'Solid Software',
+            href: 'https://solid.software',
+          },
+          {
+            label: 'pub.dev',
+            href: 'https://pub.dev/packages/solid_lints',
           },
           {
             label: 'GitHub',

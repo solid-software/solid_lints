@@ -1,0 +1,71 @@
+# solid_lints
+
+> An opinionated set of lint rules and metrics for Dart and Flutter based on software engineering industry standards and best practices, developed and maintained by [Solid Software](https://solid.software), a top Flutter agency.
+
+Quickstart setup:
+
+Add `solid_lints` to `pubspec.yaml`:
+```bash
+dart pub add dev:solid_lints
+```
+
+Or manually in `pubspec.yaml`:
+```yaml
+dev_dependencies:
+  solid_lints: ^1.0.0 # Replace with latest version
+```
+
+Enable the plugin in `analysis_options.yaml`:
+```yaml
+include: package:solid_lints/analysis_options.yaml
+
+plugins:
+  solid_lints: ^1.0.0 # Replace with latest version
+```
+
+## Documentation
+- [Introduction](https://lints.solid.software/docs/intro): Setup guide, installation, and configuration overview
+- [Main Ruleset](https://lints.solid.software/docs/rulesets/main): Standard analysis ruleset for production application code
+- [Test Ruleset](https://lints.solid.software/docs/rulesets/test): Specialized ruleset tailored for unit and widget test files
+- [Other Notable Packages](https://lints.solid.software/docs/other_notable_packages): Complementary packages for dead code analysis, cognitive complexity, and duplicate detection
+
+## Custom Lint Rules
+- [avoid_debug_print_in_release](https://lints.solid.software/docs/custom_lints/avoid_debug_print_in_release): Forbids calling debugPrint in production code
+- [avoid_duplicate_code](https://lints.solid.software/docs/custom_lints/avoid_duplicate_code): Detects and prevents duplicate code fragments and patterns
+- [avoid_final_with_getter](https://lints.solid.software/docs/custom_lints/avoid_final_with_getter): Forbids redundant private final fields with public getters
+- [avoid_global_state](https://lints.solid.software/docs/custom_lints/avoid_global_state): Avoids mutable top-level and static variables
+- [avoid_late_keyword](https://lints.solid.software/docs/custom_lints/avoid_late_keyword): Forbids the late keyword to prevent LateInitializationError
+- [avoid_non_null_assertion](https://lints.solid.software/docs/custom_lints/avoid_non_null_assertion): Discourages the bang (!) operator in favor of proper null handling
+- [avoid_returning_widgets](https://lints.solid.software/docs/custom_lints/avoid_returning_widgets): Encourages dedicated Widget classes over widget-returning helper methods
+- [avoid_similar_names](https://lints.solid.software/docs/custom_lints/avoid_similar_names): Warns when identifiers in the same scope have confusingly similar names
+- [avoid_unnecessary_return_variable](https://lints.solid.software/docs/custom_lints/avoid_unnecessary_return_variable): Prevents intermediate variables immediately returned
+- [avoid_unnecessary_setstate](https://lints.solid.software/docs/custom_lints/avoid_unnecessary_setstate): Warns against synchronous setState calls in lifecycle hooks or build
+- [avoid_unnecessary_type_assertions](https://lints.solid.software/docs/custom_lints/avoid_unnecessary_type_assertions): Flags redundant is checks and whereType calls
+- [avoid_unrelated_type_assertions](https://lints.solid.software/docs/custom_lints/avoid_unrelated_type_assertions): Warns about unrelated is type checks whose result is always constant
+- [avoid_unused_parameters](https://lints.solid.software/docs/custom_lints/avoid_unused_parameters): Detects unused parameters in functions, constructors, and methods
+- [avoid_using_api](https://lints.solid.software/docs/custom_lints/avoid_using_api): Configurable rule to restrict deprecated or discouraged classes and APIs
+- [cyclomatic_complexity](https://lints.solid.software/docs/custom_lints/cyclomatic_complexity): Calculates and limits cyclomatic complexity of functions and methods
+- [double_literal_format](https://lints.solid.software/docs/custom_lints/double_literal_format): Enforces consistent formatting of floating-point number literals
+- [feature_envy](https://lints.solid.software/docs/custom_lints/feature_envy): Warns when a method accesses external class members more than its own
+- [function_lines_of_code](https://lints.solid.software/docs/custom_lints/function_lines_of_code): Monitors and limits source lines of code per function body
+- [member_ordering](https://lints.solid.software/docs/custom_lints/member_ordering): Enforces configurable ordering conventions for class members
+- [named_parameters_ordering](https://lints.solid.software/docs/custom_lints/named_parameters_ordering): Enforces specific ordering conventions for named parameters
+- [newline_before_return](https://lints.solid.software/docs/custom_lints/newline_before_return): Requires an empty line preceding return statements in code blocks
+- [no_empty_block](https://lints.solid.software/docs/custom_lints/no_empty_block): Disallows empty code blocks unless explicitly commented or catch handlers
+- [no_equal_then_else](https://lints.solid.software/docs/custom_lints/no_equal_then_else): Warns when if-else branches contain identical execution bodies
+- [no_magic_number](https://lints.solid.software/docs/custom_lints/no_magic_number): Forbids unexplained raw numeric literals outside named constants
+- [number_of_parameters](https://lints.solid.software/docs/custom_lints/number_of_parameters): Limits maximum allowed number of parameters per function or constructor
+- [prefer_conditional_expressions](https://lints.solid.software/docs/custom_lints/prefer_conditional_expressions): Recommends ternary operators instead of verbose if-else assignment blocks
+- [prefer_early_return](https://lints.solid.software/docs/custom_lints/prefer_early_return): Encourages guard clauses and early returns to reduce nesting
+- [prefer_first](https://lints.solid.software/docs/custom_lints/prefer_first): Suggests using iterable.first instead of [0] or elementAt(0)
+- [prefer_last](https://lints.solid.software/docs/custom_lints/prefer_last): Suggests using iterable.last instead of index-by-length
+- [prefer_match_file_name](https://lints.solid.software/docs/custom_lints/prefer_match_file_name): Checks that the file name matches the primary declared class or element
+- [proper_super_calls](https://lints.solid.software/docs/custom_lints/proper_super_calls): Ensures correct super invocation order in initState and dispose methods
+- [use_descriptive_names_for_type_parameters](https://lints.solid.software/docs/custom_lints/use_descriptive_names_for_type_parameters): Requires clear generic type parameter names when three or more are present
+- [use_nearest_context](https://lints.solid.software/docs/custom_lints/use_nearest_context): Ensures BuildContext is retrieved from the nearest available widget scope
+
+## Optional
+- [undead](https://pub.dev/packages/undead): Deterministic reachability and dead code analysis for Dart and Flutter
+- [cognitive_complexity](https://pub.dev/packages/cognitive_complexity): Cognitive complexity calculation and data-flow analysis tools
+- [ciach](https://pub.dev/packages/ciach): Architecture and module boundary enforcement for layered Flutter projects
+- [dedupe](https://pub.dev/packages/dedupe): CLI tool and algorithms for detecting duplicate Dart code blocks

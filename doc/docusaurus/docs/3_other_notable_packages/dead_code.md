@@ -1,7 +1,14 @@
 ---
+title: Dead Code
+description: Find and remove unused code.
+keywords:
+  - dead code
+  - ciach
+  - undead
+  - unused code
+  - dart dead code
 sidebar_label: Dead code
 sidebar_position: 1
-description: Find and remove unused code.
 ---
 
 # Dead Code

@@ -1,4 +1,11 @@
 ---
+title: Test Rule Set
+keywords:
+  - test ruleset
+  - solid_lints
+  - dart test linter
+  - flutter test rules
+  - unit testing
 sidebar_label: Test
 sidebar_position: 2
 description: Static analysis for autotests.

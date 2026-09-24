@@ -1,7 +1,14 @@
 ---
+title: Code Complexity
+description: Measure and manage code complexity.
+keywords:
+  - code complexity
+  - cognitive_complexity
+  - cyclomatic_complexity
+  - code metrics
+  - dart complexity
 sidebar_label: Code complexity
 sidebar_position: 3
-description: Measure and manage code complexity.
 ---
 
 # Code Complexity

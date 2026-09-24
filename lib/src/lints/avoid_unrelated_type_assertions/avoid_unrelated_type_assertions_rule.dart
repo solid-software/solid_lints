@@ -5,7 +5,7 @@ import 'package:analyzer/error/error.dart';
 import 'package:solid_lints/src/lints/avoid_unrelated_type_assertions/visitors/avoid_unrelated_type_assertions_visitor.dart';
 
 /// A `avoid_unrelated_type_assertions` rule which
-/// warns about unnecessary usage of `as` operator
+/// warns about unnecessary usage of `as` operator.
 class AvoidUnrelatedTypeAssertionsRule extends AnalysisRule {
   /// The lint rule name. Must be public to generate docs.
   static const lintName = 'avoid_unrelated_type_assertions';
