@@ -2,7 +2,10 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/source/line_info.dart';
+import 'package:collection/collection.dart';
 import 'package:solid_lints/src/utils/path_utils.dart';
+import 'package:solid_lints/src/utils/token_utils.dart';
 
 /// Check node is override method from its metadata
 bool isOverride(List<Annotation> metadata) => metadata.any(
@@ -160,6 +163,15 @@ extension AstNodeExtension on AstNode {
     }
     return null;
   }
+
+  /// Returns the number of lines of code in this node, ignoring synthetic
+  /// tokens and blank/comment-only lines.
+  int calculateLoc(LineInfo lineInfo) => beginToken
+      .upTo(endToken)
+      .whereNot((t) => t.isSynthetic)
+      .map((t) => lineInfo.getLocation(t.offset).lineNumber)
+      .toSet()
+      .length;
 }
 
 /// Extension on [NamedType] to provide source URL utility.
@@ -225,6 +237,13 @@ extension ElementExtension on Element {
   /// or null if none.
   InterfaceElement? get enclosingInterface =>
       enclosingElements.whereType<InterfaceElement>().firstOrNull;
+
+  /// Returns the [InterfaceType] if this element is an [InterfaceElement],
+  /// or null otherwise.
+  InterfaceType? get interfaceType => switch (this) {
+    InterfaceElement(:final thisType) => thisType,
+    _ => null,
+  };
 
   /// Returns an iterable of this element and all its enclosing elements.
   Iterable<Element> get enclosingElements sync* {
@@ -362,4 +381,67 @@ extension DeclarationExtension on Declaration {
       declaredFragment.element.returnType,
     _ => null,
   };
+}
+
+/// Extension on [CompilationUnitMember] to provide declaration metadata.
+extension CompilationUnitMemberExtension on CompilationUnitMember {
+  /// Returns `true` if this member is a nominal type declaration (class, enum,
+  /// mixin, extension, extension type, or class type alias).
+  bool get isNominalDeclaration => declarationToken != null;
+
+  /// Returns the primary identifier token of this declaration, or `null` if
+  /// not a nominal declaration.
+  Token? get declarationToken => switch (this) {
+    ClassDeclaration(:final namePart) ||
+    EnumDeclaration(:final namePart) ||
+    ExtensionTypeDeclaration(:final namePart) => namePart.typeName,
+    ClassTypeAlias(:final name) || MixinDeclaration(:final name) => name,
+    ExtensionDeclaration(:final name, :final extensionKeyword) =>
+      name ?? extensionKeyword,
+    _ => null,
+  };
+
+  /// Returns the human-readable display name of this declaration.
+  String get displayName =>
+      declaredFragment?.element.name ?? 'unnamed extension';
+
+  /// Returns `true` if this declaration has a private name or is an unnamed
+  /// extension (which is library-private).
+  bool get isPrivate => declaredFragment?.element.isPrivate ?? false;
+
+  /// Returns the declared [DartType] of this member if it declares an
+  /// interface type (class, enum, mixin, or extension type), or `null`
+  /// otherwise.
+  DartType? get declaredType => declaredFragment?.element.interfaceType;
+
+  /// Returns all explicitly declared supertypes on this member.
+  Iterable<NamedType> get explicitSupertypes => switch (this) {
+    ClassDeclaration(
+      :final extendsClause,
+      :final implementsClause,
+      :final withClause,
+    ) =>
+      [
+        if (extendsClause != null) extendsClause.superclass,
+        if (implementsClause != null) ...implementsClause.interfaces,
+        if (withClause != null) ...withClause.mixinTypes,
+      ],
+    EnumDeclaration(:final implementsClause?) ||
+    MixinDeclaration(:final implementsClause?) => implementsClause.interfaces,
+    _ => const [],
+  };
+
+  /// Returns the names of all explicitly referenced supertypes.
+  Iterable<String> get supertypeNames =>
+      explicitSupertypes.map((t) => t.name.lexeme);
+}
+
+/// Extension on [CompilationUnit] to provide declaration queries.
+extension CompilationUnitExtension on CompilationUnit {
+  /// Returns the names of all sealed classes declared in this compilation unit.
+  Set<String> get sealedClassNames => declarations
+      .whereType<ClassDeclaration>()
+      .where((c) => c.sealedKeyword != null)
+      .map((c) => c.displayName)
+      .toSet();
 }
