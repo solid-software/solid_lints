@@ -33,6 +33,7 @@ import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_ru
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
+import 'package:solid_lints/src/lints/prefer_mirror_test_structure/prefer_mirror_test_structure_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:solid_lints/src/lints/use_descriptive_names_for_type_parameters/use_descriptive_names_for_type_parameters_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
@@ -89,6 +90,7 @@ class SolidLintsPlugin extends Plugin {
       PreferFirstRule(),
       PreferLastRule(),
       PreferMatchFileNameRule(analysisOptionsLoader: analysisLoader),
+      PreferMirrorTestStructureRule(),
       ProperSuperCallsRule(),
       UseDescriptiveNamesForTypeParametersRule(
         analysisOptionsLoader: analysisLoader,

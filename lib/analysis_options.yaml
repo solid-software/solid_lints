@@ -110,6 +110,7 @@ solid_lints:
     prefer_first: true
     prefer_last: true
     prefer_match_file_name: true
+    prefer_mirror_test_structure: true
     proper_super_calls: true
     # Disabled for now due to conflict with
     # `always_put_required_named_parameters_first`.
