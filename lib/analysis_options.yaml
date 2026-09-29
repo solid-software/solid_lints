@@ -112,16 +112,15 @@ solid_lints:
     prefer_match_file_name: true
     prefer_mirror_test_structure: true
     proper_super_calls: true
-    # Disabled for now due to conflict with
-    # `always_put_required_named_parameters_first`.
-    named_parameters_ordering: false
+    named_parameters_ordering: true
     use_nearest_context: true
     use_descriptive_names_for_type_parameters: true
 
 linter:
   rules:
     - always_declare_return_types
-    - always_put_required_named_parameters_first
+    # Disabled in favor of `solid_lints` rule `named_parameters_ordering`.
+    # - always_put_required_named_parameters_first
     - always_use_package_imports
     - annotate_overrides
     - avoid_bool_literals_in_conditional_expressions
