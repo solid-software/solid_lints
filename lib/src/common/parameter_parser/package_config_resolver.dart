@@ -103,7 +103,7 @@ class PackageConfigResolver {
                 ),
         };
       }
-    } catch (_) {}
+    } on Object catch (_) {}
 
     return const {};
   }

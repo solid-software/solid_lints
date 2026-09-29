@@ -48,7 +48,7 @@ extension IterableTryMap<T> on Iterable<T> {
   Iterable<U?> tryMap<U>(U Function(T) f) => map((e) {
     try {
       return f(e);
-    } catch (_) {
+    } on Object catch (_) {
       return null;
     }
   });

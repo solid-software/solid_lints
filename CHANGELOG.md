@@ -1,3 +1,27 @@
+## 1.1.0
+
+- **BREAKING CHANGE**: Added 16 new lint rules to `analysis_options.yaml`.
+  Existing projects may see new static analysis issues after upgrading:
+  - `avoid_catches_without_on_clauses`
+  - `avoid_returning_this`
+  - `avoid_types_on_closure_parameters`
+  - `cascade_invocations`
+  - `discarded_futures`
+  - `document_ignores`
+  - `no_literal_bool_comparisons`
+  - `no_wildcard_variable_uses`
+  - `unnecessary_const_in_enum_constructor`
+  - `unnecessary_ignore`
+  - `unnecessary_late`
+  - `unnecessary_unawaited`
+  - `unnecessary_underscores`
+  - `unreachable_from_main`
+  - `use_enums`
+  - `use_truncating_division`
+- Added `avoid_multiple_declarations_per_file` rule.
+- Added `prefer_mirror_test_structure` rule.
+- Fixed code style and analysis warnings across package utilities and rules.
+
 ## 1.0.0
 
 - Enhanced `prefer_early_return` rule to support loops and added `max_depth`

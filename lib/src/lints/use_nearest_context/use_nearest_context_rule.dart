@@ -85,7 +85,8 @@ class UseNearestContextRule extends AnalysisRule implements RuleWithFixes {
     RuleContext context,
   ) {
     final visitor = UseNearestContextVisitor(this);
-    registry.addSimpleIdentifier(this, visitor);
-    registry.addThisExpression(this, visitor);
+    registry
+      ..addSimpleIdentifier(this, visitor)
+      ..addThisExpression(this, visitor);
   }
 }

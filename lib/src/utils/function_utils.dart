@@ -5,7 +5,7 @@ abstract final class FunctionUtils {
   static T? tryOrNull<T>(T Function() f) {
     try {
       return f();
-    } catch (_) {
+    } on Object catch (_) {
       return null;
     }
   }

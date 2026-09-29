@@ -99,7 +99,7 @@ class ParserUtils {
   static String camelCaseToSnakeCase(String camelCaseString) => camelCaseString
       .replaceAllMapped(
         ParserRegexes.camelCaseRegex,
-        (Match m) => '_${m.group(0)}',
+        (m) => '_${m.group(0)}',
       )
       .toLowerCase();
 

@@ -34,7 +34,7 @@ extension CompilationUnitMemberDocsExtension on CompilationUnitMember {
 T? _tryOrNull<T>(T Function() f) {
   try {
     return f();
-  } catch (_) {
+  } on Object catch (_) {
     return null;
   }
 }

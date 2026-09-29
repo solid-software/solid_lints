@@ -108,10 +108,11 @@ class AvoidUsingApiRule extends SolidMultiLintRule<AvoidUsingApiParameters> {
       context: context,
     );
 
-    registry.addSimpleIdentifier(this, visitor);
-    registry.addNamedType(this, visitor);
-    registry.addVariableDeclaration(this, visitor);
-    registry.addInstanceCreationExpression(this, visitor);
-    registry.addMethodInvocation(this, visitor);
+    registry
+      ..addSimpleIdentifier(this, visitor)
+      ..addNamedType(this, visitor)
+      ..addVariableDeclaration(this, visitor)
+      ..addInstanceCreationExpression(this, visitor)
+      ..addMethodInvocation(this, visitor);
   }
 }

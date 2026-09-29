@@ -66,7 +66,7 @@ class DocusaurusFormatter implements RulesDocumentationFormatter<void> {
       if (yaml case {'version': final String rawVersion}) {
         return '^${rawVersion.split(RegExp('[-+]')).first}';
       }
-    } catch (_) {}
+    } on Object catch (_) {}
     return null;
   }
 
