@@ -54,25 +54,6 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// // child.dart
 /// class Child extends StatelessWidget {}
 /// ```
-///
-/// #### ALLOWED WITH CONFIGURATION (`ignored_types: [State]`):
-///
-/// ```dart
-/// class SomeWidget extends StatefulWidget {}
-///
-/// class _SomeWidgetState extends State<SomeWidget> {}
-/// ```
-///
-/// #### ALLOWED WITH CONFIGURATION (`maximum_loc: 10`):
-///
-/// ```dart
-/// class MainClass {}
-///
-/// class SmallHelper {
-///   // Comments and blank lines are excluded from LOC calculation.
-///   void run() {}
-/// }
-/// ```
 class AvoidMultipleDeclarationsPerFileRule
     extends SolidLintRule<AvoidMultipleDeclarationsPerFileParameters> {
   /// The lint rule name. Must be public to generate docs.
