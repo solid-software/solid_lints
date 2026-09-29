@@ -83,4 +83,15 @@ Since we're not using the `function_lines_of_code` rule, the `main()` function i
 
 State: **Disabled**.
 
-It's acceptable to include stubs or other helper classes into the test file.
+Allows declaring stubs and helper classes whose names do not match the test
+file name.
+
+## avoid_multiple_declarations_per_file
+
+State: **Disabled**.
+
+Allows keeping test-specific declarations (such as mocks, fakes, and fixtures)
+together within the test file so tests remain self-contained without creating
+extra files.
+
+

@@ -23,7 +23,7 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 ///       exclude_entity:
 ///         - extension_type
 ///         - enum
-///       allow_private: false
+///       allow_private: true
 ///       maximum_loc: 20
 /// ```
 ///
@@ -61,6 +61,17 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// class SomeWidget extends StatefulWidget {}
 ///
 /// class _SomeWidgetState extends State<SomeWidget> {}
+/// ```
+///
+/// #### ALLOWED WITH CONFIGURATION (`maximum_loc: 10`):
+///
+/// ```dart
+/// class MainClass {}
+///
+/// class SmallHelper {
+///   // Comments and blank lines are excluded from LOC calculation.
+///   void run() {}
+/// }
 /// ```
 class AvoidMultipleDeclarationsPerFileRule
     extends SolidLintRule<AvoidMultipleDeclarationsPerFileParameters> {

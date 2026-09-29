@@ -45,7 +45,7 @@ class AvoidMultipleDeclarationsPerFileParameters {
   ///
   /// enum UserRole { admin, regular } // OK
   /// ```
-  final ExcludedEntitiesListParameter excludedEntities;
+  final ExcludedEntitiesListParameter excludeEntity;
 
   /// Whether private declarations (e.g. prefixed with `_`) are allowed.
   ///
@@ -65,7 +65,8 @@ class AvoidMultipleDeclarationsPerFileParameters {
   /// ```
   final bool allowPrivate;
 
-  /// Maximum lines of code allowed for secondary declarations.
+  /// Maximum lines of code allowed for secondary declarations, excluding
+  /// blank lines and comments.
   ///
   /// Example:
   ///
@@ -80,6 +81,7 @@ class AvoidMultipleDeclarationsPerFileParameters {
   /// class MainClass {}
   ///
   /// class SmallHelper {
+  ///   // Comments and blank lines are excluded from LOC calculation.
   ///   void run() {}
   /// } // OK if LOC <= 10
   /// ```
@@ -88,7 +90,7 @@ class AvoidMultipleDeclarationsPerFileParameters {
   /// Constructor for [AvoidMultipleDeclarationsPerFileParameters].
   const AvoidMultipleDeclarationsPerFileParameters({
     required this.ignoredTypes,
-    required this.excludedEntities,
+    required this.excludeEntity,
     this.allowPrivate = false,
     this.maximumLoc,
   });
@@ -97,7 +99,7 @@ class AvoidMultipleDeclarationsPerFileParameters {
   factory AvoidMultipleDeclarationsPerFileParameters.empty() =>
       AvoidMultipleDeclarationsPerFileParameters(
         ignoredTypes: IgnoredTypesListParameter.empty(),
-        excludedEntities: ExcludedEntitiesListParameter(
+        excludeEntity: ExcludedEntitiesListParameter(
           excludedEntityNames: {},
         ),
       );
@@ -107,14 +109,14 @@ class AvoidMultipleDeclarationsPerFileParameters {
     Map<String, Object?> json,
   ) => AvoidMultipleDeclarationsPerFileParameters(
     ignoredTypes: IgnoredTypesListParameter.fromJson(json),
-    excludedEntities: ExcludedEntitiesListParameter.fromJson(json),
+    excludeEntity: ExcludedEntitiesListParameter.fromJson(json),
     allowPrivate: json['allow_private'] as bool? ?? false,
     maximumLoc: json['maximum_loc'] as int?,
   );
 
   /// Returns `true` if the given [node] should be ignored based on
-  /// [excludedEntities] or [ignoredTypes].
+  /// [excludeEntity] or [ignoredTypes].
   bool shouldIgnore(CompilationUnitMember node) =>
-      excludedEntities.shouldIgnoreEntity(node) ||
+      excludeEntity.shouldIgnoreEntity(node) ||
       ignoredTypes.shouldIgnore(node.declaredType);
 }
