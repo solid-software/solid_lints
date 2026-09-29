@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
 import 'package:analyzer_testing/utilities/utilities.dart';
 import 'package:solid_lints/src/common/parameter_parser/analysis_options_loader.dart';
@@ -23,39 +25,86 @@ class AvoidMultipleDeclarationsPerFileRuleTest extends AnalysisRuleTest
       ),
     );
     super.setUp();
+
+    newFile('$testPackageLibPath/base.dart', r'''
+abstract class Base {}
+mixin Mix {}
+''');
+
+    newFile('$testPackageLibPath/flutter.dart', r'''
+abstract class StatefulWidget {}
+abstract class State<T extends StatefulWidget> {}
+''');
   }
 
-  void _configureOptions(String customOptions) {
+  void _configureRule({
+    List<String>? ignoredTypes,
+    List<String>? excludeEntity,
+    bool? allowPrivate,
+    int? maximumLoc,
+  }) {
+    final options = jsonEncode({
+      if (ignoredTypes != null) 'ignored_types': ignoredTypes,
+      if (excludeEntity != null) 'exclude_entity': excludeEntity,
+      if (allowPrivate != null) 'allow_private': allowPrivate,
+      if (maximumLoc != null) 'maximum_loc': maximumLoc,
+    });
+
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
 ${analysisOptionsContent(rules: [rule.name])}
-$customOptions''');
+plugins:
+  solid_lints:
+    diagnostics:
+      ${rule.name}: $options''');
   }
 
-  void test_singleClass_noLint() async {
+  // ---------------------------------------------------------------------------
+  // Single & Non-Nominal Declarations
+  // ---------------------------------------------------------------------------
+
+  Future<void> test_does_not_report_on_single_declaration() async {
     await assertNoDiagnostics(r'''
 class Test {}
 ''');
   }
 
-  void test_singleEnum_noLint() async {
+  Future<void> test_does_not_report_on_non_nominal_declarations() async {
     await assertNoDiagnostics(r'''
-enum SingleEnum { a, b }
+typedef JsonMap = Map<String, Object?>;
+
+class Test {}
+
+void topLevelHelper() {}
+
+const timeoutSeconds = 30;
 ''');
   }
 
-  void test_singleMixin_noLint() async {
-    await assertNoDiagnostics(r'''
-mixin SingleMixin {}
+  // ---------------------------------------------------------------------------
+  // File Name Matching & Priority
+  // ---------------------------------------------------------------------------
+
+  Future<void> test_reports_class_when_matching_class_is_not_first() async {
+    await assertAutoDiagnostics('''
+class ${expectLint('Helper')} {}
+
+class Test {}
 ''');
   }
 
-  void test_singleExtension_noLint() async {
-    await assertNoDiagnostics(r'''
-extension SingleExtension on String {}
+  Future<void> test_reports_secondary_when_no_class_matches_file_name() async {
+    await assertAutoDiagnostics('''
+class FirstHelper {}
+
+class ${expectLint('SecondHelper')} {}
 ''');
   }
 
-  void test_multipleClasses_reportsSecondaryClass() async {
+  // ---------------------------------------------------------------------------
+  // Violations Reported by Default
+  // ---------------------------------------------------------------------------
+
+  Future<void> test_reports_secondary_class() async {
     await assertAutoDiagnostics('''
 class Test {}
 
@@ -63,7 +112,27 @@ class ${expectLint('SecondClass')} {}
 ''');
   }
 
-  void test_classAndEnum_reportsEnumByDefault() async {
+  Future<void> test_reports_all_secondary_classes() async {
+    await assertAutoDiagnostics('''
+class Test {}
+
+class ${expectLint('SecondClass')} {}
+
+class ${expectLint('ThirdClass')} {}
+''');
+  }
+
+  Future<void> test_reports_class_type_alias() async {
+    await assertAutoDiagnostics('''
+import 'base.dart';
+
+class Test {}
+
+class ${expectLint('TestAlias')} = Base with Mix;
+''');
+  }
+
+  Future<void> test_reports_enum() async {
     await assertAutoDiagnostics('''
 class Test {}
 
@@ -71,41 +140,7 @@ enum ${expectLint('TestRole')} { admin, user }
 ''');
   }
 
-  void test_classAndEnum_excludeEntity_noLint() async {
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        exclude_entity:
-          - enum
-''');
-
-    await assertNoDiagnostics(r'''
-class Test {}
-
-enum TestRole { admin, user }
-''');
-  }
-
-  void test_classAndEnum_ignoredTypesEnum_noLint() async {
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        ignored_types:
-          - Enum
-''');
-
-    await assertNoDiagnostics(r'''
-class Test {}
-
-enum TestRole { admin, user }
-''');
-  }
-
-  void test_classAndMixin_reportsMixin() async {
+  Future<void> test_reports_mixin() async {
     await assertAutoDiagnostics('''
 class Test {}
 
@@ -113,7 +148,7 @@ mixin ${expectLint('LoggingMixin')} {}
 ''');
   }
 
-  void test_classAndExtension_reportsExtension() async {
+  Future<void> test_reports_extension() async {
     await assertAutoDiagnostics('''
 class Test {}
 
@@ -121,7 +156,7 @@ extension ${expectLint('TestFormatting')} on Test {}
 ''');
   }
 
-  void test_classAndExtensionType_reportsExtensionType() async {
+  Future<void> test_reports_extension_type() async {
     await assertAutoDiagnostics('''
 class Test {}
 
@@ -129,7 +164,7 @@ extension type ${expectLint('TestId')}(int id) {}
 ''');
   }
 
-  void test_classAndUnnamedExtension_reportsExtension() async {
+  Future<void> test_reports_unnamed_extension() async {
     await assertAutoDiagnostics('''
 class Test {}
 
@@ -137,14 +172,30 @@ ${expectLint('extension')} on Test {}
 ''');
   }
 
-  void test_allowPrivate_permitsPrivateDeclarations() async {
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        allow_private: true
+  Future<void> test_reports_private_declaration_by_default() async {
+    await assertAutoDiagnostics('''
+class Test {}
+
+class ${expectLint('_PrivateHelper')} {}
 ''');
+  }
+
+  Future<void> test_reports_state_class_by_default() async {
+    await assertAutoDiagnostics('''
+import 'flutter.dart';
+
+class Test extends StatefulWidget {}
+
+class ${expectLint('_TestState')} extends State<Test> {}
+''');
+  }
+
+  // ---------------------------------------------------------------------------
+  // allow_private Configuration
+  // ---------------------------------------------------------------------------
+
+  Future<void> test_does_not_report_private_declarations_when_allowed() async {
+    _configureRule(allowPrivate: true);
 
     await assertNoDiagnostics(r'''
 class Test {}
@@ -157,49 +208,29 @@ mixin _PrivateMixin {}
 
 extension _PrivateExtension on String {}
 
+// Unnamed extensions are library-private by Dart specification.
 extension on String {}
 ''');
   }
 
-  void test_allowPrivateFalse_reportsPrivateDeclaration() async {
+  Future<void> test_reports_public_class_when_private_allowed() async {
+    _configureRule(allowPrivate: true);
+
     await assertAutoDiagnostics('''
 class Test {}
 
-class ${expectLint('_PrivateHelper')} {}
+class _PrivateHelper {}
+
+class ${expectLint('OtherPublic')} {}
 ''');
   }
 
-  void test_statefulWidgetAndState_reportsByDefault() async {
-    newFile('$testPackageLibPath/flutter.dart', r'''
-abstract class StatefulWidget {}
+  // ---------------------------------------------------------------------------
+  // ignored_types Configuration
+  // ---------------------------------------------------------------------------
 
-abstract class State<T extends StatefulWidget> {}
-''');
-
-    await assertAutoDiagnostics('''
-import 'flutter.dart';
-
-class Test extends StatefulWidget {}
-
-class ${expectLint('_TestState')} extends State<Test> {}
-''');
-  }
-
-  void test_statefulWidgetAndState_ignoredTypesConfigured_noLint() async {
-    newFile('$testPackageLibPath/flutter.dart', r'''
-abstract class StatefulWidget {}
-
-abstract class State<T extends StatefulWidget> {}
-''');
-
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        ignored_types:
-          - State
-''');
+  Future<void> test_does_not_report_on_state_when_type_ignored() async {
+    _configureRule(ignoredTypes: ['State']);
 
     await assertNoDiagnostics(r'''
 import 'flutter.dart';
@@ -210,7 +241,25 @@ class _TestState extends State<Test> {}
 ''');
   }
 
-  void test_sealedClassHierarchy_noLint() async {
+  Future<void> test_reports_unrelated_class_when_type_ignored() async {
+    _configureRule(ignoredTypes: ['State']);
+
+    await assertAutoDiagnostics('''
+import 'flutter.dart';
+
+class Test extends StatefulWidget {}
+
+class _TestState extends State<Test> {}
+
+class ${expectLint('UnrelatedClass')} {}
+''');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Sealed Class Hierarchy
+  // ---------------------------------------------------------------------------
+
+  Future<void> test_does_not_report_on_sealed_class_hierarchy() async {
     await assertNoDiagnostics(r'''
 sealed class Result {}
 
@@ -226,7 +275,28 @@ class Failure extends Result {
 ''');
   }
 
-  void test_sealedClassHierarchyWithUnrelatedClass_reportsUnrelated() async {
+  Future<void> test_does_not_report_on_sealed_class_implements() async {
+    await assertNoDiagnostics(r'''
+sealed class Result {}
+
+class Success implements Result {}
+
+class Failure implements Result {}
+''');
+  }
+
+  Future<void> test_does_not_report_on_sealed_class_enum_implements() async {
+    await assertNoDiagnostics(r'''
+sealed class Status {}
+
+enum ItemStatus implements Status {
+  active,
+  inactive,
+}
+''');
+  }
+
+  Future<void> test_reports_unrelated_class_in_sealed_hierarchy() async {
     await assertAutoDiagnostics('''
 sealed class Result {}
 
@@ -238,21 +308,15 @@ class ${expectLint('OtherClass')} {}
 ''');
   }
 
-  void test_maximumLoc_permitsSmallDeclarations() async {
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        maximum_loc: 4
-''');
+  // ---------------------------------------------------------------------------
+  // maximum_loc Configuration
+  // ---------------------------------------------------------------------------
+
+  Future<void> test_does_not_report_when_loc_equals_maximum() async {
+    _configureRule(maximumLoc: 3);
 
     await assertNoDiagnostics(r'''
-class Test {
-  void doSomething() {
-    print('main');
-  }
-}
+class Test {}
 
 class SmallHelper {
   void run() {}
@@ -260,14 +324,23 @@ class SmallHelper {
 ''');
   }
 
-  void test_maximumLoc_reportsExceedingDeclarations() async {
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        maximum_loc: 3
+  Future<void> test_does_not_report_on_loc_with_comments_and_blanks() async {
+    _configureRule(maximumLoc: 3);
+
+    await assertNoDiagnostics(r'''
+class Test {}
+
+// Comment before helper class
+class SmallHelper {
+  // Method comment
+
+  void run() {}
+}
 ''');
+  }
+
+  Future<void> test_reports_when_loc_exceeds_maximum() async {
+    _configureRule(maximumLoc: 3);
 
     await assertAutoDiagnostics('''
 class Test {}
@@ -280,72 +353,37 @@ class ${expectLint('LargeHelper')} {
 ''');
   }
 
-  void test_typedefAndFunctions_areNotCountedAsViolations() async {
-    await assertNoDiagnostics(r'''
-typedef JsonMap = Map<String, Object?>;
+  // ---------------------------------------------------------------------------
+  // exclude_entity Configuration
+  // ---------------------------------------------------------------------------
 
-class Test {}
-
-void topLevelHelper() {}
-
-const timeoutSeconds = 30;
-''');
-  }
-
-  void test_excludeEntity_ignoresSpecifiedEntities() async {
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        exclude_entity:
-          - mixin
-          - extension
-''');
+  Future<void> test_does_not_report_on_excluded_entities() async {
+    _configureRule(
+      excludeEntity: ['enum', 'mixin', 'extension', 'extension_type'],
+    );
 
     await assertNoDiagnostics(r'''
 class Test {}
 
-mixin ServiceHelper {}
+enum TestRole { admin, user }
 
-extension ServiceExt on Test {}
-''');
-  }
+mixin LoggingMixin {}
 
-  void test_classAndExtensionType_excludeEntity_noLint() async {
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        exclude_entity:
-          - extension_type
-''');
-
-    await assertNoDiagnostics(r'''
-class Test {}
+extension TestFormatting on Test {}
 
 extension type TestId(int id) {}
 ''');
   }
 
-  void test_excludeEntity_extensionTypeAndEnum_noLint() async {
-    _configureOptions('''
-plugins:
-  solid_lints:
-    diagnostics:
-      avoid_multiple_declarations_per_file:
-        exclude_entity:
-          - extension_type
-          - enum
-''');
+  Future<void> test_reports_unrelated_class_when_entity_excluded() async {
+    _configureRule(excludeEntity: ['enum']);
 
-    await assertNoDiagnostics(r'''
+    await assertAutoDiagnostics('''
 class Test {}
-
-extension type TestId(int id) {}
 
 enum TestStatus { active, inactive }
+
+class ${expectLint('OtherClass')} {}
 ''');
   }
 }
