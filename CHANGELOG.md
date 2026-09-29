@@ -2,7 +2,7 @@
 
 - BREAKING CHANGE: Updated rules in `analysis_options.yaml`. Existing
   projects may see new static analysis issues after upgrading:
-  - Added 16 standard linter rules:
+  - Added 15 standard linter rules:
     - `avoid_catches_without_on_clauses`
     - `avoid_returning_this`
     - `avoid_types_on_closure_parameters`
@@ -11,7 +11,6 @@
     - `document_ignores`
     - `no_literal_bool_comparisons`
     - `no_wildcard_variable_uses`
-    - `unnecessary_const_in_enum_constructor`
     - `unnecessary_ignore`
     - `unnecessary_late`
     - `unnecessary_unawaited`
