@@ -414,34 +414,24 @@ extension CompilationUnitMemberExtension on CompilationUnitMember {
   /// otherwise.
   DartType? get declaredType => declaredFragment?.element.interfaceType;
 
-  /// Returns all explicitly declared supertypes on this member.
-  Iterable<NamedType> get explicitSupertypes => switch (this) {
-    ClassDeclaration(
-      :final extendsClause,
-      :final implementsClause,
-      :final withClause,
-    ) =>
-      [
-        if (extendsClause != null) extendsClause.superclass,
-        if (implementsClause != null) ...implementsClause.interfaces,
-        if (withClause != null) ...withClause.mixinTypes,
-      ],
-    EnumDeclaration(:final implementsClause?) ||
-    MixinDeclaration(:final implementsClause?) => implementsClause.interfaces,
-    _ => const [],
-  };
-
-  /// Returns the names of all explicitly referenced supertypes.
-  Iterable<String> get supertypeNames =>
-      explicitSupertypes.map((t) => t.name.lexeme);
+  /// Returns the elements of all supertypes of this declaration.
+  Iterable<InterfaceElement> get allSupertypeElements =>
+      switch (declaredFragment?.element) {
+        InterfaceElement(:final allSupertypes) => allSupertypes.map(
+          (s) => s.element,
+        ),
+        _ => const [],
+      };
 }
 
 /// Extension on [CompilationUnit] to provide declaration queries.
 extension CompilationUnitExtension on CompilationUnit {
-  /// Returns the names of all sealed classes declared in this compilation unit.
-  Set<String> get sealedClassNames => declarations
+  /// Returns the elements of all sealed classes declared in this compilation
+  /// unit.
+  Set<InterfaceElement> get sealedClassElements => declarations
       .whereType<ClassDeclaration>()
       .where((c) => c.sealedKeyword != null)
-      .map((c) => c.displayName)
+      .map((c) => c.declaredFragment?.element)
+      .nonNulls
       .toSet();
 }

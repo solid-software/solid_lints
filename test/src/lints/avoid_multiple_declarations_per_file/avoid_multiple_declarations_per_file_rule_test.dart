@@ -308,6 +308,31 @@ class ${expectLint('OtherClass')} {}
 ''');
   }
 
+  Future<void>
+  test_reports_class_extending_external_with_same_name_as_sealed() async {
+    newFile('$testPackageLibPath/other.dart', r'''
+class Result {}
+''');
+
+    await assertAutoDiagnostics('''
+import 'other.dart' as other;
+
+sealed class Result {}
+
+class ${expectLint('Helper')} extends other.Result {}
+''');
+  }
+
+  Future<void> test_does_not_report_on_transitive_sealed_subclass() async {
+    await assertNoDiagnostics(r'''
+sealed class Result {}
+
+class Success extends Result {}
+
+class SpecialSuccess extends Success {}
+''');
+  }
+
   // ---------------------------------------------------------------------------
   // maximum_loc Configuration
   // ---------------------------------------------------------------------------

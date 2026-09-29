@@ -1,5 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/source/line_info.dart';
 import 'package:collection/collection.dart';
 import 'package:solid_lints/src/lints/avoid_multiple_declarations_per_file/avoid_multiple_declarations_per_file_rule.dart';
@@ -39,7 +40,7 @@ class AvoidMultipleDeclarationsPerFileVisitor extends SimpleAstVisitor<void> {
     final violations = declarations
         .where((c) => c != primary)
         .whereNot((c) => parameters.allowPrivate && c.isPrivate)
-        .whereNot((c) => _isSubclassOfSealed(c, node.sealedClassNames))
+        .whereNot((c) => _isSubclassOfSealed(c, node.sealedClassElements))
         .whereNot((c) => _isUnderMaxLoc(c, node.lineInfo));
 
     for (final violation in violations) {
@@ -67,8 +68,8 @@ class AvoidMultipleDeclarationsPerFileVisitor extends SimpleAstVisitor<void> {
 
   bool _isSubclassOfSealed(
     CompilationUnitMember candidate,
-    Set<String> sealedNames,
-  ) => candidate.supertypeNames.any(sealedNames.contains);
+    Set<InterfaceElement> sealedElements,
+  ) => candidate.allSupertypeElements.any(sealedElements.contains);
 
   bool _isUnderMaxLoc(CompilationUnitMember node, LineInfo lineInfo) {
     final maxLoc = parameters.maximumLoc ?? 0;
