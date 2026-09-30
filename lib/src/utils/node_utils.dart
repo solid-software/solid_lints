@@ -164,9 +164,17 @@ extension AstNodeExtension on AstNode {
     return null;
   }
 
+  /// Returns the first token of actual code or metadata, skipping
+  /// documentation comments.
+  Token get firstCodeToken => switch (this) {
+    final AnnotatedNode n =>
+      n.metadata.firstOrNull?.beginToken ?? n.firstTokenAfterCommentAndMetadata,
+    _ => beginToken,
+  };
+
   /// Returns the number of lines of code in this node, ignoring synthetic
   /// tokens and blank/comment-only lines.
-  int calculateLoc(LineInfo lineInfo) => beginToken
+  int calculateLoc(LineInfo lineInfo) => firstCodeToken
       .upTo(endToken)
       .whereNot((t) => t.isSynthetic)
       .map((t) => lineInfo.getLocation(t.offset).lineNumber)

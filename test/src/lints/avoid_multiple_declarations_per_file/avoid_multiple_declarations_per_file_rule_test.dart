@@ -378,6 +378,52 @@ class ${expectLint('LargeHelper')} {
 ''');
   }
 
+  Future<void> test_reports_when_loc_exceeds_maximum_with_doc_comments() async {
+    _configureRule(maximumLoc: 3);
+
+    await assertAutoDiagnostics('''
+class Test {}
+
+/// Documentation comment
+/// across multiple lines
+class ${expectLint('LargeHelper')} {
+  void lineOne() {}
+  void lineTwo() {}
+  void lineThree() {}
+}
+''');
+  }
+
+  Future<void> test_does_not_report_on_loc_with_doc_comments() async {
+    _configureRule(maximumLoc: 3);
+
+    await assertNoDiagnostics(r'''
+class Test {}
+
+/// Documentation comment
+/// across multiple lines
+class SmallHelper {
+  void run() {}
+}
+''');
+  }
+
+  Future<void> test_reports_when_loc_exceeds_maximum_with_metadata() async {
+    _configureRule(maximumLoc: 3);
+
+    await assertAutoDiagnostics('''
+class Test {}
+
+/// Documentation comment
+@deprecated
+class ${expectLint('LargeHelper')} {
+  void lineOne() {}
+  void lineTwo() {}
+  void lineThree() {}
+}
+''');
+  }
+
   // ---------------------------------------------------------------------------
   // exclude_entity Configuration
   // ---------------------------------------------------------------------------
