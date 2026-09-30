@@ -7,7 +7,7 @@ extension FileUtils on File {
   String? tryReadAsStringSync() {
     try {
       return readAsStringSync();
-    } catch (_) {
+    } on Object catch (_) {
       return null;
     }
   }

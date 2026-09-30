@@ -141,7 +141,8 @@ class NoMagicNumberRule extends SolidLintRule<NoMagicNumberParameters> {
 
     final visitor = NoMagicNumberRuleVisitor(this, parameters);
 
-    registry.addDoubleLiteral(this, visitor);
-    registry.addIntegerLiteral(this, visitor);
+    registry
+      ..addDoubleLiteral(this, visitor)
+      ..addIntegerLiteral(this, visitor);
   }
 }

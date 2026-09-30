@@ -58,12 +58,12 @@ class AvoidFinalWithGetterFix extends ResolvedCorrectionProducer {
           : variableName;
 
       await builder.addDartFileEdit(file, (builder) {
-        builder.addDeletion(getterNode.sourceRange);
-
-        builder.addSimpleReplacement(
-          variableDeclaration.name.sourceRange,
-          newPublicVariableName,
-        );
+        builder
+          ..addDeletion(getterNode.sourceRange)
+          ..addSimpleReplacement(
+            variableDeclaration.name.sourceRange,
+            newPublicVariableName,
+          );
 
         for (final reference in variableReferences) {
           if (reference.sourceRange.intersects(getterNode.sourceRange)) {

@@ -43,13 +43,14 @@ class MarkdownFormatter implements RulesDocumentationFormatter<String> {
       formattedString.writeln('### Parameters');
 
       for (final parameter in rule.parameters) {
-        formattedString.writeln(
-          const HtmlEscape().convert(
-            '${parametersAsList ? '-' : '####'} **${parameter.name}**'
-            ' (_${parameter.type}_)  ',
-          ),
-        );
-        formattedString.writeln('  ${ParserUtils.escapeMdx(parameter.doc)}');
+        formattedString
+          ..writeln(
+            const HtmlEscape().convert(
+              '${parametersAsList ? '-' : '####'} **${parameter.name}**'
+              ' (_${parameter.type}_)  ',
+            ),
+          )
+          ..writeln('  ${ParserUtils.escapeMdx(parameter.doc)}');
       }
     }
 

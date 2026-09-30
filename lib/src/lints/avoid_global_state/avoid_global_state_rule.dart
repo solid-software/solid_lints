@@ -63,7 +63,8 @@ class AvoidGlobalStateRule extends AnalysisRule {
   ) {
     final visitor = AvoidGlobalStateVisitor(this);
 
-    registry.addTopLevelVariableDeclaration(this, visitor);
-    registry.addFieldDeclaration(this, visitor);
+    registry
+      ..addTopLevelVariableDeclaration(this, visitor)
+      ..addFieldDeclaration(this, visitor);
   }
 }

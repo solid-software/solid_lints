@@ -12,7 +12,7 @@ dart pub add dev:solid_lints
 Or manually in `pubspec.yaml`:
 ```yaml
 dev_dependencies:
-  solid_lints: ^1.0.0 # Replace with latest version
+  solid_lints: ^1.1.0 # Replace with latest version
 ```
 
 Enable the plugin in `analysis_options.yaml`:
@@ -20,7 +20,7 @@ Enable the plugin in `analysis_options.yaml`:
 include: package:solid_lints/analysis_options.yaml
 
 plugins:
-  solid_lints: ^1.0.0 # Replace with latest version
+  solid_lints: ^1.1.0 # Replace with latest version
 ```
 
 ## Documentation
