@@ -2,7 +2,10 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/source/line_info.dart';
+import 'package:collection/collection.dart';
 import 'package:solid_lints/src/utils/path_utils.dart';
+import 'package:solid_lints/src/utils/token_utils.dart';
 
 /// Check node is override method from its metadata
 bool isOverride(List<Annotation> metadata) => metadata.any(
@@ -160,6 +163,23 @@ extension AstNodeExtension on AstNode {
     }
     return null;
   }
+
+  /// Returns the first token of actual code or metadata, skipping
+  /// documentation comments.
+  Token get firstCodeToken => switch (this) {
+    final AnnotatedNode n =>
+      n.metadata.firstOrNull?.beginToken ?? n.firstTokenAfterCommentAndMetadata,
+    _ => beginToken,
+  };
+
+  /// Returns the number of lines of code in this node, ignoring synthetic
+  /// tokens and blank/comment-only lines.
+  int calculateLoc(LineInfo lineInfo) => firstCodeToken
+      .upTo(endToken)
+      .whereNot((t) => t.isSynthetic)
+      .map((t) => lineInfo.getLocation(t.offset).lineNumber)
+      .toSet()
+      .length;
 }
 
 /// Extension on [NamedType] to provide source URL utility.
@@ -225,6 +245,13 @@ extension ElementExtension on Element {
   /// or null if none.
   InterfaceElement? get enclosingInterface =>
       enclosingElements.whereType<InterfaceElement>().firstOrNull;
+
+  /// Returns the [InterfaceType] if this element is an [InterfaceElement],
+  /// or null otherwise.
+  InterfaceType? get interfaceType => switch (this) {
+    InterfaceElement(:final thisType) => thisType,
+    _ => null,
+  };
 
   /// Returns an iterable of this element and all its enclosing elements.
   Iterable<Element> get enclosingElements sync* {
@@ -362,4 +389,57 @@ extension DeclarationExtension on Declaration {
       declaredFragment.element.returnType,
     _ => null,
   };
+}
+
+/// Extension on [CompilationUnitMember] to provide declaration metadata.
+extension CompilationUnitMemberExtension on CompilationUnitMember {
+  /// Returns `true` if this member is a nominal type declaration (class, enum,
+  /// mixin, extension, extension type, or class type alias).
+  bool get isNominalDeclaration => declarationToken != null;
+
+  /// Returns the primary identifier token of this declaration, or `null` if
+  /// not a nominal declaration.
+  Token? get declarationToken => switch (this) {
+    ClassDeclaration(:final namePart) ||
+    EnumDeclaration(:final namePart) ||
+    ExtensionTypeDeclaration(:final namePart) => namePart.typeName,
+    ClassTypeAlias(:final name) || MixinDeclaration(:final name) => name,
+    ExtensionDeclaration(:final name, :final extensionKeyword) =>
+      name ?? extensionKeyword,
+    _ => null,
+  };
+
+  /// Returns the human-readable display name of this declaration.
+  String get displayName =>
+      declaredFragment?.element.name ?? 'unnamed extension';
+
+  /// Returns `true` if this declaration has a private name or is an unnamed
+  /// extension (which is library-private).
+  bool get isPrivate => declaredFragment?.element.isPrivate ?? false;
+
+  /// Returns the declared [DartType] of this member if it declares an
+  /// interface type (class, enum, mixin, or extension type), or `null`
+  /// otherwise.
+  DartType? get declaredType => declaredFragment?.element.interfaceType;
+
+  /// Returns the elements of all supertypes of this declaration.
+  Iterable<InterfaceElement> get allSupertypeElements =>
+      switch (declaredFragment?.element) {
+        InterfaceElement(:final allSupertypes) => allSupertypes.map(
+          (s) => s.element,
+        ),
+        _ => const [],
+      };
+}
+
+/// Extension on [CompilationUnit] to provide declaration queries.
+extension CompilationUnitExtension on CompilationUnit {
+  /// Returns the elements of all sealed classes declared in this compilation
+  /// unit.
+  Set<InterfaceElement> get sealedClassElements => declarations
+      .whereType<ClassDeclaration>()
+      .where((c) => c.sealedKeyword != null)
+      .map((c) => c.declaredFragment?.element)
+      .nonNulls
+      .toSet();
 }

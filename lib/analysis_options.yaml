@@ -46,6 +46,9 @@ solid_lints:
       allow_initialized: true
       ignored_types:
         - AnimationController
+    avoid_multiple_declarations_per_file:
+      ignored_types:
+        - State
     avoid_non_null_assertion: true
     avoid_returning_widgets: true
     avoid_similar_names: true
