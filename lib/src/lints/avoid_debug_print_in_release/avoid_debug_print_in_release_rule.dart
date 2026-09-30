@@ -54,7 +54,8 @@ class AvoidDebugPrintInReleaseRule extends AnalysisRule {
     RuleContext context,
   ) {
     final visitor = AvoidDebugPrintInReleaseVisitor(this);
-    registry.addMethodInvocation(this, visitor);
-    registry.addSimpleIdentifier(this, visitor);
+    registry
+      ..addMethodInvocation(this, visitor)
+      ..addSimpleIdentifier(this, visitor);
   }
 }

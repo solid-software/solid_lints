@@ -64,7 +64,7 @@ class AnalysisOptionsParser {
       final parsed = loadYaml(optionsString);
       if (parsed is! Map) return null;
       return _toStandardMap(parsed);
-    } catch (_) {
+    } on Object catch (_) {
       return null;
     }
   }

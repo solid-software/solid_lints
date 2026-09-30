@@ -11,7 +11,7 @@ NamedType parseNamedTypeFromString(String typeString) {
     parseResult.unit.visitChildren(namedTypeFinder);
 
     return namedTypeFinder.foundNamedType!;
-  } catch (_) {
+  } on Object catch (_) {
     throw FormatException(
       "No NamedType could be parsed from the input "
       "typeString: '$typeString'. Ensure it's a valid Dart "

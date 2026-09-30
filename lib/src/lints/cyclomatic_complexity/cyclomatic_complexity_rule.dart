@@ -59,8 +59,9 @@ class CyclomaticComplexityRule
 
     final visitor = CyclomaticComplexityVisitor(this, parameters);
 
-    registry.addFunctionDeclaration(this, visitor);
-    registry.addConstructorDeclaration(this, visitor);
-    registry.addMethodDeclaration(this, visitor);
+    registry
+      ..addFunctionDeclaration(this, visitor)
+      ..addConstructorDeclaration(this, visitor)
+      ..addMethodDeclaration(this, visitor);
   }
 }

@@ -72,7 +72,8 @@ class NumberOfParametersRule
 
     final visitor = NumberOfParametersVisitor(this, parameters);
 
-    registry.addFunctionDeclaration(this, visitor);
-    registry.addMethodDeclaration(this, visitor);
+    registry
+      ..addFunctionDeclaration(this, visitor)
+      ..addMethodDeclaration(this, visitor);
   }
 }
