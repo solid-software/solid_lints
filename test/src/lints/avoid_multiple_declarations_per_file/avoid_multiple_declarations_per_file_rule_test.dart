@@ -44,10 +44,10 @@ abstract class State<T extends StatefulWidget> {}
     int? maximumLoc,
   }) {
     final options = jsonEncode({
-      if (ignoredTypes != null) 'ignored_types': ignoredTypes,
-      if (excludeEntity != null) 'exclude_entity': excludeEntity,
-      if (allowPrivate != null) 'allow_private': allowPrivate,
-      if (maximumLoc != null) 'maximum_loc': maximumLoc,
+      'ignored_types': ?ignoredTypes,
+      'exclude_entity': ?excludeEntity,
+      'allow_private': ?allowPrivate,
+      'maximum_loc': ?maximumLoc,
     });
 
     newAnalysisOptionsYamlFile(testPackageRootPath, '''
