@@ -79,6 +79,7 @@ const config = {
           // Please change this to your repo.
           editUrl: 'https://github.com/solid-software/solid_lints/tree/master/doc/docusaurus',
         },
+        blog: false,
         googleTagManager: {
           containerId: 'GTM-N84NG6SJ',
         },
