@@ -3,6 +3,7 @@
   "position": 2,
   "link": {
     "type": "generated-index",
+    "slug": "/custom_lints",
     "description": "Custom lint rules provided by solid_lints."
   }
 }
