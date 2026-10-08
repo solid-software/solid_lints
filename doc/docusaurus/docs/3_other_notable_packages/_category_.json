@@ -3,6 +3,7 @@
   "position": 3,
   "link": {
     "type": "generated-index",
+    "slug": "/other_notable_packages",
     "title": "Other Notable Packages",
     "description": "Recommended Dart and Flutter packages that complement solid_lints for dead code detection, cognitive complexity, and architectural quality.",
     "keywords": [

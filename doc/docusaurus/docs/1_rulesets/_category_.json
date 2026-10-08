@@ -3,6 +3,7 @@
   "position": 1,
   "link": {
     "type": "generated-index",
+    "slug": "/rulesets",
     "description": "Pre-configured rule sets for applications and tests."
   }
 }
