@@ -1,4 +1,4 @@
-## 1.1.0
+## 2.0.0
 
 - BREAKING CHANGE: Updated rules in `analysis_options.yaml`. Existing
   projects may see new static analysis issues after upgrading:
