@@ -23,6 +23,7 @@ import 'package:solid_lints/src/lints/double_literal_format/double_literal_forma
 import 'package:solid_lints/src/lints/feature_envy/feature_envy_rule.dart';
 import 'package:solid_lints/src/lints/function_lines_of_code/function_lines_of_code_rule.dart';
 import 'package:solid_lints/src/lints/member_ordering/member_ordering_rule.dart';
+import 'package:solid_lints/src/lints/mirror_test_structure/mirror_test_structure_rule.dart';
 import 'package:solid_lints/src/lints/named_parameters_ordering/named_parameters_ordering_rule.dart';
 import 'package:solid_lints/src/lints/newline_before_return/newline_before_return_rule.dart';
 import 'package:solid_lints/src/lints/no_empty_block/no_empty_block_rule.dart';
@@ -34,7 +35,6 @@ import 'package:solid_lints/src/lints/prefer_early_return/prefer_early_return_ru
 import 'package:solid_lints/src/lints/prefer_first/prefer_first_rule.dart';
 import 'package:solid_lints/src/lints/prefer_last/prefer_last_rule.dart';
 import 'package:solid_lints/src/lints/prefer_match_file_name/prefer_match_file_name_rule.dart';
-import 'package:solid_lints/src/lints/prefer_mirror_test_structure/prefer_mirror_test_structure_rule.dart';
 import 'package:solid_lints/src/lints/proper_super_calls/proper_super_calls_rule.dart';
 import 'package:solid_lints/src/lints/use_descriptive_names_for_type_parameters/use_descriptive_names_for_type_parameters_rule.dart';
 import 'package:solid_lints/src/lints/use_nearest_context/use_nearest_context_rule.dart';
@@ -83,6 +83,7 @@ class SolidLintsPlugin extends Plugin {
       FeatureEnvyRule(analysisOptionsLoader: analysisLoader),
       FunctionLinesOfCodeRule(analysisOptionsLoader: analysisLoader),
       MemberOrderingRule(analysisOptionsLoader: analysisLoader),
+      MirrorTestStructureRule(),
       NamedParametersOrderingRule(analysisOptionsLoader: analysisLoader),
       NewlineBeforeReturnRule(),
       NoEmptyBlockRule(analysisOptionsLoader: analysisLoader),
@@ -94,7 +95,6 @@ class SolidLintsPlugin extends Plugin {
       PreferFirstRule(),
       PreferLastRule(),
       PreferMatchFileNameRule(analysisOptionsLoader: analysisLoader),
-      PreferMirrorTestStructureRule(),
       ProperSuperCallsRule(),
       UseDescriptiveNamesForTypeParametersRule(
         analysisOptionsLoader: analysisLoader,

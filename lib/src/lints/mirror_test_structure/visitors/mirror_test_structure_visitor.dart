@@ -3,24 +3,24 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:path/path.dart' as p;
-import 'package:solid_lints/src/lints/prefer_mirror_test_structure/prefer_mirror_test_structure_rule.dart';
+import 'package:solid_lints/src/lints/mirror_test_structure/mirror_test_structure_rule.dart';
 
 /// The AST visitor that checks if test files mirror the folder structure of
 /// their corresponding implementation files.
-class PreferMirrorTestStructureVisitor extends SimpleAstVisitor<void> {
+class MirrorTestStructureVisitor extends SimpleAstVisitor<void> {
   static const _testSuffix = '_test.dart';
   static const _dartSuffix = '.dart';
   static const _testDirName = 'test';
   static const _libDirName = 'lib';
 
   /// The rule that instantiated this visitor.
-  final PreferMirrorTestStructureRule rule;
+  final MirrorTestStructureRule rule;
 
   /// The context of the current analysis rule.
   final RuleContext context;
 
-  /// Creates a new instance of [PreferMirrorTestStructureVisitor].
-  PreferMirrorTestStructureVisitor({
+  /// Creates a new instance of [MirrorTestStructureVisitor].
+  MirrorTestStructureVisitor({
     required this.rule,
     required this.context,
   });
