@@ -1,6 +1,7 @@
-## 2.0.1
+## 3.0.0
 
-- Renamed `prefer_mirror_test_structure` rule to `mirror_test_structure`.
+- BREAKING CHANGE: Renamed `prefer_mirror_test_structure` rule to
+  `mirror_test_structure`.
 
 ## 2.0.0
 
