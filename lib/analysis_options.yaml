@@ -92,6 +92,7 @@ solid_lints:
         - deactivate_method
         - dispose_method
 
+    mirror_test_structure: true
     newline_before_return: true
     no_empty_block: true
     no_equal_then_else: true
@@ -113,7 +114,6 @@ solid_lints:
     prefer_first: true
     prefer_last: true
     prefer_match_file_name: true
-    prefer_mirror_test_structure: true
     proper_super_calls: true
     named_parameters_ordering: true
     use_nearest_context: true

@@ -1,17 +1,17 @@
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/src/diagnostic/diagnostic.dart' as diag;
 import 'package:analyzer_testing/analysis_rule/analysis_rule.dart';
-import 'package:solid_lints/src/lints/prefer_mirror_test_structure/prefer_mirror_test_structure_rule.dart';
+import 'package:solid_lints/src/lints/mirror_test_structure/mirror_test_structure_rule.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 void main() {
   defineReflectiveSuite(() {
-    defineReflectiveTests(PreferMirrorTestStructureRuleTest);
+    defineReflectiveTests(MirrorTestStructureRuleTest);
   });
 }
 
 @reflectiveTest
-class PreferMirrorTestStructureRuleTest extends AnalysisRuleTest {
+class MirrorTestStructureRuleTest extends AnalysisRuleTest {
   static const _stubContent = 'class AuthService {}';
 
   @override
@@ -22,7 +22,7 @@ class PreferMirrorTestStructureRuleTest extends AnalysisRuleTest {
 
   @override
   void setUp() {
-    rule = PreferMirrorTestStructureRule();
+    rule = MirrorTestStructureRule();
     newPackage('other_package')
       ..addFile('lib/services/auth_service.dart', _stubContent);
     _newLibFile('services/auth_service.dart');

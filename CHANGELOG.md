@@ -1,3 +1,8 @@
+## 3.0.0
+
+- BREAKING CHANGE: Renamed `prefer_mirror_test_structure` rule to
+  `mirror_test_structure`.
+
 ## 2.0.0
 
 - BREAKING CHANGE: Updated rules in `analysis_options.yaml`. Existing

@@ -1,7 +1,7 @@
 import 'package:analyzer/analysis_rule/rule_context.dart';
 import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/error/error.dart';
-import 'package:solid_lints/src/lints/prefer_mirror_test_structure/visitors/prefer_mirror_test_structure_visitor.dart';
+import 'package:solid_lints/src/lints/mirror_test_structure/visitors/mirror_test_structure_visitor.dart';
 import 'package:solid_lints/src/models/solid_lint_rule.dart';
 
 /// Warns when the test file folder structure does not mirror the 'lib/' folder
@@ -33,9 +33,9 @@ import 'package:solid_lints/src/models/solid_lint_rule.dart';
 /// import 'package:my_app/src/services/auth_service.dart'; // OK
 /// ```
 ///
-class PreferMirrorTestStructureRule extends SolidLintRule<void> {
+class MirrorTestStructureRule extends SolidLintRule<void> {
   /// Name of the lint.
-  static const lintName = 'prefer_mirror_test_structure';
+  static const lintName = 'mirror_test_structure';
 
   static const _code = LintCode(
     lintName,
@@ -44,8 +44,8 @@ class PreferMirrorTestStructureRule extends SolidLintRule<void> {
     correctionMessage: "Move the test file to '{0}'.",
   );
 
-  /// Creates an instance of [PreferMirrorTestStructureRule].
-  PreferMirrorTestStructureRule()
+  /// Creates an instance of [MirrorTestStructureRule].
+  MirrorTestStructureRule()
     : super(
         name: lintName,
         description:
@@ -63,7 +63,7 @@ class PreferMirrorTestStructureRule extends SolidLintRule<void> {
   ) {
     super.registerNodeProcessors(registry, context);
 
-    final visitor = PreferMirrorTestStructureVisitor(
+    final visitor = MirrorTestStructureVisitor(
       rule: this,
       context: context,
     );
